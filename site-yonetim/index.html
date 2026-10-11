@@ -81,6 +81,15 @@ p{margin:4px 0 0}
 .directory-intro code{color:#d0e6f7;word-break:break-word}
 .person-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
 .person-actions button{padding:7px 8px;font-size:11px}
+.person-actions .delete-person-button{color:#ffcecb;border-color:#85555b;background:#452b35}
+.person-actions .delete-person-button:hover{background:#65363e;border-color:#d2848c}
+.delete-confirm-dialog{width:min(455px,calc(100vw - 24px));max-height:88vh;overflow:auto;background:#15293c;color:var(--text);border:1px solid #765459;border-radius:14px;padding:25px;box-shadow:0 15px 65px #0009}
+.delete-confirm-dialog h2{font-size:21px;margin:0 0 10px}
+.delete-confirm-dialog p{margin:10px 0;line-height:1.6}
+.delete-confirm-dialog .delete-secondary{color:var(--muted);font-size:12px}
+.delete-confirm-dialog .delete-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:9px;margin-top:20px}
+.delete-danger{background:#a33842;border-color:#d66571;color:#fff}
+.delete-danger:hover{background:#c24650;border-color:#ed8991}
 .invite-status{display:block;margin-top:6px;font-size:11px;color:var(--teal);font-weight:700}
 .mode-picker{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px;margin-bottom:8px}
 .mode-picker button{flex:1 1 140px}
@@ -193,6 +202,16 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
     <div id="personMessage" role="status" class="status"></div>
   </form>
 </dialog>
+<dialog id="deletePersonDialog" class="delete-confirm-dialog" aria-labelledby="deletePersonTitle" aria-describedby="deletePersonText">
+  <h2 id="deletePersonTitle">Bu kişiyi silmek istediğinize emin misiniz?</h2>
+  <p id="deletePersonText"></p>
+  <p id="deletePersonDetails" class="delete-secondary"></p>
+  <p id="deletePersonStatus" class="status" role="status"></p>
+  <div class="delete-actions">
+    <button id="cancelPersonDelete" type="button">Vazgeç</button>
+    <button id="confirmPersonDelete" type="button" class="delete-danger">Evet, Sil</button>
+  </div>
+</dialog>
 <footer class="footer">Site Yönetim · Aya Park 2 — Pilot sürüm. Bu sayfada henüz sakin isimleri ve ödeme tutarları bulunmaz. Önceki aidat ve borç takip sayfası bağımsız çalışmaya devam eder.</footer>
 </main>
 <script>
@@ -202,7 +221,7 @@ const CONFIG={url:'https://eisozwhhinqszfikemot.supabase.co',publishableKey:'sb_
 const SESSION_KEY='site-yonetim:aya-park-2:auth-v1';
 const el=id=>document.getElementById(id);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',rememberSession:false,saving:new Set(),people:[],unitPeople:[],residentLinks:[],inviteBusy:new Set(),selectedUnitId:null,editingLinkId:null,personMode:'new',contactBusy:false};
+const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',rememberSession:false,saving:new Set(),people:[],unitPeople:[],residentLinks:[],inviteBusy:new Set(),selectedUnitId:null,editingLinkId:null,deletingLinkId:null,deleteBusy:false,personMode:'new',contactBusy:false};
 let refreshPromise=null;
 function readSavedRefresh(){
  try{
@@ -329,7 +348,8 @@ async function loadPeople(){
 function relationLabel(x){return {owner:'Kat Maliki',tenant:'Kiracı'}[x]||'Önceki ilişki';}
 
 function clearSession(){
- state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.rememberSession=false;state.people=[];state.unitPeople=[];state.residentLinks=[];state.inviteBusy.clear();state.selectedUnitId=null;state.editingLinkId=null;state.personMode='new';state.contactBusy=false;state.saving.clear();
+ state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.rememberSession=false;state.people=[];state.unitPeople=[];state.residentLinks=[];state.inviteBusy.clear();state.selectedUnitId=null;state.editingLinkId=null;state.deletingLinkId=null;state.deleteBusy=false;state.personMode='new';state.contactBusy=false;state.saving.clear();
+ el('deletePersonDialog').close();
  el('personDialog').close();
  el('userBadge').textContent='';el('loginPanel').classList.remove('hidden');el('app').classList.add('hidden');el('logout').classList.add('hidden');
 }
@@ -443,6 +463,7 @@ function renderPersonList(){
    const details=[person.phone,person.email].filter(Boolean).map(esc).join(' · ');
    const inactive=link.is_current?'':' <span class="archived">(Pasif)</span>';
    const edit=canEdit()?'<button type="button" data-edit-person="'+esc(link.id)+'">Düzenle</button>':'';
+   const remove=canEdit()?'<button type="button" class="delete-person-button" data-delete-person="'+esc(link.id)+'" '+(state.deleteBusy||state.inviteBusy.has(link.id)?'disabled':'')+' aria-label="'+esc(person.full_name)+' kişisini bu daireden sil">Sil</button>':'';
    const hasAccess=state.residentLinks.some(r=>r.unit_id===link.unit_id&&r.person_id===person.id&&r.active);
    const invite=canEdit()&&link.is_current&&!hasAccess?'<button type="button" data-invite-person="'+esc(link.id)+'" '+(state.inviteBusy.has(link.id)||!person.email?'disabled':'')+' title="'+(!person.email?'Önce e-posta adresi ekleyin.':'Bu kişiye e-posta daveti gönder')+'">✉ Davet Gönder</button>':'';
    const status=hasAccess?'<span class="invite-status">✓ Portal erişimi tanımlı</span>':'';
@@ -450,7 +471,7 @@ function renderPersonList(){
      '<div class="person-name">'+esc(person.full_name)+'</div>'+
      (details?'<div class="person-sub">'+details+'</div>':'')+
      (person.admin_note?'<div class="person-sub">Not: '+esc(person.admin_note)+'</div>':'')+
-     status+'</div><div class="person-actions">'+edit+invite+'</div></div>';
+     status+'</div><div class="person-actions">'+edit+invite+remove+'</div></div>';
  }).join(''):'<div class="dialog-empty">Bu daireye henüz kişi eklenmedi.</div>';
 }
 function openPeople(unitId){
@@ -536,11 +557,67 @@ async function invitePerson(linkId){
  }catch(error){setPersonMessage('Davet hatası: '+error.message,true);}
  finally{state.inviteBusy.delete(linkId);renderPersonList();}
 }
+function prepareDeletePerson(linkId){
+ if(!canEdit()||state.contactBusy||state.deleteBusy||state.inviteBusy.has(linkId))return;
+ const link=state.unitPeople.find(l=>l.id===linkId&&l.unit_id===state.selectedUnitId);
+ const person=link&&state.people.find(p=>p.id===link.person_id);
+ const unit=link&&state.units.find(u=>u.id===link.unit_id);
+ if(!link||!person||!unit)return;
+ const others=state.unitPeople.filter(l=>l.person_id===person.id&&l.id!==link.id);
+ const hadAccess=state.residentLinks.some(r=>r.person_id===person.id&&r.unit_id===unit.id&&r.active);
+ state.deletingLinkId=linkId;
+ el('deletePersonText').textContent=person.full_name+' — '+unit.code+' dairesindeki kaydı silinecek.';
+ el('deletePersonDetails').textContent=others.length
+  ? 'Bu işlem yalnızca seçili daireyle bağlantıyı kaldırır. Diğer '+others.length+' daire bağlantısı korunur.'
+    +(hadAccess?' Bu daireye ait portal erişimi de kaldırılır.':'')
+  : 'Bu kişinin başka daire bağlantısı bulunmuyor. Kişinin iletişim bilgileri ve yönetim notları da silinir.'
+    +(hadAccess?' Portalın bu daireye erişimi kaldırılır.':'')
+    +' Bu işlem geri alınamaz.';
+ el('deletePersonStatus').textContent='';
+ el('confirmPersonDelete').disabled=false;
+ el('cancelPersonDelete').disabled=false;
+ el('deletePersonDialog').showModal();
+}
+async function confirmDeletePerson(){
+ const linkId=state.deletingLinkId;
+ if(!canEdit()||state.deleteBusy||!linkId)return;
+ const link=state.unitPeople.find(l=>l.id===linkId&&l.unit_id===state.selectedUnitId);
+ if(!link){el('deletePersonDialog').close();return;}
+ state.deleteBusy=true;
+ el('confirmPersonDelete').disabled=true;
+ el('cancelPersonDelete').disabled=true;
+ el('deletePersonStatus').textContent='Siliniyor…';
+ try{
+  const result=await request('/rest/v1/rpc/site_delete_unit_person','POST',{target_link_id:linkId});
+  el('deletePersonDialog').close();
+  if(state.editingLinkId===linkId)clearPersonForm();
+  try{
+   await loadPeople();renderPersonList();render();
+   setPersonMessage(result==='unit_unlinked'
+    ? '✓ Daire bağlantısı silindi. Kişinin diğer daire kayıtları korundu.'
+    : '✓ Kişi kaydı silindi.');
+  }catch(_){
+   setPersonMessage('Kayıt silindi ancak ekran yenilenemedi. Sayfayı yenileyin.',true);
+  }
+ }catch(error){
+  el('deletePersonStatus').textContent='Silme hatası: '+error.message;
+ }finally{
+  state.deleteBusy=false;
+  el('confirmPersonDelete').disabled=false;
+  el('cancelPersonDelete').disabled=false;
+ }
+}
+el('confirmPersonDelete').addEventListener('click',confirmDeletePerson);
+el('cancelPersonDelete').addEventListener('click',()=>{if(!state.deleteBusy)el('deletePersonDialog').close();});
+el('deletePersonDialog').addEventListener('cancel',event=>{if(state.deleteBusy)event.preventDefault();});
+el('deletePersonDialog').addEventListener('close',()=>{state.deletingLinkId=null;});
 el('personList').addEventListener('click',event=>{
  const edit=event.target.closest('button[data-edit-person]');
  if(edit){editPerson(edit.dataset.editPerson);return;}
  const invite=event.target.closest('button[data-invite-person]');
- if(invite)invitePerson(invite.dataset.invitePerson);
+ if(invite){invitePerson(invite.dataset.invitePerson);return;}
+ const remove=event.target.closest('button[data-delete-person]');
+ if(remove)prepareDeletePerson(remove.dataset.deletePerson);
 });
 el('closePersonDialog').addEventListener('click',()=>el('personDialog').close());
 el('cancelPersonEdit').addEventListener('click',clearPersonForm);
