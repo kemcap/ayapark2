@@ -133,6 +133,47 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
 .remember-row{display:flex;align-items:center;gap:10px;margin:13px 0 4px;color:var(--text);font-size:13px;font-weight:650;cursor:pointer}
 .remember-row input{width:18px;height:18px;min-width:18px;accent-color:var(--teal);cursor:pointer}
 .remember-hint{margin:0 0 14px;color:var(--muted);font-size:11px;line-height:1.5}
+
+/* Compact, flat archive and contemporary person management */
+.person-dialog{border-radius:18px!important;border-color:#35536b!important;padding:24px!important;background:#102337!important;box-shadow:none!important}
+.person-dialog .dialog-top{padding-bottom:18px;border-bottom:1px solid #2c4358;align-items:flex-start}
+.person-dialog .dialog-top h2{font-size:24px;line-height:1.2;letter-spacing:-.035em;margin:2px 0 8px}
+.person-dialog .dialog-top .muted{font-size:12px;line-height:1.6;max-width:460px}
+.person-dialog #closePersonDialog{width:34px;height:34px;padding:0;display:grid;place-items:center;font-size:18px;border-color:#344e65;background:#172f45}
+.person-tabs{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:18px 0 10px;min-height:38px}
+.person-tabs .person-tabs-heading{display:flex;align-items:center;gap:9px;min-width:0}
+.person-tabs-heading strong{font-size:14px;letter-spacing:-.01em}
+.person-tabs-heading .count-pill{background:#1e405b;color:#a8cce7;font-size:11px;font-weight:800;padding:3px 9px;border:1px solid #365870;border-radius:999px}
+.person-tabs-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.person-tabs-actions .person-active-toggle{flex:none;font-weight:650;font-size:12px;padding:8px 11px;border:1px solid #395873;background:#1c3851}
+.person-tabs-actions .person-archive-icon{position:relative;flex:none;width:36px;height:36px;padding:0;display:grid;place-items:center;border-radius:10px;background:#19344a;border-color:#3a5a70;color:#d5e9f7}
+.person-tabs-actions .person-archive-icon:hover,.person-tabs-actions .person-archive-icon[aria-pressed="true"]{background:#235574;border-color:#74b4dd;color:#fff}
+.person-tabs-actions .person-archive-icon .archive-badge{position:absolute;top:-6px;right:-7px;border:1px solid #102337;background:#315a74;border-radius:99px;min-width:17px;height:17px;padding:0 3px;font-size:10px;font-weight:800;line-height:15px;text-align:center;color:#fff}
+.person-dialog .dialog-list{display:grid;gap:9px;margin:12px 0 12px}
+.person-dialog .person-row{border:1px solid #2e4a61;background:#172e43;border-radius:12px;padding:15px;align-items:center;gap:16px}
+.person-dialog .person-row:hover{border-color:#496c83}
+.person-dialog .person-row .person-name{font-size:15px;font-weight:730;line-height:1.3;margin:3px 0}
+.person-dialog .person-row .person-sub{font-size:12px;line-height:1.6}
+.person-dialog .relation{font-size:10px;border-radius:6px;font-weight:720;color:#b9daef;background:#24455c}
+.person-dialog .person-actions{align-items:center;justify-content:flex-end;gap:7px;flex:0 0 auto;max-width:50%}
+.person-dialog .person-actions button{font-size:12px;padding:8px 11px;border-radius:8px;font-weight:630}
+.person-dialog .person-actions .archive-control{width:35px;height:35px;min-width:35px;display:grid;place-items:center;padding:0;border-radius:9px;background:#234056;color:#c9dce9;border:1px solid #496b82}
+.person-dialog .person-actions .archive-control:hover{background:#315a71;color:#fff;border-color:#7db6d7}
+.person-dialog .person-actions .archive-control svg{display:block}
+.person-dialog .person-actions .restore-control{border:1px solid #4c8168;background:#214a3b;color:#d4f9e6}
+.person-dialog .person-actions .delete-person-button{border:1px solid #74505b;color:#ffccd1;background:#412d38}
+.person-dialog .person-actions .delete-person-button:hover{background:#603540}
+.person-dialog #unitAudit{border:0;background:transparent;color:#98b9d1;font-weight:600;font-size:12px;padding:7px 0;display:flex;align-items:center;gap:6px}
+.person-dialog #unitAudit:hover{color:#fff;background:transparent}
+.person-dialog .person-feedback{margin:8px 0 4px}
+.person-dialog .contact-form{margin-top:20px;border-top:1px solid #2d4559}
+.person-dialog .contact-form h3{font-size:16px;letter-spacing:-.02em}
+.person-dialog .mode-picker button{border-radius:9px;font-size:12px}
+.unit .archive-corner{position:relative;min-width:33px;width:33px;height:33px;padding:0;display:grid;place-items:center;border-radius:9px;background:#18354b;border:1px solid #355169;color:#b9d4e5}
+.unit .archive-corner:hover{background:#24506e;border-color:#79b2d4}
+.unit .archive-corner .archive-badge{position:absolute;top:-7px;right:-6px;min-width:17px;height:17px;border-radius:9px;font-size:10px;font-weight:750;line-height:15px;background:#365c75;border:1px solid #102337;color:#fff;padding:0 3px;text-align:center}
+@media(max-width:570px){dialog.person-dialog{padding:16px!important}.person-dialog .person-row{padding:13px;display:block}.person-dialog .person-actions{max-width:none;justify-content:flex-start;margin-top:11px}.person-dialog .person-actions button{margin:0}.person-tabs-heading strong{font-size:13px}}
+
 </style>
 </head>
 <body>
@@ -188,14 +229,19 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
 </section>
 <dialog id="personDialog" class="person-dialog" aria-labelledby="personDialogTitle">
   <div class="dialog-top">
-    <div><div class="kicker">Daire sakinleri · Yönetim kaydı</div><h2 id="personDialogTitle">Daire Kişileri</h2><p class="muted">Bu kişiler otomatik olarak giriş hesabı oluşturmaz. Portal erişimi ayrıca tanımlanır.</p></div>
+    <div><div class="kicker">AYA PARK 2 · DAİRE KAYITLARI</div><h2 id="personDialogTitle">Daire Kişileri</h2><p class="muted">Aktif sakinleri yönetin, geçmiş kayıtları arşivde saklayın.</p></div>
     <button id="closePersonDialog" type="button" aria-label="Kapat">✕</button>
   </div>
   <div id="personTabs" class="person-tabs">
-<button type="button" data-list-tab="active" aria-pressed="true">Aktif Kişiler</button>
-<button type="button" data-list-tab="archive" aria-pressed="false">📦 Arşiv</button></div>
+  <div class="person-tabs-heading"><strong id="personViewTitle">Aktif kişiler</strong><span id="personViewCount" class="count-pill">0</span></div>
+  <div class="person-tabs-actions">
+    <button type="button" data-list-tab="active" class="person-active-toggle hidden" aria-pressed="true">← Aktifler</button>
+    <button type="button" data-list-tab="archive" class="person-archive-icon" aria-label="Arşivi aç" title="Arşiv" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1.5"></rect><path d="M5 9v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"></path><path d="M10 13h4"></path></svg><span id="personArchiveCount" class="archive-badge">0</span></button>
+  </div>
+</div>
 <div id="personList" class="dialog-list"></div>
-<button id="unitAudit" type="button">📋 Daire İşlem Geçmişi</button>
+<button id="unitAudit" type="button">↗ Dairenin işlem geçmişini görüntüle</button>
+<div id="personMessage" role="status" class="status person-feedback"></div>
   <form id="personForm" class="contact-form">
     <h3 id="personFormTitle">Yeni Kişi Ekle</h3>
     <div id="personModePicker" class="mode-picker">
@@ -217,8 +263,7 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
       <button id="savePerson" type="submit" class="primary">Kişiyi Kaydet</button>
       <button id="cancelPersonEdit" type="button" class="hidden">Düzenlemeyi İptal Et</button>
     </div>
-    <div id="personMessage" role="status" class="status"></div>
-  </form>
+    </form>
 </dialog>
 <dialog id="archiveDialog" class="delete-confirm-dialog" aria-labelledby="archiveTitle">
 <h2 id="archiveTitle">Kişiyi arşive taşımak istiyor musunuz?</h2><p id="archiveInfo"></p>
@@ -230,12 +275,12 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
 </dialog>
 <dialog id="deletePersonDialog" class="delete-confirm-dialog" aria-labelledby="deletePersonTitle">
 <h2 id="deletePersonTitle">Kalıcı olarak silmek istiyor musunuz?</h2><p id="deletePersonText"></p>
-<p class="protocol-note">⚠ Kişi yanlışlıkla girilmediyse geçmiş verilerin kaybolmaması için Arşivle seçeneğini kullanın.</p>
+<p class="protocol-note">⚠ Bu kayıt zaten arşivde. Kalıcı silme geri alınamaz. İlgili kişisel bilgileri saklamanın hukuki gerekliliğini değerlendirin.</p>
 <p id="deletePersonDetails" class="delete-secondary"></p>
 <label class="archive-field">Silme gerekçesi<select id="deleteReason"><option value="yanlis_kayit">Yanlışlıkla girilen kayıt</option><option value="kvkk_imha">KVKK kapsamında değerlendirilmiş imha</option></select></label>
 <label class="archive-field">Onaylamak için SİL yazın<input id="deleteVerify" autocomplete="off" placeholder="SİL"></label>
 <p id="deletePersonStatus" role="status" class="status"></p>
-<div class="delete-actions"><button id="cancelPersonDelete" type="button">Vazgeç</button><button id="archiveInstead" type="button">📦 Arşivle</button><button id="confirmPersonDelete" type="button" class="delete-danger" disabled>Kalıcı Sil</button></div></dialog>
+<div class="delete-actions"><button id="cancelPersonDelete" type="button">Vazgeç</button><button id="confirmPersonDelete" type="button" class="delete-danger" disabled>Kalıcı Sil</button></div></dialog>
 <dialog id="auditDialog" class="audit-dialog" aria-labelledby="auditTitle">
 <div class="dialog-top"><div><div class="kicker">Denetim / İşlem Protokolü</div><h2 id="auditTitle">İşlem Geçmişi</h2><p class="muted">İşlemi yapan kişi, tarih ve değişen alanlar.</p></div><button type="button" id="closeAudit">✕</button></div>
 <div id="auditList" class="audit-list"></div>
@@ -422,7 +467,7 @@ function render(){
     const chooser=writable?'<label>Doluluk durumu<select data-unit-id="'+esc(u.id)+'" aria-label="'+esc(u.code)+' doluluk durumu" '+(state.saving.has(u.id)?'disabled':'')+'><option value="unknown" '+(u.occupancy_status==='unknown'?'selected':'')+'>Bilinmiyor</option><option value="occupied" '+(u.occupancy_status==='occupied'?'selected':'')+'>Dolu</option><option value="vacant" '+(u.occupancy_status==='vacant'?'selected':'')+'>Boş</option></select></label>':'<span class="muted" style="font-size:11px">Salt okunur</span>';
     const linked=state.unitPeople.filter(link=>link.unit_id===u.id && link.is_current).length;
     const archCount=state.unitPeople.filter(link=>link.unit_id===u.id&&!link.is_current).length;
-    const archButton=isStaff()?'<button class="archive-corner" type="button" data-unit-archive="'+esc(u.id)+'" title="Daire arşivi">📦 '+archCount+'</button>':'';
+    const archButton=isStaff()?'<button class="archive-corner" type="button" data-unit-archive="'+esc(u.id)+'" title="Daire arşivi · '+archCount+' kayıt" aria-label="'+esc(u.code)+' dairesi arşivini aç">'+"<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"5\" rx=\"1.5\"></rect><path d=\"M5 9v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9\"></path><path d=\"M10 13h4\"></path></svg>"+'<span class="archive-badge">'+archCount+'</span></button>':'';
     const residentButton=isStaff()?'<button type="button" class="person-button" data-person-unit="'+esc(u.id)+'">👥 Kişiler ('+linked+')</button>':'';
     return '<article class="unit" data-state="'+esc(u.occupancy_status)+'"><div class="head"><h3>'+esc(u.code)+'</h3>'+archButton+'</div><span class="state">'+esc(labelFor(u.occupancy_status))+'</span>'+chooser+residentButton+'</article>';
    }).join('');
@@ -503,11 +548,15 @@ function renderPersonList(){
  const archived=state.unitPeople.filter(l=>l.unit_id===unit.id&&!l.is_current);
  el('personDialogTitle').textContent=unit.code+' · Kişiler';
  el('personForm').classList.toggle('hidden',!canEdit()||state.showArchived);
- document.querySelectorAll('[data-list-tab]').forEach(btn=>{
-   const isArchive=btn.dataset.listTab==='archive';
-   btn.textContent=isArchive?'📦 Arşiv ('+archived.length+')':'Aktif Kişiler ('+active.length+')';
-   btn.setAttribute('aria-pressed',String(isArchive===state.showArchived));
- });
+ el('personViewTitle').textContent=state.showArchived?'Arşivlenmiş kişiler':'Aktif kişiler';
+ el('personViewCount').textContent=String(state.showArchived?archived.length:active.length);
+ el('personArchiveCount').textContent=String(archived.length);
+ const activeButton=el('personTabs').querySelector('[data-list-tab="active"]');
+ const archiveButton=el('personTabs').querySelector('[data-list-tab="archive"]');
+ activeButton.classList.toggle('hidden',!state.showArchived);
+ activeButton.setAttribute('aria-pressed',String(!state.showArchived));
+ archiveButton.setAttribute('aria-pressed',String(state.showArchived));
+ archiveButton.setAttribute('aria-label',state.showArchived?'Arşiv açık':'Arşivi aç · '+archived.length+' kayıt');
  const related=state.showArchived?archived:active;
  const names=new Map(state.people.map(p=>[p.id,p]));
  const rows=related.map(link=>{
@@ -516,9 +565,9 @@ function renderPersonList(){
    const access=state.residentLinks.some(r=>r.unit_id===link.unit_id&&r.person_id===person.id&&r.active);
    const edit=canEdit()&&link.is_current?'<button type="button" data-edit-person="'+esc(link.id)+'">Düzenle</button>':'';
    const invite=canEdit()&&link.is_current&&!access?'<button type="button" data-invite-person="'+esc(link.id)+'" '+(!person.email?'disabled':'')+'>✉ Davet Gönder</button>':'';
-   const archive=canEdit()&&link.is_current?'<button type="button" class="archive-control" data-archive-person="'+esc(link.id)+'">📦 Arşivle</button>':'';
+   const archive=canEdit()&&link.is_current?'<button type="button" class="archive-control" data-archive-person="'+esc(link.id)+'" aria-label="'+esc(person.full_name)+' kişisini arşivle" title="Kişiyi arşivle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1.5"></rect><path d="M5 9v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"></path><path d="M10 13h4"></path></svg></button>':'';
    const restore=canEdit()&&!link.is_current?'<button type="button" class="restore-control" data-restore-person="'+esc(link.id)+'">↩ Geri Yükle</button>':'';
-   const remove=state.role==='manager'?'<button type="button" class="delete-person-button" data-delete-person="'+esc(link.id)+'">Kalıcı Sil</button>':'';
+   const remove=state.role==='manager'&&!link.is_current?'<button type="button" class="delete-person-button" data-delete-person="'+esc(link.id)+'">Kalıcı Sil</button>':'';
    const historical=link.is_current?'':'<div class="archive-meta">Arşiv: '+esc(timeTr(link.archived_at||link.updated_at))+
      (link.ended_on?' · Ayrılış: '+esc(link.ended_on):'')+'</div>'+
      (link.archive_reason?'<div class="person-sub">Açıklama: '+esc(link.archive_reason)+'</div>':'');
@@ -528,7 +577,7 @@ function renderPersonList(){
      (details?'<div class="person-sub">'+details+'</div>':'')+
      (person.admin_note?'<div class="person-sub">Not: '+esc(person.admin_note)+'</div>':'')+
      historical+(access?'<span class="invite-status">✓ Portal erişimi tanımlı</span>':'')+
-     '</div><div class="person-actions">'+edit+invite+archive+restore+remove+'</div></div>';
+     '</div><div class="person-actions">'+edit+invite+restore+remove+archive+'</div></div>';
  });
  el('personList').innerHTML=rows.join('')||'<div class="dialog-empty">'+(state.showArchived?'Bu dairenin arşivinde henüz kayıt yok.':'Bu dairede henüz aktif kişi yok.')+'</div>';
 }
@@ -662,8 +711,8 @@ async function restorePerson(linkId){
  finally{state.deleteBusy=false;}
 }
 function prepareDeletePerson(linkId){
- if(state.role!=='manager'||state.deleteBusy||state.contactBusy)return;
- const link=state.unitPeople.find(l=>l.id===linkId&&l.unit_id===state.selectedUnitId);
+ if(state.role!=='manager'||state.deleteBusy||state.contactBusy||!state.showArchived)return;
+ const link=state.unitPeople.find(l=>l.id===linkId&&l.unit_id===state.selectedUnitId&&!l.is_current);
  const person=link&&state.people.find(p=>p.id===link.person_id);
  if(!link||!person)return;
  const others=state.unitPeople.filter(l=>l.person_id===person.id&&l.id!==link.id);
@@ -672,8 +721,7 @@ function prepareDeletePerson(linkId){
  el('deletePersonDetails').textContent=others.length
   ?'Diğer '+others.length+' daireye ait kayıtları korunur.'
   :'Başka daire bağlantısı bulunmuyor. Kişinin iletişim bilgileri ve özel yönetim notları da silinecektir. İşlem günlüğü kişisel içerik kopyalamaz.';
- el('deleteReason').value=link.is_current?'yanlis_kayit':'kvkk_imha';
- el('archiveInstead').classList.toggle('hidden',!link.is_current);
+ el('deleteReason').value='yanlis_kayit';
  el('deleteVerify').value='';el('deletePersonStatus').textContent='';
  el('confirmPersonDelete').disabled=true;
  el('deletePersonDialog').showModal();
@@ -683,7 +731,7 @@ async function confirmDeletePerson(){
  if(state.role!=='manager'||state.deleteBusy||!id||el('deleteVerify').value.trim()!=='SİL')return;
  state.deleteBusy=true;
  el('confirmPersonDelete').disabled=true;el('cancelPersonDelete').disabled=true;
- el('archiveInstead').disabled=true;el('deletePersonStatus').textContent='Siliniyor…';
+ el('deletePersonStatus').textContent='Siliniyor…';
  try{
   const result=await request('/rest/v1/rpc/site_purge_unit_person','POST',{
    target_link_id:id,erase_reason:el('deleteReason').value});
@@ -696,7 +744,7 @@ async function confirmDeletePerson(){
  }catch(error){el('deletePersonStatus').textContent='Silme hatası: '+error.message;}
  finally{
   state.deleteBusy=false;el('confirmPersonDelete').disabled=false;
-  el('cancelPersonDelete').disabled=false;el('archiveInstead').disabled=false;
+  el('cancelPersonDelete').disabled=false;
  }
 }
 const eventNames={
@@ -756,11 +804,6 @@ el('deleteVerify').addEventListener('input',()=>{
  el('confirmPersonDelete').disabled=el('deleteVerify').value.trim()!=='SİL';
 });
 el('cancelPersonDelete').addEventListener('click',()=>{if(!state.deleteBusy)el('deletePersonDialog').close();});
-el('archiveInstead').addEventListener('click',()=>{
- const linkId=state.deletingLinkId;
- el('deletePersonDialog').close();
- prepareArchivePerson(linkId);
-});
 el('deletePersonDialog').addEventListener('cancel',event=>{if(state.deleteBusy)event.preventDefault();});
 el('deletePersonDialog').addEventListener('close',()=>{state.deletingLinkId=null;});
 el('personList').addEventListener('click',event=>{
