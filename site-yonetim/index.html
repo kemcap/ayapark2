@@ -482,34 +482,52 @@ function choosePersonMode(mode){
  el('personFormTitle').textContent=mode==='existing'?'Kayıtlı Kişiyi Bağla':'Yeni Kişi Ekle';
  setPersonMessage('');updatePersonMode();
 }
+function timeTr(value){
+ if(!value)return 'Belirtilmedi';
+ const date=new Date(value);
+ return Number.isNaN(date.getTime())?String(value):date.toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'});
+}
 function renderPersonList(){
- const selected=state.units.find(u=>u.id===state.selectedUnitId);
- if(!selected||!isStaff())return;
- el('personDialogTitle').textContent=selected.code+' · Kişiler';
- el('personForm').classList.toggle('hidden',!canEdit());
- const related=state.unitPeople.filter(x=>x.unit_id===selected.id);
- const peopleById=new Map(state.people.map(p=>[p.id,p]));
- el('personList').innerHTML=related.length?related.map(link=>{
-   const person=peopleById.get(link.person_id);if(!person)return '';
+ const unit=state.units.find(u=>u.id===state.selectedUnitId);
+ if(!unit||!isStaff())return;
+ const active=state.unitPeople.filter(l=>l.unit_id===unit.id&&l.is_current);
+ const archived=state.unitPeople.filter(l=>l.unit_id===unit.id&&!l.is_current);
+ el('personDialogTitle').textContent=unit.code+' · Kişiler';
+ el('personForm').classList.toggle('hidden',!canEdit()||state.showArchived);
+ document.querySelectorAll('[data-list-tab]').forEach(btn=>{
+   const isArchive=btn.dataset.listTab==='archive';
+   btn.textContent=isArchive?'📦 Arşiv ('+archived.length+')':'Aktif Kişiler ('+active.length+')';
+   btn.setAttribute('aria-pressed',String(isArchive===state.showArchived));
+ });
+ const related=state.showArchived?archived:active;
+ const names=new Map(state.people.map(p=>[p.id,p]));
+ const rows=related.map(link=>{
+   const person=names.get(link.person_id);if(!person)return '';
    const details=[person.phone,person.email].filter(Boolean).map(esc).join(' · ');
-   const inactive=link.is_current?'':' <span class="archived">(Pasif)</span>';
-   const edit=canEdit()?'<button type="button" data-edit-person="'+esc(link.id)+'">Düzenle</button>':'';
-   const remove=canEdit()?'<button type="button" class="delete-person-button" data-delete-person="'+esc(link.id)+'" '+(state.deleteBusy||state.inviteBusy.has(link.id)?'disabled':'')+' aria-label="'+esc(person.full_name)+' kişisini bu daireden sil">Sil</button>':'';
-   const hasAccess=state.residentLinks.some(r=>r.unit_id===link.unit_id&&r.person_id===person.id&&r.active);
-   const invite=canEdit()&&link.is_current&&!hasAccess?'<button type="button" data-invite-person="'+esc(link.id)+'" '+(state.inviteBusy.has(link.id)||!person.email?'disabled':'')+' title="'+(!person.email?'Önce e-posta adresi ekleyin.':'Bu kişiye e-posta daveti gönder')+'">✉ Davet Gönder</button>':'';
-   const status=hasAccess?'<span class="invite-status">✓ Portal erişimi tanımlı</span>':'';
-   return '<div class="person-row"><div><span class="relation">'+esc(relationLabel(link.relation))+'</span>'+inactive+
+   const access=state.residentLinks.some(r=>r.unit_id===link.unit_id&&r.person_id===person.id&&r.active);
+   const edit=canEdit()&&link.is_current?'<button type="button" data-edit-person="'+esc(link.id)+'">Düzenle</button>':'';
+   const invite=canEdit()&&link.is_current&&!access?'<button type="button" data-invite-person="'+esc(link.id)+'" '+(!person.email?'disabled':'')+'>✉ Davet Gönder</button>':'';
+   const archive=canEdit()&&link.is_current?'<button type="button" class="archive-control" data-archive-person="'+esc(link.id)+'">📦 Arşivle</button>':'';
+   const restore=canEdit()&&!link.is_current?'<button type="button" class="restore-control" data-restore-person="'+esc(link.id)+'">↩ Geri Yükle</button>':'';
+   const remove=state.role==='manager'?'<button type="button" class="delete-person-button" data-delete-person="'+esc(link.id)+'">Kalıcı Sil</button>':'';
+   const historical=link.is_current?'':'<div class="archive-meta">Arşiv: '+esc(timeTr(link.archived_at||link.updated_at))+
+     (link.ended_on?' · Ayrılış: '+esc(link.ended_on):'')+'</div>'+
+     (link.archive_reason?'<div class="person-sub">Açıklama: '+esc(link.archive_reason)+'</div>':'');
+   return '<div class="person-row"><div><span class="relation">'+esc(relationLabel(link.relation))+'</span>'+
+     (link.is_current?'':' <span class="archived">(Arşivde)</span>')+
      '<div class="person-name">'+esc(person.full_name)+'</div>'+
      (details?'<div class="person-sub">'+details+'</div>':'')+
      (person.admin_note?'<div class="person-sub">Not: '+esc(person.admin_note)+'</div>':'')+
-     status+'</div><div class="person-actions">'+edit+invite+remove+'</div></div>';
- }).join(''):'<div class="dialog-empty">Bu daireye henüz kişi eklenmedi.</div>';
+     historical+(access?'<span class="invite-status">✓ Portal erişimi tanımlı</span>':'')+
+     '</div><div class="person-actions">'+edit+invite+archive+restore+remove+'</div></div>';
+ });
+ el('personList').innerHTML=rows.join('')||'<div class="dialog-empty">'+(state.showArchived?'Bu dairenin arşivinde henüz kayıt yok.':'Bu dairede henüz aktif kişi yok.')+'</div>';
 }
-function openPeople(unitId){
+function openPeople(unitId,archive=false){
  if(!isStaff())return;
  const unit=state.units.find(u=>u.id===unitId);if(!unit)return;
- state.selectedUnitId=unitId;clearPersonForm();renderPersonList();
- el('personDialog').showModal();
+ state.selectedUnitId=unitId;state.showArchived=archive;
+ clearPersonForm();renderPersonList();el('personDialog').showModal();
 }
 function editPerson(linkId){
  if(!canEdit()||!state.selectedUnitId)return;
@@ -561,7 +579,8 @@ async function submitPerson(event){
  finally{state.contactBusy=false;updatePersonMode();}
 }
 el('blockLists').addEventListener('click',event=>{
- const target=event.target.closest('button[data-person-unit]');if(target)openPeople(target.dataset.personUnit);
+ const target=event.target.closest('button[data-person-unit]');if(target){openPeople(target.dataset.personUnit);return;}
+ const arch=event.target.closest('button[data-unit-archive]');if(arch)openPeople(arch.dataset.unitArchive,true);
 });
 el('personModePicker').addEventListener('click',event=>{
  const target=event.target.closest('button[data-person-mode]');if(target)choosePersonMode(target.dataset.personMode);
@@ -653,7 +672,7 @@ el('personList').addEventListener('click',event=>{
 el('closePersonDialog').addEventListener('click',()=>el('personDialog').close());
 el('cancelPersonEdit').addEventListener('click',clearPersonForm);
 el('personForm').addEventListener('submit',submitPerson);
-el('personDialog').addEventListener('close',()=>{state.selectedUnitId=null;clearPersonForm();});
+el('personDialog').addEventListener('close',()=>{state.selectedUnitId=null;state.showArchived=false;clearPersonForm();});
 el('loginForm').addEventListener('submit',enter);
 el('logout').addEventListener('click',logout);
 ['unitSearch','blockFilter','statusFilter'].forEach(id=>el(id).addEventListener(id==='unitSearch'?'input':'change',render));
