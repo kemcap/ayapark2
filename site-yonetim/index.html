@@ -100,6 +100,9 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
 .dialog-empty{padding:15px;text-align:center;color:var(--muted);border:1px dashed var(--edge);border-radius:9px}
 .contact-error{color:var(--error)}
 @media(max-width:570px){dialog.person-dialog{padding:15px}.fields{grid-template-columns:1fr}.fields .wide{grid-column:1}.person-row{display:block}.person-row button{margin-top:9px}}
+.remember-row{display:flex;align-items:center;gap:10px;margin:13px 0 4px;color:var(--text);font-size:13px;font-weight:650;cursor:pointer}
+.remember-row input{width:18px;height:18px;min-width:18px;accent-color:var(--teal);cursor:pointer}
+.remember-hint{margin:0 0 14px;color:var(--muted);font-size:11px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -120,6 +123,8 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
       <label>E-posta<input id="email" type="email" autocomplete="username" required placeholder="E-posta adresiniz"></label>
       <label>Şifre<input id="password" type="password" autocomplete="current-password" required placeholder="Şifreniz"></label>
     </div>
+    <label class="remember-row"><input id="rememberLogin" type="checkbox" checked> <span>Bu cihazda oturum açık kalsın</span></label>
+    <p class="remember-hint">Oturumunuz bu tarayıcıda hatırlanır. Ortak veya paylaşılan cihazlarda bu seçeneği kapatın.</p>
     <button id="loginBtn" class="primary" type="submit">Giriş Yap</button>
   </form>
   <div id="authMessage" class="status" role="status">Bu sayfadaki daire bilgileri giriş yapılmadan görüntülenmez.</div>
@@ -180,10 +185,32 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
 (function(){
 'use strict';
 const CONFIG={url:'https://eisozwhhinqszfikemot.supabase.co',publishableKey:'sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc'};
+const SESSION_KEY='site-yonetim:aya-park-2:auth-v1';
 const el=id=>document.getElementById(id);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',saving:new Set(),people:[],unitPeople:[],selectedUnitId:null,editingLinkId:null,contactBusy:false};
+const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',rememberSession:false,saving:new Set(),people:[],unitPeople:[],selectedUnitId:null,editingLinkId:null,contactBusy:false};
 let refreshPromise=null;
+function readSavedRefresh(){
+ try{
+  const saved=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
+  return typeof saved?.refresh_token==='string' && saved.refresh_token.length>10?saved.refresh_token:null;
+ }catch(_){return null;}
+}
+function forgetSavedSession(){try{localStorage.removeItem(SESSION_KEY);}catch(_){}}
+function saveSession(){
+ if(!state.rememberSession || !state.refreshToken)return;
+ try{localStorage.setItem(SESSION_KEY,JSON.stringify({refresh_token:state.refreshToken}));}
+ catch(_){state.rememberSession=false;}
+}
+function setTokens(session){
+ if(!session.access_token||!session.user?.id)throw Error('Oturum bilgileri alınamadı.');
+ state.token=session.access_token;
+ state.refreshToken=session.refresh_token||state.refreshToken;
+ state.expiresAt=Date.now()+(Number(session.expires_in)||3600)*1000;
+ state.userId=session.user.id;
+ state.email=session.user.email||state.email;
+ saveSession();
+}
 function showStatus(message,isError=false){el('authMessage').textContent=message;el('authMessage').classList.toggle('error',!!isError);}
 function sync(message,isError=false){el('syncMessage').textContent=message;el('syncMessage').classList.toggle('error',!!isError);}
 async function request(path,method='GET',data=null,authenticated=true){
@@ -200,33 +227,64 @@ async function request(path,method='GET',data=null,authenticated=true){
 async function ensureToken(){
  if(!state.token)throw Error('Önce giriş yapın.');
  if(Date.now()+60000 < state.expiresAt)return;
+ if(state.rememberSession){
+  const fromBrowser=readSavedRefresh();
+  if(fromBrowser)state.refreshToken=fromBrowser;
+ }
  if(!state.refreshToken)throw Error('Oturum süresi doldu, yeniden giriş yapın.');
  if(!refreshPromise)refreshPromise=(async()=>{
   const next=await request('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:state.refreshToken},false);
   if(!next.access_token)throw Error('Oturum yenilenemedi.');
   state.token=next.access_token;state.refreshToken=next.refresh_token||state.refreshToken;
   state.expiresAt=Date.now()+(Number(next.expires_in)||3600)*1000;
+  saveSession();
  })().finally(()=>{refreshPromise=null;});
  await refreshPromise;
 }
+async function openAuthorizedApp(){
+ const sites=await request('/rest/v1/site_sites?select=id,slug,name&slug=eq.aya-park-2&limit=1');
+ if(!Array.isArray(sites)||!sites.length)throw Error('Bu site için erişim yetkiniz bulunmuyor.');
+ state.site=sites[0];
+ await loadData();
+ el('userBadge').textContent=state.email;
+ el('loginPanel').classList.add('hidden');
+ el('app').classList.remove('hidden');
+}
 async function enter(event){
- event.preventDefault();el('loginBtn').disabled=true;showStatus('Giriş yapılıyor…');
+ event.preventDefault();
+ el('loginBtn').disabled=true;showStatus('Giriş yapılıyor…');
  try{
-  const session=await request('/auth/v1/token?grant_type=password','POST',{email:el('email').value.trim(),password:el('password').value},false);
-  if(!session.access_token||!session.user?.id)throw Error('Oturum açılmadı.');
-  state.token=session.access_token;state.refreshToken=session.refresh_token||'';
-  state.expiresAt=Date.now()+(Number(session.expires_in)||3600)*1000;
-  state.userId=session.user.id;state.email=session.user.email||el('email').value.trim();
-  const sites=await request('/rest/v1/site_sites?select=id,slug,name&slug=eq.aya-park-2&limit=1');
-  if(!Array.isArray(sites)||!sites.length)throw Error('Bu site için henüz erişim yetkiniz bulunmuyor.');
-  state.site=sites[0];
-  await loadData();
-  el('password').value='';
-  el('userBadge').textContent=state.email;
-  el('loginPanel').classList.add('hidden');
-  el('app').classList.remove('hidden');
- }catch(error){clearSession();showStatus('Giriş yapılamadı: '+error.message,true);}
- finally{el('loginBtn').disabled=false;}
+  state.rememberSession=el('rememberLogin').checked;
+  const session=await request('/auth/v1/token?grant_type=password','POST',{
+   email:el('email').value.trim(),password:el('password').value},false);
+  setTokens(session);
+  await openAuthorizedApp();
+  if(!state.rememberSession)forgetSavedSession();
+  el('loginForm').reset();
+  el('rememberLogin').checked=true;
+ }catch(error){
+  forgetSavedSession();clearSession();
+  showStatus('Giriş yapılamadı: '+error.message,true);
+ }finally{el('loginBtn').disabled=false;}
+}
+async function restoreSession(){
+ const storedRefresh=readSavedRefresh();
+ if(!storedRefresh)return;
+ el('loginBtn').disabled=true;showStatus('Önceki oturumunuz açılıyor…');
+ try{
+  state.rememberSession=true;
+  state.refreshToken=storedRefresh;
+  const session=await request('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:storedRefresh},false);
+  setTokens(session);
+  await openAuthorizedApp();
+ }catch(error){
+  // An invalidated session requires signing in again. Network outages keep the saved session.
+  if(/invalid|expired|revoked|401|403|400|refresh token|not found|yetkiniz|erişim yetkiniz/i.test(String(error.message))){
+   forgetSavedSession();
+  }
+  clearSession();
+  showStatus('Otomatik giriş yapılamadı. Lütfen tekrar giriş yapın.',true);
+ }finally{el('loginBtn').disabled=false;}
 }
 async function loadData(){
  const siteId=encodeURIComponent(state.site.id),uid=encodeURIComponent(state.userId);
@@ -256,11 +314,22 @@ async function loadPeople(){
 function relationLabel(x){return {owner:'Kat Maliki',tenant:'Kiracı',occupant:'Sakin',representative:'Temsilci'}[x]||'Diğer';}
 
 function clearSession(){
- state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.people=[];state.unitPeople=[];state.selectedUnitId=null;state.editingLinkId=null;state.contactBusy=false;state.saving.clear();
+ state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.rememberSession=false;state.people=[];state.unitPeople=[];state.selectedUnitId=null;state.editingLinkId=null;state.contactBusy=false;state.saving.clear();
  el('personDialog').close();
  el('userBadge').textContent='';el('loginPanel').classList.remove('hidden');el('app').classList.add('hidden');el('logout').classList.add('hidden');
 }
-function logout(){clearSession();el('loginForm').reset();showStatus('Oturum kapatıldı.');}
+async function logout(){
+ const token=state.token;
+ forgetSavedSession();
+ clearSession();el('loginForm').reset();showStatus('Oturum kapatıldı.');
+ // Revoke this Supabase session on the server as well; local sign-out must work offline.
+ if(token)try{
+  await fetch(CONFIG.url+'/auth/v1/logout',{method:'POST',headers:{apikey:CONFIG.publishableKey,Authorization:'Bearer '+token},cache:'no-store'});
+ }catch(_){}
+}
+window.addEventListener('storage',event=>{
+ if(event.key===SESSION_KEY&&!event.newValue&&state.rememberSession)logout();
+});
 function labelFor(status){return {unknown:'Durum belirtilmedi',occupied:'Dolu',vacant:'Boş'}[status]||'Bilinmiyor';}
 function render(){
  const q=el('unitSearch').value.trim().toLocaleLowerCase('tr-TR');
@@ -393,6 +462,7 @@ el('blockLists').addEventListener('change',event=>{
  const target=event.target.closest('select[data-unit-id]');
  if(target)updateOccupancy(target.dataset.unitId,target.value);
 });
+restoreSession();
 })();
 </script>
 </body>
