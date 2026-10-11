@@ -76,6 +76,30 @@ p{margin:4px 0 0}
 @media(max-width:1050px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:770px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.next{grid-template-columns:1fr}.summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.shell{padding:18px 12px 36px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:1fr}.stat strong{font-size:23px}.toolbar{display:block}.filters{margin-bottom:12px}.filter{flex:1}.filter input,.filter select{width:100%;min-width:0}.unit{padding:11px}}
+
+.directory-intro{margin-top:12px;font-size:12px;color:var(--muted)}
+.person-button{width:100%;margin-top:10px;padding:7px 5px;font-size:11px;border:1px solid #46657a;background:#1b3b56}
+dialog.person-dialog{width:min(720px,calc(100vw - 24px));max-height:88vh;overflow:auto;background:#12263b;color:var(--text);border:1px solid #42627d;border-radius:15px;padding:23px;box-shadow:0 15px 65px #0009}
+dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
+.dialog-top{display:flex;align-items:start;justify-content:space-between;gap:10px}
+.dialog-top h2{font-size:23px}
+.dialog-list{display:grid;gap:8px;margin:16px 0 20px}
+.person-row{border:1px solid var(--edge);background:#182e43;border-radius:10px;padding:12px;display:flex;align-items:start;justify-content:space-between;gap:12px}
+.person-row .person-name{font-size:14px;font-weight:750}
+.person-row .person-sub{font-size:11px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
+.relation{font-size:10px;background:#28455d;color:#cbe9fc;padding:4px 7px;border-radius:5px;display:inline-block;margin:0 0 5px}
+.person-row .archived{color:var(--orange)}
+.contact-form{border-top:1px solid var(--edge);padding-top:16px}
+.contact-form h3{margin:0 0 8px;font-size:16px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0}
+.fields label{display:grid;gap:5px;color:var(--muted);font-size:11px;font-weight:700}
+.fields input,.fields select,.fields textarea{width:100%;min-width:0}
+.fields textarea{background:#0c1c2b;color:var(--text);border:1px solid var(--edge);border-radius:8px;padding:10px;resize:vertical;min-height:54px;font:inherit}
+.fields .wide{grid-column:1/-1}
+.contact-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dialog-empty{padding:15px;text-align:center;color:var(--muted);border:1px dashed var(--edge);border-radius:9px}
+.contact-error{color:var(--error)}
+@media(max-width:570px){dialog.person-dialog{padding:15px}.fields{grid-template-columns:1fr}.fields .wide{grid-column:1}.person-row{display:block}.person-row button{margin-top:9px}}
 </style>
 </head>
 <body>
@@ -116,6 +140,7 @@ p{margin:4px 0 0}
     </div>
     <button id="clearFilters" type="button">Filtreleri Temizle</button>
   </div>
+  <p id="directoryIntro" class="directory-intro hidden">Her daire için kat maliki ve kiracı ekleyebilir, iletişim bilgilerini ve ilişki durumlarını yönetebilirsiniz. Kayıtlar yalnızca yetkili yöneticiler tarafından düzenlenebilir.</p>
   <div id="blockLists"></div>
   <section class="roadmap">
     <h2>Sonraki geliştirme adımları</h2>
@@ -126,6 +151,29 @@ p{margin:4px 0 0}
     </div>
   </section>
 </section>
+<dialog id="personDialog" class="person-dialog" aria-labelledby="personDialogTitle">
+  <div class="dialog-top">
+    <div><div class="kicker">Daire sakinleri · Yönetim kaydı</div><h2 id="personDialogTitle">Daire Kişileri</h2><p class="muted">Bu kişiler otomatik olarak giriş hesabı oluşturmaz. Portal erişimi ayrıca tanımlanır.</p></div>
+    <button id="closePersonDialog" type="button" aria-label="Kapat">✕</button>
+  </div>
+  <div id="personList" class="dialog-list"></div>
+  <form id="personForm" class="contact-form">
+    <h3 id="personFormTitle">Yeni Kişi Ekle</h3>
+    <div class="fields">
+      <label class="wide">Ad Soyad *<input id="personName" autocomplete="off" required minlength="2" maxlength="180" placeholder="Ad ve soyad"></label>
+      <label>İlişki *<select id="personRelation" required><option value="owner">Kat Maliki</option><option value="tenant">Kiracı</option><option value="occupant">Sakin</option><option value="representative">Temsilci</option></select></label>
+      <label>Telefon<input id="personPhone" type="tel" autocomplete="off" maxlength="48" placeholder="05xx ..."></label>
+      <label class="wide">E-posta<input id="personEmail" type="email" autocomplete="off" maxlength="254" placeholder="ornek@eposta.com"></label>
+      <label class="wide">Yalnızca yönetim için not<textarea id="personNote" maxlength="4000" rows="2" placeholder="İsteğe bağlı özel not"></textarea></label>
+      <label id="personActiveLabel" class="wide hidden"><span>İlişki durumu</span><select id="personActive"><option value="true">Aktif</option><option value="false">Eski kayıt (pasif)</option></select></label>
+    </div>
+    <div class="contact-actions">
+      <button id="savePerson" type="submit" class="primary">Kişiyi Kaydet</button>
+      <button id="cancelPersonEdit" type="button" class="hidden">Düzenlemeyi İptal Et</button>
+    </div>
+    <div id="personMessage" role="status" class="status"></div>
+  </form>
+</dialog>
 <footer class="footer">Site Yönetim · Aya Park 2 — Pilot sürüm. Bu sayfada henüz sakin isimleri ve ödeme tutarları bulunmaz. Önceki aidat ve borç takip sayfası bağımsız çalışmaya devam eder.</footer>
 </main>
 <script>
@@ -134,7 +182,7 @@ p{margin:4px 0 0}
 const CONFIG={url:'https://eisozwhhinqszfikemot.supabase.co',publishableKey:'sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc'};
 const el=id=>document.getElementById(id);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',saving:new Set()};
+const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',saving:new Set(),people:[],unitPeople:[],selectedUnitId:null,editingLinkId:null,contactBusy:false};
 let refreshPromise=null;
 function showStatus(message,isError=false){el('authMessage').textContent=message;el('authMessage').classList.toggle('error',!!isError);}
 function sync(message,isError=false){el('syncMessage').textContent=message;el('syncMessage').classList.toggle('error',!!isError);}
@@ -188,14 +236,28 @@ async function loadData(){
   request('/rest/v1/site_staff_memberships?select=role&site_id=eq.'+siteId+'&user_id=eq.'+uid)
  ]);
  state.blocks=blocks;state.units=units;state.role=memberships[0]?.role||'resident';
+ await loadPeople();
  const names={manager:'Yönetici',deputy:'Yönetici Yardımcısı',auditor:'Denetçi',resident:'Sakin'};
  el('roleBadge').textContent=names[state.role]||'Sakin';
  sync('● Veriler Supabase üzerinden yüklendi');
  render();
 }
+function isStaff(){return ['manager','deputy','auditor'].includes(state.role);}
 function canEdit(){return state.role==='manager'||state.role==='deputy';}
+async function loadPeople(){
+ if(!isStaff()){state.people=[];state.unitPeople=[];return;}
+ const siteId=encodeURIComponent(state.site.id);
+ const [people,links]=await Promise.all([
+  request('/rest/v1/site_people?select=id,site_id,full_name,phone,email,admin_note&site_id=eq.'+siteId+'&order=full_name.asc'),
+  request('/rest/v1/site_unit_people?select=id,site_id,unit_id,person_id,relation,is_current,started_on,ended_on&site_id=eq.'+siteId+'&order=created_at.asc')
+ ]);
+ state.people=people;state.unitPeople=links;
+}
+function relationLabel(x){return {owner:'Kat Maliki',tenant:'Kiracı',occupant:'Sakin',representative:'Temsilci'}[x]||'Diğer';}
+
 function clearSession(){
- state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.saving.clear();
+ state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.people=[];state.unitPeople=[];state.selectedUnitId=null;state.editingLinkId=null;state.contactBusy=false;state.saving.clear();
+ el('personDialog').close();
  el('userBadge').textContent='';el('loginPanel').classList.remove('hidden');el('app').classList.add('hidden');el('logout').classList.add('hidden');
 }
 function logout(){clearSession();el('loginForm').reset();showStatus('Oturum kapatıldı.');}
@@ -208,6 +270,7 @@ function render(){
  el('statOccupied').textContent=state.units.filter(u=>u.occupancy_status==='occupied').length;
  el('statVacant').textContent=state.units.filter(u=>u.occupancy_status==='vacant').length;
  el('statUnknown').textContent=state.units.filter(u=>u.occupancy_status==='unknown').length;
+ el('directoryIntro').classList.toggle('hidden',!isStaff());
  const container=el('blockLists');
  container.innerHTML=state.blocks.map(b=>{
    const rows=displayed.filter(u=>u.block_id===b.id).sort((a,b)=>a.number-b.number);
@@ -215,7 +278,9 @@ function render(){
    const cards=rows.map(u=>{
     const writable=canEdit();
     const chooser=writable?'<label>Doluluk durumu<select data-unit-id="'+esc(u.id)+'" aria-label="'+esc(u.code)+' doluluk durumu" '+(state.saving.has(u.id)?'disabled':'')+'><option value="unknown" '+(u.occupancy_status==='unknown'?'selected':'')+'>Bilinmiyor</option><option value="occupied" '+(u.occupancy_status==='occupied'?'selected':'')+'>Dolu</option><option value="vacant" '+(u.occupancy_status==='vacant'?'selected':'')+'>Boş</option></select></label>':'<span class="muted" style="font-size:11px">Salt okunur</span>';
-    return '<article class="unit" data-state="'+esc(u.occupancy_status)+'"><div class="head"><h3>'+esc(u.code)+'</h3><span class="number">DAİRE</span></div><span class="state">'+esc(labelFor(u.occupancy_status))+'</span>'+chooser+'</article>';
+    const linked=state.unitPeople.filter(link=>link.unit_id===u.id && link.is_current).length;
+    const residentButton=isStaff()?'<button type="button" class="person-button" data-person-unit="'+esc(u.id)+'">👥 Kişiler ('+linked+')</button>':'';
+    return '<article class="unit" data-state="'+esc(u.occupancy_status)+'"><div class="head"><h3>'+esc(u.code)+'</h3><span class="number">DAİRE</span></div><span class="state">'+esc(labelFor(u.occupancy_status))+'</span>'+chooser+residentButton+'</article>';
    }).join('');
    return '<section class="block"><div class="blockhead"><h2>'+esc(b.code)+' Blok</h2><span class="count">'+rows.length+' daire</span></div><div class="cards">'+cards+'</div></section>';
  }).join('');
@@ -236,6 +301,90 @@ async function updateOccupancy(id,value){
  }catch(error){unit.occupancy_status=previous;sync('Kaydetme hatası: '+error.message,true);}
  finally{state.saving.delete(id);render();}
 }
+
+function setPersonMessage(message,error=false){el('personMessage').textContent=message;el('personMessage').classList.toggle('contact-error',error);}
+function clearPersonForm(){
+ el('personForm').reset();state.editingLinkId=null;
+ el('personFormTitle').textContent='Yeni Kişi Ekle';
+ el('personActiveLabel').classList.add('hidden');el('cancelPersonEdit').classList.add('hidden');
+ el('savePerson').textContent='Kişiyi Kaydet';setPersonMessage('');
+}
+function renderPersonList(){
+ const selected=state.units.find(u=>u.id===state.selectedUnitId);
+ if(!selected||!isStaff())return;
+ el('personDialogTitle').textContent=selected.code+' · Kişiler';
+ el('personForm').classList.toggle('hidden',!canEdit());
+ const related=state.unitPeople.filter(x=>x.unit_id===selected.id);
+ const peopleById=new Map(state.people.map(p=>[p.id,p]));
+ el('personList').innerHTML=related.length?related.map(link=>{
+   const person=peopleById.get(link.person_id);if(!person)return '';
+   const details=[person.phone,person.email].filter(Boolean).map(esc).join(' · ');
+   const inactive=link.is_current?'':' <span class="archived">(Pasif)</span>';
+   const edit=canEdit()?'<button type="button" data-edit-person="'+esc(link.id)+'">Düzenle</button>':'';
+   return '<div class="person-row"><div><span class="relation">'+esc(relationLabel(link.relation))+'</span>'+inactive+
+     '<div class="person-name">'+esc(person.full_name)+'</div>'+
+     (details?'<div class="person-sub">'+details+'</div>':'')+
+     (person.admin_note?'<div class="person-sub">Not: '+esc(person.admin_note)+'</div>':'')+
+     '</div>'+edit+'</div>';
+ }).join(''):'<div class="dialog-empty">Bu daireye henüz kişi eklenmedi.</div>';
+}
+function openPeople(unitId){
+ if(!isStaff())return;
+ const unit=state.units.find(u=>u.id===unitId);if(!unit)return;
+ state.selectedUnitId=unitId;clearPersonForm();renderPersonList();
+ el('personDialog').showModal();
+}
+function editPerson(linkId){
+ if(!canEdit()||!state.selectedUnitId)return;
+ const link=state.unitPeople.find(l=>l.id===linkId&&l.unit_id===state.selectedUnitId);
+ const person=link&&state.people.find(p=>p.id===link.person_id);
+ if(!person)return;
+ state.editingLinkId=linkId;
+ el('personName').value=person.full_name;el('personPhone').value=person.phone||'';
+ el('personEmail').value=person.email||'';el('personNote').value=person.admin_note||'';
+ el('personRelation').value=link.relation;el('personActive').value=String(link.is_current);
+ el('personFormTitle').textContent='Kişiyi Düzenle';
+ el('personActiveLabel').classList.remove('hidden');
+ el('cancelPersonEdit').classList.remove('hidden');
+ el('savePerson').textContent='Değişiklikleri Kaydet';setPersonMessage('');
+ el('personName').focus();
+}
+async function submitPerson(event){
+ event.preventDefault();
+ if(!canEdit()||!state.selectedUnitId||state.contactBusy)return;
+ const name=el('personName').value.trim(),phone=el('personPhone').value.trim(),
+ email=el('personEmail').value.trim(),note=el('personNote').value.trim(),relation=el('personRelation').value;
+ if(name.length<2){setPersonMessage('Ad Soyad en az iki karakter olmalıdır.',true);return;}
+ const current=state.editingLinkId&&state.unitPeople.find(l=>l.id===state.editingLinkId);
+ state.contactBusy=true;el('savePerson').disabled=true;setPersonMessage('Kaydediliyor…');
+ try{
+  if(current){
+   const updated=await request('/rest/v1/site_people?id=eq.'+encodeURIComponent(current.person_id),'PATCH',
+    {full_name:name,phone,email,admin_note:note});
+   if(!Array.isArray(updated)||updated.length!==1)throw Error('Kişi güncellenemedi.');
+   const changed=await request('/rest/v1/site_unit_people?id=eq.'+encodeURIComponent(current.id),'PATCH',
+    {relation,is_current:el('personActive').value==='true'});
+   if(!Array.isArray(changed)||changed.length!==1)throw Error('Daire ilişkisi güncellenemedi.');
+  }else{
+   await request('/rest/v1/rpc/site_register_unit_person','POST',
+    {target_unit_id:state.selectedUnitId,person_full_name:name,person_relation:relation,
+     person_phone:phone,person_email:email,person_note:note});
+  }
+  await loadPeople();clearPersonForm();renderPersonList();render();
+  setPersonMessage('✓ Kişi kaydedildi.');
+ }catch(error){setPersonMessage('Kayıt hatası: '+error.message,true);}
+ finally{state.contactBusy=false;el('savePerson').disabled=false;}
+}
+el('blockLists').addEventListener('click',event=>{
+ const target=event.target.closest('button[data-person-unit]');if(target)openPeople(target.dataset.personUnit);
+});
+el('personList').addEventListener('click',event=>{
+ const target=event.target.closest('button[data-edit-person]');if(target)editPerson(target.dataset.editPerson);
+});
+el('closePersonDialog').addEventListener('click',()=>el('personDialog').close());
+el('cancelPersonEdit').addEventListener('click',clearPersonForm);
+el('personForm').addEventListener('submit',submitPerson);
+el('personDialog').addEventListener('close',()=>{state.selectedUnitId=null;clearPersonForm();});
 el('loginForm').addEventListener('submit',enter);
 el('logout').addEventListener('click',logout);
 ['unitSearch','blockFilter','statusFilter'].forEach(id=>el(id).addEventListener(id==='unitSearch'?'input':'change',render));
