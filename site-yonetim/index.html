@@ -607,58 +607,151 @@ async function invitePerson(linkId){
  }catch(error){setPersonMessage('Davet hatası: '+error.message,true);}
  finally{state.inviteBusy.delete(linkId);renderPersonList();}
 }
+function todayTr(){
+ const d=new Date();
+ return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+}
+function prepareArchivePerson(linkId){
+ if(!canEdit()||state.deleteBusy||state.contactBusy)return;
+ const link=state.unitPeople.find(l=>l.id===linkId&&l.unit_id===state.selectedUnitId&&l.is_current);
+ const person=link&&state.people.find(p=>p.id===link.person_id);
+ if(!link||!person)return;
+ state.archivingLinkId=linkId;
+ el('archiveInfo').textContent=person.full_name+' kişisinin bu dairedeki kaydı arşive alınacak.';
+ el('archiveDate').value=todayTr();el('archiveDate').max=todayTr();
+ el('archiveNote').value='';el('archiveStatus').textContent='';
+ el('archiveDialog').showModal();
+}
+async function submitArchive(){
+ if(!canEdit()||state.deleteBusy||!state.archivingLinkId)return;
+ if(!el('archiveDate').value){el('archiveStatus').textContent='Ayrılış tarihini belirtin.';return;}
+ state.deleteBusy=true;el('archiveConfirm').disabled=true;el('archiveCancel').disabled=true;
+ el('archiveStatus').textContent='Arşivleniyor…';
+ try{
+  await request('/rest/v1/rpc/site_archive_unit_person','POST',{
+   target_link_id:state.archivingLinkId,archive_note:el('archiveNote').value.trim(),
+   departure_date:el('archiveDate').value});
+  if(state.editingLinkId===state.archivingLinkId)clearPersonForm();
+  el('archiveDialog').close();
+  await loadPeople();state.showArchived=true;renderPersonList();render();
+  setPersonMessage('✓ Kişi arşivlendi. Bu daireye ait portal erişimi kapatıldı.');
+ }catch(error){el('archiveStatus').textContent='Arşivleme hatası: '+error.message;}
+ finally{state.deleteBusy=false;el('archiveConfirm').disabled=false;el('archiveCancel').disabled=false;}
+}
+async function restorePerson(linkId){
+ if(!canEdit()||state.deleteBusy)return;
+ const link=state.unitPeople.find(l=>l.id===linkId&&l.unit_id===state.selectedUnitId&&!l.is_current);
+ const person=link&&state.people.find(p=>p.id===link.person_id);
+ if(!link||!person)return;
+ if(!confirm(person.full_name+' arşivden geri yüklensin mi? Portal erişimi otomatik olarak açılmaz.'))return;
+ state.deleteBusy=true;setPersonMessage('Geri yükleniyor…');
+ try{
+  await request('/rest/v1/rpc/site_restore_unit_person','POST',{target_link_id:linkId});
+  await loadPeople();state.showArchived=false;renderPersonList();render();
+  setPersonMessage('✓ Kişi geri yüklendi. Portal için gerekirse Davet Gönder kullanın.');
+ }catch(error){setPersonMessage('Geri yükleme hatası: '+error.message,true);}
+ finally{state.deleteBusy=false;}
+}
 function prepareDeletePerson(linkId){
- if(!canEdit()||state.contactBusy||state.deleteBusy||state.inviteBusy.has(linkId))return;
+ if(state.role!=='manager'||state.deleteBusy||state.contactBusy)return;
  const link=state.unitPeople.find(l=>l.id===linkId&&l.unit_id===state.selectedUnitId);
  const person=link&&state.people.find(p=>p.id===link.person_id);
- const unit=link&&state.units.find(u=>u.id===link.unit_id);
- if(!link||!person||!unit)return;
+ if(!link||!person)return;
  const others=state.unitPeople.filter(l=>l.person_id===person.id&&l.id!==link.id);
- const hadAccess=state.residentLinks.some(r=>r.person_id===person.id&&r.unit_id===unit.id&&r.active);
  state.deletingLinkId=linkId;
- el('deletePersonText').textContent=person.full_name+' — '+unit.code+' dairesindeki kaydı silinecek.';
+ el('deletePersonText').textContent=person.full_name+' kişisinin bu dairedeki kaydı kalıcı olarak silinecek.';
  el('deletePersonDetails').textContent=others.length
-  ? 'Bu işlem yalnızca seçili daireyle bağlantıyı kaldırır. Diğer '+others.length+' daire bağlantısı korunur.'
-    +(hadAccess?' Bu daireye ait portal erişimi de kaldırılır.':'')
-  : 'Bu kişinin başka daire bağlantısı bulunmuyor. Kişinin iletişim bilgileri ve yönetim notları da silinir.'
-    +(hadAccess?' Portalın bu daireye erişimi kaldırılır.':'')
-    +' Bu işlem geri alınamaz.';
- el('deletePersonStatus').textContent='';
- el('confirmPersonDelete').disabled=false;
- el('cancelPersonDelete').disabled=false;
+  ?'Diğer '+others.length+' daireye ait kayıtları korunur.'
+  :'Başka daire bağlantısı bulunmuyor. Kişinin iletişim bilgileri ve özel yönetim notları da silinecektir. İşlem günlüğü kişisel içerik kopyalamaz.';
+ el('deleteReason').value=link.is_current?'yanlis_kayit':'kvkk_imha';
+ el('archiveInstead').classList.toggle('hidden',!link.is_current);
+ el('deleteVerify').value='';el('deletePersonStatus').textContent='';
+ el('confirmPersonDelete').disabled=true;
  el('deletePersonDialog').showModal();
 }
 async function confirmDeletePerson(){
- const linkId=state.deletingLinkId;
- if(!canEdit()||state.deleteBusy||!linkId)return;
- const link=state.unitPeople.find(l=>l.id===linkId&&l.unit_id===state.selectedUnitId);
- if(!link){el('deletePersonDialog').close();return;}
+ const id=state.deletingLinkId;
+ if(state.role!=='manager'||state.deleteBusy||!id||el('deleteVerify').value.trim()!=='SİL')return;
  state.deleteBusy=true;
- el('confirmPersonDelete').disabled=true;
- el('cancelPersonDelete').disabled=true;
- el('deletePersonStatus').textContent='Siliniyor…';
+ el('confirmPersonDelete').disabled=true;el('cancelPersonDelete').disabled=true;
+ el('archiveInstead').disabled=true;el('deletePersonStatus').textContent='Siliniyor…';
  try{
-  const result=await request('/rest/v1/rpc/site_delete_unit_person','POST',{target_link_id:linkId});
+  const result=await request('/rest/v1/rpc/site_purge_unit_person','POST',{
+   target_link_id:id,erase_reason:el('deleteReason').value});
   el('deletePersonDialog').close();
-  if(state.editingLinkId===linkId)clearPersonForm();
-  try{
-   await loadPeople();renderPersonList();render();
-   setPersonMessage(result==='unit_unlinked'
-    ? '✓ Daire bağlantısı silindi. Kişinin diğer daire kayıtları korundu.'
-    : '✓ Kişi kaydı silindi.');
-  }catch(_){
-   setPersonMessage('Kayıt silindi ancak ekran yenilenemedi. Sayfayı yenileyin.',true);
-  }
- }catch(error){
-  el('deletePersonStatus').textContent='Silme hatası: '+error.message;
- }finally{
-  state.deleteBusy=false;
-  el('confirmPersonDelete').disabled=false;
-  el('cancelPersonDelete').disabled=false;
+  if(state.editingLinkId===id)clearPersonForm();
+  await loadPeople();renderPersonList();render();
+  setPersonMessage(result==='person_erased'
+   ?'✓ Kişi silindi. Silme protokole işlendi.'
+   :'✓ Daire bağlantısı silindi. İşlem protokole işlendi.');
+ }catch(error){el('deletePersonStatus').textContent='Silme hatası: '+error.message;}
+ finally{
+  state.deleteBusy=false;el('confirmPersonDelete').disabled=false;
+  el('cancelPersonDelete').disabled=false;el('archiveInstead').disabled=false;
  }
 }
+const eventNames={
+ person_created:'Kişi oluşturuldu',person_updated:'Kişi bilgileri değiştirildi',
+ person_erased:'Kişi kalıcı silindi',relation_created:'Daire bağlantısı oluşturuldu',
+ relation_updated:'Daire ilişkisi değiştirildi',relation_archived:'Kişi arşivlendi',
+ relation_restored:'Kişi geri yüklendi',relation_erased:'Daire ilişkisi kalıcı silindi',
+ portal_access_granted:'Portal erişimi verildi',portal_access_removed:'Portal erişimi silindi',
+ portal_access_enabled:'Portal erişimi açıldı',portal_access_disabled:'Portal erişimi kapatıldı',
+ unit_status_changed:'Daire doluluk durumu değişti'
+};
+const fieldNames={full_name:'Ad soyad',phone:'Telefon',email:'E-posta',
+ admin_note:'Yönetim notu',relation:'Malik / kiracı',is_current:'Aktif / arşiv',
+ started_on:'Başlangıç tarihi',ended_on:'Bitiş tarihi',archived_at:'Arşiv tarihi',
+ portal_access:'Portal erişimi',occupancy_status:'Doluluk durumu'};
+async function openAudit(unitId=null){
+ if(!isStaff())return;
+ el('auditTitle').textContent=unitId?
+  (state.units.find(u=>u.id===unitId)?.code||'Daire')+' · İşlem Geçmişi':'Site İşlem Geçmişi';
+ el('auditList').textContent='İşlem geçmişi yükleniyor…';el('auditDialog').showModal();
+ try{
+  const path='/rest/v1/site_audit_events?select=id,site_id,unit_id,person_id,actor_user_id,actor_email,event_type,changed_fields,details,happened_at&site_id=eq.'+
+   encodeURIComponent(state.site.id)+(unitId?'&unit_id=eq.'+encodeURIComponent(unitId):'')+
+   '&order=happened_at.desc&limit=150';
+  const rows=await request(path);
+  const people=new Map(state.people.map(p=>[p.id,p]));
+  const units=new Map(state.units.map(u=>[u.id,u]));
+  el('auditList').innerHTML=rows.length?rows.map(ev=>{
+   const name=people.get(ev.person_id)?.full_name||'Silinmiş kişi kaydı';
+   const unit=units.get(ev.unit_id)?.code||'';
+   const fields=(ev.changed_fields||[]).map(f=>fieldNames[f]||f).join(', ');
+   const reason=ev.details?.reason;
+   const reasonText=reason==='yanlis_kayit'?'Yanlış kayıt':reason==='kvkk_imha'?'KVKK kapsamında imha':reason||'';
+   return '<div class="audit-event"><strong>'+esc(eventNames[ev.event_type]||ev.event_type)+'</strong>'+
+    '<p>'+esc(timeTr(ev.happened_at))+' · İşlemi yapan: '+esc(ev.actor_email||ev.actor_user_id||'Sistem')+'</p>'+
+    '<p>'+(unit?'Daire: '+esc(unit)+' · ':'')+(ev.person_id?'Kişi: '+esc(name):'')+'</p>'+
+    (fields?'<p>Değişen alanlar: '+esc(fields)+'</p>':'')+
+    (reasonText?'<p>Gerekçe: '+esc(reasonText)+'</p>':'')+'</div>';
+  }).join(''):'<p class="muted">Henüz işlem kaydı yok.</p>';
+ }catch(error){el('auditList').textContent='Geçmiş yüklenemedi: '+error.message;}
+}
+el('personTabs').addEventListener('click',event=>{
+ const button=event.target.closest('button[data-list-tab]');
+ if(!button)return;
+ state.showArchived=button.dataset.listTab==='archive';
+ clearPersonForm();renderPersonList();
+});
+el('openAudit').addEventListener('click',()=>openAudit());
+el('unitAudit').addEventListener('click',()=>openAudit(state.selectedUnitId));
+el('closeAudit').addEventListener('click',()=>el('auditDialog').close());
+el('archiveConfirm').addEventListener('click',submitArchive);
+el('archiveCancel').addEventListener('click',()=>{if(!state.deleteBusy)el('archiveDialog').close();});
+el('archiveDialog').addEventListener('cancel',event=>{if(state.deleteBusy)event.preventDefault();});
+el('archiveDialog').addEventListener('close',()=>{state.archivingLinkId=null;});
 el('confirmPersonDelete').addEventListener('click',confirmDeletePerson);
+el('deleteVerify').addEventListener('input',()=>{
+ el('confirmPersonDelete').disabled=el('deleteVerify').value.trim()!=='SİL';
+});
 el('cancelPersonDelete').addEventListener('click',()=>{if(!state.deleteBusy)el('deletePersonDialog').close();});
+el('archiveInstead').addEventListener('click',()=>{
+ const linkId=state.deletingLinkId;
+ el('deletePersonDialog').close();
+ prepareArchivePerson(linkId);
+});
 el('deletePersonDialog').addEventListener('cancel',event=>{if(state.deleteBusy)event.preventDefault();});
 el('deletePersonDialog').addEventListener('close',()=>{state.deletingLinkId=null;});
 el('personList').addEventListener('click',event=>{
@@ -666,6 +759,10 @@ el('personList').addEventListener('click',event=>{
  if(edit){editPerson(edit.dataset.editPerson);return;}
  const invite=event.target.closest('button[data-invite-person]');
  if(invite){invitePerson(invite.dataset.invitePerson);return;}
+ const arch=event.target.closest('button[data-archive-person]');
+ if(arch){prepareArchivePerson(arch.dataset.archivePerson);return;}
+ const restore=event.target.closest('button[data-restore-person]');
+ if(restore){restorePerson(restore.dataset.restorePerson);return;}
  const remove=event.target.closest('button[data-delete-person]');
  if(remove)prepareDeletePerson(remove.dataset.deletePerson);
 });
