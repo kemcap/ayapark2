@@ -239,9 +239,18 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
 <dialog id="auditDialog" class="audit-dialog" aria-labelledby="auditTitle">
 <div class="dialog-top"><div><div class="kicker">Denetim / İşlem Protokolü</div><h2 id="auditTitle">İşlem Geçmişi</h2><p class="muted">İşlemi yapan kişi, tarih ve değişen alanlar.</p></div><button type="button" id="closeAudit">✕</button></div>
 <div id="auditList" class="audit-list"></div>
-<p class="protocol-note">KVKK: Kişisel veriler süresiz saklanmamalıdır. Silme ve imha işlemleri kayıt altına alınır. Saklama süreleri kanuni yükümlülük ve somut işleme amacına göre belirlenir.</p>
+<details style="margin-top:16px">
+<summary style="cursor:pointer;color:var(--blue);font-weight:700">KVKK · Saklama ve İmha Usulü</summary>
+<div class="protocol-note" style="color:var(--muted)">
+<p><strong>1. Amaç:</strong> Malik/kiracı kayıtlarının güncel yönetimi, geçmiş daire ilişkileri, yönetim denetimi ve varsa hukuki yükümlülükler. Gereksiz veriler kaydedilmez.</p>
+<p><strong>2. Erişim:</strong> Kişisel bilgiler yalnızca yetkili site yönetimi ve denetim hesabıyla görüntülenebilir. Arşivlenen kişinin o daireye portal erişimi kapatılır.</p>
+<p><strong>3. Saklama:</strong> Arşiv süresiz saklama izni değildir. Her kayıt için hukuki dayanak ve gerekli saklama süresi ayrıca değerlendirilir; bu modül otomatik süre sonu imhası yapmaz.</p>
+<p><strong>4. İmha:</strong> İşleme nedenleri sona ermiş kişisel veriler silinir, yok edilir veya anonim hale getirilir. Silme/imha işlemlerinin kayıtları mevzuata göre kural olarak en az 3 yıl tutulur. Uygulanabilir imha süresi ve yönteminin yazılı politikada belirlenmesi gerekir.</p>
+<p><strong>5. Denetim:</strong> İşlem türü, değişen alanlar, yapan hesap ve zaman tutulur; eski telefon, e-posta ve özel not içerikleri işlem günlüğüne kopyalanmaz. Uygulama üzerinden günlük kayıtları değiştirilemez.</p>
+<p><a href="https://www.kvkk.gov.tr/Icerik/5441/KISISEL-VERILERIN-SILINMESI-YOK-EDILMESI-VEYA-ANONIM-HALE-GETIRILMESI-HAKKINDA-YONETMELIK" target="_blank" rel="noopener noreferrer">KVKK Silme, Yok Etme ve Anonimleştirme Yönetmeliği ↗</a></p>
+</div></details>
 </dialog>
-<footer class="footer">Site Yönetim · Aya Park 2 — Pilot sürüm. Bu sayfada henüz sakin isimleri ve ödeme tutarları bulunmaz. Önceki aidat ve borç takip sayfası bağımsız çalışmaya devam eder.</footer>
+<footer class="footer">Site Yönetim · Aya Park 2. Kişi kayıtları ve işlem geçmişi yalnızca yetkili kullanıcılar tarafından görüntülenir. Önceki aidat ve borç takip sayfası bağımsız çalışmaya devam eder.</footer>
 </main>
 <script>
 (function(){
