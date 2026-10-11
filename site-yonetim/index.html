@@ -81,6 +81,20 @@ p{margin:4px 0 0}
 .directory-intro code{color:#d0e6f7;word-break:break-word}
 .person-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
 .person-actions button{padding:7px 8px;font-size:11px}
+.archive-corner{padding:4px 7px;font-size:11px;white-space:nowrap}
+.person-tabs{display:flex;gap:8px;margin:12px 0}
+.person-tabs button{flex:1}
+.person-tabs button[aria-pressed="true"]{background:#215576;color:#fff;border-color:var(--blue)}
+.person-actions button.archive-control{border-color:#786b46;color:#fff0c9;background:#554532}
+.person-actions button.restore-control{border-color:#588e73;color:#caffdf;background:#22513d}
+.archive-meta{color:var(--orange);font-size:11px;margin:5px 0}
+.audit-dialog{width:min(720px,calc(100vw - 24px));max-height:88vh;overflow:auto;background:#12263b;color:var(--text);border:1px solid var(--edge);border-radius:14px;padding:22px}
+.audit-list{display:grid;gap:7px;max-height:55vh;overflow:auto;margin:15px 0}
+.audit-event{background:#183149;border:1px solid var(--edge);border-radius:8px;padding:11px}
+.audit-event p{font-size:11px;color:var(--muted);margin:4px 0}
+.archive-field{display:grid;gap:5px;font-size:12px;color:var(--muted);margin:11px 0}
+.archive-field input,.archive-field select{width:100%}
+.protocol-note{font-size:12px;color:var(--orange);line-height:1.6;margin:12px 0}
 .person-actions .delete-person-button{color:#ffcecb;border-color:#85555b;background:#452b35}
 .person-actions .delete-person-button:hover{background:#65363e;border-color:#d2848c}
 .delete-confirm-dialog{width:min(455px,calc(100vw - 24px));max-height:88vh;overflow:auto;background:#15293c;color:var(--text);border:1px solid #765459;border-radius:14px;padding:25px;box-shadow:0 15px 65px #0009}
@@ -146,7 +160,7 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
   <div id="authMessage" class="status" role="status">Bu sayfadaki daire bilgileri giriş yapılmadan görüntülenmez.</div>
 </section>
 <section id="app" class="hidden" aria-label="Daire listesi">
-  <div class="userbar"><span id="roleBadge" class="pill"></span><span id="syncMessage" class="status" role="status"></span></div>
+  <div class="userbar"><span id="roleBadge" class="pill"></span><button id="openAudit" type="button" class="hidden">📋 İşlem Geçmişi</button><span id="syncMessage" class="status" role="status"></span></div>
   <div class="summary">
     <div class="stat"><span>Görüntülenen Daire</span><strong id="statUnits">0</strong></div>
     <div class="stat"><span>Dolu</span><strong id="statOccupied">0</strong></div>
@@ -177,7 +191,11 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
     <div><div class="kicker">Daire sakinleri · Yönetim kaydı</div><h2 id="personDialogTitle">Daire Kişileri</h2><p class="muted">Bu kişiler otomatik olarak giriş hesabı oluşturmaz. Portal erişimi ayrıca tanımlanır.</p></div>
     <button id="closePersonDialog" type="button" aria-label="Kapat">✕</button>
   </div>
-  <div id="personList" class="dialog-list"></div>
+  <div id="personTabs" class="person-tabs">
+<button type="button" data-list-tab="active" aria-pressed="true">Aktif Kişiler</button>
+<button type="button" data-list-tab="archive" aria-pressed="false">📦 Arşiv</button></div>
+<div id="personList" class="dialog-list"></div>
+<button id="unitAudit" type="button">📋 Daire İşlem Geçmişi</button>
   <form id="personForm" class="contact-form">
     <h3 id="personFormTitle">Yeni Kişi Ekle</h3>
     <div id="personModePicker" class="mode-picker">
@@ -202,15 +220,26 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
     <div id="personMessage" role="status" class="status"></div>
   </form>
 </dialog>
-<dialog id="deletePersonDialog" class="delete-confirm-dialog" aria-labelledby="deletePersonTitle" aria-describedby="deletePersonText">
-  <h2 id="deletePersonTitle">Bu kişiyi silmek istediğinize emin misiniz?</h2>
-  <p id="deletePersonText"></p>
-  <p id="deletePersonDetails" class="delete-secondary"></p>
-  <p id="deletePersonStatus" class="status" role="status"></p>
-  <div class="delete-actions">
-    <button id="cancelPersonDelete" type="button">Vazgeç</button>
-    <button id="confirmPersonDelete" type="button" class="delete-danger">Evet, Sil</button>
-  </div>
+<dialog id="archiveDialog" class="delete-confirm-dialog" aria-labelledby="archiveTitle">
+<h2 id="archiveTitle">Kişiyi arşive taşımak istiyor musunuz?</h2><p id="archiveInfo"></p>
+<label class="archive-field">Ayrılış tarihi<input id="archiveDate" type="date" required></label>
+<label class="archive-field">Açıklama (isteğe bağlı)<input id="archiveNote" maxlength="500" placeholder="Örn. Kiracı taşındı"></label>
+<p class="protocol-note">Kişi arşivde saklanır; bu daireye ait portal erişimi kapatılır. Daha sonra geri yüklenebilir.</p>
+<p id="archiveStatus" role="status" class="status"></p>
+<div class="delete-actions"><button id="archiveCancel" type="button">Vazgeç</button><button id="archiveConfirm" type="button" class="primary">Arşive Taşı</button></div>
+</dialog>
+<dialog id="deletePersonDialog" class="delete-confirm-dialog" aria-labelledby="deletePersonTitle">
+<h2 id="deletePersonTitle">Kalıcı olarak silmek istiyor musunuz?</h2><p id="deletePersonText"></p>
+<p class="protocol-note">⚠ Kişi yanlışlıkla girilmediyse geçmiş verilerin kaybolmaması için Arşivle seçeneğini kullanın.</p>
+<p id="deletePersonDetails" class="delete-secondary"></p>
+<label class="archive-field">Silme gerekçesi<select id="deleteReason"><option value="yanlis_kayit">Yanlışlıkla girilen kayıt</option><option value="kvkk_imha">KVKK kapsamında değerlendirilmiş imha</option></select></label>
+<label class="archive-field">Onaylamak için SİL yazın<input id="deleteVerify" autocomplete="off" placeholder="SİL"></label>
+<p id="deletePersonStatus" role="status" class="status"></p>
+<div class="delete-actions"><button id="cancelPersonDelete" type="button">Vazgeç</button><button id="archiveInstead" type="button">📦 Arşivle</button><button id="confirmPersonDelete" type="button" class="delete-danger" disabled>Kalıcı Sil</button></div></dialog>
+<dialog id="auditDialog" class="audit-dialog" aria-labelledby="auditTitle">
+<div class="dialog-top"><div><div class="kicker">Denetim / İşlem Protokolü</div><h2 id="auditTitle">İşlem Geçmişi</h2><p class="muted">İşlemi yapan kişi, tarih ve değişen alanlar.</p></div><button type="button" id="closeAudit">✕</button></div>
+<div id="auditList" class="audit-list"></div>
+<p class="protocol-note">KVKK: Kişisel veriler süresiz saklanmamalıdır. Silme ve imha işlemleri kayıt altına alınır. Saklama süreleri kanuni yükümlülük ve somut işleme amacına göre belirlenir.</p>
 </dialog>
 <footer class="footer">Site Yönetim · Aya Park 2 — Pilot sürüm. Bu sayfada henüz sakin isimleri ve ödeme tutarları bulunmaz. Önceki aidat ve borç takip sayfası bağımsız çalışmaya devam eder.</footer>
 </main>
@@ -221,7 +250,7 @@ const CONFIG={url:'https://eisozwhhinqszfikemot.supabase.co',publishableKey:'sb_
 const SESSION_KEY='site-yonetim:aya-park-2:auth-v1';
 const el=id=>document.getElementById(id);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',rememberSession:false,saving:new Set(),people:[],unitPeople:[],residentLinks:[],inviteBusy:new Set(),selectedUnitId:null,editingLinkId:null,deletingLinkId:null,deleteBusy:false,personMode:'new',contactBusy:false};
+const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',rememberSession:false,saving:new Set(),people:[],unitPeople:[],residentLinks:[],inviteBusy:new Set(),selectedUnitId:null,showArchived:false,editingLinkId:null,deletingLinkId:null,archivingLinkId:null,deleteBusy:false,personMode:'new',contactBusy:false};
 let refreshPromise=null;
 function readSavedRefresh(){
  try{
@@ -330,6 +359,7 @@ async function loadData(){
  await loadPeople();
  const names={manager:'Yönetici',deputy:'Yönetici Yardımcısı',auditor:'Denetçi',resident:'Sakin'};
  el('roleBadge').textContent=names[state.role]||'Sakin';
+ el('openAudit').classList.toggle('hidden',!isStaff());
  sync('● Veriler Supabase üzerinden yüklendi');
  render();
 }
@@ -340,7 +370,7 @@ async function loadPeople(){
  const siteId=encodeURIComponent(state.site.id);
  const [people,links,residents]=await Promise.all([
   request('/rest/v1/site_people?select=id,site_id,full_name,phone,email,admin_note&site_id=eq.'+siteId+'&order=full_name.asc'),
-  request('/rest/v1/site_unit_people?select=id,site_id,unit_id,person_id,relation,is_current,started_on,ended_on&site_id=eq.'+siteId+'&order=created_at.asc'),
+  request('/rest/v1/site_unit_people?select=id,site_id,unit_id,person_id,relation,is_current,started_on,ended_on,archived_at,archived_by,archive_reason&site_id=eq.'+siteId+'&order=created_at.asc'),
   canEdit()?request('/rest/v1/site_resident_units?select=unit_id,person_id,user_id,role,active&active=eq.true'):Promise.resolve([])
  ]);
  state.people=people;state.unitPeople=links;state.residentLinks=residents;
@@ -348,9 +378,8 @@ async function loadPeople(){
 function relationLabel(x){return {owner:'Kat Maliki',tenant:'Kiracı'}[x]||'Önceki ilişki';}
 
 function clearSession(){
- state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.rememberSession=false;state.people=[];state.unitPeople=[];state.residentLinks=[];state.inviteBusy.clear();state.selectedUnitId=null;state.editingLinkId=null;state.deletingLinkId=null;state.deleteBusy=false;state.personMode='new';state.contactBusy=false;state.saving.clear();
- el('deletePersonDialog').close();
- el('personDialog').close();
+ state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.rememberSession=false;state.people=[];state.unitPeople=[];state.residentLinks=[];state.inviteBusy.clear();state.selectedUnitId=null;state.showArchived=false;state.editingLinkId=null;state.deletingLinkId=null;state.archivingLinkId=null;state.deleteBusy=false;state.personMode='new';state.contactBusy=false;state.saving.clear();
+ ['archiveDialog','auditDialog','deletePersonDialog','personDialog'].forEach(id=>{if(el(id).open)el(id).close();});
  el('userBadge').textContent='';el('loginPanel').classList.remove('hidden');el('app').classList.add('hidden');el('logout').classList.add('hidden');
 }
 async function logout(){
@@ -383,8 +412,10 @@ function render(){
     const writable=canEdit();
     const chooser=writable?'<label>Doluluk durumu<select data-unit-id="'+esc(u.id)+'" aria-label="'+esc(u.code)+' doluluk durumu" '+(state.saving.has(u.id)?'disabled':'')+'><option value="unknown" '+(u.occupancy_status==='unknown'?'selected':'')+'>Bilinmiyor</option><option value="occupied" '+(u.occupancy_status==='occupied'?'selected':'')+'>Dolu</option><option value="vacant" '+(u.occupancy_status==='vacant'?'selected':'')+'>Boş</option></select></label>':'<span class="muted" style="font-size:11px">Salt okunur</span>';
     const linked=state.unitPeople.filter(link=>link.unit_id===u.id && link.is_current).length;
+    const archCount=state.unitPeople.filter(link=>link.unit_id===u.id&&!link.is_current).length;
+    const archButton=isStaff()?'<button class="archive-corner" type="button" data-unit-archive="'+esc(u.id)+'" title="Daire arşivi">📦 '+archCount+'</button>':'';
     const residentButton=isStaff()?'<button type="button" class="person-button" data-person-unit="'+esc(u.id)+'">👥 Kişiler ('+linked+')</button>':'';
-    return '<article class="unit" data-state="'+esc(u.occupancy_status)+'"><div class="head"><h3>'+esc(u.code)+'</h3><span class="number">DAİRE</span></div><span class="state">'+esc(labelFor(u.occupancy_status))+'</span>'+chooser+residentButton+'</article>';
+    return '<article class="unit" data-state="'+esc(u.occupancy_status)+'"><div class="head"><h3>'+esc(u.code)+'</h3>'+archButton+'</div><span class="state">'+esc(labelFor(u.occupancy_status))+'</span>'+chooser+residentButton+'</article>';
    }).join('');
    return '<section class="block"><div class="blockhead"><h2>'+esc(b.code)+' Blok</h2><span class="count">'+rows.length+' daire</span></div><div class="cards">'+cards+'</div></section>';
  }).join('');
@@ -409,7 +440,7 @@ async function updateOccupancy(id,value){
 function setPersonMessage(message,error=false){el('personMessage').textContent=message;el('personMessage').classList.toggle('contact-error',error);}
 function availablePeople(){
  if(!state.selectedUnitId)return [];
- const assigned=new Set(state.unitPeople.filter(x=>x.unit_id===state.selectedUnitId && x.is_current).map(x=>x.person_id));
+ const assigned=new Set(state.unitPeople.filter(x=>x.unit_id===state.selectedUnitId).map(x=>x.person_id));
  return state.people.filter(p=>!assigned.has(p.id)).sort((a,b)=>a.full_name.localeCompare(b.full_name,'tr-TR'));
 }
 function updatePersonMode(){
@@ -491,7 +522,7 @@ function editPerson(linkId){
  el('personRelation').value=link.relation;el('personActive').value=String(link.is_current);
  el('personFormTitle').textContent='Kişiyi Düzenle';
  state.personMode='new';
- el('personActiveLabel').classList.remove('hidden');
+ el('personActiveLabel').classList.add('hidden');
  el('cancelPersonEdit').classList.remove('hidden');
  setPersonMessage('');updatePersonMode();
  el('personName').focus();
@@ -512,7 +543,7 @@ async function submitPerson(event){
     {full_name:name,phone,email,admin_note:note});
    if(!Array.isArray(updated)||updated.length!==1)throw Error('Kişi güncellenemedi.');
    const changed=await request('/rest/v1/site_unit_people?id=eq.'+encodeURIComponent(current.id),'PATCH',
-    {relation,is_current:el('personActive').value==='true'});
+    {relation});
    if(!Array.isArray(changed)||changed.length!==1)throw Error('Daire ilişkisi güncellenemedi.');
   }else if(existing){
    const personId=el('existingPerson').value;
