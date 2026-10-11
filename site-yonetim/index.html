@@ -410,7 +410,7 @@ dialog::backdrop{background:rgba(2,7,13,.78);backdrop-filter:blur(7px)}
     <div class="stat"><div class="stat-top"><span>Boş Daire</span><span class="stat-icon blue">◇</span></div><strong id="statVacant">0</strong><small>Takip edilebilir</small></div>
     <div class="stat"><div class="stat-top"><span>Durum Bekliyor</span><span class="stat-icon warm">◷</span></div><strong id="statUnknown">0</strong><small>Kontrol gerekli</small></div>
   </div>
-  <div class="directory-heading"><div><div class="section-eyebrow">DAİRE REHBERİ</div><h2>Blok ve Daireler</h2><p class="muted">Dairelere ait kişi ve arşiv kayıtlarını yönetin.</p></div><span class="directory-hint">A + B BLOK</span></div>
+  <div class="directory-heading"><div><div class="section-eyebrow">DAİRE REHBERİ</div><h2>Blok ve Daireler</h2><p class="muted">Dairelere ait kişi ve arşiv kayıtlarını yönetin.</p></div><span class="directory-hint" id="visibleCount">20 DAİRE</span></div>
   <div class="toolbar">
     <div class="filters">
       <label class="filter">Daire Ara<span class="search-wrap"><span aria-hidden="true">⌕</span><input id="unitSearch" type="search" placeholder="Örn. A-5" autocomplete="off"></span></label>
@@ -657,14 +657,35 @@ window.addEventListener('storage',event=>{
  if(event.key===SESSION_KEY&&!event.newValue&&state.rememberSession)logout();
 });
 function labelFor(status){return {unknown:'Durum belirtilmedi',occupied:'Dolu',vacant:'Boş'}[status]||'Bilinmiyor';}
+let dashboardNumbersAnimated=false;
+function displayDashboardNumbers(){
+ const numbers=[
+  ['statUnits',state.units.length],
+  ['statOccupied',state.units.filter(u=>u.occupancy_status==='occupied').length],
+  ['statVacant',state.units.filter(u=>u.occupancy_status==='vacant').length],
+  ['statUnknown',state.units.filter(u=>u.occupancy_status==='unknown').length]
+ ];
+ if(!dashboardNumbersAnimated && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  dashboardNumbersAnimated=true;
+  const start=performance.now(),duration=650;
+  const animate=now=>{
+   const position=Math.min((now-start)/duration,1);
+   const eased=1-Math.pow(1-position,3);
+   numbers.forEach(([id,target])=>el(id).textContent=Math.round(target*eased));
+   if(position<1)requestAnimationFrame(animate);
+  };
+  requestAnimationFrame(animate);
+ }else{
+  dashboardNumbersAnimated=true;
+  numbers.forEach(([id,target])=>el(id).textContent=target);
+ }
+}
 function render(){
  const q=el('unitSearch').value.trim().toLocaleLowerCase('tr-TR');
  const block=el('blockFilter').value,filter=el('statusFilter').value;
  const displayed=state.units.filter(u=>(!q||u.code.toLocaleLowerCase('tr-TR').includes(q))&&(block==='all'||u.code.startsWith(block+'-'))&&(filter==='all'||u.occupancy_status===filter));
- el('statUnits').textContent=state.units.length;
- el('statOccupied').textContent=state.units.filter(u=>u.occupancy_status==='occupied').length;
- el('statVacant').textContent=state.units.filter(u=>u.occupancy_status==='vacant').length;
- el('statUnknown').textContent=state.units.filter(u=>u.occupancy_status==='unknown').length;
+ displayDashboardNumbers();
+ el('visibleCount').textContent=displayed.length+' DAİRE GÖSTERİLİYOR';
  el('directoryIntro').classList.toggle('hidden',!isStaff());
  const container=el('blockLists');
  container.innerHTML=state.blocks.map(b=>{
