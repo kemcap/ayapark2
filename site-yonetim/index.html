@@ -78,6 +78,9 @@ p{margin:4px 0 0}
 @media(max-width:520px){.shell{padding:18px 12px 36px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:1fr}.stat strong{font-size:23px}.toolbar{display:block}.filters{margin-bottom:12px}.filter{flex:1}.filter input,.filter select{width:100%;min-width:0}.unit{padding:11px}}
 
 .directory-intro{margin-top:12px;font-size:12px;color:var(--muted)}
+.mode-picker{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px;margin-bottom:8px}
+.mode-picker button{flex:1 1 140px}
+.mode-picker button[aria-pressed="true"]{border-color:var(--blue);color:var(--blue);background:#163f5e}
 .person-button{width:100%;margin-top:10px;padding:7px 5px;font-size:11px;border:1px solid #46657a;background:#1b3b56}
 dialog.person-dialog{width:min(720px,calc(100vw - 24px));max-height:88vh;overflow:auto;background:#12263b;color:var(--text);border:1px solid #42627d;border-radius:15px;padding:23px;box-shadow:0 15px 65px #0009}
 dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
@@ -164,12 +167,19 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
   <div id="personList" class="dialog-list"></div>
   <form id="personForm" class="contact-form">
     <h3 id="personFormTitle">Yeni Kişi Ekle</h3>
+    <div id="personModePicker" class="mode-picker">
+      <button type="button" data-person-mode="new" aria-pressed="true">Yeni Kişi</button>
+      <button type="button" data-person-mode="existing" aria-pressed="false">Kayıtlı Kişiyi Bağla</button>
+    </div>
+    <p id="linkPersonHint" class="directory-intro hidden">Kişi yeniden oluşturulmaz; mevcut kişi kaydı bu daireye de bağlanır.</p>
+    <p id="sharedPersonHint" class="directory-intro hidden">Bu kişinin iletişim bilgilerini değiştirmeniz, bağlı olduğu diğer dairelerde de güncelleyecektir.</p>
     <div class="fields">
-      <label class="wide">Ad Soyad *<input id="personName" autocomplete="off" required minlength="2" maxlength="180" placeholder="Ad ve soyad"></label>
-      <label>İlişki *<select id="personRelation" required><option value="owner">Kat Maliki</option><option value="tenant">Kiracı</option><option value="occupant">Sakin</option><option value="representative">Temsilci</option></select></label>
-      <label>Telefon<input id="personPhone" type="tel" autocomplete="off" maxlength="48" placeholder="05xx ..."></label>
-      <label class="wide">E-posta<input id="personEmail" type="email" autocomplete="off" maxlength="254" placeholder="ornek@eposta.com"></label>
-      <label class="wide">Yalnızca yönetim için not<textarea id="personNote" maxlength="4000" rows="2" placeholder="İsteğe bağlı özel not"></textarea></label>
+      <label class="wide hidden" id="existingPersonLabel">Kayıtlı Kişi *<select id="existingPerson"><option value="">Kişi seçin</option></select></label>
+      <label class="wide person-new-only">Ad Soyad *<input id="personName" autocomplete="off" required minlength="2" maxlength="180" placeholder="Ad ve soyad"></label>
+      <label>İlişki *<select id="personRelation" required><option value="owner">Kat Maliki</option><option value="tenant">Kiracı</option></select></label>
+      <label class="person-new-only">Telefon<input id="personPhone" type="tel" autocomplete="off" maxlength="48" placeholder="05xx ..."></label>
+      <label class="wide person-new-only">E-posta<input id="personEmail" type="email" autocomplete="off" maxlength="254" placeholder="ornek@eposta.com"></label>
+      <label class="wide person-new-only">Yalnızca yönetim için not<textarea id="personNote" maxlength="4000" rows="2" placeholder="İsteğe bağlı özel not"></textarea></label>
       <label id="personActiveLabel" class="wide hidden"><span>İlişki durumu</span><select id="personActive"><option value="true">Aktif</option><option value="false">Eski kayıt (pasif)</option></select></label>
     </div>
     <div class="contact-actions">
@@ -188,7 +198,7 @@ const CONFIG={url:'https://eisozwhhinqszfikemot.supabase.co',publishableKey:'sb_
 const SESSION_KEY='site-yonetim:aya-park-2:auth-v1';
 const el=id=>document.getElementById(id);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',rememberSession:false,saving:new Set(),people:[],unitPeople:[],selectedUnitId:null,editingLinkId:null,contactBusy:false};
+const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',rememberSession:false,saving:new Set(),people:[],unitPeople:[],selectedUnitId:null,editingLinkId:null,personMode:'new',contactBusy:false};
 let refreshPromise=null;
 function readSavedRefresh(){
  try{
@@ -311,10 +321,10 @@ async function loadPeople(){
  ]);
  state.people=people;state.unitPeople=links;
 }
-function relationLabel(x){return {owner:'Kat Maliki',tenant:'Kiracı',occupant:'Sakin',representative:'Temsilci'}[x]||'Diğer';}
+function relationLabel(x){return {owner:'Kat Maliki',tenant:'Kiracı'}[x]||'Önceki ilişki';}
 
 function clearSession(){
- state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.rememberSession=false;state.people=[];state.unitPeople=[];state.selectedUnitId=null;state.editingLinkId=null;state.contactBusy=false;state.saving.clear();
+ state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.rememberSession=false;state.people=[];state.unitPeople=[];state.selectedUnitId=null;state.editingLinkId=null;state.personMode='new';state.contactBusy=false;state.saving.clear();
  el('personDialog').close();
  el('userBadge').textContent='';el('loginPanel').classList.remove('hidden');el('app').classList.add('hidden');el('logout').classList.add('hidden');
 }
@@ -372,11 +382,49 @@ async function updateOccupancy(id,value){
 }
 
 function setPersonMessage(message,error=false){el('personMessage').textContent=message;el('personMessage').classList.toggle('contact-error',error);}
+function availablePeople(){
+ if(!state.selectedUnitId)return [];
+ const assigned=new Set(state.unitPeople.filter(x=>x.unit_id===state.selectedUnitId && x.is_current).map(x=>x.person_id));
+ return state.people.filter(p=>!assigned.has(p.id)).sort((a,b)=>a.full_name.localeCompare(b.full_name,'tr-TR'));
+}
+function updatePersonMode(){
+ const editing=!!state.editingLinkId;
+ const existing=state.personMode==='existing'&&!editing;
+ el('personModePicker').classList.toggle('hidden',editing);
+ el('linkPersonHint').classList.toggle('hidden',!existing);
+ el('sharedPersonHint').classList.toggle('hidden',!editing);
+ el('existingPersonLabel').classList.toggle('hidden',!existing);
+ el('existingPerson').required=existing;
+ el('personName').required=!existing;
+ document.querySelectorAll('.person-new-only').forEach(node=>node.classList.toggle('hidden',existing));
+ document.querySelectorAll('[data-person-mode]').forEach(button=>{
+  button.setAttribute('aria-pressed',String(button.dataset.personMode===state.personMode));
+ });
+ if(existing){
+  const previous=el('existingPerson').value;
+  const persons=availablePeople();
+  el('existingPerson').innerHTML='<option value="">Kişi seçin</option>'+persons.map(person=>
+   '<option value="'+esc(person.id)+'">'+esc(person.full_name)+'</option>').join('');
+  if(persons.some(p=>p.id===previous))el('existingPerson').value=previous;
+  el('savePerson').disabled=!persons.length||state.contactBusy;
+  el('savePerson').textContent='Kişiyi Daireye Bağla';
+  if(!persons.length)setPersonMessage('Bağlanabilecek mevcut kişi bulunamadı.',true);
+ }else{
+  el('savePerson').disabled=state.contactBusy;
+  el('savePerson').textContent=editing?'Değişiklikleri Kaydet':'Kişiyi Kaydet';
+ }
+}
 function clearPersonForm(){
- el('personForm').reset();state.editingLinkId=null;
+ el('personForm').reset();state.editingLinkId=null;state.personMode='new';
  el('personFormTitle').textContent='Yeni Kişi Ekle';
  el('personActiveLabel').classList.add('hidden');el('cancelPersonEdit').classList.add('hidden');
- el('savePerson').textContent='Kişiyi Kaydet';setPersonMessage('');
+ setPersonMessage('');updatePersonMode();
+}
+function choosePersonMode(mode){
+ if(!canEdit()||state.editingLinkId||!['new','existing'].includes(mode))return;
+ state.personMode=mode;
+ el('personFormTitle').textContent=mode==='existing'?'Kayıtlı Kişiyi Bağla':'Yeni Kişi Ekle';
+ setPersonMessage('');updatePersonMode();
 }
 function renderPersonList(){
  const selected=state.units.find(u=>u.id===state.selectedUnitId);
@@ -413,17 +461,20 @@ function editPerson(linkId){
  el('personEmail').value=person.email||'';el('personNote').value=person.admin_note||'';
  el('personRelation').value=link.relation;el('personActive').value=String(link.is_current);
  el('personFormTitle').textContent='Kişiyi Düzenle';
+ state.personMode='new';
  el('personActiveLabel').classList.remove('hidden');
  el('cancelPersonEdit').classList.remove('hidden');
- el('savePerson').textContent='Değişiklikleri Kaydet';setPersonMessage('');
+ setPersonMessage('');updatePersonMode();
  el('personName').focus();
 }
 async function submitPerson(event){
  event.preventDefault();
  if(!canEdit()||!state.selectedUnitId||state.contactBusy)return;
+ const existing=state.personMode==='existing'&&!state.editingLinkId;
  const name=el('personName').value.trim(),phone=el('personPhone').value.trim(),
  email=el('personEmail').value.trim(),note=el('personNote').value.trim(),relation=el('personRelation').value;
- if(name.length<2){setPersonMessage('Ad Soyad en az iki karakter olmalıdır.',true);return;}
+ if(!['owner','tenant'].includes(relation)){setPersonMessage('Kat Maliki veya Kiracı seçin.',true);return;}
+ if(!existing&&name.length<2){setPersonMessage('Ad Soyad en az iki karakter olmalıdır.',true);return;}
  const current=state.editingLinkId&&state.unitPeople.find(l=>l.id===state.editingLinkId);
  state.contactBusy=true;el('savePerson').disabled=true;setPersonMessage('Kaydediliyor…');
  try{
@@ -434,6 +485,11 @@ async function submitPerson(event){
    const changed=await request('/rest/v1/site_unit_people?id=eq.'+encodeURIComponent(current.id),'PATCH',
     {relation,is_current:el('personActive').value==='true'});
    if(!Array.isArray(changed)||changed.length!==1)throw Error('Daire ilişkisi güncellenemedi.');
+  }else if(existing){
+   const personId=el('existingPerson').value;
+   if(!availablePeople().some(p=>p.id===personId))throw Error('Lütfen geçerli bir kayıtlı kişi seçin.');
+   await request('/rest/v1/rpc/site_link_existing_person','POST',{
+    target_unit_id:state.selectedUnitId,existing_person_id:personId,person_relation:relation});
   }else{
    await request('/rest/v1/rpc/site_register_unit_person','POST',
     {target_unit_id:state.selectedUnitId,person_full_name:name,person_relation:relation,
@@ -442,10 +498,13 @@ async function submitPerson(event){
   await loadPeople();clearPersonForm();renderPersonList();render();
   setPersonMessage('✓ Kişi kaydedildi.');
  }catch(error){setPersonMessage('Kayıt hatası: '+error.message,true);}
- finally{state.contactBusy=false;el('savePerson').disabled=false;}
+ finally{state.contactBusy=false;updatePersonMode();}
 }
 el('blockLists').addEventListener('click',event=>{
  const target=event.target.closest('button[data-person-unit]');if(target)openPeople(target.dataset.personUnit);
+});
+el('personModePicker').addEventListener('click',event=>{
+ const target=event.target.closest('button[data-person-mode]');if(target)choosePersonMode(target.dataset.personMode);
 });
 el('personList').addEventListener('click',event=>{
  const target=event.target.closest('button[data-edit-person]');if(target)editPerson(target.dataset.editPerson);
