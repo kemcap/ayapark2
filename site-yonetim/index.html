@@ -78,6 +78,10 @@ p{margin:4px 0 0}
 @media(max-width:520px){.shell{padding:18px 12px 36px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:1fr}.stat strong{font-size:23px}.toolbar{display:block}.filters{margin-bottom:12px}.filter{flex:1}.filter input,.filter select{width:100%;min-width:0}.unit{padding:11px}}
 
 .directory-intro{margin-top:12px;font-size:12px;color:var(--muted)}
+.directory-intro code{color:#d0e6f7;word-break:break-word}
+.person-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.person-actions button{padding:7px 8px;font-size:11px}
+.invite-status{display:block;margin-top:6px;font-size:11px;color:var(--teal);font-weight:700}
 .mode-picker{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px;margin-bottom:8px}
 .mode-picker button{flex:1 1 140px}
 .mode-picker button[aria-pressed="true"]{border-color:var(--blue);color:var(--blue);background:#163f5e}
@@ -112,7 +116,7 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
 <main class="shell">
 <div class="topline">
   <div class="brand"><div class="brandmark" aria-hidden="true">SY</div><div><strong>Site Yönetim</strong><span>Aya Park 2 · Yönetim ve Sakin Portalı</span></div></div>
-  <div class="userbar"><span id="userBadge" class="identity"></span><button id="logout" class="hidden" type="button">Çıkış Yap</button></div>
+  <div class="userbar"><a href="./sakin/" title="Sakin Portalı">Sakin Portalı ↗</a><span id="userBadge" class="identity"></span><button id="logout" class="hidden" type="button">Çıkış Yap</button></div>
 </div>
 <div class="hero">
   <div><div class="kicker">İlk geliştirme aşaması · Daire kayıtları</div><h1>Daire Yönetimi</h1><p class="muted">A Blok ve B Blok için güvenli daire kayıtları. Yönetim tüm daireleri, sakinler yalnızca kendilerine yetki verilen daireleri görebilir.</p></div>
@@ -148,7 +152,7 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
     </div>
     <button id="clearFilters" type="button">Filtreleri Temizle</button>
   </div>
-  <p id="directoryIntro" class="directory-intro hidden">Her daire için kat maliki ve kiracı ekleyebilir, iletişim bilgilerini ve ilişki durumlarını yönetebilirsiniz. Kayıtlar yalnızca yetkili yöneticiler tarafından düzenlenebilir.</p>
+  <p id="directoryIntro" class="directory-intro hidden">Her daire için kat maliki ve kiracı kaydedebilir, kişileri birden fazla daireye bağlayabilirsiniz. E-posta adresi girilmiş kişilere <strong>Davet Gönder</strong> ile kişisel portal erişimi verebilirsiniz. Davet bağlantısının çalışması için Supabase URL Configuration içinde <code>https://kemcap.github.io/ayapark2/site-yonetim/sakin/</code> yönlendirmesi izinli olmalıdır.</p>
   <div id="blockLists"></div>
   <section class="roadmap">
     <h2>Sonraki geliştirme adımları</h2>
@@ -198,7 +202,7 @@ const CONFIG={url:'https://eisozwhhinqszfikemot.supabase.co',publishableKey:'sb_
 const SESSION_KEY='site-yonetim:aya-park-2:auth-v1';
 const el=id=>document.getElementById(id);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',rememberSession:false,saving:new Set(),people:[],unitPeople:[],selectedUnitId:null,editingLinkId:null,personMode:'new',contactBusy:false};
+const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',rememberSession:false,saving:new Set(),people:[],unitPeople:[],residentLinks:[],inviteBusy:new Set(),selectedUnitId:null,editingLinkId:null,personMode:'new',contactBusy:false};
 let refreshPromise=null;
 function readSavedRefresh(){
  try{
@@ -313,18 +317,19 @@ async function loadData(){
 function isStaff(){return ['manager','deputy','auditor'].includes(state.role);}
 function canEdit(){return state.role==='manager'||state.role==='deputy';}
 async function loadPeople(){
- if(!isStaff()){state.people=[];state.unitPeople=[];return;}
+ if(!isStaff()){state.people=[];state.unitPeople=[];state.residentLinks=[];return;}
  const siteId=encodeURIComponent(state.site.id);
- const [people,links]=await Promise.all([
+ const [people,links,residents]=await Promise.all([
   request('/rest/v1/site_people?select=id,site_id,full_name,phone,email,admin_note&site_id=eq.'+siteId+'&order=full_name.asc'),
-  request('/rest/v1/site_unit_people?select=id,site_id,unit_id,person_id,relation,is_current,started_on,ended_on&site_id=eq.'+siteId+'&order=created_at.asc')
+  request('/rest/v1/site_unit_people?select=id,site_id,unit_id,person_id,relation,is_current,started_on,ended_on&site_id=eq.'+siteId+'&order=created_at.asc'),
+  canEdit()?request('/rest/v1/site_resident_units?select=unit_id,person_id,user_id,role,active&active=eq.true'):Promise.resolve([])
  ]);
- state.people=people;state.unitPeople=links;
+ state.people=people;state.unitPeople=links;state.residentLinks=residents;
 }
 function relationLabel(x){return {owner:'Kat Maliki',tenant:'Kiracı'}[x]||'Önceki ilişki';}
 
 function clearSession(){
- state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.rememberSession=false;state.people=[];state.unitPeople=[];state.selectedUnitId=null;state.editingLinkId=null;state.personMode='new';state.contactBusy=false;state.saving.clear();
+ state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.rememberSession=false;state.people=[];state.unitPeople=[];state.residentLinks=[];state.inviteBusy.clear();state.selectedUnitId=null;state.editingLinkId=null;state.personMode='new';state.contactBusy=false;state.saving.clear();
  el('personDialog').close();
  el('userBadge').textContent='';el('loginPanel').classList.remove('hidden');el('app').classList.add('hidden');el('logout').classList.add('hidden');
 }
@@ -438,11 +443,14 @@ function renderPersonList(){
    const details=[person.phone,person.email].filter(Boolean).map(esc).join(' · ');
    const inactive=link.is_current?'':' <span class="archived">(Pasif)</span>';
    const edit=canEdit()?'<button type="button" data-edit-person="'+esc(link.id)+'">Düzenle</button>':'';
+   const hasAccess=state.residentLinks.some(r=>r.unit_id===link.unit_id&&r.person_id===person.id&&r.active);
+   const invite=canEdit()&&link.is_current&&!hasAccess?'<button type="button" data-invite-person="'+esc(link.id)+'" '+(state.inviteBusy.has(link.id)||!person.email?'disabled':'')+' title="'+(!person.email?'Önce e-posta adresi ekleyin.':'Bu kişiye e-posta daveti gönder')+'">✉ Davet Gönder</button>':'';
+   const status=hasAccess?'<span class="invite-status">✓ Portal erişimi tanımlı</span>':'';
    return '<div class="person-row"><div><span class="relation">'+esc(relationLabel(link.relation))+'</span>'+inactive+
      '<div class="person-name">'+esc(person.full_name)+'</div>'+
      (details?'<div class="person-sub">'+details+'</div>':'')+
      (person.admin_note?'<div class="person-sub">Not: '+esc(person.admin_note)+'</div>':'')+
-     '</div>'+edit+'</div>';
+     status+'</div><div class="person-actions">'+edit+invite+'</div></div>';
  }).join(''):'<div class="dialog-empty">Bu daireye henüz kişi eklenmedi.</div>';
 }
 function openPeople(unitId){
@@ -506,8 +514,33 @@ el('blockLists').addEventListener('click',event=>{
 el('personModePicker').addEventListener('click',event=>{
  const target=event.target.closest('button[data-person-mode]');if(target)choosePersonMode(target.dataset.personMode);
 });
+async function invitePerson(linkId){
+ if(!canEdit()||state.inviteBusy.has(linkId))return;
+ const link=state.unitPeople.find(x=>x.id===linkId&&x.is_current);
+ const person=link&&state.people.find(p=>p.id===link.person_id);
+ const unit=link&&state.units.find(u=>u.id===link.unit_id);
+ if(!link||!person||!unit)return;
+ if(!person.email){setPersonMessage('Önce kişinin e-posta adresini ekleyin.',true);return;}
+ if(!confirm(person.full_name+' için '+person.email+' adresine '+unit.code+' dairesi portal daveti gönderilsin mi?'))return;
+ state.inviteBusy.add(linkId);renderPersonList();setPersonMessage('Davet gönderiliyor…');
+ try{
+  await ensureToken();
+  const response=await fetch(CONFIG.url+'/functions/v1/site-invite-resident',{
+   method:'POST',headers:{apikey:CONFIG.publishableKey,Authorization:'Bearer '+state.token,'Content-Type':'application/json'},
+   body:JSON.stringify({unit_person_link_id:linkId}),cache:'no-store'
+  });
+  const payload=await response.json();
+  if(!response.ok)throw Error(payload?.error||'Davet gönderilemedi.');
+  await loadPeople();renderPersonList();render();
+  setPersonMessage('✓ '+(payload.message||'Portal erişimi tanımlandı.'));
+ }catch(error){setPersonMessage('Davet hatası: '+error.message,true);}
+ finally{state.inviteBusy.delete(linkId);renderPersonList();}
+}
 el('personList').addEventListener('click',event=>{
- const target=event.target.closest('button[data-edit-person]');if(target)editPerson(target.dataset.editPerson);
+ const edit=event.target.closest('button[data-edit-person]');
+ if(edit){editPerson(edit.dataset.editPerson);return;}
+ const invite=event.target.closest('button[data-invite-person]');
+ if(invite)invitePerson(invite.dataset.invitePerson);
 });
 el('closePersonDialog').addEventListener('click',()=>el('personDialog').close());
 el('cancelPersonEdit').addEventListener('click',clearPersonForm);
