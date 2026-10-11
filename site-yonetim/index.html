@@ -363,6 +363,7 @@ dialog::backdrop{background:rgba(2,7,13,.78);backdrop-filter:blur(7px)}
 </style>
 </head>
 <body>
+<div id="toastArea" role="status" aria-live="polite"></div>
 <main class="shell">
 <div class="topline">
   <div class="brand">
@@ -669,14 +670,14 @@ function render(){
  container.innerHTML=state.blocks.map(b=>{
    const rows=displayed.filter(u=>u.block_id===b.id).sort((a,b)=>a.number-b.number);
    if(!rows.length)return '';
-   const cards=rows.map(u=>{
+   const cards=rows.map((u,index)=>{
     const writable=canEdit();
     const chooser=writable?'<label>Doluluk durumu<select data-unit-id="'+esc(u.id)+'" aria-label="'+esc(u.code)+' doluluk durumu" '+(state.saving.has(u.id)?'disabled':'')+'><option value="unknown" '+(u.occupancy_status==='unknown'?'selected':'')+'>Bilinmiyor</option><option value="occupied" '+(u.occupancy_status==='occupied'?'selected':'')+'>Dolu</option><option value="vacant" '+(u.occupancy_status==='vacant'?'selected':'')+'>Boş</option></select></label>':'<span class="muted" style="font-size:11px">Salt okunur</span>';
     const linked=state.unitPeople.filter(link=>link.unit_id===u.id && link.is_current).length;
     const archCount=state.unitPeople.filter(link=>link.unit_id===u.id&&!link.is_current).length;
     const archButton=isStaff()?'<button class="archive-corner" type="button" data-unit-archive="'+esc(u.id)+'" title="Daire arşivi · '+archCount+' kayıt" aria-label="'+esc(u.code)+' dairesi arşivini aç">'+"<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"5\" rx=\"1.5\"></rect><path d=\"M5 9v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9\"></path><path d=\"M10 13h4\"></path></svg>"+'<span class="archive-badge">'+archCount+'</span></button>':'';
     const residentButton=isStaff()?'<button type="button" class="person-button" data-person-unit="'+esc(u.id)+'">👥 Kişiler ('+linked+')</button>':'';
-    return '<article class="unit" data-state="'+esc(u.occupancy_status)+'"><div class="head"><h3>'+esc(u.code)+'</h3>'+archButton+'</div><span class="state">'+esc(labelFor(u.occupancy_status))+'</span>'+chooser+residentButton+'</article>';
+    return '<article class="unit" style="--card-order:'+index+'" data-state="'+esc(u.occupancy_status)+'"><div class="head"><h3>'+esc(u.code)+'</h3>'+archButton+'</div><span class="state">'+esc(labelFor(u.occupancy_status))+'</span>'+chooser+residentButton+'</article>';
    }).join('');
    return '<section class="block"><div class="blockhead"><h2>'+esc(b.code)+' Blok</h2><span class="count">'+rows.length+' daire</span></div><div class="cards">'+cards+'</div></section>';
  }).join('');
@@ -698,7 +699,20 @@ async function updateOccupancy(id,value){
  finally{state.saving.delete(id);render();}
 }
 
-function setPersonMessage(message,error=false){el('personMessage').textContent=message;el('personMessage').classList.toggle('contact-error',error);}
+function showToast(message,error=false){
+ if(!message)return;
+ const target=el('toastArea');if(!target)return;
+ const item=document.createElement('div');
+ item.className='toast-note'+(error?' error':'');
+ item.textContent=message.replace(/^✓\s*/,'');
+ target.appendChild(item);
+ setTimeout(()=>item.remove(),4200);
+}
+function setPersonMessage(message,error=false){
+ el('personMessage').textContent=message;
+ el('personMessage').classList.toggle('contact-error',error);
+ if(error||message.startsWith('✓'))showToast(message,error);
+}
 function availablePeople(){
  if(!state.selectedUnitId)return [];
  const assigned=new Set(state.unitPeople.filter(x=>x.unit_id===state.selectedUnitId).map(x=>x.person_id));
@@ -955,43 +969,152 @@ async function confirmDeletePerson(){
  }
 }
 const eventNames={
- person_created:'Kişi oluşturuldu',person_updated:'Kişi bilgileri değiştirildi',
- person_erased:'Kişi kalıcı silindi',relation_created:'Daire bağlantısı oluşturuldu',
- relation_updated:'Daire ilişkisi değiştirildi',relation_archived:'Kişi arşivlendi',
- relation_restored:'Kişi geri yüklendi',relation_erased:'Daire ilişkisi kalıcı silindi',
- portal_access_granted:'Portal erişimi verildi',portal_access_removed:'Portal erişimi silindi',
- portal_access_enabled:'Portal erişimi açıldı',portal_access_disabled:'Portal erişimi kapatıldı',
- unit_status_changed:'Daire doluluk durumu değişti'
+ person_created:'Kişi kaydı oluşturuldu',
+ person_updated:'Kişi bilgileri güncellendi',
+ person_erased:'Kişi kaydı kalıcı olarak silindi',
+ relation_created:'Daireye kişi kaydedildi',
+ relation_updated:'Daire ilişkisi değiştirildi',
+ relation_archived:'Kişi arşive taşındı',
+ relation_restored:'Kişi arşivden geri yüklendi',
+ relation_erased:'Daire bağlantısı kalıcı olarak silindi',
+ portal_access_granted:'Sakin portalı erişimi tanımlandı',
+ portal_access_removed:'Sakin portalı erişimi kaldırıldı',
+ portal_access_enabled:'Sakin portalı erişimi etkinleştirildi',
+ portal_access_disabled:'Sakin portalı erişimi kapatıldı',
+ unit_status_changed:'Dairenin doluluk durumu değişti',
+ audit_view_reset:'Yeni protokol dönemi başlatıldı'
 };
 const fieldNames={full_name:'Ad soyad',phone:'Telefon',email:'E-posta',
- admin_note:'Yönetim notu',relation:'Malik / kiracı',is_current:'Aktif / arşiv',
+ admin_note:'Yönetim notu',relation:'Malik / kiracı',is_current:'Aktif / arşiv durumu',
  started_on:'Başlangıç tarihi',ended_on:'Bitiş tarihi',archived_at:'Arşiv tarihi',
  portal_access:'Portal erişimi',occupancy_status:'Doluluk durumu'};
+let auditData=[], auditUnitScope=null, auditResetAt=null;
+function auditCategory(type){
+ if(type==='relation_archived'||type==='relation_restored')return 'archive';
+ if(type==='person_erased'||type==='relation_erased')return 'delete';
+ if(type==='unit_status_changed')return 'unit';
+ return 'person';
+}
+function auditInitials(name){
+ if(!name||name.startsWith('KVKK')||name.startsWith('Kişi kaydı'))return '◈';
+ return name.trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0)).join('').toLocaleUpperCase('tr-TR')||'◈';
+}
+function auditPersonName(event,people){
+ if(event.details?.privacy_erased)return 'KVKK kapsamında anonimleştirilen kişi';
+ return event.details?.subject_name||
+        people.get(event.person_id)?.full_name||
+        (event.person_id?'Önceki kayıtlardan kişi':'Genel yönetim işlemi');
+}
+function renderAuditLog(){
+ if(!el('auditDialog').open)return;
+ const q=el('auditSearch').value.trim().toLocaleLowerCase('tr-TR');
+ const type=el('auditType').value;
+ const people=new Map(state.people.map(x=>[x.id,x]));
+ const units=new Map(state.units.map(x=>[x.id,x]));
+ let rows=auditData;
+ if(auditUnitScope){
+  const unitPersonIds=new Set(rows.filter(x=>x.unit_id===auditUnitScope && x.person_id).map(x=>x.person_id));
+  state.unitPeople.filter(x=>x.unit_id===auditUnitScope).forEach(x=>unitPersonIds.add(x.person_id));
+  rows=rows.filter(x=>x.unit_id===auditUnitScope||(x.person_id&&unitPersonIds.has(x.person_id)));
+ }
+ rows=rows.filter(event=>{
+  const category=auditCategory(event.event_type);
+  if(type==='archive'&&category!=='archive')return false;
+  if(type==='delete'&&category!=='delete')return false;
+  if(type==='unit'&&category!=='unit')return false;
+  if(type==='person'&&category==='unit')return false;
+  if(!q)return true;
+  const searchable=[
+   auditPersonName(event,people),event.actor_email,
+   event.details?.unit_code,units.get(event.unit_id)?.code,
+   eventNames[event.event_type],event.details?.reason
+  ].filter(Boolean).join(' ').toLocaleLowerCase('tr-TR');
+  return searchable.includes(q);
+ });
+ el('auditPeriod').textContent='Yeni dönem · v0.2.0'+
+  (auditResetAt?'  ·  '+timeTr(auditResetAt)+' tarihinden itibaren':'')+
+  '  ·  '+rows.length+' işlem  ·  Kayıtlar kronolojik sıralanır';
+ if(!rows.length){
+  el('auditList').innerHTML='<div class="audit-empty"><div class="empty-icon">✧</div><h3>'+
+   (auditData.length?'Bu filtreye uygun işlem bulunamadı':'Yeni işlem geçmişi hazır')+
+   '</h3><p>'+(
+    auditData.length?'Arama kelimesini veya işlem türünü değiştirebilirsiniz.':
+    'Eski test döneminin protokolü bu görünümde sıfırlandı. Yeni kayıt, arşivleme ve silme işlemleri burada kişi bazında görünecek.'
+   )+'</p></div>';
+  return;
+ }
+ const groups=new Map();
+ for(const event of rows){
+  const key=event.person_id?'person:'+event.person_id:
+   event.unit_id?'unit:'+event.unit_id:'system';
+  if(!groups.has(key))groups.set(key,[]);
+  groups.get(key).push(event);
+ }
+ el('auditList').innerHTML=[...groups.values()].map(group=>{
+  const latest=group[0];
+  const personEvent=group.find(ev=>ev.details?.subject_name);
+  const anonymized=group.some(ev=>ev.details?.privacy_erased);
+  const name=anonymized?'KVKK kapsamında anonimleştirilen kişi':
+   (personEvent?auditPersonName(personEvent,people):auditPersonName(latest,people));
+  const unitLabels=[...new Set(group.map(ev=>ev.details?.unit_code||units.get(ev.unit_id)?.code).filter(Boolean))];
+  const relation=group.find(ev=>ev.details?.relation||ev.details?.new_relation)?.details;
+  const relationText=relation?.new_relation||relation?.relation||'';
+  const subtitle=[
+   unitLabels.length?unitLabels.join(' · ')+' daire':'',
+   relationText?({owner:'Kat Maliki',tenant:'Kiracı'}[relationText]||relationText):'',
+   !latest.person_id?'Yönetim kaydı':''
+  ].filter(Boolean).join('  ·  ');
+  const timeline=group.map(event=>{
+   const cat=auditCategory(event.event_type);
+   const t=cat==='delete'?'event-danger':cat==='archive'?'event-archive':
+    event.event_type.endsWith('created')?'event-create':'';
+   const eventUnit=event.details?.unit_code||units.get(event.unit_id)?.code||'';
+   const reason=event.details?.reason;
+   const why=reason==='yanlis_kayit'?'Yanlışlıkla girilen kayıt':
+    reason==='kvkk_imha'?'KVKK kapsamında imha':reason;
+   const changed=(event.changed_fields||[]).map(f=>fieldNames[f]||f).join(', ');
+   const actor=event.actor_email||(event.actor_user_id?'Yetkili kullanıcı':'Otomatik sistem');
+   return '<div class="audit-event '+t+'"><div class="audit-event-title"><strong>'+
+    esc(eventNames[event.event_type]||event.event_type)+
+    '</strong><time datetime="'+esc(event.happened_at)+'">'+esc(timeTr(event.happened_at))+'</time></div>'+
+    '<p>İşlemi yapan: <b>'+esc(actor)+'</b>'+
+     (eventUnit?' · Daire: <b>'+esc(eventUnit)+'</b>':'')+'</p>'+
+    (changed?'<p>Değişiklik: '+esc(changed)+'</p>':'')+
+    (why?'<p>Gerekçe: '+esc(why)+'</p>':'')+
+    '</div>';
+  }).join('');
+  return '<section class="audit-person-card"><div class="audit-person-head">'+
+   '<div class="audit-avatar">'+esc(auditInitials(name))+'</div>'+
+   '<div><strong>'+esc(name)+'</strong><div><span>'+esc(subtitle||'Kayıt geçmişi')+'</span></div></div>'+
+   '<span class="audit-count">'+group.length+' işlem</span></div>'+
+   '<div class="audit-timeline">'+timeline+'</div></section>';
+ }).join('');
+}
 async function openAudit(unitId=null){
  if(!isStaff())return;
+ auditUnitScope=unitId;
  el('auditTitle').textContent=unitId?
-  (state.units.find(u=>u.id===unitId)?.code||'Daire')+' · İşlem Geçmişi':'Site İşlem Geçmişi';
- el('auditList').textContent='İşlem geçmişi yükleniyor…';el('auditDialog').showModal();
+  (state.units.find(u=>u.id===unitId)?.code||'Daire')+' · İşlem Geçmişi':
+  'İşlem Geçmişi';
+ el('auditSearch').value='';el('auditType').value='all';
+ el('auditPeriod').textContent='Kayıtlar hazırlanıyor…';
+ el('auditList').textContent='İşlem geçmişi yükleniyor…';
+ el('auditDialog').showModal();
  try{
-  const path='/rest/v1/site_audit_events?select=id,site_id,unit_id,person_id,actor_user_id,actor_email,event_type,changed_fields,details,happened_at&site_id=eq.'+
-   encodeURIComponent(state.site.id)+(unitId?'&unit_id=eq.'+encodeURIComponent(unitId):'')+
-   '&order=happened_at.desc&limit=150';
-  const rows=await request(path);
-  const people=new Map(state.people.map(p=>[p.id,p]));
-  const units=new Map(state.units.map(u=>[u.id,u]));
-  el('auditList').innerHTML=rows.length?rows.map(ev=>{
-   const name=people.get(ev.person_id)?.full_name||'Silinmiş kişi kaydı';
-   const unit=units.get(ev.unit_id)?.code||'';
-   const fields=(ev.changed_fields||[]).map(f=>fieldNames[f]||f).join(', ');
-   const reason=ev.details?.reason;
-   const reasonText=reason==='yanlis_kayit'?'Yanlış kayıt':reason==='kvkk_imha'?'KVKK kapsamında imha':reason||'';
-   return '<div class="audit-event"><strong>'+esc(eventNames[ev.event_type]||ev.event_type)+'</strong>'+
-    '<p>'+esc(timeTr(ev.happened_at))+' · İşlemi yapan: '+esc(ev.actor_email||ev.actor_user_id||'Sistem')+'</p>'+
-    '<p>'+(unit?'Daire: '+esc(unit)+' · ':'')+(ev.person_id?'Kişi: '+esc(name):'')+'</p>'+
-    (fields?'<p>Değişen alanlar: '+esc(fields)+'</p>':'')+
-    (reasonText?'<p>Gerekçe: '+esc(reasonText)+'</p>':'')+'</div>';
-  }).join(''):'<p class="muted">Henüz işlem kaydı yok.</p>';
- }catch(error){el('auditList').textContent='Geçmiş yüklenemedi: '+error.message;}
+  const settings=await request(
+   '/rest/v1/site_audit_view_settings?select=hidden_through_id,reset_at&site_id=eq.'+
+   encodeURIComponent(state.site.id)+'&limit=1');
+  const baseline=Number(settings?.[0]?.hidden_through_id)||0;
+  auditResetAt=settings?.[0]?.reset_at||null;
+  auditData=await request(
+   '/rest/v1/site_audit_events?select=id,site_id,unit_id,person_id,actor_user_id,actor_email,event_type,changed_fields,details,happened_at'+
+   '&site_id=eq.'+encodeURIComponent(state.site.id)+
+   '&id=gt.'+baseline+'&order=happened_at.desc&limit=300');
+  renderAuditLog();
+ }catch(error){
+  el('auditList').textContent='Geçmiş yüklenemedi: '+error.message;
+  el('auditPeriod').textContent='';
+ }
 }
 el('personTabs').addEventListener('click',event=>{
  const button=event.target.closest('button[data-list-tab]');
@@ -999,6 +1122,8 @@ el('personTabs').addEventListener('click',event=>{
  state.showArchived=button.dataset.listTab==='archive';
  clearPersonForm();renderPersonList();
 });
+el('auditSearch').addEventListener('input',renderAuditLog);
+el('auditType').addEventListener('change',renderAuditLog);
 el('openAudit').addEventListener('click',()=>openAudit());
 el('unitAudit').addEventListener('click',()=>openAudit(state.selectedUnitId));
 el('closeAudit').addEventListener('click',()=>el('auditDialog').close());
@@ -1036,6 +1161,13 @@ el('clearFilters').addEventListener('click',()=>{el('unitSearch').value='';el('b
 el('blockLists').addEventListener('change',event=>{
  const target=event.target.closest('select[data-unit-id]');
  if(target)updateOccupancy(target.dataset.unitId,target.value);
+});
+document.addEventListener('keydown',event=>{
+ if(event.key!=='/'||event.ctrlKey||event.altKey||event.metaKey)return;
+ const typing=/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName||'');
+ if(typing||!el('app')||el('app').classList.contains('hidden')||
+    document.querySelector('dialog[open]'))return;
+ event.preventDefault();el('unitSearch').focus();
 });
 restoreSession();
 })();
