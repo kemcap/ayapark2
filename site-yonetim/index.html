@@ -324,7 +324,7 @@ async function logout(){
  clearSession();el('loginForm').reset();showStatus('Oturum kapatıldı.');
  // Revoke this Supabase session on the server as well; local sign-out must work offline.
  if(token)try{
-  await fetch(CONFIG.url+'/auth/v1/logout',{method:'POST',headers:{apikey:CONFIG.publishableKey,Authorization:'Bearer '+token},cache:'no-store'});
+  await fetch(CONFIG.url+'/auth/v1/logout?scope=local',{method:'POST',headers:{apikey:CONFIG.publishableKey,Authorization:'Bearer '+token},cache:'no-store'});
  }catch(_){}
 }
 window.addEventListener('storage',event=>{
