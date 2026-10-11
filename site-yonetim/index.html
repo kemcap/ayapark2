@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="dark">
-<title>Site Yönetim · Aya Park 2 · Daireler</title>
+<title>Aya Park 2 · Yönetim Paneli | v0.2.0</title>
 <style>
 :root{color-scheme:dark;--bg:#0a1420;--surface:#132437;--surface2:#1b3148;--edge:#324b60;--text:#eef4fc;--muted:#a6bad0;--blue:#81c7ff;--teal:#5dddb0;--orange:#f5c77c;--error:#ffb8b5}
 *{box-sizing:border-box}
@@ -179,13 +179,25 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
 <body>
 <main class="shell">
 <div class="topline">
-  <div class="brand"><div class="brandmark" aria-hidden="true">SY</div><div><strong>Site Yönetim</strong><span>Aya Park 2 · Yönetim ve Sakin Portalı</span></div></div>
-  <div class="userbar"><a href="./sakin/" title="Sakin Portalı">Sakin Portalı ↗</a><span id="userBadge" class="identity"></span><button id="logout" class="hidden" type="button">Çıkış Yap</button></div>
+  <div class="brand">
+    <div class="brandmark" aria-hidden="true">A<span>²</span></div>
+    <div class="brand-copy"><strong>AYA PARK <em>2</em></strong><span>YÖNETİM MERKEZİ</span></div>
+  </div>
+  <div class="userbar"><a class="resident-link" href="./sakin/" title="Sakin Portalı">Sakin Portalı <span aria-hidden="true">↗</span></a><span id="userBadge" class="identity"></span><button id="logout" class="hidden" type="button">Çıkış Yap <span aria-hidden="true">↗</span></button></div>
 </div>
-<div class="hero">
-  <div><div class="kicker">İlk geliştirme aşaması · Daire kayıtları</div><h1>Daire Yönetimi</h1><p class="muted">A Blok ve B Blok için güvenli daire kayıtları. Yönetim tüm daireleri, sakinler yalnızca kendilerine yetki verilen daireleri görebilir.</p></div>
-  <span class="pill">Sürüm 0.1 · Pilot</span>
-</div>
+<header class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow"><span class="live-point" aria-hidden="true"></span> AYA PARK 2 <span class="eyebrow-dot">·</span> YÖNETİM PANELİ</div>
+    <h1>Daha düzenli.<span class="hero-accent"> Daha şeffaf.</span></h1>
+    <p class="muted">20 daireyi, sakin kayıtlarını ve geçmiş işlemleri tek bir güvenli yönetim alanından takip edin.</p>
+    <div class="hero-chips"><span class="hero-chip">✦ Dijital yönetim</span><span class="hero-chip">◈ Güvenli kayıt</span><span class="hero-chip">↗ Akıllı takip</span></div>
+  </div>
+  <div class="hero-right" aria-label="Sürüm bilgisi">
+    <div class="hero-emblem" aria-hidden="true"><span>A</span><small>Ⅱ</small></div>
+    <span class="version-note">PILOT SÜRÜM</span>
+    <span class="version-number">v0.2.0</span>
+  </div>
+</header>
 <section id="loginPanel" class="panel auth" aria-label="Giriş">
   <h2>Hesabınızla giriş yapın</h2>
   <p class="muted">Mevcut yönetici hesabınızı kullanabilirsiniz. Sakin erişimi, yönetim tarafından tanımlandıktan sonra açılır.</p>
@@ -201,29 +213,33 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
   <div id="authMessage" class="status" role="status">Bu sayfadaki daire bilgileri giriş yapılmadan görüntülenmez.</div>
 </section>
 <section id="app" class="hidden" aria-label="Daire listesi">
-  <div class="userbar"><span id="roleBadge" class="pill"></span><button id="openAudit" type="button" class="hidden">📋 İşlem Geçmişi</button><span id="syncMessage" class="status" role="status"></span></div>
-  <div class="summary">
-    <div class="stat"><span>Görüntülenen Daire</span><strong id="statUnits">0</strong></div>
-    <div class="stat"><span>Dolu</span><strong id="statOccupied">0</strong></div>
-    <div class="stat"><span>Boş</span><strong id="statVacant">0</strong></div>
-    <div class="stat"><span>Durumu Bilinmeyen</span><strong id="statUnknown">0</strong></div>
+  <div class="dashboard-head">
+    <div class="dashboard-heading"><div class="section-eyebrow">GENEL BAKIŞ</div><h2>Yönetim Özeti</h2><span id="roleBadge" class="pill"></span></div>
+    <div class="dashboard-actions"><span id="syncMessage" class="status" role="status"></span><button id="openAudit" class="audit-open-button hidden" type="button"><span aria-hidden="true">◷</span> İşlem Geçmişi <span aria-hidden="true">↗</span></button></div>
   </div>
+  <div class="summary">
+    <div class="stat"><div class="stat-top"><span>Toplam Daire</span><span class="stat-icon">▦</span></div><strong id="statUnits">0</strong><small>A ve B Blok</small></div>
+    <div class="stat"><div class="stat-top"><span>Dolu Daire</span><span class="stat-icon positive">●</span></div><strong id="statOccupied">0</strong><small>Aktif kullanım</small></div>
+    <div class="stat"><div class="stat-top"><span>Boş Daire</span><span class="stat-icon blue">◇</span></div><strong id="statVacant">0</strong><small>Takip edilebilir</small></div>
+    <div class="stat"><div class="stat-top"><span>Durum Bekliyor</span><span class="stat-icon warm">◷</span></div><strong id="statUnknown">0</strong><small>Kontrol gerekli</small></div>
+  </div>
+  <div class="directory-heading"><div><div class="section-eyebrow">DAİRE REHBERİ</div><h2>Blok ve Daireler</h2><p class="muted">Dairelere ait kişi ve arşiv kayıtlarını yönetin.</p></div><span class="directory-hint">A + B BLOK</span></div>
   <div class="toolbar">
     <div class="filters">
-      <label class="filter">Daire Ara<input id="unitSearch" type="search" placeholder="Örn. A-5" autocomplete="off"></label>
+      <label class="filter">Daire Ara<span class="search-wrap"><span aria-hidden="true">⌕</span><input id="unitSearch" type="search" placeholder="Örn. A-5" autocomplete="off"></span></label>
       <label class="filter">Blok<select id="blockFilter"><option value="all">Tüm bloklar</option><option value="A">A Blok</option><option value="B">B Blok</option></select></label>
       <label class="filter">Durum<select id="statusFilter"><option value="all">Tüm durumlar</option><option value="occupied">Dolu</option><option value="vacant">Boş</option><option value="unknown">Bilinmiyor</option></select></label>
     </div>
-    <button id="clearFilters" type="button">Filtreleri Temizle</button>
+    <button id="clearFilters" class="clear-action" type="button">↺ Filtreleri Sıfırla</button>
   </div>
-  <p id="directoryIntro" class="directory-intro hidden">Her daire için kat maliki ve kiracı kaydedebilir, kişileri birden fazla daireye bağlayabilirsiniz. E-posta adresi girilmiş kişilere <strong>Davet Gönder</strong> ile kişisel portal erişimi verebilirsiniz. Davet bağlantısının çalışması için Supabase URL Configuration içinde <code>https://kemcap.github.io/ayapark2/site-yonetim/sakin/</code> yönlendirmesi izinli olmalıdır.</p>
+  <p id="directoryIntro" class="directory-intro hidden">✦ Her daireye kat maliki ve kiracı ekleyebilir, eski kayıtları arşivleyebilir ve işlemleri denetim geçmişinden takip edebilirsiniz.</p>
   <div id="blockLists"></div>
   <section class="roadmap">
-    <h2>Sonraki geliştirme adımları</h2>
+    <div class="section-eyebrow">YOL HARİTASI</div><h2>Gelecek Geliştirmeler</h2>
     <div class="next">
-      <div class="future"><strong>👥 Kat Malikleri ve Kiracılar</strong><span>Gerçek kişi kayıtları, davetler ve daire ilişkileri</span></div>
-      <div class="future"><strong>₺ Aidat ve Tahakkuk</strong><span>Finansal hareketlerden otomatik hesaplanan borçlar</span></div>
-      <div class="future"><strong>📄 Gelir / Gider ve Raporlar</strong><span>Tahsilat, banka, kasa, belge ve denetim raporları</span></div>
+      <div class="future"><div class="future-icon">♙</div><strong>İletişim Yönetimi</strong><span>Sakinlere alternatif giriş ve yetkili yakın desteği</span></div>
+      <div class="future"><div class="future-icon">₺</div><strong>Aidat ve Tahakkuk</strong><span>Ödeme hareketlerine bağlı güncel finans takibi</span></div>
+      <div class="future"><div class="future-icon">▤</div><strong>Raporlama Merkezi</strong><span>Gelir-gider tabloları, belgeler ve denetim raporları</span></div>
     </div>
   </section>
 </section>
@@ -282,8 +298,13 @@ dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
 <p id="deletePersonStatus" role="status" class="status"></p>
 <div class="delete-actions"><button id="cancelPersonDelete" type="button">Vazgeç</button><button id="confirmPersonDelete" type="button" class="delete-danger" disabled>Kalıcı Sil</button></div></dialog>
 <dialog id="auditDialog" class="audit-dialog" aria-labelledby="auditTitle">
-<div class="dialog-top"><div><div class="kicker">Denetim / İşlem Protokolü</div><h2 id="auditTitle">İşlem Geçmişi</h2><p class="muted">İşlemi yapan kişi, tarih ve değişen alanlar.</p></div><button type="button" id="closeAudit">✕</button></div>
-<div id="auditList" class="audit-list"></div>
+<div class="dialog-top"><div><div class="kicker">GÜVENLİ DENETİM MERKEZİ</div><h2 id="auditTitle">İşlem Geçmişi</h2><p class="muted">Kişi bazında kronolojik işlem dökümü, daire ve yönetici bilgileri.</p></div><button type="button" id="closeAudit" aria-label="Pencereyi kapat">✕</button></div>
+<div class="audit-toolbar">
+ <label class="filter">Kişi veya daire ara<input id="auditSearch" type="search" placeholder="Ad, daire veya işlem..." autocomplete="off"></label>
+ <label class="filter">İşlem türü<select id="auditType"><option value="all">Tüm işlemler</option><option value="person">Kişi işlemleri</option><option value="archive">Arşiv ve geri yükleme</option><option value="delete">Silme ve imha</option><option value="unit">Daire işlemleri</option></select></label>
+</div>
+<div id="auditPeriod" class="audit-period"></div>
+<div id="auditList" class="audit-list" aria-live="polite"></div>
 <details style="margin-top:16px">
 <summary style="cursor:pointer;color:var(--blue);font-weight:700">KVKK · Saklama ve İmha Usulü</summary>
 <div class="protocol-note" style="color:var(--muted)">
