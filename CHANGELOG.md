@@ -3,6 +3,13 @@
 Uygulama henüz pilot aşamasındadır. Kaynak kodunun her değişikliği GitHub commit geçmişinde tutulur.
 Önemli sürümlerde, ilgili commit ayrıca `releases/vX.Y.Z` dalıyla sabitlenir.
 
+## [0.2.1] — 2026-10-11
+**Yönetim paneli üst bölüm sadeleştirildi (pilot)**
+
+- Büyük tanıtım / slogan / logo / özellik etiketleri bölümü tamamen kaldırıldı.
+- Sürüm bilgisi üst navigasyonun sağ köşesine küçük `v0.2.1` etiketi olarak taşındı.
+- Mevcut yönetim, arşiv ve veri işlemleri değiştirilmedi.
+
 ## [0.2.0] — 2026-10-11
 **Premium arayüz ve yeni işlem protokolü (pilot)**
 
