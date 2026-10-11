@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="dark">
+<title>Site Yönetim · Aya Park 2 · Daireler</title>
+<style>
+:root{color-scheme:dark;--bg:#0a1420;--surface:#132437;--surface2:#1b3148;--edge:#324b60;--text:#eef4fc;--muted:#a6bad0;--blue:#81c7ff;--teal:#5dddb0;--orange:#f5c77c;--error:#ffb8b5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.48 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+button,input,select{font:inherit}
+button{color:var(--text);cursor:pointer;border:1px solid var(--edge);border-radius:8px;background:#203a53;padding:9px 14px;font-weight:650}
+button:hover{border-color:#6393b8;background:#294964}
+button:disabled{opacity:.5;cursor:not-allowed}
+input,select{background:#0c1c2b;border:1px solid var(--edge);color:var(--text);padding:10px 12px;border-radius:8px;min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+a{color:var(--blue)}
+.hidden{display:none!important}
+.shell{max-width:1200px;margin:0 auto;padding:28px 20px 65px}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:21px}
+.brand{display:flex;align-items:center;gap:12px}
+.brandmark{background:#185b85;border:1px solid #3986bd;width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:20px}
+.brand strong{display:block;font-size:15px;letter-spacing:-.02em}
+.brand span{color:var(--muted);font-size:11px}
+.kicker{color:var(--blue);text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:800;margin-bottom:7px}
+h1{font-size:clamp(27px,4vw,38px);letter-spacing:-.045em;margin:0 0 8px;line-height:1.13}
+h2{font-size:18px;margin:0 0 4px;letter-spacing:-.02em}
+p{margin:4px 0 0}
+.muted{color:var(--muted)}
+.hero{display:flex;align-items:end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:20px 0 19px}
+.hero p{max-width:760px;line-height:1.6}
+.pill{display:inline-block;border:1px solid var(--edge);border-radius:30px;background:#18334a;color:#bfe2ff;font-weight:750;font-size:11px;padding:7px 11px}
+.panel{background:var(--surface);border:1px solid var(--edge);border-radius:14px;padding:20px}
+.auth{max-width:660px;margin:32px auto 20px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:18px 0 13px}
+.formgrid label{display:grid;gap:6px;font-size:12px;font-weight:650;color:var(--muted)}
+.formgrid input{width:100%}
+.primary{background:#176fa9;border-color:#378fc8;color:#fff}
+.auth .primary{width:100%;padding:12px}
+.status{color:var(--muted);font-size:12px;min-height:21px;margin-top:9px}
+.status.error{color:var(--error)}
+.userbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.identity{color:var(--muted);font-size:12px}
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:17px 0}
+.stat{background:var(--surface);border:1px solid var(--edge);border-radius:12px;padding:15px}
+.stat span{font-size:11px;color:var(--muted);display:block;margin-bottom:5px}
+.stat strong{font-size:25px;font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.toolbar{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--edge);border-radius:12px;padding:13px;margin:16px 0}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.filter{display:grid;gap:5px;color:var(--muted);font-weight:700;font-size:11px}
+.filter input{width:145px}.filter select{min-width:130px}
+.block{margin-top:21px}
+.blockhead{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.blockhead h2{margin:0}
+.blockhead .count{font-size:11px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.unit{min-width:0;background:var(--surface);border:1px solid var(--edge);border-radius:12px;padding:14px}
+.unit .head{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.unit h3{margin:0;font-size:21px;letter-spacing:-.04em}
+.unit .number{color:var(--muted);font-size:10px;font-weight:750}
+.unit .state{display:block;margin:10px 0 13px;border-radius:5px;font-size:11px;font-weight:750;color:#f3cc8f}
+.unit[data-state="occupied"] .state{color:#81e5bc}
+.unit[data-state="vacant"] .state{color:#9eccf2}
+.unit label{display:grid;gap:5px;font-size:10px;font-weight:750;color:var(--muted)}
+.unit select{width:100%;padding:7px 5px;font-size:11px}
+.empty{border:1px dashed var(--edge);padding:25px;border-radius:10px;color:var(--muted);text-align:center}
+.roadmap{margin-top:28px;border-top:1px solid var(--edge);padding-top:22px}
+.next{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:13px 0}
+.future{border:1px solid var(--edge);background:#122234;border-radius:10px;padding:13px}
+.future strong{display:block;font-size:13px;margin-bottom:5px}
+.future span{font-size:11px;color:var(--muted)}
+.footer{margin-top:24px;color:var(--muted);font-size:11px;line-height:1.6}
+@media(max-width:1050px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:770px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.next{grid-template-columns:1fr}.summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.shell{padding:18px 12px 36px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:1fr}.stat strong{font-size:23px}.toolbar{display:block}.filters{margin-bottom:12px}.filter{flex:1}.filter input,.filter select{width:100%;min-width:0}.unit{padding:11px}}
+</style>
+</head>
+<body>
+<main class="shell">
+<div class="topline">
+  <div class="brand"><div class="brandmark" aria-hidden="true">SY</div><div><strong>Site Yönetim</strong><span>Aya Park 2 · Yönetim ve Sakin Portalı</span></div></div>
+  <div class="userbar"><span id="userBadge" class="identity"></span><button id="logout" class="hidden" type="button">Çıkış Yap</button></div>
+</div>
+<div class="hero">
+  <div><div class="kicker">İlk geliştirme aşaması · Daire kayıtları</div><h1>Daire Yönetimi</h1><p class="muted">A Blok ve B Blok için güvenli daire kayıtları. Yönetim tüm daireleri, sakinler yalnızca kendilerine yetki verilen daireleri görebilir.</p></div>
+  <span class="pill">Sürüm 0.1 · Pilot</span>
+</div>
+<section id="loginPanel" class="panel auth" aria-label="Giriş">
+  <h2>Hesabınızla giriş yapın</h2>
+  <p class="muted">Mevcut yönetici hesabınızı kullanabilirsiniz. Sakin erişimi, yönetim tarafından tanımlandıktan sonra açılır.</p>
+  <form id="loginForm">
+    <div class="formgrid">
+      <label>E-posta<input id="email" type="email" autocomplete="username" required placeholder="E-posta adresiniz"></label>
+      <label>Şifre<input id="password" type="password" autocomplete="current-password" required placeholder="Şifreniz"></label>
+    </div>
+    <button id="loginBtn" class="primary" type="submit">Giriş Yap</button>
+  </form>
+  <div id="authMessage" class="status" role="status">Bu sayfadaki daire bilgileri giriş yapılmadan görüntülenmez.</div>
+</section>
+<section id="app" class="hidden" aria-label="Daire listesi">
+  <div class="userbar"><span id="roleBadge" class="pill"></span><span id="syncMessage" class="status" role="status"></span></div>
+  <div class="summary">
+    <div class="stat"><span>Görüntülenen Daire</span><strong id="statUnits">0</strong></div>
+    <div class="stat"><span>Dolu</span><strong id="statOccupied">0</strong></div>
+    <div class="stat"><span>Boş</span><strong id="statVacant">0</strong></div>
+    <div class="stat"><span>Durumu Bilinmeyen</span><strong id="statUnknown">0</strong></div>
+  </div>
+  <div class="toolbar">
+    <div class="filters">
+      <label class="filter">Daire Ara<input id="unitSearch" type="search" placeholder="Örn. A-5" autocomplete="off"></label>
+      <label class="filter">Blok<select id="blockFilter"><option value="all">Tüm bloklar</option><option value="A">A Blok</option><option value="B">B Blok</option></select></label>
+      <label class="filter">Durum<select id="statusFilter"><option value="all">Tüm durumlar</option><option value="occupied">Dolu</option><option value="vacant">Boş</option><option value="unknown">Bilinmiyor</option></select></label>
+    </div>
+    <button id="clearFilters" type="button">Filtreleri Temizle</button>
+  </div>
+  <div id="blockLists"></div>
+  <section class="roadmap">
+    <h2>Sonraki geliştirme adımları</h2>
+    <div class="next">
+      <div class="future"><strong>👥 Kat Malikleri ve Kiracılar</strong><span>Gerçek kişi kayıtları, davetler ve daire ilişkileri</span></div>
+      <div class="future"><strong>₺ Aidat ve Tahakkuk</strong><span>Finansal hareketlerden otomatik hesaplanan borçlar</span></div>
+      <div class="future"><strong>📄 Gelir / Gider ve Raporlar</strong><span>Tahsilat, banka, kasa, belge ve denetim raporları</span></div>
+    </div>
+  </section>
+</section>
+<footer class="footer">Site Yönetim · Aya Park 2 — Pilot sürüm. Bu sayfada henüz sakin isimleri ve ödeme tutarları bulunmaz. Önceki aidat ve borç takip sayfası bağımsız çalışmaya devam eder.</footer>
+</main>
+<script>
+(function(){
+'use strict';
+const CONFIG={url:'https://eisozwhhinqszfikemot.supabase.co',publishableKey:'sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc'};
+const el=id=>document.getElementById(id);
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const state={token:'',refreshToken:'',expiresAt:0,userId:'',email:'',site:null,units:[],blocks:[],role:'',saving:new Set()};
+let refreshPromise=null;
+function showStatus(message,isError=false){el('authMessage').textContent=message;el('authMessage').classList.toggle('error',!!isError);}
+function sync(message,isError=false){el('syncMessage').textContent=message;el('syncMessage').classList.toggle('error',!!isError);}
+async function request(path,method='GET',data=null,authenticated=true){
+ if(authenticated)await ensureToken();
+ const headers={apikey:CONFIG.publishableKey,'Content-Type':'application/json'};
+ if(authenticated&&state.token)headers.Authorization='Bearer '+state.token;
+ if(method==='PATCH')headers.Prefer='return=representation';
+ const response=await fetch(CONFIG.url+path,{method,headers,body:data===null?undefined:JSON.stringify(data),cache:'no-store'});
+ const raw=await response.text();let payload;
+ try{payload=raw?JSON.parse(raw):null;}catch(_){payload=raw;}
+ if(!response.ok){const why=payload?.message||payload?.error_description||payload?.error||'HTTP '+response.status;throw Error(String(why));}
+ return payload;
+}
+async function ensureToken(){
+ if(!state.token)throw Error('Önce giriş yapın.');
+ if(Date.now()+60000 < state.expiresAt)return;
+ if(!state.refreshToken)throw Error('Oturum süresi doldu, yeniden giriş yapın.');
+ if(!refreshPromise)refreshPromise=(async()=>{
+  const next=await request('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:state.refreshToken},false);
+  if(!next.access_token)throw Error('Oturum yenilenemedi.');
+  state.token=next.access_token;state.refreshToken=next.refresh_token||state.refreshToken;
+  state.expiresAt=Date.now()+(Number(next.expires_in)||3600)*1000;
+ })().finally(()=>{refreshPromise=null;});
+ await refreshPromise;
+}
+async function enter(event){
+ event.preventDefault();el('loginBtn').disabled=true;showStatus('Giriş yapılıyor…');
+ try{
+  const session=await request('/auth/v1/token?grant_type=password','POST',{email:el('email').value.trim(),password:el('password').value},false);
+  if(!session.access_token||!session.user?.id)throw Error('Oturum açılmadı.');
+  state.token=session.access_token;state.refreshToken=session.refresh_token||'';
+  state.expiresAt=Date.now()+(Number(session.expires_in)||3600)*1000;
+  state.userId=session.user.id;state.email=session.user.email||el('email').value.trim();
+  const sites=await request('/rest/v1/site_sites?select=id,slug,name&slug=eq.aya-park-2&limit=1');
+  if(!Array.isArray(sites)||!sites.length)throw Error('Bu site için henüz erişim yetkiniz bulunmuyor.');
+  state.site=sites[0];
+  await loadData();
+  el('password').value='';
+  el('userBadge').textContent=state.email;
+  el('loginPanel').classList.add('hidden');
+  el('app').classList.remove('hidden');
+ }catch(error){clearSession();showStatus('Giriş yapılamadı: '+error.message,true);}
+ finally{el('loginBtn').disabled=false;}
+}
+async function loadData(){
+ const siteId=encodeURIComponent(state.site.id),uid=encodeURIComponent(state.userId);
+ const [blocks,units,memberships]=await Promise.all([
+  request('/rest/v1/site_blocks?select=id,code,site_id&site_id=eq.'+siteId+'&order=code.asc'),
+  request('/rest/v1/site_units?select=id,block_id,site_id,number,code,occupancy_status&site_id=eq.'+siteId+'&order=code.asc'),
+  request('/rest/v1/site_staff_memberships?select=role&site_id=eq.'+siteId+'&user_id=eq.'+uid)
+ ]);
+ state.blocks=blocks;state.units=units;state.role=memberships[0]?.role||'resident';
+ const names={manager:'Yönetici',deputy:'Yönetici Yardımcısı',auditor:'Denetçi',resident:'Sakin'};
+ el('roleBadge').textContent=names[state.role]||'Sakin';
+ sync('● Veriler Supabase üzerinden yüklendi');
+ render();
+}
+function canEdit(){return state.role==='manager'||state.role==='deputy';}
+function clearSession(){
+ state.token='';state.refreshToken='';state.expiresAt=0;state.userId='';state.email='';state.site=null;state.blocks=[];state.units=[];state.role='';state.saving.clear();
+ el('userBadge').textContent='';el('loginPanel').classList.remove('hidden');el('app').classList.add('hidden');el('logout').classList.add('hidden');
+}
+function logout(){clearSession();el('loginForm').reset();showStatus('Oturum kapatıldı.');}
+function labelFor(status){return {unknown:'Durum belirtilmedi',occupied:'Dolu',vacant:'Boş'}[status]||'Bilinmiyor';}
+function render(){
+ const q=el('unitSearch').value.trim().toLocaleLowerCase('tr-TR');
+ const block=el('blockFilter').value,filter=el('statusFilter').value;
+ const displayed=state.units.filter(u=>(!q||u.code.toLocaleLowerCase('tr-TR').includes(q))&&(block==='all'||u.code.startsWith(block+'-'))&&(filter==='all'||u.occupancy_status===filter));
+ el('statUnits').textContent=state.units.length;
+ el('statOccupied').textContent=state.units.filter(u=>u.occupancy_status==='occupied').length;
+ el('statVacant').textContent=state.units.filter(u=>u.occupancy_status==='vacant').length;
+ el('statUnknown').textContent=state.units.filter(u=>u.occupancy_status==='unknown').length;
+ const container=el('blockLists');
+ container.innerHTML=state.blocks.map(b=>{
+   const rows=displayed.filter(u=>u.block_id===b.id).sort((a,b)=>a.number-b.number);
+   if(!rows.length)return '';
+   const cards=rows.map(u=>{
+    const writable=canEdit();
+    const chooser=writable?'<label>Doluluk durumu<select data-unit-id="'+esc(u.id)+'" aria-label="'+esc(u.code)+' doluluk durumu" '+(state.saving.has(u.id)?'disabled':'')+'><option value="unknown" '+(u.occupancy_status==='unknown'?'selected':'')+'>Bilinmiyor</option><option value="occupied" '+(u.occupancy_status==='occupied'?'selected':'')+'>Dolu</option><option value="vacant" '+(u.occupancy_status==='vacant'?'selected':'')+'>Boş</option></select></label>':'<span class="muted" style="font-size:11px">Salt okunur</span>';
+    return '<article class="unit" data-state="'+esc(u.occupancy_status)+'"><div class="head"><h3>'+esc(u.code)+'</h3><span class="number">DAİRE</span></div><span class="state">'+esc(labelFor(u.occupancy_status))+'</span>'+chooser+'</article>';
+   }).join('');
+   return '<section class="block"><div class="blockhead"><h2>'+esc(b.code)+' Blok</h2><span class="count">'+rows.length+' daire</span></div><div class="cards">'+cards+'</div></section>';
+ }).join('');
+ if(!container.innerHTML)container.innerHTML='<div class="empty">Bu filtreye uyan daire bulunamadı.</div>';
+ el('logout').classList.remove('hidden');
+}
+async function updateOccupancy(id,value){
+ if(!canEdit()||!['unknown','occupied','vacant'].includes(value))return;
+ const unit=state.units.find(u=>u.id===id);if(!unit||state.saving.has(id))return;
+ const previous=unit.occupancy_status;
+ if(previous===value)return;
+ state.saving.add(id);sync('● Kaydediliyor…');
+ try{
+  const result=await request('/rest/v1/site_units?id=eq.'+encodeURIComponent(id),'PATCH',{occupancy_status:value});
+  if(!Array.isArray(result)||result.length!==1)throw Error('Kayıt güncellenemedi.');
+  unit.occupancy_status=result[0].occupancy_status;
+  sync('✓ '+unit.code+' kaydedildi.');
+ }catch(error){unit.occupancy_status=previous;sync('Kaydetme hatası: '+error.message,true);}
+ finally{state.saving.delete(id);render();}
+}
+el('loginForm').addEventListener('submit',enter);
+el('logout').addEventListener('click',logout);
+['unitSearch','blockFilter','statusFilter'].forEach(id=>el(id).addEventListener(id==='unitSearch'?'input':'change',render));
+el('clearFilters').addEventListener('click',()=>{el('unitSearch').value='';el('blockFilter').value='all';el('statusFilter').value='all';render();});
+el('blockLists').addEventListener('change',event=>{
+ const target=event.target.closest('select[data-unit-id]');
+ if(target)updateOccupancy(target.dataset.unitId,target.value);
+});
+})();
+</script>
+</body>
+</html>
