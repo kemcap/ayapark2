@@ -1311,3 +1311,18 @@ dialog p {
 .chart-track progress::-moz-progress-bar {
   background:#487b55
 }
+.pre-wrap { white-space:pre-wrap; overflow-wrap:anywhere; }
+.section-space { margin:26px 0 12px; }
+.contact-row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:15px 0; border-bottom:1px solid var(--line); }
+.contact-row p { font-size:12px; color:var(--muted); }
+.check-field { display:flex; align-items:flex-start; gap:10px; margin:20px 0; font-size:12px; }
+.check-field input { width:18px; height:18px; accent-color:var(--green); flex:none; }
+textarea { font:inherit; border:1px solid var(--line); border-radius:8px; padding:10px; resize:vertical; color:var(--ink); width:100%; }
+textarea:focus-visible { outline:3px solid #8aac59; outline-offset:3px; }
+#detailDialog { max-width:900px; }
+#actionDialog { max-width:600px; }
+#importDialog { max-width:800px; }
+button.text-button { text-align:left; }
+td .button { margin:3px; min-height:34px; padding:6px 9px; font-size:11px; }
+.page-heading .heading-actions { flex-wrap:wrap; }
+@media(max-width:600px) { .header-actions{gap:5px}.header-actions .button{font-size:10px;padding:6px 8px}.topbar{gap:6px}.contact-row{align-items:flex-start;flex-direction:column}.heading-actions .button{flex:1;white-space:nowrap}.activity .detail .text-button{display:block;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} }

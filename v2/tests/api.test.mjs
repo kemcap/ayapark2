@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ReadonlyApi} from '../api.mjs';
+import {AyaparkApi} from '../api.mjs';
 const session={access_token:'access',refresh_token:'refresh',expires_in:3600,user:{id:'user-1'}};
 const response=(data,status=200)=>({ok:status<400,status,json:async()=>data});
 function mockApi(role='manager'){
  const calls=[];
- const api=new ReadonlyApi(async(url,options)=>{
+ const api=new AyaparkApi(async(url,options)=>{
   calls.push({url,options});
   if(url.includes('/auth/v1/token'))return response(session);
   if(url.endsWith('/auth/v1/user'))return response({id:'user-1'});
@@ -13,14 +13,17 @@ function mockApi(role='manager'){
   if(url.includes('/site_staff_memberships?'))return response(role?[{role}]:[]);
   if(url.includes('/site_blocks?'))return response([{id:'block-1',code:'A'}]);
   if(url.includes('/site_resident_units?'))return response([{unit_id:'u1'}]);
+  if(url.includes('/rpc/ay2_workspace'))return response({capabilities:{finance:role==='manager',import:role==='manager',people:role==='manager',announcements:role==='manager',admin:role==='manager'},...Object.fromEntries(['settings','permissions','entries','charges','allocations','people','announcements','reports','audit','staged_charges'].map(n=>[n,[]]))});
+  if(url.includes('/rpc/ay2_capabilities'))return response({finance:role==='manager',import:role==='manager',people:role==='manager',announcements:role==='manager',admin:role==='manager'});
+  if(url.includes('/ay2_'))return response([]);
   if(url.includes('/site_units?'))return response([{id:'u1',block_id:'block-1',code:'A-1'},{id:'u2',block_id:'block-1',code:'A-2'}]);
   return response(null);
  });return {api,calls};
 }
-test('connected mode loads only scoped, allowlisted tables and unknown financial values stay null',async()=>{
+test('connected mode loads scoped V2 tables; bank opening remains unset until initialized',async()=>{
  const {api,calls}=mockApi();await api.login('example@example.com','example');const d=await api.load();
- assert.equal(d.role,'super');assert.equal(d.units[0].debt,null);assert.equal(d.opening,null);assert.deepEqual(d.transactions,[]);
- for(const {url,options} of calls.filter(c=>c.url.includes('/rest/'))){assert.equal(options.method,'GET');assert.match(options.headers.Authorization,/^Bearer /);assert.ok(url.includes('site_id=eq.site-1')||url.includes('slug=eq.aya-park-2')||url.includes('user_id=eq.user-1'));}
+ assert.equal(d.role,'super');assert.equal(d.units[0].debt,0);assert.equal(d.opening,null);assert.deepEqual(d.transactions,[]);
+ for(const {url,options} of calls.filter(c=>c.url.includes('/rest/')&&!c.url.includes('/rpc/'))){assert.equal(options.method,'GET');assert.match(options.headers.Authorization,/^Bearer /);assert.ok(url.includes('site_id=eq.site-1')||url.includes('slug=eq.aya-park-2')||url.includes('user_id=eq.user-1'));}
  assert.ok(!calls.some(c=>c.url.includes('ayapark_claims')||c.url.includes('site_people')));
  await assert.rejects(api.read('ayapark_private','select=*'),/kapsamı/);
 });
@@ -35,12 +38,12 @@ test('simultaneous reads share one refresh and logout revokes only this session'
  await api.logout();assert.equal(api.session,null);assert.ok(calls.some(c=>c.url.endsWith('/logout?scope=local')));
 });
 test('a cancelled login cannot restore credentials after an asynchronous response',async()=>{
- let resolve;const api=new ReadonlyApi(()=>new Promise(r=>resolve=r));
+ let resolve;const api=new AyaparkApi(()=>new Promise(r=>resolve=r));
  const pending=api.login('x','y');api.clear();resolve(response(session));
  await assert.rejects(pending,/Oturum değişti/);assert.equal(api.session,null);
 });
 test('unauthenticated reads fail closed and network errors do not fabricate data',async()=>{
  const {api}=mockApi();await assert.rejects(api.read('site_units','select=id'),/Giriş/);
- const broken=new ReadonlyApi(async()=>response({},403));await assert.rejects(broken.login('x','y'),/erişim/);
+ const broken=new AyaparkApi(async()=>response({},403));await assert.rejects(broken.login('x','y'),/erişim/);
  assert.equal(broken.session,null);
 });

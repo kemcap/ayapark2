@@ -1,0 +1,48 @@
+# V2-Abschlussstand – 20.10.2026
+
+**Private App:** https://ayapark2-v2-private.kemcap.chatgpt.site
+
+**Quellbranch:** `kemcap/ayapark2`, `ayapark-v2`. Die alte Website wurde nicht veröffentlicht, ersetzt oder gemergt.
+
+## Fertig implementiert
+
+- Neues responsives Design und durchgehende Wohnungsdetails.
+- Bestehender Supabase-Login und drei Ansichten mit serverseitigen V2-Zusatzrechten.
+- Eigener Bank-/Forderungs-/Zahlungsbereich mit integerbasierten Geldbeträgen.
+- CSV-Vorschau, Import, Wiederholungsschutz, manuelle Buchung und Storno.
+- Einzel- und Monatsforderungen, Teilzahlungen, Zuordnung und begründete Korrekturen.
+- Geschützte Prüfliste für Altbestände; Bestätigen oder mit Begründung ausschließen.
+- Personenpflege, Archivstatus, Duyurular und gemeinsame Monatsberichte.
+- CSV-/Druckexport, Auditverlauf und konsistente Abfragen.
+- Geschützter Import des bereitgestellten Bankbestands: 1.714 Buchungen, Salden vollständig abgeglichen.
+
+## Bestätigte Datenbankänderungen
+
+Nur neue V2-Objekte wurden angelegt. Bestehende Tabellen, Policies, Auth-Einstellungen und Funktionen bleiben unverändert.
+
+| Supabase-Version | Name |
+| --- | --- |
+| 20261020145217 | ayapark_v2_isolated_finance |
+| 20261020150258 | ayapark_v2_consistent_workspace |
+| 20261020150554 | ayapark_v2_idempotent_allocation |
+
+Elf neue öffentliche Tabellen mit RLS; keine anonymen Tabellen- oder RPC-Freigaben. Drei öffentliche Funktionen laufen als Aufrufer; die geschützte Implementierung prüft jede Schreiboperation. Gleichzeitige V2-Finanzbefehle werden je Site serialisiert. Ein erneuter Zuordnungsauftrag mit derselben Request-ID wird nicht doppelt gebucht; veränderte Werte mit derselben ID werden abgewiesen.
+
+## Validierung
+
+- 22 automatische Tests bestanden, darunter echte Postgres-RLS-Tests mit Manager, Verwaltungsmitglied, Bewohner und fremdem Benutzer.
+- Syntaxkontrollen aller Module und HTML-/DOM-Verweise bestanden.
+- Verbundenes Projekt: berechtigter Manager erhält 1.714 Buchungen, 22 Prüffälle und 0 bestätigte übernommene Forderungen.
+- Neuer Bankbestand: letzter Buchungstag 11.10.2026. Datenbankanzahl und Gesamtbetrag entsprechen der geprüften Extraktion; echte Beträge sind nicht im öffentlichen Quellcode enthalten.
+- Supabase-Berater meldet keine zusätzlichen V2-Sicherheitsbefunde. Vorhandene Altbefunde bleiben dokumentiert.
+- Private Bereitstellung wurde vom Hosting-Dienst als erfolgreich bestätigt.
+
+## Noch fachlich abzunehmen
+
+Die **Software-Kernabläufe sind implementiert**. Eine vollständige Produktivfreigabe oder Ablösung des Altsystems ist noch nicht erfolgt.
+
+1. Die 22 Altbestände in „Aidat & borçlar → Devir kayıtlarını incele“ Wohnung und Verantwortlichem zuordnen. Zeitraum, Mehrfachausdrucke und İcra-Überschneidungen prüfen.
+2. Die Oberfläche im Desktop- und Mobilbrowser mit echten Rollen-Logins abnehmen. In dieser Umgebung war kein unterstützter interaktiver Browsertest verfügbar.
+3. Vor einer öffentlichen Umstellung die alten öffentlichen Forderungszugriffe in einer abgestimmten Migration schließen. Bestehende Bewohner dürfen dabei nicht unerwartet ausgesperrt werden.
+
+Die separate private App kann bereits aufgerufen werden. Sie startet mit Beispieldaten; echte V2-Änderungen sind erst nach Supabase-Anmeldung mit passenden Rechten möglich.

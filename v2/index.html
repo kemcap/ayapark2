@@ -24,20 +24,21 @@
  <header class="topbar"><span id="breadcrumb">Yönetim / Genel bakış</span><div class="header-actions"><span class="mode" id="modeBadge">Örnek veriler</span><button id="refreshButton" class="button small" hidden>Yenile</button><button id="connectionButton" class="button small">Hesabımla giriş</button><span class="avatar" aria-hidden="true">A2</span></div></header>
  <div class="context-bar"><p id="contextText">Tasarım önizlemesi · Tüm tutarlar örnektir.</p><label id="roleControl">Görünümü dene <select id="roleSelect" aria-label="Örnek rol görünümü"><option value="super">Süper Admin</option><option value="staff">Yönetim</option><option value="resident">Site Sakini</option></select></label></div>
  <main id="content" tabindex="-1"></main>
- <footer>AYAPARK 2 <span>V2 geliştirme sürümü · <span id="footerMode">Örnek veriler</span></span></footer>
+ <footer>AYAPARK 2 <span>V2.0 · <span id="footerMode">Örnek veriler</span></span></footer>
 </div>
 </div>
 <dialog id="detailDialog" aria-labelledby="detailTitle"><div id="detailContent"></div><form method="dialog" class="dialog-actions"><button class="button">Kapat</button></form></dialog>
 <dialog id="loginDialog" aria-labelledby="loginTitle">
- <div class="dialog-kicker">AYAPARK 2 HESABINIZ</div><h2 id="loginTitle">Sitenize hoş geldiniz.</h2><p class="muted">Mevcut hesabınızla daire bilgilerinizi görüntüleyin. Bu geliştirme sürümünde kayıtlar yalnızca okunur.</p>
- <form id="loginForm"><label class="field">E-posta<input id="email" type="email" required autocomplete="username"></label><label class="field">Şifre<input id="password" type="password" required autocomplete="current-password"></label><p id="loginMessage" role="status"></p><div class="dialog-actions"><button type="button" id="cancelLogin" class="button">Vazgeç</button><button id="loginSubmit" class="button primary" type="submit">Giriş yap</button></div></form><p class="fine">Oturum yalnızca bu sekmede tutulur. Şifre sıfırlama ve davet kabulü için mevcut sakin portalını kullanın.</p>
+ <div class="dialog-kicker">AYAPARK 2 HESABINIZ</div><h2 id="loginTitle">Sitenize hoş geldiniz.</h2><p class="muted">Mevcut hesabınızla daire bilgilerinizi görüntüleyin. İşlemler hesabınıza verilen yetkilerle yapılır.</p>
+ <form id="loginForm"><label class="field">E-posta<input id="email" type="email" required autocomplete="username"></label><label class="field">Şifre<input id="password" type="password" required autocomplete="current-password"></label><p id="loginMessage" role="status"></p><div class="dialog-actions"><button type="button" id="cancelLogin" class="button">Vazgeç</button><button id="loginSubmit" class="button primary" type="submit">Giriş yap</button></div></form><p class="fine">Oturum bu sekmenin belleğinde tutulur. Şifre sıfırlama ve davet kabulü için mevcut sakin portalını kullanın.</p>
 </dialog>
 <dialog id="importDialog" aria-labelledby="importTitle">
- <div class="dialog-kicker">DOSYA ÖNİZLEMESİ</div><h2 id="importTitle">Önce kontrol, sonra aktarım.</h2><p class="muted">CSV dosyanızı burada inceleyin. Bu aşamada hiçbir kayıt oluşturulmaz ve dosya sunucuya gönderilmez.</p>
+ <div class="dialog-kicker">DOSYA ÖNİZLEMESİ</div><h2 id="importTitle">Önce kontrol, sonra aktarım.</h2><p class="muted">CSV dosyanızı burada inceleyin. Önizleme yereldir. Kayıt oluşturmak için ayrıca “İçe aktar” düğmesine basın.</p>
  <label class="file-drop">CSV dosyası seçin<input id="csvFile" type="file" accept=".csv,text/csv"><small>En fazla 2 MB / 2.000 satır</small></label>
  <p class="fine">Sütunlar: <code>tarih;aciklama;tutar</code><br>Örnek: <code>2026-10-20;Ekim aidatı;3.600,00</code><br>Gider tutarını eksi yazın. XLSX ve PDF aktarımı henüz hazır değil.</p>
- <div id="importPreview" role="status">Henüz dosya seçilmedi.</div><form method="dialog" class="dialog-actions"><button class="button">Kapat</button></form>
+ <div id="importPreview" role="status">Henüz dosya seçilmedi.</div><form method="dialog" class="dialog-actions"><button class="button">Kapat</button><button class="button primary" id="commitImport" type="button" disabled>İçe aktar</button></form>
 </dialog>
+<dialog id="actionDialog" aria-labelledby="actionTitle"><div class="dialog-kicker">AYAPARK 2</div><h2 id="actionTitle"></h2><form id="actionForm"><div id="actionFields"></div><p id="actionMessage" role="status"></p><div class="dialog-actions"><button class="button" type="button" id="cancelAction">Vazgeç</button><button class="button primary" type="submit" id="saveAction">Kaydet</button></div></form></dialog>
 <div id="toast" role="status" class="toast" hidden></div>
 <noscript><p>Bu uygulama için JavaScript'i etkinleştirin.</p></noscript>
 </body>

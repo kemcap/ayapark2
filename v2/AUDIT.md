@@ -63,3 +63,20 @@ Stand: 20.10.2026. Geprüft: Quellstand des Branches `ayapark-v2`, bestehende Su
 - [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)
 
 Der aktuelle Changelog wurde konsultiert. Die angekündigte Abschaltung veralteter TLS-1.2-Cipher am 10.11.2026 verlangt für diesen normalen Browser-HTTPS-Client keine eigene Implementierung; Unterstützung alter Browser separat prüfen.
+
+---
+
+## Fortschreibung: implementierter Abschlussstand
+
+Die obige Erstprüfung beschreibt den vorherigen Entwurf. Seitdem wurden die fehlenden V2-Kernabläufe umgesetzt. Maßgeblich für den aktuellen Funktionsstand sind `README.md` und `RELEASE.md`.
+
+- Der frühere reine Leseadapter wurde durch eng begrenzte V2-Befehle ergänzt. Bestehende `site_*`-Tabellen werden weiterhin nur gelesen.
+- Das V2-Finanzmodell ist jetzt vorhanden: Einstellungen, Zusatzrechte, Importbatches, Bankbuchungen, Forderungen, Zahlungszuordnungen, Personen, Duyurular, veröffentlichte Berichte, Audit und Altbestandsprüfung in elf `ay2_*`-Tabellen.
+- Drei neue, bestätigte Migrationen sind mit ihren tatsächlichen Supabase-Versionen im Repository gespeichert.
+- Individuelle Zusatzrechte sind serverseitig implementiert. Sie gelten für die neuen V2-Objekte; bestehende Rechte der alten Anwendung wurden nicht verändert.
+- 1.714 Bankbuchungen wurden lückenlos anhand der laufenden Salden abgeglichen und geschützt importiert. Gebühren mit identischer Bankreferenz wurden nicht versehentlich entfernt.
+- 22 Altbestände sind nur vorgemerkt. Keine unsichere OCR-Zuordnung wurde zu einer bestätigten Forderung gemacht.
+- Die inzwischen 22 Tests umfassen echte lokale Postgres-/RLS-Tests, Finanzabläufe und gerenderte Rollenansichten. Die verbundene Datenbank wurde zusätzlich lesend geprüft.
+- Der Sicherheitsberater meldet keine zusätzlichen V2-Funde. Die öffentlichen Altforderungen, alten Funktionsfreigaben und der deaktivierte Passwortschutz bleiben offen, weil ihre Änderung die geschützte Live-Version beeinflussen würde.
+- Kein visueller Browsertest und kein tatsächlicher Passwort-Login wurden durchgeführt. Die private Bereitstellung ist bestätigt; eine vollständige Produktivfreigabe wird nicht behauptet.
+- Die Supabase-CLI wurde durch automatische Sicherheitsprüfung wegen einer externen Analyseanfrage blockiert und nicht erneut ausgeführt. Die erforderlichen Datenbankoperationen liefen über die verbundene Supabase-Schnittstelle.
