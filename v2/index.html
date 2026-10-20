@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f6f8f7">
+<title>Ayapark 2 | Site Yönetimi – V2 Tasarım</title>
+<style>
+:root{--bg:#f5f7f6;--surface:#fff;--line:#e7ecea;--ink:#182b31;--muted:#728188;--teal:#087e80;--teal-soft:#e6f5f3;--green:#237957;--green-soft:#e9f6ee;--amber:#9b6d24;--amber-soft:#fff4dc;--red:#b75a59;--red-soft:#feeeec;--shadow:0 10px 40px rgba(32,64,67,.045)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #9be0db;outline-offset:2px}button:disabled{opacity:.45;cursor:not-allowed}
+.app{display:grid;grid-template-columns:246px minmax(0,1fr);min-height:100vh}.sidebar{background:#fff;border-right:1px solid var(--line);padding:28px 16px;display:flex;flex-direction:column;gap:32px}.brand{display:flex;align-items:center;gap:12px;padding:0 10px}.brandmark{width:40px;height:40px;border-radius:12px;background:#087e80;color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;letter-spacing:-.07em}.brand strong{display:block;font-size:16px;letter-spacing:-.035em}.brand small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.12em;font-weight:800}.navlabel{font-size:10px;color:#9baaac;letter-spacing:.16em;font-weight:800;padding:0 13px;margin-bottom:10px}.nav{display:grid;gap:4px}.nav button{border:0;background:transparent;color:#5c6c71;display:flex;align-items:center;gap:12px;width:100%;padding:12px 13px;border-radius:10px;text-align:left;font-weight:650}.nav button.active{color:var(--teal);background:var(--teal-soft)}.nav button:hover:not(.active){background:#f2f5f4}.nav svg,.icon{width:19px;height:19px;flex:none;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}.sidebar-foot{margin-top:auto;padding:14px;border-radius:14px;background:#f7faf9}.sidebar-foot b{font-size:12px}.sidebar-foot p{margin:5px 0 0;font-size:11px;color:var(--muted)}
+.main{padding:28px clamp(16px,3.7vw,54px) 60px;max-width:1500px;width:100%;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:32px}.breadcrumb{font-size:12px;color:#88999a;font-weight:600}.top-right{display:flex;align-items:center;gap:12px}.demo-pill{font-size:11px;border:1px solid #ebdfc6;color:#92691e;background:#fff8e9;padding:7px 10px;border-radius:8px;font-weight:800;white-space:nowrap}.role-switch{background:#fff;border:1px solid var(--line);padding:8px 12px;border-radius:10px;font-weight:750;color:var(--ink);max-width:180px}.avatar{width:35px;height:35px;border-radius:50%;background:#d2ebe7;color:#0a7476;display:grid;place-items:center;font-weight:800}
+.page{display:none}.page.active{display:block}.heading{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:24px;flex-wrap:wrap}.eyebrow{color:var(--teal);text-transform:uppercase;font-size:11px;font-weight:850;letter-spacing:.16em}h1{margin:5px 0 6px;font-size:clamp(27px,3vw,36px);line-height:1.15;letter-spacing:-.045em;font-weight:780}h2{font-size:16px;letter-spacing:-.024em;line-height:1.3;margin:0}p{margin:0}.muted{color:var(--muted)}.intro{font-size:13px;color:var(--muted)}.btn{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:10px;font-weight:800;color:#34464b;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}.btn.ghost{background:transparent}.btn:hover{filter:brightness(.965)}.btn svg{width:16px;height:16px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:0 0 18px}.stat,.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}.stat{padding:20px}.stat .topline{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:13px}.stat-icon{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:#f1f6f4;color:var(--teal)}.stat strong{font-size:clamp(19px,2vw,26px);letter-spacing:-.055em;font-weight:790;display:block;white-space:nowrap}.stat small{font-size:11px;color:var(--muted)}.stat strong.negative{color:var(--red)}.stat strong.positive{color:var(--green)}
+.columns{display:grid;grid-template-columns:minmax(0,1.38fr) minmax(310px,1fr);gap:18px}.card{padding:22px;margin-bottom:18px}.cardhead{display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:18px}.cardhead p{font-size:12px;color:var(--muted);margin-top:3px}.linkbtn{background:transparent;border:0;color:var(--teal);font-weight:800;font-size:12px;white-space:nowrap}.cashbar{height:11px;border-radius:30px;background:#edf1f1;overflow:hidden;display:flex;margin:20px 0 15px}.cashbar span:first-child{background:#55b8a5;width:77%}.cashbar span:last-child{background:#edac73;width:23%}.twos{display:flex;justify-content:space-between;gap:12px}.legend{display:flex;gap:7px;align-items:center;color:var(--muted);font-size:12px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%}.dot.green{background:#55b8a5}.dot.orange{background:#edac73}.legend b{color:var(--ink);margin-left:7px}.activity-list{display:grid}.activity{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #eef1f0}.activity:last-child{border:0}.activity-icon{width:37px;height:37px;display:grid;place-items:center;border-radius:10px;background:var(--green-soft);color:var(--green);font-size:17px}.activity-icon.out{background:var(--red-soft);color:var(--red)}.activity .detail{flex:1;min-width:0}.activity .detail b{display:block;font-size:12px}.activity .detail small{color:var(--muted);font-size:11px}.activity .amount{font-weight:800;white-space:nowrap;font-size:13px}.amount.out{color:var(--red)}.amount.in{color:var(--green)}
+.unit-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:12px}.unit{border:1px solid #d8e7df;background:#eef8f1;border-radius:9px;min-height:51px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#376d51;font-weight:800}.unit small{font-size:9px;font-weight:700;color:#648b76}.unit.overdue{background:#fff5e3;color:#92671e;border-color:#f5e2bb}.unit.overdue small{color:#a58b60}.blockrow{display:grid;grid-template-columns:1fr 1fr;gap:19px}.blockname{font-size:12px;font-weight:800;color:#4d6567}.unit-head{display:flex;justify-content:space-between;align-items:center}.status-legend{display:flex;gap:15px;margin-top:18px}.status-legend span{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.tablewrap{overflow:auto}.data-table{width:100%;border-collapse:collapse;text-align:left;white-space:nowrap}.data-table th{color:#8b9a9e;text-transform:uppercase;font-size:10px;letter-spacing:.085em;padding:13px 10px;border-bottom:1px solid var(--line)}.data-table td{padding:13px 10px;border-bottom:1px solid #f0f2f1;font-size:12px}.data-table tr:last-child td{border-bottom:0}.data-table td:first-child{font-weight:750}.pill{font-size:10px;font-weight:850;padding:5px 8px;border-radius:7px;display:inline-block;background:#eaf6ee;color:#3d8461}.pill.warn{background:#fff2d7;color:#a27328}.pill.soft{background:#ecf4f6;color:#47808b}.toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;margin-bottom:17px;align-items:center}.search{border:1px solid var(--line);background:#fff;padding:11px 12px;border-radius:10px;min-width:220px;max-width:100%;color:var(--ink)}.filter{border:1px solid var(--line);background:#fff;padding:10px;border-radius:10px;color:var(--ink)}.notice{border:1px dashed #b9dcd6;background:#f0faf7;color:#557d76;padding:13px 15px;border-radius:12px;font-size:12px;margin-bottom:18px}.empty-state{text-align:center;padding:26px;color:var(--muted)}
+.modalback{position:fixed;inset:0;background:#142c36a8;display:none;place-items:center;z-index:100;padding:18px}.modalback.show{display:grid}.modal{background:#fff;border-radius:18px;padding:26px;max-width:520px;width:100%;box-shadow:0 28px 80px #091d264d}.modal h2{font-size:22px;margin:0 0 7px}.modal p{font-size:12px;color:var(--muted)}.field{display:grid;gap:6px;margin-top:17px}.field label{font-size:12px;color:#45595c;font-weight:800}.field input,.field select{width:100%;padding:11px;border:1px solid #d9e3e1;border-radius:10px;color:var(--ink);background:#fff}.modal-actions{display:flex;justify-content:end;gap:8px;margin-top:22px}.preview{max-height:180px;overflow:auto;margin-top:12px;border-radius:8px;background:#f5f8f6;padding:12px;font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere}.smallnote{font-size:11px;color:#9aa8a9;margin-top:17px}.page-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.minicard{padding:19px;background:#fff;border:1px solid var(--line);border-radius:13px}.minicard strong{display:block;font-size:23px;margin:5px 0}.minicard span{color:var(--muted);font-size:11px}.visually-hidden{position:absolute;height:1px;width:1px;overflow:hidden;clip:rect(0,0,0,0)}
+@media(max-width:1160px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.columns{grid-template-columns:1fr}.unit-grid{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:800px){.app{display:block}.sidebar{position:sticky;top:0;z-index:10;padding:11px 12px;gap:10px;border-bottom:1px solid var(--line);border-right:0}.brandmark{width:34px;height:34px;border-radius:9px}.brand small{font-size:9px}.navlabel,.sidebar-foot{display:none}.nav{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none}.nav button{width:auto;flex:none;padding:9px 11px;font-size:12px}.nav button svg{display:none}.main{padding:18px 14px 44px}.top{margin-bottom:22px}.demo-pill{display:none}.blockrow{gap:10px}}
+@media(max-width:520px){.stats{gap:9px}.stat{padding:14px}.stat strong{font-size:20px}.stat .topline{font-size:11px}.stat-icon{width:27px;height:27px}.card{padding:16px}.blockrow{grid-template-columns:1fr;gap:22px}.unit-grid{gap:7px}.top-right{gap:7px}.role-switch{max-width:144px;font-size:11px}.avatar{display:none}.heading{margin-bottom:19px}.page-summary{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand"><div class="brandmark">A<span style="opacity:.6">2</span></div><div><strong>AYAPARK 2</strong><small>Site Yönetimi</small></div></div>
+ <div><div class="navlabel">YÖNETİM PANELİ</div><nav class="nav" id="mainNav">
+  <button class="active" data-page="overview"><svg viewBox="0 0 24 24" class="icon"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Genel Bakış</button>
+  <button data-page="units"><svg viewBox="0 0 24 24" class="icon"><path d="M3 21h18M5 21V4l7-2 7 2v17M9 6v2m6-2v2M9 12v2m6-2v2M10 21v-4h4v4"/></svg>Daireler</button>
+  <button data-page="dues"><svg viewBox="0 0 24 24" class="icon"><path d="M4 5h16v14H4zM7 9h10M7 13h6"/></svg>Aidat & Borç</button>
+  <button data-page="transactions" data-private="finance"><svg viewBox="0 0 24 24" class="icon"><path d="M3 8h18v10H3zM3 11h18M7 15h3"/></svg>Banka Hareketleri</button>
+  <button data-page="reports"><svg viewBox="0 0 24 24" class="icon"><path d="M4 20V10m5 10V4m5 16v-7m5 7V7"/></svg>Raporlar</button>
+  <button data-page="settings" data-private="admin"><svg viewBox="0 0 24 24" class="icon"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="4"/></svg>Ayarlar</button>
+ </nav></div>
+ <div class="sidebar-foot"><b>20 daire • 2 blok</b><p>Ortak havuz ve site giderleri tek yerde.</p></div>
+</aside>
+<main class="main">
+ <header class="top"><span class="breadcrumb">AYAPARK 2 / <span id="breadcrumb">Genel Bakış</span></span><div class="top-right"><span class="demo-pill">● TASARIM ÖNİZLEMESİ</span><label class="visually-hidden" for="roleSelect">Rol görünümü</label><select class="role-switch" id="roleSelect"><option value="super">Süper Admin</option><option value="staff">Yönetim</option><option value="resident">Site Sakini</option></select><span class="avatar">A2</span></div></header>
+ <section id="page-overview" class="page active">
+  <div class="heading"><div><span class="eyebrow" id="overviewEyebrow">Ekim 2026 • Yönetim</span><h1 id="welcome">Günaydın, Yönetici</h1><p class="intro" id="welcomeSub">Sitenizin mali durumuna tek bakışta ulaşın.</p></div><button class="btn primary admin-action" id="quickImport">＋ Excel / CSV Aktar</button></div>
+  <div class="notice">Bu ekran <b>temsili verilerle hazırlanmış tasarım önizlemesidir</b>. Gerçek banka hesabına veya canlı veritabanına bağlı değildir.</div>
+  <div class="stats" id="dashboardStats">
+   <div class="stat"><div class="topline"><span>Site Hesap Bakiyesi</span><span class="stat-icon">▣</span></div><strong>₺ 48.500</strong><small>Örnek banka bakiyesi</small></div>
+   <div class="stat"><div class="topline"><span>Toplam Aidat Alacağı</span><span class="stat-icon">⌛</span></div><strong class="negative">₺ 18.200</strong><small>6 dairede açık borç</small></div>
+   <div class="stat"><div class="topline"><span>Bu Ay Gelir</span><span class="stat-icon">↙</span></div><strong class="positive">₺ 72.000</strong><small>20 daire • çeşitli tahsilatlar</small></div>
+   <div class="stat"><div class="topline"><span>Bu Ay Gider</span><span class="stat-icon">↗</span></div><strong>₺ 23.500</strong><small>Bakım ve ortak giderler</small></div>
+  </div>
+  <div class="columns">
+   <div>
+    <article class="card"><div class="cardhead"><div><h2>Gelir & Gider Özeti</h2><p>Ekim 2026 • örnek aylık rapor</p></div><button class="linkbtn" data-go="reports">Raporu aç ↗</button></div><div class="twos"><div><div class="muted" style="font-size:12px">Tahsilat</div><strong style="font-size:24px;letter-spacing:-.04em">₺ 72.000</strong></div><div style="text-align:right"><div class="muted" style="font-size:12px">Harcamalar</div><strong style="font-size:24px;letter-spacing:-.04em">₺ 23.500</strong></div></div><div class="cashbar"><span></span><span></span></div><div class="twos"><span class="legend"><i class="dot green"></i> Gelir <b>%75</b></span><span class="legend"><i class="dot orange"></i> Gider <b>%25</b></span></div></article>
+    <article class="card" id="activityCard"><div class="cardhead"><div><h2>Son Banka Hareketleri</h2><p>En son kaydedilen işlemler</p></div><button class="linkbtn" data-go="transactions">Tümünü gör ↗</button></div><div id="recentList" class="activity-list"></div></article>
+   </div>
+   <div>
+    <article class="card" id="apartmentsCard"><div class="cardhead"><div><h2>Dairelerin Durumu</h2><p>Yeşil: ödenmiş • Sarı: açık bakiye</p></div><button class="linkbtn" data-go="units">Daireler ↗</button></div><div id="miniUnits"></div><div class="status-legend"><span><i class="dot green"></i>14 güncel</span><span><i class="dot orange"></i>6 borçlu</span></div></article>
+    <article class="card"><div class="cardhead"><div><h2>Hızlı Erişim</h2><p>En sık kullanılan işlemler</p></div></div><div style="display:grid;gap:9px"><button class="btn" data-go="dues">◫ Aidat listesi</button><button class="btn" data-go="reports">▥ Aylık mali rapor</button><button class="btn admin-action" id="secondImport">⇪ Dosyadan aktar</button></div></article>
+   </div>
+  </div>
+ </section>
+ <section id="page-units" class="page"><div class="heading"><div><span class="eyebrow">20 bağımsız bölüm</span><h1>Daireler</h1><p class="intro">A Blok ve B Blok, her blokta 10 daire.</p></div></div><div class="card"><div class="toolbar"><input class="search" id="unitSearch" type="search" placeholder="Daire ara: A4, B10..." aria-label="Daire ara"><span class="muted" style="font-size:12px">Tüm rakamlar temsili</span></div><div class="tablewrap"><table class="data-table"><thead><tr><th>Daire</th><th>Blok</th><th>Durum</th><th>Açık Bakiye</th></tr></thead><tbody id="unitRows"></tbody></table></div></div></section>
+ <section id="page-dues" class="page"><div class="heading"><div><span class="eyebrow">Aidat Yönetimi</span><h1>Aidat & Borçlar</h1><p class="intro">Genel aidat, havuz, asansör ve demirbaş kalemlerini ayrı izleyin.</p></div></div><div class="page-summary" id="dueSummary"><div class="minicard"><span>Genel Aidat</span><strong>₺ 3.600</strong><span>Örnek aylık tutar</span></div><div class="minicard"><span>Havuz</span><strong>₺ 1.900</strong><span>Örnek özel tahakkuk</span></div><div class="minicard"><span>Ödenmemiş</span><strong>6 daire</strong><span>Örnek durum</span></div></div><div class="card" style="margin-top:18px"><div class="cardhead"><div><h2>Aidat Durumları</h2><p>Daireye göre güncel borç özeti</p></div></div><div class="tablewrap"><table class="data-table"><thead><tr><th>Daire</th><th>Aidat Durumu</th><th>Tutar</th></tr></thead><tbody id="dueRows"></tbody></table></div></div></section>
+ <section id="page-transactions" class="page"><div class="heading"><div><span class="eyebrow">Banka & Muhasebe</span><h1>Banka Hareketleri</h1><p class="intro">Gelirleri, giderleri ve banka kayıtlarını tek tabloda inceleyin.</p></div><button class="btn primary admin-action" id="transactionsImport">＋ Dosya İçe Aktar</button></div><div class="card"><div class="toolbar"><input class="search" id="txnSearch" type="search" placeholder="İşlem veya açıklama ara..." aria-label="İşlem ara"><select id="txnFilter" class="filter"><option value="all">Tüm hareketler</option><option value="in">Gelirler</option><option value="out">Giderler</option></select></div><div class="tablewrap"><table class="data-table"><thead><tr><th>Tarih</th><th>İşlem</th><th>Kategori</th><th>Gelir / Gider</th></tr></thead><tbody id="txnRows"></tbody></table></div></div></section>
+ <section id="page-reports" class="page"><div class="heading"><div><span class="eyebrow">Şeffaf Yönetim</span><h1>Mali Raporlar</h1><p class="intro">Ortak giderler ve site gelirleri hakkında anlaşılır raporlar.</p></div></div><div class="page-summary"><div class="minicard"><span>Ekim Tahsilatı</span><strong>₺ 72.000</strong><span>Örnek veri</span></div><div class="minicard"><span>Ekim Giderleri</span><strong>₺ 23.500</strong><span>Örnek veri</span></div><div class="minicard"><span>Net Fark</span><strong>₺ 48.500</strong><span>Örnek hesaplama</span></div></div><div class="card" style="margin-top:18px"><h2>Gider Dağılımı</h2><p class="intro" style="margin:8px 0 18px">Bölümlerin hesapları test verileridir.</p><div id="reportBars"></div></div></section>
+ <section id="page-settings" class="page"><div class="heading"><div><span class="eyebrow">Yönetici Yetkileri</span><h1>Ayarlar</h1><p class="intro">Kullanıcı rolleri ve kişisel erişim izinleri.</p></div></div><div class="card"><h2>3 Kullanıcı Rolü</h2><div class="tablewrap"><table class="data-table"><thead><tr><th>Rol</th><th>Yapabilecekleri</th></tr></thead><tbody><tr><td>Süper Admin</td><td>Tüm finans işlemleri, yönetim ve yetkilendirme</td></tr><tr><td>Yönetim</td><td>Verilen ek izinlerle mali kayıt ve duyuru işlemleri</td></tr><tr><td>Site Sakini</td><td>Kendi aidatı ve yayımlanan ortak raporlar</td></tr></tbody></table></div><p class="smallnote">Gerçek giriş, yetkilendirme ve izin denetimleri sonraki teknik aşamada Supabase üzerinde uygulanacaktır. Buradaki rol değiştirici yalnızca tasarım testidir.</p></div></section>
+ <div class="smallnote">Ayapark 2 · V2 tasarım prototipi · Kayıtlar sahte ve yalnızca bu sayfa içinde gösterilir.</div>
+</main>
+</div>
+<div class="modalback" id="importModal" role="presentation"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><h2 id="modalTitle">Hesap Hareketi İçe Aktar</h2><p>Önizleme için CSV dosyası seçin. Veri yalnızca tarayıcıda okunur, hiçbir yere gönderilmez.</p><div class="field"><label for="csvFile">CSV dosyası</label><input type="file" id="csvFile" accept=".csv,text/csv"></div><div class="preview" id="filePreview">Henüz dosya seçilmedi.</div><p style="margin-top:12px">Excel (XLSX), PDF ve yapay zeka okuma sonraki geliştirme aşamasında eklenecek.</p><div class="modal-actions"><button class="btn" id="closeModal">Kapat</button></div></div></div>
+<script>
+(function(){
+'use strict';
+const units=[];const overdue=new Set(['A2','A6','A9','B3','B5','B8']);
+['A','B'].forEach(function(block){for(let n=1;n<=10;n++){let code=block+n;units.push({code:code,block:block,overdue:overdue.has(code),amount:overdue.has(code)?(code==='A2'?5600:code==='B8'?3600:1800):0})}});
+const transactions=[
+{date:'20.10.2026',desc:'A Blok Daire 4 • Genel Aidat',cat:'Aidat',type:'in',amount:3600},
+{date:'19.10.2026',desc:'Havuz bakım hizmeti',cat:'Havuz',type:'out',amount:2500},
+{date:'18.10.2026',desc:'B Blok Daire 7 • Genel Aidat',cat:'Aidat',type:'in',amount:3600},
+{date:'17.10.2026',desc:'Peyzaj bakım hizmeti',cat:'Peyzaj',type:'out',amount:1800},
+{date:'16.10.2026',desc:'A Blok Daire 1 • Genel Aidat',cat:'Aidat',type:'in',amount:3600},
+{date:'15.10.2026',desc:'Ortak alan elektrik',cat:'Elektrik',type:'out',amount:1200}
+];
+const money=function(n){return '₺ '+Number(n).toLocaleString('tr-TR')};
+const esc=function(v){return String(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+const role=document.getElementById('roleSelect');let current='overview';
+function setPage(page){
+ if(role.value==='resident'&&(page==='transactions'||page==='settings'))page='overview';
+ if(role.value!=='super'&&page==='settings')page='overview';
+ current=page;
+ document.querySelectorAll('.page').forEach(function(el){el.classList.toggle('active',el.id==='page-'+page)});
+ document.querySelectorAll('[data-page]').forEach(function(el){el.classList.toggle('active',el.dataset.page===page)});
+ const map={overview:'Genel Bakış',units:'Daireler',dues:'Aidat & Borç',transactions:'Banka Hareketleri',reports:'Raporlar',settings:'Ayarlar'};
+ document.getElementById('breadcrumb').textContent=map[page];window.scrollTo(0,0);
+}
+function cardUnits(){
+ const r=document.getElementById('miniUnits');r.textContent='';
+ ['A','B'].forEach(function(b){const section=document.createElement('div');section.innerHTML='<div class="unit-head"><span class="blockname">'+b+' BLOK</span><span class="muted" style="font-size:11px">10 daire</span></div>';const grid=document.createElement('div');grid.className='unit-grid';units.filter(u=>u.block===b).forEach(function(u){let tile=document.createElement('div');tile.className='unit'+(u.overdue?' overdue':'');tile.innerHTML='<span>'+u.code.slice(1)+'</span><small>'+(u.overdue?'Borç var':'Ödendi')+'</small>';grid.appendChild(tile)});section.appendChild(grid);section.style.marginBottom='20px';r.appendChild(section)});
+}
+function fillUnits(){
+ const query=(document.getElementById('unitSearch').value||'').toUpperCase().replace(/\s/g,'');
+ const visible=role.value==='resident'?units.filter(u=>u.code==='A4'):units;
+ const found=visible.filter(u=>u.code.includes(query));
+ document.getElementById('unitRows').innerHTML=found.map(u=>'<tr><td>'+u.code+'</td><td>'+u.block+' Blok</td><td><span class="pill '+(u.overdue?'warn':'')+'">'+(u.overdue?'Borç var':'Güncel')+'</span></td><td>'+money(u.amount)+'</td></tr>').join('')||'<tr><td colspan="4">Daire bulunamadı.</td></tr>';
+ document.getElementById('dueRows').innerHTML=visible.map(u=>'<tr><td>'+u.code+'</td><td><span class="pill '+(u.overdue?'warn':'')+'">'+(u.overdue?'Ödeme bekleniyor':'Ödendi')+'</span></td><td>'+money(u.amount)+'</td></tr>').join('');
+}
+function fillTransactions(){
+ let q=(document.getElementById('txnSearch').value||'').toLocaleLowerCase('tr-TR'),filter=document.getElementById('txnFilter').value;
+ const items=transactions.filter(t=>(filter==='all'||t.type===filter)&&(t.desc.toLocaleLowerCase('tr-TR').includes(q)||t.cat.toLocaleLowerCase('tr-TR').includes(q)));
+ document.getElementById('txnRows').innerHTML=items.map(t=>'<tr><td>'+t.date+'</td><td>'+esc(t.desc)+'</td><td><span class="pill soft">'+esc(t.cat)+'</span></td><td class="amount '+t.type+'">'+(t.type==='in'?'+ ':'− ')+money(t.amount)+'</td></tr>').join('')||'<tr><td colspan="4">İşlem bulunamadı.</td></tr>';
+ document.getElementById('recentList').innerHTML=transactions.slice(0,4).map(t=>'<div class="activity"><span class="activity-icon '+(t.type==='out'?'out':'')+'">'+(t.type==='in'?'↙':'↗')+'</span><div class="detail"><b>'+esc(t.desc)+'</b><small>'+t.date+' · '+esc(t.cat)+'</small></div><span class="amount '+t.type+'">'+(t.type==='in'?'+':'−')+money(t.amount)+'</span></div>').join('');
+}
+function fillReport(){
+ const categories=[['Havuz bakım',8200],['Temizlik',6000],['Peyzaj',4500],['Elektrik',2800],['Diğer',2000]];
+ document.getElementById('reportBars').innerHTML=categories.map(c=>'<div style="margin-bottom:17px"><div class="twos" style="font-size:12px;margin-bottom:7px"><b>'+c[0]+'</b><span>'+money(c[1])+'</span></div><div style="height:10px;border-radius:10px;background:#eef2f1;overflow:hidden"><div style="height:100%;width:'+(c[1]/8200*100)+'%;background:#59b5a6;border-radius:10px"></div></div></div>').join('');
+}
+function changeRole(){
+ const r=role.value,isResident=r==='resident';
+ document.querySelectorAll('[data-private="finance"]').forEach(el=>el.hidden=isResident);
+ document.querySelectorAll('[data-private="admin"]').forEach(el=>el.hidden=r!=='super');
+ document.querySelectorAll('.admin-action').forEach(el=>el.hidden=r!=='super');
+ document.getElementById('welcome').textContent=isResident?'Merhaba, Site Sakini':'Günaydın, Yönetici';
+ document.getElementById('welcomeSub').textContent=isResident?'Kendi aidat durumunuzu ve ortak mali raporları inceleyin.':'Sitenizin mali durumuna tek bakışta ulaşın.';
+ document.getElementById('overviewEyebrow').textContent=isResident?'Ekim 2026 • Sakin Paneli':'Ekim 2026 • Yönetim';
+ document.getElementById('dashboardStats').innerHTML=isResident?'<div class="stat"><div class="topline"><span>Örnek Daire</span><span class="stat-icon">⌂</span></div><strong>A4</strong><small>Rol önizlemesi</small></div><div class="stat"><div class="topline"><span>Kalan Aidat Borcu</span><span class="stat-icon">✓</span></div><strong class="positive">₺ 0</strong><small>Örnek ödenmiş tutar</small></div><div class="stat"><div class="topline"><span>Ortak Gelir</span><span class="stat-icon">↙</span></div><strong>₺ 72.000</strong><small>Yayımlanan rapor</small></div><div class="stat"><div class="topline"><span>Ortak Gider</span><span class="stat-icon">↗</span></div><strong>₺ 23.500</strong><small>Yayımlanan rapor</small></div>':defaultStats;
+ document.getElementById('activityCard').hidden=isResident;
+ document.getElementById('apartmentsCard').hidden=isResident;
+ document.getElementById('dueSummary').hidden=isResident;
+ fillUnits();setPage(current);
+}
+const defaultStats=document.getElementById('dashboardStats').innerHTML;
+document.querySelectorAll('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page)));
+document.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.go)));
+role.addEventListener('change',changeRole);
+document.getElementById('unitSearch').addEventListener('input',fillUnits);
+document.getElementById('txnSearch').addEventListener('input',fillTransactions);
+document.getElementById('txnFilter').addEventListener('change',fillTransactions);
+const modal=document.getElementById('importModal'),csv=document.getElementById('csvFile');
+['quickImport','secondImport','transactionsImport'].forEach(id=>document.getElementById(id).addEventListener('click',()=>{modal.classList.add('show');csv.focus()}));
+document.getElementById('closeModal').addEventListener('click',()=>modal.classList.remove('show'));
+modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('show')});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')modal.classList.remove('show')});
+csv.addEventListener('change',function(){const file=csv.files&&csv.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(){const lines=String(reader.result||'').split(/\r?\n/);document.getElementById('filePreview').textContent='Dosya: '+file.name+' • '+lines.filter(Boolean).length+' satır\n\n'+lines.slice(0,6).join('\n')+'\n\nBu bir önizlemedir; veritabanına aktarım yapılmaz.'};reader.onerror=()=>document.getElementById('filePreview').textContent='Dosya okunamadı.';reader.readAsText(file)});
+cardUnits();fillUnits();fillTransactions();fillReport();changeRole();
+})();
+</script>
+</body>
+</html>
