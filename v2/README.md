@@ -1,49 +1,73 @@
 # Ayapark 2 – Version 2.0
 
-## Durum
-Bu dal (**ayapark-v2**) yeni sürümün çalışma alanıdır. Mevcut `main` sürümü korunur.
+Bu çalışma yalnızca `ayapark-v2` dalındaki `v2/` dizinini geliştirir. `main`, eski sayfalar, canlı veriler, Auth ayarları ve Supabase şeması değiştirilmez. V2 bu aşamada canlıya yayımlanmaz.
 
-`v2/index.html` dosyası; bağımsız, mobil uyumlu, Türkçe bir **tasarım prototipidir**. Yalnızca örnek veriler kullanır; Supabase'e bağlanmaz ve banka bilgisi göndermez.
+## Kullanım
 
-## Site kapsamı
-- Ayapark 2: A Blok (10 daire), B Blok (10 daire), toplam 20 daire.
-- Ortak havuz, asansör, temizlik, peyzaj, elektrik ve genel giderler.
-- Aidat tahakkuku, geçmiş borçlar, banka hareketleri ve raporlar.
+`v2/index.html`, `styles.css`, `app.mjs`, `core.mjs` ve `api.mjs` birlikte statik bir HTTP sunucusunda açılır. ES modülleri nedeniyle HTML dosyasını doğrudan `file://` ile açmayın.
 
-## Üç kullanıcı rolü
+Örneğin yerel bilgisayarda depo kökünden:
 
-| Yetki | Süper Admin | Yönetim | Site Sakini |
-| --- | --- | --- | --- |
-| Tüm kayıtları görme | Evet | Yetkiye bağlı | Hayır |
-| Kendi dairesinin borcunu görme | Evet | Evet | Evet |
-| Ortak, anonim finans raporlarını görme | Evet | Evet | Evet |
-| Excel / CSV içe aktarma | Evet | İzin verilirse | Hayır |
-| İşlem düzenleme / onaylama | Evet | İzin verilirse | Hayır |
-| Duyuru oluşturma | Evet | İzin verilirse | Hayır |
-| Kullanıcı ve yetki yönetimi | Evet | Hayır | Hayır |
+```bash
+python3 -m http.server 8080 --bind 127.0.0.1
+```
 
-Yönetim rolüne verilen ek izinler Süper Admin tarafından ayrı ayrı yönetilir.
-Gerçek yetki denetimi ileride sunucuda / Supabase RLS ile uygulanacaktır; arayüzde rol değiştirmek güvenlik mekanizması değildir.
+Tarayıcıda `http://127.0.0.1:8080/v2/` adresini açın. Bu komut yayınlama yapmaz. GitHub Pages'in canlı kaynak dalını değiştirmeyin.
 
-## Planlanan modüller
-1. Genel Bakış – bakiye, aidat alacağı, gelir/gider, son hareketler
-2. Daireler – A/B Blok, her dairenin cari hesabı
-3. Aidat & Borç – genel, havuz, asansör, demirbaş; tahakkuk ve ödeme mahsupları
-4. Banka Hareketleri – CSV/Excel toplu aktarım, manuel düzeltme, mükerrer kontrol
-5. Raporlar – ortak, kişisel bilgi içermeyen finansal raporlar
-6. Ayarlar – izinler, kategoriler ve yönetim tercihleri
-7. Daha sonra: PDF/dekont yapay zeka okuma, belgeler, hizmet takvimi ve duyurular
+## İki ayrı veri görünümü
 
-## Veri modeli ilkeleri
-- Banka işlemleri (gerçekleşen para hareketleri) ile aidat borçları (tahakkuklar) birbirinden ayrı tutulur.
-- Bir banka ödemesi bir veya birden fazla borç kalemine eşleştirilebilir; kısmi ödeme desteklenir.
-- İçe aktarmada banka işlem referansı ve kontrollü tekilleştirme kullanılır.
-- Orijinal PDF veya görsel saklama isteğe bağlıdır; standart iş akışında yapılandırılmış veri yeterlidir.
-- Her düzenleme denetim kaydına bağlanır. Geriye dönük düzeltme kayıtları silmeden yapılır.
-- Sakinler yalnızca kendi hesap hareketlerini ve anonimleştirilmiş toplu raporları görebilir.
-- Kimlik, IBAN gibi hassas veriler herkese açık raporlara/dekontlara dahil edilmez.
-- Supabase Auth, Postgres, RLS ve gerektiğinde özel Storage kullanılır.
-- Canlı kullanımdan önce yedekleme, yetkilendirme ve toplu aktarım testleri yapılır.
+**Örnek veriler:** Sayfa varsayılan olarak tamamen örnek kayıtlarla açılır. Süper Admin, Yönetim ve Site Sakini görünümleri üstten denenebilir. Raporlar aynı örnek defterden hesaplanır; resmî belge değildir.
 
-## Sıradaki teknik adım
-Mevcut Supabase `site_*` tabloları önce denetlenir. Uygun yapılar korunur; yeni banka işlemi / tahakkuk / ödeme mahsup tabloları ayrı bir geçiş planıyla oluşturulur. `main` sürümü ve canlı veriler onaylanmadan değiştirilmez.
+**Mevcut hesap:** “Hesabımla giriş” mevcut Supabase Auth hesabını kullanır. Doğrulanmış oturumla `site_sites`, `site_blocks`, `site_units`, `site_staff_memberships` ve `site_resident_units` okunur. RLS mevcut veritabanında uygulanır. Hesap yalnızca erişebildiği daireleri görür. Kişi iletişim bilgileri, kimlik notları ve eski `ayapark_claims` kayıtları sorgulanmaz.
+
+Gerçek bağlantıda mali tutarlar gösterilmez: banka, tahakkuk ve ödeme mahsup tabloları henüz yoktur. `—`, sıfır borç değildir. “Yenile” daire kayıtlarını tekrar okur; son okuma saati üstte görünür.
+
+Bu V2 adaptöründe iş verileri için INSERT, UPDATE, DELETE veya RPC işlemi yoktur. Auth oturumu açma/yenileme/kapatma çağrıları yapılır. Oturum yalnızca sekme belleğinde tutulur; eski uygulamanın oturum depoları kullanılmaz. Sekme yenilenince tekrar giriş gerekir.
+
+## Üç görünüm
+
+| Görünüm | Şimdiki erişim | Mevcut sunucu modeli |
+| --- | --- | --- |
+| Süper Admin | Tüm yetkili daireleri okuma, örnek modda CSV önizleme | `manager` |
+| Yönetim | Yetkili daireleri okuma | `deputy` / `auditor` |
+| Site Sakini | Aktif bağlantıyla yalnızca kendi dairesini okuma | `site_resident_units` |
+
+Bu eşleme yeni sunucu izinleri oluşturmaz. Mevcut `deputy` ve `auditor` izinleri farklıdır; bu aşamada V2 hiçbirine yazma işlemi sunmaz. Yönetim için kişiye özel ek izinler, davetler ve mali işlem yetkileri sonraki şema çalışmasıdır. Arayüzde rol gizlemek bir güvenlik mekanizması değildir.
+
+## Ekranlar
+
+- Genel bakış: öncelikli özet, sonraki adımlar, daire haritası ve son örnek hareketler.
+- Daireler: arama, blok/durum filtreleri ve her yerden açılan daire detayı.
+- Aidat & borçlar: daire bazlı örnek bakiye veya henüz bağlı olmayan mali durum.
+- Banka hareketleri: örnek hareket arama ve gelir/gider filtresi.
+- Mali raporlar: aynı örnek defterden üretilen toplamlar, gider dağılımı ve yazdırma.
+- Erişim & ayarlar: gerçek erişim modelinin mevcut sınırları.
+
+## CSV önizlemesi
+
+Yalnızca örnek Süper Admin görünümünde, yerel tarayıcı içinde çalışır. Dosya sunucuya gönderilmez veya kaydedilmez. En fazla 2 MB / 2.000 satır.
+
+```csv
+tarih;aciklama;tutar
+2026-10-20;Ekim aidatı;3.600,00
+2026-10-20;Havuz bakımı;-2.500,00
+```
+
+Tarih ISO biçiminde, tutar Türkçe sayı biçimindedir. Tırnaklı alanlar ve alan içi satır sonları desteklenir. Dosya içindeki olası tekrarlar işaretlenir. Banka kayıtlarıyla mükerrer kontrol ve gerçek aktarım henüz yoktur. XLSX/PDF henüz desteklenmez.
+
+## Kaynak ve kontrol
+
+- `app.mjs`: ekranlar ve etkileşimler.
+- `core.mjs`: kuruş cinsinden hesaplama, görünüm filtreleri ve CSV doğrulaması.
+- `api.mjs`: dar kapsamlı, salt okunur Supabase veri adaptörü.
+- `tests/`: Node'un yerleşik test aracı; ek paket gerekmez.
+- `AUDIT.md`: Almanca ayrıntılı bulgular, doğrulama sınırları ve sonraki adımlar.
+
+```bash
+node --test v2/tests/*.test.mjs
+node --check v2/app.mjs
+node --check v2/core.mjs
+node --check v2/api.mjs
+```
+
+Otomatik mantık testleri geçmiştir. Görsel tarayıcı ve gerçek kullanıcılarla uçtan uca test bu ortamda yapılmamıştır. Canlı sürüme geçişten önce farklı rollerle RLS, mobil görünüm, klavye kullanımı ve baskı ayrıca doğrulanmalıdır.
