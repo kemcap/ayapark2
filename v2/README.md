@@ -8,6 +8,8 @@ Diese Version wird im Branch `ayapark-v2` entwickelt. GitHub Pages und die bishe
 
 Die Vorschau startet im **Beispielmodus**. Hier lassen sich alle Abläufe ohne echte Buchungen testen und die drei Ansichten wechseln. Beispieländerungen gelten nur bis zum Neuladen der Seite.
 
+Oben rechts schaltet die Mond-/Sonnentaste zwischen heller und dunkler Darstellung um. Die Auswahl wird lokal im Browser gespeichert; ohne Auswahl gilt die Systemeinstellung. Druckberichte behalten die helle Darstellung.
+
 **„Hesabımla giriş“** öffnet das bestehende Supabase-Konto. Danach gelten echte Daten und die serverseitigen Berechtigungen. Zugangsdaten werden nicht im Quellcode hinterlegt. Tokens bleiben im Speicher des aktuellen Tabs. Nach Neuladen ist eine erneute Anmeldung nötig.
 
 1. **Genel bakış:** datierter Buchungsstand, bestätigte Forderungen, Wohnungen und nächste Schritte.
@@ -57,7 +59,7 @@ Das Werkzeug `tools/prepare_bank.py` extrahiert den unterstützten Yapı-Kredi-A
 
 ## Entwicklung und Tests
 
-Statische App ohne Build-Schritt oder Laufzeitpakete. `api.mjs`, `core.mjs`, `ledger.mjs`, `ui.mjs`, `forms.mjs`, `app.mjs`, `styles.css` und `index.html` werden zusammen per HTTP ausgeliefert. Nicht direkt als `file://` öffnen.
+Statische App ohne Build-Schritt oder Laufzeitpakete. `api.mjs`, `core.mjs`, `ledger.mjs`, `ui.mjs`, `forms.mjs`, `app.mjs`, `theme.js`, `styles.css` und `index.html` werden zusammen per HTTP ausgeliefert. Nicht direkt als `file://` öffnen.
 
 ```bash
 cd v2

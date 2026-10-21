@@ -58,3 +58,13 @@ Die separate private App kann bereits aufgerufen werden. Sie startet mit Beispie
 - 31 Tests bestanden. Zusätzlich im Desktop-Browser mit Beispieldaten geprüft: Teilzahlung korrekt verarbeitet, Bewohneransicht begrenzt und Devir-Dialog mit Vorauswahl sowie ausdrücklicher Bestätigung geöffnet. Die Request-ID-Erzeugung wurde für HTTP-Vorschauen korrigiert. Echter Passwort-Login und Mobilgerät-Abnahme bleiben offen.
 
 Prüfansicht mit ausschließlich fiktiven Daten: [Screenshot](docs/devir-pruefung-beispiel.jpg).
+
+## Fortschritt 21.10.2026: Helle und dunkle Darstellung
+
+- Kleine Mond-/Sonnentaste oben rechts; per Maus und Tastatur bedienbar, mit zugänglicher Zustandsanzeige.
+- Auswahl wird ausschließlich lokal als Darstellungspräferenz gespeichert. Ohne Auswahl folgt die App der Systemeinstellung. Frühe Initialisierung verhindert einen unnötigen hellen Zwischenstand.
+- Navigation, Statusanzeigen, Tabellen, Formulare und Dialoge verwenden passende helle/dunkle Farben. Druckberichte behalten die helle Palette.
+- Desktop-Browserprüfung mit Beispieldaten: Umschalten in beide Richtungen, Tastaturbedienung, Speicherung nach Neuladen und Dialogfarben geprüft. Alle 31 bestehenden Tests bestanden; Syntaxprüfung und Git-Diff-Prüfung ohne Fehler.
+- Keine Datenbankänderung. Die Änderung betrifft ausschließlich V2; `main` und die alte Live-Anwendung bleiben unverändert.
+
+Dunkle Ansicht mit ausschließlich fiktiven Daten: [Screenshot](docs/dark-mode-beispiel.jpg).
