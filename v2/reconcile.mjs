@@ -1,3 +1,4 @@
+import {t as tr} from './i18n.mjs';
 // Evidence-based suggestions only. No financial posting or automatic allocation.
 export function normalize(value){return String(value??'').replace(/[İı]/g,'i').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/ş/g,'s').replace(/ğ/g,'g').replace(/ç/g,'c').replace(/ö/g,'o').replace(/ü/g,'u').replace(/[^a-z0-9]+/g,' ').trim();}
 function matchesName(label,description){
@@ -33,11 +34,11 @@ export function analyzeStage(row,data){
  const paymentCandidates=relevant.filter(t=>t.date>row.as_of&&t.cents===Number(row.cents)&&!t.reversal_of&&!data.transactions.some(x=>x.reversal_of===t.id)).map(t=>({id:t.id,date:t.date,cents:t.cents,reference:t.bank_reference||t.reference||''}));
  const overlaps=data.staged.filter(x=>x.id!==row.id&&normalize(x.person_label)===normalize(row.person_label)).map(x=>({id:x.id,kind:x.kind,source:x.source,cents:Number(x.cents),resolved:!!(x.confirmed_charge||x.ignored_reason)}));
  const warnings=[];
- if(!suggested)warnings.push('Blok kesinleşmedi. Daireyi belgeden veya kişi teyidinden belirleyin.');
- if(!sourceCode&&codes.length===1)warnings.push('Daire, son bir yılın banka açıklamalarından önerildi; güncel ilişki ayrıca teyit edilmeli.');
- if(codes.length>1)warnings.push('Banka açıklamalarında birden fazla daire var. Öneri otomatik kesinleştirilmez.');
- if(paymentCandidates.length)warnings.push('Belge tarihinden sonra aynı kişi için aynı tutarda tahsilat var. Borcu açık kabul etmeden bu ödemeyi inceleyin.');
- if(overlaps.length)warnings.push('Aynı kişi başka bir devir kaydında da var. Dönem ve kalemlerin çakışmadığını kontrol edin.');
- if(unitEvidence.some(x=>x.shared))warnings.push('Bazı banka açıklamaları birden fazla daireyi kapsıyor. Ödemenin tamamı tek daireye atanmamalı.');
+ if(!suggested)warnings.push(tr("Blok kesinleşmedi. Daireyi belgeden veya kişi teyidinden belirleyin."));
+ if(!sourceCode&&codes.length===1)warnings.push(tr("Daire, son bir yılın banka açıklamalarından önerildi; güncel ilişki ayrıca teyit edilmeli."));
+ if(codes.length>1)warnings.push(tr("Banka açıklamalarında birden fazla daire var. Öneri otomatik kesinleştirilmez."));
+ if(paymentCandidates.length)warnings.push(tr("Belge tarihinden sonra aynı kişi için aynı tutarda tahsilat var. Borcu açık kabul etmeden bu ödemeyi inceleyin."));
+ if(overlaps.length)warnings.push(tr("Aynı kişi başka bir devir kaydında da var. Dönem ve kalemlerin çakışmadığını kontrol edin."));
+ if(unitEvidence.some(x=>x.shared))warnings.push(tr("Bazı banka açıklamaları birden fazla daireyi kapsıyor. Ödemenin tamamı tek daireye atanmamalı."));
  return {suggestedUnitId:suggested?.id||null,suggestedCode:suggested?.code||null,basis:sourceCode?'document':suggested?'bank':'unresolved',unitEvidence:unitEvidence.slice(0,3),paymentCandidates,overlaps,warnings};
 }

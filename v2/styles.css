@@ -1409,3 +1409,14 @@ td .button { margin:3px; min-height:34px; padding:6px 9px; font-size:11px; }
   #breadcrumb { flex:1 1 100px; }
   .header-actions { flex:none; }
 }
+
+.language-toggle { min-width:38px; }
+.block-filter { border:0; padding:0; margin:0; min-width:0; }
+.block-filter legend { padding:0; margin-bottom:4px; color:var(--muted); font-size:11px; }
+.block-buttons { display:flex; gap:5px; }
+.block-buttons .button { min-width:42px; min-height:42px; }
+.block-buttons [aria-pressed="true"] { background:var(--nav-active); border-color:var(--green); color:var(--nav-active-ink); }
+.header-actions { flex-wrap:wrap; justify-content:flex-end; }
+.topbar { height:auto; min-height:81px; padding-block:12px; }
+@media(max-width:800px) { .topbar { min-height:62px; } }
+@media(max-width:480px) { .header-actions { flex:1 1 auto; } }

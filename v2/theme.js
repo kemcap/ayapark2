@@ -8,7 +8,7 @@
   const dark=theme==='dark';root.dataset.theme=theme;
   document.querySelector('meta[name="theme-color"]').content=dark?'#111c18':'#f4f5f0';
   const button=document.getElementById('themeToggle');
-  if(button){button.setAttribute('aria-pressed',String(dark));button.title=dark?'Açık temaya geç':'Koyu temaya geç';button.hidden=false;}
+  if(button){const de=root.lang==='de';button.setAttribute('aria-pressed',String(dark));button.setAttribute('aria-label',de?'Dunkles Design':'Koyu tema');button.title=de?(dark?'Zum hellen Design wechseln':'Zum dunklen Design wechseln'):(dark?'Açık temaya geç':'Koyu temaya geç');button.hidden=false;}
  }
  apply(preference||(system.matches?'dark':'light'));
  document.addEventListener('DOMContentLoaded',()=>{
@@ -19,6 +19,7 @@
    apply(preference);
   });
  });
+ document.addEventListener('ay2:languagechange',()=>apply(root.dataset.theme));
  system.addEventListener('change',event=>{if(!preference)apply(event.matches?'dark':'light');});
  window.addEventListener('storage',event=>{
   if(event.key!==key&&event.key!==null)return;

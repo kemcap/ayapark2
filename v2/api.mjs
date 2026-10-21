@@ -1,3 +1,4 @@
+import {t as tr} from './i18n.mjs';
 // Existing site tables are read-only; V2 mutations use a checked transactional RPC.
 const URL='https://eisozwhhinqszfikemot.supabase.co';
 const KEY='sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc';
@@ -8,54 +9,54 @@ export class AyaparkApi {
  async raw(path,method='GET',body,token) {
   const response=await this.fetcher(URL+path,{method,headers:{apikey:KEY,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',signal:AbortSignal.timeout(15000)});
   const data=await response.json().catch(()=>null);
-  if(!response.ok){const error=Error(response.status===401?'Oturum sona erdi. Yeniden giriş yapın.':response.status===429?'Çok fazla deneme yapıldı. Biraz sonra tekrar deneyin.':(['P0001','42501'].includes(data?.code)?data.message:'İşlem tamamlanamadı. Bağlantıyı, erişimi ve zorunlu alanları kontrol edin.'));error.status=response.status;throw error;}
+  if(!response.ok){const error=Error(response.status===401?tr("Oturum sona erdi. Yeniden giriş yapın."):response.status===429?tr("Çok fazla deneme yapıldı. Biraz sonra tekrar deneyin."):(['P0001','42501'].includes(data?.code)?data.message:tr("İşlem tamamlanamadı. Bağlantıyı, erişimi ve zorunlu alanları kontrol edin.")));error.status=response.status;throw error;}
   return data;
  }
  accept(session,generation){
-  if(generation!==this.generation)throw Error('Oturum değişti. Yeniden giriş yapın.');
-  if(!session?.access_token||!session.user?.id)throw Error('Geçerli oturum alınamadı.');
+  if(generation!==this.generation)throw Error(tr("Oturum değişti. Yeniden giriş yapın."));
+  if(!session?.access_token||!session.user?.id)throw Error(tr("Geçerli oturum alınamadı."));
   this.session=session;this.expiry=Date.now()+Number(session.expires_in||3600)*1000;
  }
  async login(email,password){
   this.clear();const generation=this.generation;
   this.accept(await this.raw('/auth/v1/token?grant_type=password','POST',{email,password}),generation);
   const user=await this.raw('/auth/v1/user','GET',undefined,this.session.access_token);
-  if(generation!==this.generation)throw Error('Oturum değişti.');
-  if(!user?.id||user.id!==this.session.user.id)throw Error('Kimlik doğrulanamadı.');
+  if(generation!==this.generation)throw Error(tr("Oturum değişti."));
+  if(!user?.id||user.id!==this.session.user.id)throw Error(tr("Kimlik doğrulanamadı."));
   return user;
  }
  async token(){
-  if(!this.session)throw Error('Giriş yapın.');
+  if(!this.session)throw Error(tr("Giriş yapın."));
   if(this.expiry>Date.now()+60000)return this.session.access_token;
   if(!this.refreshing){
    const generation=this.generation;
    this.refreshing=this.raw('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:this.session.refresh_token}).then(s=>this.accept(s,generation)).finally(()=>{if(generation===this.generation)this.refreshing=null;});
   }
   await this.refreshing;
-  if(!this.session)throw Error('Giriş yapın.');
+  if(!this.session)throw Error(tr("Giriş yapın."));
   return this.session.access_token;
  }
  async read(table,query){
-  if(!TABLES.has(table))throw Error('Bu tablo V2 okuma kapsamı dışında.');
+  if(!TABLES.has(table))throw Error(tr("Bu tablo V2 okuma kapsamı dışında."));
   const generation=this.generation;
   const token=await this.token();
   const data=await this.raw(`/rest/v1/${table}?${query}`,'GET',undefined,token);
-  if(generation!==this.generation)throw Error('Oturum değişti.');
-  if(!Array.isArray(data))throw Error('Veri biçimi geçersiz.');
+  if(generation!==this.generation)throw Error(tr("Oturum değişti."));
+  if(!Array.isArray(data))throw Error(tr("Veri biçimi geçersiz."));
   return data;
  }
  async rpc(name,body){
-  if(!['ay2_command','ay2_capabilities','ay2_workspace'].includes(name))throw Error('İşlem kapsam dışında.');
+  if(!['ay2_command','ay2_capabilities','ay2_workspace'].includes(name))throw Error(tr("İşlem kapsam dışında."));
   const generation=this.generation,token=await this.token();
   const result=await this.raw('/rest/v1/rpc/'+name,'POST',body,token);
-  if(generation!==this.generation)throw Error('Oturum değişti.');return result;
+  if(generation!==this.generation)throw Error(tr("Oturum değişti."));return result;
  }
- async readAll(table,query){let out=[];for(let offset=0;offset<100000;offset+=1000){const rows=await this.read(table,query+'&limit=1000&offset='+offset);out.push(...rows);if(rows.length<1000)return out;}throw Error('Çok fazla kayıt var. Dönem filtresi gerekli.');}
+ async readAll(table,query){let out=[];for(let offset=0;offset<100000;offset+=1000){const rows=await this.read(table,query+'&limit=1000&offset='+offset);out.push(...rows);if(rows.length<1000)return out;}throw Error(tr("Çok fazla kayıt var. Dönem filtresi gerekli."));}
  async command(site,action,payload){return this.rpc('ay2_command',{p_site:site,p_action:action,p_payload:payload});}
  async load(){
   const userId=encodeURIComponent(this.session?.user.id||'');
   const sites=await this.read('site_sites','select=id,name,slug&slug=eq.aya-park-2&limit=1');
-  if(!sites.length){const error=Error('Ayapark 2 erişiminiz bulunamadı. Yöneticiye danışın.');error.status=403;throw error;}
+  if(!sites.length){const error=Error(tr("Ayapark 2 erişiminiz bulunamadı. Yöneticiye danışın."));error.status=403;throw error;}
   const site=sites[0],sid=encodeURIComponent(site.id);
   const [memberships,units,blocks,links]=await Promise.all([
    this.read('site_staff_memberships',`select=role&site_id=eq.${sid}&user_id=eq.${userId}`),
@@ -67,7 +68,7 @@ export class AyaparkApi {
   const role=serverRole==='manager'?'super':['deputy','auditor'].includes(serverRole)?'staff':'resident';
   const ownIds=links.map(l=>l.unit_id);
   const byName=await this.rpc('ay2_workspace',{p_site:site.id});
-  if(!byName)throw Error('Çalışma alanı erişimi doğrulanamadı.');
+  if(!byName)throw Error(tr("Çalışma alanı erişimi doğrulanamadı."));
   const capabilities=byName.capabilities;
   const transactions=byName.entries.map(t=>({...t,date:t.booked_on,desc:t.description,cents:Number(t.cents)})).sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
   const charges=byName.charges.map(c=>({...c,cents:Number(c.cents)})),allocations=byName.allocations.map(a=>({...a,cents:Number(a.cents)}));

@@ -68,3 +68,24 @@ Prüfansicht mit ausschließlich fiktiven Daten: [Screenshot](docs/devir-pruefun
 - Keine Datenbankänderung. Die Änderung betrifft ausschließlich V2; `main` und die alte Live-Anwendung bleiben unverändert.
 
 Dunkle Ansicht mit ausschließlich fiktiven Daten: [Screenshot](docs/dark-mode-beispiel.jpg).
+
+
+## Fortschritt 21.10.2026: Deutsche Entwicklungsansicht
+
+- DE-/TR-Sprachtaste unmittelbar links neben dem Tag-/Nacht-Schalter; Auswahl bleibt lokal nach Neuladen erhalten. Der Wechsel benötigt keinen externen Dienst und meldet Benutzer nicht ab.
+- Menüs, Formulare, Hinweise und lokale Fehlermeldungen in Deutsch; Datum und Geldanzeige folgen der Sprache. Originalinhalte und technische Kategorie-/Rollenwerte bleiben unverändert. Nicht zugeordnete Servermeldungen bleiben im Original.
+- Direkte A-/B-Blocktasten statt des bisherigen Dropdowns. Erneutes Antippen des aktiven Blocks hebt den Filter auf. Suche und Statusfilter gelten weiterhin zusätzlich.
+- 34 Tests bestanden, einschließlich Sprachwechsel aller Ansichten, unverändertem Originalinhalt, unveränderten Formularwerten und Rollenfilterung. Desktop-Browserprüfung: Deutsch/Türkisch in beide Richtungen, Sprache nach Neuladen, Blockfilter und deutsches Forderungsformular.
+- Bestehende Live-Version, Datenbank und die vorgemerkte größere Designänderung wurden nicht verändert.
+
+## Vorgemerkte Wünsche – noch nicht umgesetzt
+
+- Gebäudefarben: helle Oberfläche in gebrochenem Weiß, Anthrazit und Terrakotta; dunkle Oberfläche in Anthrazit mit weichen Kupferakzenten. Grün bleibt für positive Status.
+- Schematische Gebäudemarke; Gebäudefoto für einen geeigneten größeren Bereich. Die konkrete Ausführung ist noch abzustimmen.
+- Kompakte Haupt-/Unterkategorien mit Umbruch auf ein 2×2-Raster bei schmalen oder vergrößerten Ansichten.
+- Wohnungsplan nach Skizze: B links, A rechts; jeweils 9/10, 7/8, 5/6, 3/4, 1/2 von oben nach unten.
+- Suche nach gespeicherten Eigentümer-/Mieternamen mit Verweis auf die zugeordnete Wohnung, unter bestehenden Zugriffsrechten.
+- Leerstand (Boş) durch einen dezenten Rotton klarer von bewohnt (Dolu) unterscheiden, zusätzlich zur Beschriftung.
+- Englisch und gegebenenfalls weitere Sprachen später.
+
+Deutsche Ansicht mit ausschließlich fiktiven Daten: [Screenshot](docs/deutsch-blockfilter-beispiel.jpg).

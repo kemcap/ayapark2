@@ -22,6 +22,12 @@ Oben rechts schaltet die Mond-/Sonnentaste zwischen heller und dunkler Darstellu
 
 Die bestehende Verwaltung bleibt für neue Auth-Konten und Portal-Einladungen verlinkt. V2-Personen sind eigene Verwaltungsdaten und vergeben keine Login-Rechte. Die App ruft keine Einladungs- oder E-Mail-Sendefunktion automatisch auf.
 
+## Sprache und Blockfilter
+
+Links neben der Tag-/Nacht-Taste wechselt **DE / TR** zwischen Türkisch und Deutsch. Türkisch bleibt der Standard; die Darstellungspräferenz wird lokal gespeichert. Der Wechsel lädt die Seite nicht neu und verändert weder Buchungen noch Berechtigungen. Namen, freie Beschreibungen, Mitteilungen und gespeicherte Kategorien bleiben im Original. In Formularen werden Kategorien deutsch angezeigt, intern bleiben ihre türkischen Schlüssel unverändert. CSV-Importformat und Währung TRY bleiben erhalten.
+
+Die deutsche Oberfläche verwendet zentrale Texte aus `i18n.mjs`; es gibt keinen externen Übersetzungsdienst. Unbekannte Meldungen des Servers bleiben im Original. Die A-/B-Tasten unter **Blok / Block** filtern Wohnungen direkt. Ein erneuter Klick auf den aktiven Block zeigt wieder beide Blöcke. Die Namenssuche ist noch nicht implementiert.
+
 ## Datenübernahme
 
 - **1.714 Bankbuchungen** aus dem bereitgestellten Auszug wurden nach vollständiger Prüfung sämtlicher laufender Salden in die geschützten V2-Tabellen übernommen.
@@ -59,7 +65,7 @@ Das Werkzeug `tools/prepare_bank.py` extrahiert den unterstützten Yapı-Kredi-A
 
 ## Entwicklung und Tests
 
-Statische App ohne Build-Schritt oder Laufzeitpakete. `api.mjs`, `core.mjs`, `ledger.mjs`, `ui.mjs`, `forms.mjs`, `app.mjs`, `theme.js`, `styles.css` und `index.html` werden zusammen per HTTP ausgeliefert. Nicht direkt als `file://` öffnen.
+Statische App ohne Build-Schritt oder Laufzeitpakete. `api.mjs`, `core.mjs`, `ledger.mjs`, `ui.mjs`, `forms.mjs`, `app.mjs`, `theme.js`, `i18n.mjs`, `styles.css` und `index.html` werden zusammen per HTTP ausgeliefert. Nicht direkt als `file://` öffnen.
 
 ```bash
 cd v2
@@ -67,7 +73,7 @@ npm ci --ignore-scripts
 npm test
 ```
 
-`@electric-sql/pglite` ist eine exakt fixierte Entwicklungsabhängigkeit für echte lokale Postgres-/RLS-Tests. Es wird nicht an Browser ausgeliefert. Die 31 Tests prüfen Finanzsummen, Teilzahlungen, Überbuchungsschutz, Wiederholungen, Rollen, Cross-Site-Schutz, Veröffentlichung, CSV, Escaping, Formulare, Token-Erneuerung und Sitzungsabbrüche.
+`@electric-sql/pglite` ist eine exakt fixierte Entwicklungsabhängigkeit für echte lokale Postgres-/RLS-Tests. Es wird nicht an Browser ausgeliefert. Die 34 Tests prüfen Finanzsummen, Teilzahlungen, Überbuchungsschutz, Wiederholungen, Rollen, Cross-Site-Schutz, Veröffentlichung, CSV, Escaping, Formulare, Token-Erneuerung und Sitzungsabbrüche.
 
 Die drei V2-Migrationsdateien tragen die vom verbundenen Supabase-Projekt zurückgegebenen Versionen. Sie setzen die vorhandenen `site_*`-Tabellen und Auth-Struktur voraus. Die zehn älteren Datenbankmigrationen sind nicht vollständig aus diesem Repository rekonstruierbar; dies ist kein vollständiges Neuaufsetzen eines leeren Supabase-Projekts.
 

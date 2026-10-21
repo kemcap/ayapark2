@@ -1,3 +1,4 @@
+import {t as tr} from './i18n.mjs';
 import {demoData as base,summarize,randomId} from './core.mjs';
 export const paid=(d,id)=>d.allocations.filter(a=>a.charge_id===id&&!a.void_reason).reduce((n,a)=>n+a.cents,0);
 export const remaining=(d,c)=>c.void_reason?0:c.cents-paid(d,c.id);
@@ -16,7 +17,7 @@ export function fullDemo(){
 }
 export function demoCommand(d,action,p){
  const id=()=>randomId();const now=()=>new Date().toISOString();
- if(action==='settings'){if(d.transactions.length)throw Error('Hareketler varken açılış değiştirilemez.');d.opening=p.opening_cents;d.openingDate=p.opening_date;}
+ if(action==='settings'){if(d.transactions.length)throw Error(tr("Hareketler varken açılış değiştirilemez."));d.opening=p.opening_cents;d.openingDate=p.opening_date;}
  else if(action==='entry'){if(!d.transactions.some(t=>t.request_id===p.request_id))d.transactions.unshift({...p,id:id(),category:p.category});}
  else if(action==='import'){let inserted=0,duplicates=0;for(const t of p.entries){if(d.transactions.some(x=>x.date===t.date&&x.desc===t.desc&&x.cents===t.cents)){duplicates++;continue;}d.transactions.push({...t,id:id(),category:'Diğer'});inserted++;}return {inserted,duplicates};}
  else if(action==='charge'){if(!d.charges.some(c=>c.unit_id===p.unit_id&&c.reference===p.reference))d.charges.push({...p,id:id()});}
@@ -24,17 +25,17 @@ export function demoCommand(d,action,p){
  else if(action==='allocate'){
   if(d.allocations.some(a=>a.request_id===p.request_id))return {ok:true};
   const t=d.transactions.find(t=>t.id===p.entry_id),c=d.charges.find(c=>c.id===p.charge_id);
-  if(!t||!c||t.cents<0||t.reversal_of||d.transactions.some(x=>x.reversal_of===t.id)||p.cents<=0||p.cents>unassigned(d,t)||p.cents>remaining(d,c))throw Error('Tutar ödeme veya borç bakiyesini aşıyor.');
+  if(!t||!c||t.cents<0||t.reversal_of||d.transactions.some(x=>x.reversal_of===t.id)||p.cents<=0||p.cents>unassigned(d,t)||p.cents>remaining(d,c))throw Error(tr("Tutar ödeme veya borç bakiyesini aşıyor."));
   d.allocations.push({...p,id:id()});
  }
- else if(action==='unallocate'){const a=d.allocations.find(a=>a.id===p.id);if(!a)throw Error('Eşleştirme bulunamadı.');a.void_reason=p.reason;}
- else if(action==='void_charge'){if(paid(d,p.id)>0)throw Error('Önce ödeme eşleştirmelerini kaldırın.');d.charges.find(c=>c.id===p.id).void_reason=p.reason;}
- else if(action==='reverse'){const t=d.transactions.find(t=>t.id===p.id);if(!t||t.reversal_of||d.transactions.some(x=>x.reversal_of===t.id))throw Error('Hareket daha önce düzeltilmiş.');if(unassigned(d,t)!==t.cents)throw Error('Önce ödeme eşleştirmelerini kaldırın.');d.transactions.unshift({...t,id:id(),date:now().slice(0,10),cents:-t.cents,desc:'STORNO: '+p.reason,reversal_of:t.id});}
+ else if(action==='unallocate'){const a=d.allocations.find(a=>a.id===p.id);if(!a)throw Error(tr("Eşleştirme bulunamadı."));a.void_reason=p.reason;}
+ else if(action==='void_charge'){if(paid(d,p.id)>0)throw Error(tr("Önce ödeme eşleştirmelerini kaldırın."));d.charges.find(c=>c.id===p.id).void_reason=p.reason;}
+ else if(action==='reverse'){const t=d.transactions.find(t=>t.id===p.id);if(!t||t.reversal_of||d.transactions.some(x=>x.reversal_of===t.id))throw Error(tr("Hareket daha önce düzeltilmiş."));if(unassigned(d,t)!==t.cents)throw Error(tr("Önce ödeme eşleştirmelerini kaldırın."));d.transactions.unshift({...t,id:id(),date:now().slice(0,10),cents:-t.cents,desc:'STORNO: '+p.reason,reversal_of:t.id});}
  else if(action==='person'){const person=d.people.find(x=>x.id===p.id);if(person)Object.assign(person,p);else d.people.push({...p,id:id(),active:true});}
  else if(action==='announcement'){const a=d.announcements.find(x=>x.id===p.id);if(a)Object.assign(a,p);else d.announcements.unshift({...p,id:id(),created_at:now()});}
  else if(action==='publish_report'){const s=monthlySummary(d,p.period.slice(0,7));d.reports=d.reports.filter(r=>r.period!==p.period);d.reports.unshift({period:p.period,opening_cents:s.balance-s.net,income_cents:s.income,expense_cents:s.expense,closing_cents:s.balance,published_at:now()});}
- else if(action==='confirm_staged'){const row=d.staged.find(r=>r.id===p.id);if(!row||row.confirmed_charge||row.ignored_reason)throw Error('Bekleyen kayıt bulunamadı.');if(p.ignore_reason)row.ignored_reason=p.ignore_reason;else{if(!d.units.some(u=>u.id===p.unit_id))throw Error('Daire seçin.');const chargeId=id();d.charges.push({id:chargeId,unit_id:p.unit_id,category:row.kind==='enforcement'?'İcra':'Devir',label:'Örnek devir bakiyesi',due_on:row.as_of,cents:Number(row.cents),payer:p.payer,reference:'staged:'+row.id});row.confirmed_charge=chargeId;}}
+ else if(action==='confirm_staged'){const row=d.staged.find(r=>r.id===p.id);if(!row||row.confirmed_charge||row.ignored_reason)throw Error(tr("Bekleyen kayıt bulunamadı."));if(p.ignore_reason)row.ignored_reason=p.ignore_reason;else{if(!d.units.some(u=>u.id===p.unit_id))throw Error(tr("Daire seçin."));const chargeId=id();d.charges.push({id:chargeId,unit_id:p.unit_id,category:row.kind==='enforcement'?'İcra':'Devir',label:'Örnek devir bakiyesi',due_on:row.as_of,cents:Number(row.cents),payer:p.payer,reference:'staged:'+row.id});row.confirmed_charge=chargeId;}}
  else if(action==='permissions'){d.permissions=d.permissions.filter(x=>x.user_id!==p.user_id);d.permissions.push(p);}
- else throw Error('Bu işlem örnek görünümde mevcut değil.');
+ else throw Error(tr("Bu işlem örnek görünümde mevcut değil."));
  d.audit.unshift({id:id(),action,at:now(),details:{reason:p.reason||''}});refreshDebts(d);return {ok:true};
 }
