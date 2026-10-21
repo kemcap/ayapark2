@@ -65,7 +65,7 @@ npm ci --ignore-scripts
 npm test
 ```
 
-`@electric-sql/pglite` ist eine exakt fixierte Entwicklungsabhängigkeit für echte lokale Postgres-/RLS-Tests. Es wird nicht an Browser ausgeliefert. Die 22 Tests prüfen Finanzsummen, Teilzahlungen, Überbuchungsschutz, Wiederholungen, Rollen, Cross-Site-Schutz, Veröffentlichung, CSV, Escaping, Formulare, Token-Erneuerung und Sitzungsabbrüche.
+`@electric-sql/pglite` ist eine exakt fixierte Entwicklungsabhängigkeit für echte lokale Postgres-/RLS-Tests. Es wird nicht an Browser ausgeliefert. Die 31 Tests prüfen Finanzsummen, Teilzahlungen, Überbuchungsschutz, Wiederholungen, Rollen, Cross-Site-Schutz, Veröffentlichung, CSV, Escaping, Formulare, Token-Erneuerung und Sitzungsabbrüche.
 
 Die drei V2-Migrationsdateien tragen die vom verbundenen Supabase-Projekt zurückgegebenen Versionen. Sie setzen die vorhandenen `site_*`-Tabellen und Auth-Struktur voraus. Die zehn älteren Datenbankmigrationen sind nicht vollständig aus diesem Repository rekonstruierbar; dies ist kein vollständiges Neuaufsetzen eines leeren Supabase-Projekts.
 
@@ -74,9 +74,14 @@ Keine Supabase-CLI erneut ausführen, um den hier blockierten Schritt zu umgehen
 ## Prüfgrenzen und offene Freigabe
 
 - Private Veröffentlichung ist bestätigt. `main` bleibt bei `b0bb314b145fbf1f2d274dcbaeed9db2dd02bdef`.
-- Kein interaktiver Browsertest und kein echter Passwort-Login aus dieser Umgebung: Die unterstützte Browser-QA war nicht verfügbar. HTML/DOM-Bezüge und alle Module sind statisch geprüft; RLS und Geschäftslogik sind mit lokalem Postgres sowie lesend im verbundenen Projekt geprüft.
+- Desktop-Browserprüfung mit Beispieldaten durchgeführt: Übersicht, Wohnungsdetail, Teilzahlungsformular, Bewohneransicht und Devir-Prüfdialog funktionieren. Ein Fehler bei Request-IDs in HTTP-Vorschauen wurde behoben. Echter Passwort-Login und Mobilgerät-Abnahme stehen weiterhin aus. RLS und Geschäftslogik sind mit lokalem Postgres sowie lesend im verbundenen Projekt geprüft.
 - 22 Altbestände erfordern eine fachliche Zuordnung in der Oberfläche. Sie wurden absichtlich nicht als bestätigte Forderungen verbucht.
 - Die öffentlich lesbare Altforderungstabelle und vorhandene Sicherheitsberater-Hinweise der alten Anwendung bleiben offen. Eine Änderung würde das unverändert zu erhaltende Live-System betreffen. V2 verwendet diese Tabelle nicht.
 - Vor einer Ablösung der bisherigen Anwendung müssen die Altbestände bestätigt und Desktop, Mobilgerät sowie reale Rollen-Logins praktisch abgenommen werden.
 
 Weitere Details: `AUDIT.md` und `RELEASE.md`.
+
+
+### Unterstützte Altbestandsprüfung
+
+`reconcile.mjs` erzeugt ausschließlich Hinweise: klare Angaben aus dem Wohnungshinweis, jüngere passende Bankbeschreibungen, mögliche spätere Zahlungen und parallele Devir-/İcra-Fälle. Namen und Referenzen kommen erst nach berechtigter Anmeldung aus dem geschützten Bestand. Es werden keine tatsächlichen Personen oder Beträge als Regeln im Quellcode hinterlegt. Bei geteilten Überweisungen wird ausdrücklich vor einer vollständigen Zuordnung zu nur einer Wohnung gewarnt. Ohne passenden Beleg bleibt der Block offen. Die Bestätigung im Dialog ist weiterhin erforderlich.

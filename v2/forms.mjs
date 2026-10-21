@@ -1,5 +1,6 @@
-import {escapeHtml as e,money} from './core.mjs';
+import {escapeHtml as e,money,randomId} from './core.mjs';
 import {remaining,unassigned} from './ledger.mjs';
+import {analyzeStage} from './reconcile.mjs';
 export const field=(name,label,type='text',value='',attrs='')=>`<label class="field">${label}<input name="${name}" type="${type}" value="${e(value)}" ${attrs}></label>`;
 const select=(name,label,options,value='')=>`<label class="field">${label}<select name="${name}">${options.map(([v,l])=>`<option value="${e(v)}" ${String(v)===String(value)?'selected':''}>${e(l)}</option>`).join('')}</select></label>`;
 const check=(name,label,checked=false)=>`<label class="check-field"><input type="checkbox" name="${name}" ${checked?'checked':''}>${label}</label>`;
@@ -10,7 +11,7 @@ const payers=[['review','Sorumlu teyit edilmeli'],['tenant','Site sakini'],['own
 const categories=['Aidat','Havuz','Asansör','Demirbaş','Devir','İcra','Temizlik','Peyzaj','Elektrik','Banka masrafı','Diğer'];
 const cat=()=>select('category','Kategori',categories.map(x=>[x,x]),'Aidat');
 export function buildForm(s,action,args={}){
- const d=s.data,unitOptions=d.units.map(u=>[u.id,u.code]);let title='',body='',context={...args,request_id:crypto.randomUUID()};
+ const d=s.data,unitOptions=d.units.map(u=>[u.id,u.code]);let title='',body='',context={...args,request_id:randomId()};
  if(action==='charge'||action==='monthly'){
   title=action==='monthly'?'Aylık aidat oluştur':'Borç ekle';body=(action==='charge'?select('unit_id','Daire',unitOptions,args.unit):'')+field('label','Açıklama','text',action==='monthly'?s.period+' aidatı':'','required maxlength="200"')+field('due_on','Vade','date',s.period+'-01','required')+amount()+select('payer','Sorumlu taraf',payers,'review')+(action==='charge'?cat():check('confirmation',`${d.units.length} daireye birer aidat kaydı oluşturulacağını onaylıyorum.`));
   context.reference='manual:'+context.request_id;
@@ -30,7 +31,7 @@ export function buildForm(s,action,args={}){
  else if(action==='settings'){title='Defter açılışı';body=field('opening_date','Açılış tarihi','date',today(),'required')+amount('Açılış bakiyesi (TL)','0,00');}
  else if(action==='publish_report'){title='Aylık mali raporu yayımla';body=`<p>${e(s.period)} döneminin ortak toplamları site sakinlerine açılacak. Kişisel banka açıklamaları rapora dahil edilmez.</p><p class="fine">Aynı döneme ait önceki rapor güncellenir. Verilerin tamlığını kontrol edin.</p>`+check('confirmation','Tutarları kontrol ettim, raporu yayımla.');}
  else if(action==='confirm_staged'){
-  const r=d.staged.find(x=>x.id===args.id);if(!r)throw Error('Kayıt bulunamadı.');title='Devir kaydını doğrula';body=`<div class="info-strip"><strong>${e(r.person_label)}</strong><br>Belgedeki daire: ${e(r.unit_hint||'Belirtilmedi')}<br>Tutar: ${money(Number(r.cents))}<br>Kaynak: ${e(r.source)}</div><p class="fine">Belge tarihini, daireyi, sorumlu kişiyi ve aynı borcun başka kayıtta bulunmadığını kontrol edin. Teyit edilmeden bu kayıt tahsilata dahil olmaz.</p>`+select('unit_id','Doğrulanan daire',[['','Daire seçin'],...unitOptions])+select('payer','Sorumlu taraf',payers,'review')+check('confirmation','Daire ve tutarı kontrol ettim; açılış borcu olarak kaydet.');
+  const r=d.staged.find(x=>x.id===args.id);if(!r)throw Error('Kayıt bulunamadı.');const review=analyzeStage(r,d);title='Devir kaydını doğrula';body=`<div class="info-strip"><strong>${e(r.person_label)}</strong><br>Belgedeki daire: ${e(r.unit_hint||'Belirtilmedi')}<br>Tutar: ${money(Number(r.cents))}<br>Kaynak: ${e(r.source)}</div><p class="fine">Belge tarihini, daireyi, sorumlu kişiyi ve aynı borcun başka kayıtta bulunmadığını kontrol edin. Teyit edilmeden bu kayıt tahsilata dahil olmaz.</p>`+`<div class="fine">${review.warnings.map(w=>`<p class="error">${e(w)}</p>`).join('')}${review.unitEvidence.length?'<p>Banka dayanağı: '+review.unitEvidence.map(x=>e(x.code)+' · '+e(x.date)+' · Ref. '+e(x.reference)+(x.shared?' (ortak ödeme)':'')).join('<br>')+'</p>':''}${review.paymentCandidates.length?'<p>Sonraki tahsilat adayı: '+review.paymentCandidates.map(x=>e(x.date)+' · '+money(x.cents)+' · Ref. '+e(x.reference)).join('<br>')+'</p>':''}</div>`+select('unit_id','Doğrulanan daire',[['','Daire seçin'],...unitOptions],review.suggestedUnitId||'')+select('payer','Sorumlu taraf',payers,'review')+check('confirmation','Daire ve tutarı kontrol ettim; açılış borcu olarak kaydet.');
  }
  else if(action==='ignore_staged'){title='Devir kaydını hariç tut';body=text('reason','Gerekçe (ör. mükerrer veya yanlış kayıt)','',500)+check('confirmation','Bu kayıt açık borca dönüştürülmesin.');}
  else throw Error('İşlem bulunamadı.');

@@ -1,4 +1,4 @@
-import {demoData as base,summarize} from './core.mjs';
+import {demoData as base,summarize,randomId} from './core.mjs';
 export const paid=(d,id)=>d.allocations.filter(a=>a.charge_id===id&&!a.void_reason).reduce((n,a)=>n+a.cents,0);
 export const remaining=(d,c)=>c.void_reason?0:c.cents-paid(d,c.id);
 export const unassigned=(d,t)=>t.cents-d.allocations.filter(a=>a.entry_id===t.id&&!a.void_reason).reduce((n,a)=>n+a.cents,0);
@@ -12,10 +12,10 @@ export function fullDemo(){
  d.transactions=d.transactions.map((t,i)=>({...t,id:'demo-entry-'+i,reference:'EXAMPLE-'+i}));
  d.charges=d.units.filter(u=>u.debt>0).map(u=>({id:'charge-'+u.id,unit_id:u.id,category:'Devir',label:'Örnek devir bakiyesi',due_on:'2026-10-01',cents:u.debt,payer:'review',reference:'demo-'+u.id}));
  d.allocations=[];d.openingDate='2026-10-01';d.people=[];d.reports=[];d.announcements=[{id:'demo-announcement',title:'Ayapark 2 yönetim alanına hoş geldiniz',body:'Bu örnek duyurudur. Dairelerinizi, ödemelerinizi ve ortak raporları buradan takip edebilirsiniz.',published:true,created_at:'2026-10-20T09:00:00Z'}];
- d.staged=[];d.audit=[];d.permissions=[];d.staff=[{user_id:'demo-staff',role:'deputy'}];return d;
+ d.staged=[{id:'demo-staged',person_label:'Örnek Kişi',unit_hint:'B-4 (M)',cents:360000,as_of:'2026-10-09',kind:'balance',source:'Örnek devir listesi',source_key:'demo-staged'}];d.audit=[];d.permissions=[];d.staff=[{user_id:'demo-staff',role:'deputy'}];return d;
 }
 export function demoCommand(d,action,p){
- const id=()=>crypto.randomUUID();const now=()=>new Date().toISOString();
+ const id=()=>randomId();const now=()=>new Date().toISOString();
  if(action==='settings'){if(d.transactions.length)throw Error('Hareketler varken açılış değiştirilemez.');d.opening=p.opening_cents;d.openingDate=p.opening_date;}
  else if(action==='entry'){if(!d.transactions.some(t=>t.request_id===p.request_id))d.transactions.unshift({...p,id:id(),category:p.category});}
  else if(action==='import'){let inserted=0,duplicates=0;for(const t of p.entries){if(d.transactions.some(x=>x.date===t.date&&x.desc===t.desc&&x.cents===t.cents)){duplicates++;continue;}d.transactions.push({...t,id:id(),category:'Diğer'});inserted++;}return {inserted,duplicates};}
@@ -33,6 +33,7 @@ export function demoCommand(d,action,p){
  else if(action==='person'){const person=d.people.find(x=>x.id===p.id);if(person)Object.assign(person,p);else d.people.push({...p,id:id(),active:true});}
  else if(action==='announcement'){const a=d.announcements.find(x=>x.id===p.id);if(a)Object.assign(a,p);else d.announcements.unshift({...p,id:id(),created_at:now()});}
  else if(action==='publish_report'){const s=monthlySummary(d,p.period.slice(0,7));d.reports=d.reports.filter(r=>r.period!==p.period);d.reports.unshift({period:p.period,opening_cents:s.balance-s.net,income_cents:s.income,expense_cents:s.expense,closing_cents:s.balance,published_at:now()});}
+ else if(action==='confirm_staged'){const row=d.staged.find(r=>r.id===p.id);if(!row||row.confirmed_charge||row.ignored_reason)throw Error('Bekleyen kayıt bulunamadı.');if(p.ignore_reason)row.ignored_reason=p.ignore_reason;else{if(!d.units.some(u=>u.id===p.unit_id))throw Error('Daire seçin.');const chargeId=id();d.charges.push({id:chargeId,unit_id:p.unit_id,category:row.kind==='enforcement'?'İcra':'Devir',label:'Örnek devir bakiyesi',due_on:row.as_of,cents:Number(row.cents),payer:p.payer,reference:'staged:'+row.id});row.confirmed_charge=chargeId;}}
  else if(action==='permissions'){d.permissions=d.permissions.filter(x=>x.user_id!==p.user_id);d.permissions.push(p);}
  else throw Error('Bu işlem örnek görünümde mevcut değil.');
  d.audit.unshift({id:id(),action,at:now(),details:{reason:p.reason||''}});refreshDebts(d);return {ok:true};

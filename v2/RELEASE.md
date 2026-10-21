@@ -46,3 +46,15 @@ Die **Software-Kernabläufe sind implementiert**. Eine vollständige Produktivfr
 3. Vor einer öffentlichen Umstellung die alten öffentlichen Forderungszugriffe in einer abgestimmten Migration schließen. Bestehende Bewohner dürfen dabei nicht unerwartet ausgesperrt werden.
 
 Die separate private App kann bereits aufgerufen werden. Sie startet mit Beispieldaten; echte V2-Änderungen sind erst nach Supabase-Anmeldung mit passenden Rechten möglich.
+
+
+## Fortschritt 21.10.2026: Altbestandsprüfung
+
+- Die Originalseiten wurden zusätzlich visuell geprüft; drei unvollständige/fehlerhafte Wohnungshinweise im geschützten V2-Prüfbestand korrigiert. Keine Forderung bestätigt oder Zahlung zugeordnet.
+- Die Prüfansicht zeigt nun belegte Wohnungsangaben, vorsichtige Vorschläge aus passenden Bankbeschreibungen und die zugrunde liegenden Datums-/Referenzhinweise.
+- Im vorhandenen Bestand ergeben sich 11 explizite Wohnungsangaben und 7 ergänzende Vorschläge aus Bankbeschreibungen. Vier Fälle benötigen weiterhin eine Blockbestätigung. Vorschläge sind keine fachliche Freigabe.
+- Ein späterer namens- und betragsgleicher Geldeingang wird gesondert hervorgehoben. Parallele allgemeine und İcra-Fälle derselben Person werden zur Überschneidungsprüfung markiert.
+- Keine personenbezogenen Prüfdaten oder Beleginhalte werden im öffentlichen Quellcode gespeichert.
+- 31 Tests bestanden. Zusätzlich im Desktop-Browser mit Beispieldaten geprüft: Teilzahlung korrekt verarbeitet, Bewohneransicht begrenzt und Devir-Dialog mit Vorauswahl sowie ausdrücklicher Bestätigung geöffnet. Die Request-ID-Erzeugung wurde für HTTP-Vorschauen korrigiert. Echter Passwort-Login und Mobilgerät-Abnahme bleiben offen.
+
+Prüfansicht mit ausschließlich fiktiven Daten: [Screenshot](docs/devir-pruefung-beispiel.jpg).

@@ -34,3 +34,7 @@ test('published report remains a separate snapshot after later changes',()=>{
  demoCommand(d,'entry',{date:'2026-10-25',desc:'Later',category:'Diğer',cents:1000,request_id:crypto.randomUUID()});
  assert.equal(d.reports[0].closing_cents,published);assert.equal(monthlySummary(d,'2026-10').balance,published+1000);
 });
+
+test('staged demo balance is not posted until an explicit confirmation command',()=>{
+ const d=fullDemo(),before=d.charges.length;assert.equal(d.charges.length,before);const row=d.staged[0];demoCommand(d,'confirm_staged',{id:row.id,unit_id:'B-4',payer:'review'});assert.equal(d.charges.length,before+1);assert.ok(row.confirmed_charge);assert.throws(()=>demoCommand(d,'confirm_staged',{id:row.id,unit_id:'B-4',payer:'review'}),/Bekleyen/);
+});

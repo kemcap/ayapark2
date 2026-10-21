@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {demoData,summarize,visibleUnits,allowedPages,parseCsv,escapeHtml,money} from '../core.mjs';
+import {demoData,summarize,visibleUnits,allowedPages,parseCsv,escapeHtml,money,randomId} from '../core.mjs';
 test('dashboard and reports reconcile to the same ledger, in integer kuruş',()=>{
  const d=demoData(),s=summarize(d.transactions,d.opening);
  assert.deepEqual(s,{income:1080000,expense:550000,net:530000,balance:4820000});
@@ -31,4 +31,10 @@ test('CSV flags repeats within file without silently discarding rows',()=>{
 });
 test('external descriptions are escaped before interpolation in HTML',()=>{
  assert.equal(escapeHtml('<img src=x onerror="x">&\''),'&lt;img src=x onerror=&quot;x&quot;&gt;&amp;&#39;');
+});
+
+test('request IDs remain valid when randomUUID is unavailable on HTTP previews',()=>{
+ const original=Object.getOwnPropertyDescriptor(globalThis,'crypto'),cryptoObject=globalThis.crypto;
+ try{Object.defineProperty(globalThis,'crypto',{value:{getRandomValues:cryptoObject.getRandomValues.bind(cryptoObject)},configurable:true});const ids=Array.from({length:30},()=>randomId());assert.equal(new Set(ids).size,30);for(const id of ids)assert.match(id,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);}
+ finally{Object.defineProperty(globalThis,'crypto',original);}
 });
