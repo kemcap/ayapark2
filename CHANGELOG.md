@@ -1,5 +1,11 @@
 # Ayapark 2
 
+## 3.6
+
+- Close the login dialog after both password/code sign-in and automatic session restoration.
+- Prevent background restoration from superseding an in-progress manual sign-in.
+- Preserve cancellation and failed-login behavior; add regression coverage.
+
 ## 3.5
 
 - Restore Super-Admin-only view switching for real connected accounts.

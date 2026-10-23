@@ -191,6 +191,15 @@ $('connectionButton').addEventListener('click',async()=>{
  try{await api.logout();toast(tr("Oturum kapatıldı."));}catch{toast(tr("Bu sekmedeki oturum temizlendi; sunucu çıkışı doğrulanamadı."));}
 });
 $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
+function completeSignIn(loaded){
+ state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;
+ state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
+ // Closing a completed login must not trigger the pending-login cancellation handler.
+ loginBusy=false;$('loginSubmit').disabled=false;
+ if($('loginDialog').open)$('loginDialog').close();
+ $('loginForm').reset();navigate('overview');
+}
+
 $('loginDialog').addEventListener('close',()=>{hideLoginPassword();$('password').value='';if(loginBusy){epoch++;void api.logout().catch(()=>{});loginBusy=false;$('loginSubmit').disabled=false;}});
 
 function selectLogin(method){loginMethod=method;$('passwordFields').hidden=method!=='password';$('codeFields').hidden=method!=='code';$('password').required=method==='password';$('loginCode').required=method==='code';$('usePassword').setAttribute('aria-pressed',String(method==='password'));$('useCode').setAttribute('aria-pressed',String(method==='code'));hideLoginPassword();$('password').value='';$('loginCode').value='';$('loginMessage').textContent='';}
@@ -208,7 +217,7 @@ selectLogin('password');
 
 $('loginForm').addEventListener('submit',async event=>{
  event.preventDefault();if(loginBusy)return;loginBusy=true;const attempt=++epoch;$('loginSubmit').disabled=true;$('loginMessage').textContent=tr("Hesap ve erişim yetkileri doğrulanıyor…");$('loginMessage').classList.remove('error');
- try{if(loginMethod==='code')await api.verifyCode($('email').value.trim(),$('loginCode').value.trim());else await api.login($('email').value.trim(),$('password').value);$('password').value='';const loaded=await api.load();if(attempt!==epoch)return;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);loginBusy=false;$('loginDialog').close();$('loginForm').reset();navigate('overview');toast(tr("Hesabınız açıldı."));}
+ try{if(loginMethod==='code')await api.verifyCode($('email').value.trim(),$('loginCode').value.trim());else await api.login($('email').value.trim(),$('password').value);$('password').value='';const loaded=await api.load();if(attempt!==epoch)return;completeSignIn(loaded);toast(tr("Hesabınız açıldı."));}
  catch(error){if(attempt!==epoch)return;if([400,401,403].includes(error.status))await api.logout().catch(()=>{});if(attempt!==epoch)return;$('loginMessage').textContent=error.message;$('loginMessage').classList.add('error');}
  finally{if(attempt===epoch){loginBusy=false;$('loginSubmit').disabled=false;}}
 });
@@ -261,7 +270,7 @@ document.addEventListener('focusin',event=>{const el=event.target.closest('.info
 document.addEventListener('focusout',event=>{const el=event.target.closest('.info-help');if(el?.dataset.focusOpen&&!el.contains(event.relatedTarget)){el.open=false;delete el.dataset.focusOpen;}});
 
 async function resumeSession(){
- if(state.mode==='demo')return;
+ if(state.mode==='demo'||loginBusy)return;
  const attempt=++epoch,hash=new URLSearchParams(location.hash.slice(1));
  if(hash.get('type')==='recovery'){location.replace(new URL('./reset.html',location.href).href+location.hash);return;}
  try{
@@ -273,7 +282,7 @@ async function resumeSession(){
   }else restored=await api.restore();
   if(!restored||attempt!==epoch)return;
   const loaded=await api.load();if(attempt!==epoch)return;
-  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{timeZone:'Europe/Istanbul',hour:'2-digit',minute:'2-digit'})};state.mode='connected';navigate('overview');
+  completeSignIn(loaded);
  }catch(error){if(attempt===epoch)toast(error.message);}
 }
 window.addEventListener('storage',event=>{

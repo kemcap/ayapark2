@@ -1,4 +1,4 @@
-# Ayapark 2 · V3.5
+# Ayapark 2 · V3.6
 
 Browser app with Supabase Auth and row-level data access.
 
@@ -6,7 +6,7 @@ Browser app with Supabase Auth and row-level data access.
 - Archived original: https://kemcap.github.io/ayapark2/old/
 - Owner-only preview: https://ayapark2-v2-private.kemcap.chatgpt.site
 
-V3.5 adds Persons and apartment assignment in both directions, a unified contact Edit menu, illustrated phone installation, read-only Super-Admin role previews, and a safe resident provider directory. Announcement creation/list rendering and publication date validation are fixed.
+V3.6 adds Persons and apartment assignment in both directions, a unified contact Edit menu, illustrated phone installation, read-only Super-Admin role previews, and a safe resident provider directory. Announcement creation/list rendering and publication date validation are fixed.
 
 Read AUTH-SETUP.md for remaining mail configuration and real-device verification. Password is the default login method; System is the default appearance. Browser sessions persist until logout, local data removal, or server-side expiry/revocation.
 
