@@ -42,7 +42,7 @@ export function buildV3Form(s,action,args={}){
   const l=d.links.find(x=>x.id===args.id);if(!l)throw Error(tr('Kayıt bulunamadı.'));
   context.id=l.id;context.expected=linkVersion(l);title=tr('Hatalı bağlantıyı kaldır');
   body=`<div class="info-strip"><strong>${e(personName(d,l.person_id))}</strong> · ${e(d.units.find(u=>u.id===l.unit_id)?.code||'—')} · ${e(roleLabel(l.role))}</div>`+
-   `<p class="fine">${tr('Yanlış atanan rolü kaldırın. Kişi ve banka kayıtları korunur. Gerçek taşınma veya görev bitişinde Bağlantıyı bitir seçeneğini kullanın.')}</p>`+
+   `<p class="fine">${tr('Yanlış atanan rolü kaldırın. Kişi ve banka kayıtları korunur. Portal erişimi ayrı yönetilir. Gerçek taşınma veya görev bitişinde Bağlantıyı bitir seçeneğini kullanın.')}</p>`+
    field('reason',tr('Kaldırma gerekçesi'),'text','','required minlength="3" maxlength="500"')+
    check('confirmation','Bu yanlış bağlantıyı kaldırmayı onaylıyorum.');
  }
