@@ -1,3 +1,13 @@
+## V3.9 · 2026-10-23
+
+- Residents see their own open debts after departure in dues and apartment details; another person's debts remain hidden.
+- New CSV income/expense columns require unsigned positive amounts. Legacy signed CSV and signed running balances remain supported. Apartment hints accept only A-1–A-10/B-1–B-10 or blank.
+- Confirmed existing server correction for charge periods, added a guarded installation script and seven transactional SQL checks. Client requires a complete chronological pair when a period is supplied.
+- Scheduled announcements count correctly in the overview and compare actual instants across time zones.
+- Invalid bank/report ranges show a specific message. Report totals and print/export controls are withheld until the range is valid; calculations and CSV export reject invalid ranges.
+- Provider categories translate and can be searched in German without changing stored categories or names.
+- Validation: 58 Node tests, 72 extended audit checks, 7 SQL assertions, targeted browser scenarios. Real email delivery, physical phone installation and multi-day session verification remain separate acceptance work.
+
 # Ayapark 2
 
 ## 3.8

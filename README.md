@@ -1,4 +1,4 @@
-# Ayapark 2 · V3.8
+# Ayapark 2 · V3.9
 
 Browser app with Supabase Auth and row-level data access.
 
@@ -6,7 +6,9 @@ Browser app with Supabase Auth and row-level data access.
 - Archived original: https://kemcap.github.io/ayapark2/old/
 - Owner-only preview: https://ayapark2-v2-private.kemcap.chatgpt.site
 
-V3.8 simplifies the header with softer neutral surfaces, icon-based automatic/light/dark appearance selection, a compact refresh icon, and no decorative A2 avatar or connected-account badge. Resident detail help remains inside its dialog; login/session fixes and existing features are retained.
+V3.9 fixes visibility of a resident's own debts after departure, validates import direction and apartment hints, preserves charge periods without immediate person assignment, corrects scheduled announcement counts and time-zone comparisons, validates report/bank ranges before calculations or export, and translates provider categories in German.
+
+Validation: 58 automated regression tests and 72 extended audit checks passed. Seven authenticated SQL assertions for charge periods passed in a rolled-back fixture. The server-side period correction was already installed and was verified rather than replaced. `supabase/charge-period.sql` preserves that correction in the source; `tests/charge-period.sql` reproduces its checks.
 
 Read AUTH-SETUP.md for remaining mail configuration and real-device verification. Password is the default login method; System is the default appearance. Browser sessions persist until logout, local data removal, or server-side expiry/revocation.
 

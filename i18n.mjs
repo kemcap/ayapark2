@@ -761,3 +761,12 @@ Object.assign(german,{
 Object.assign(german,{'Hizmet verenlerin iletişim bilgileri.':'Kontaktdaten der Dienstleister.'});
 
 Object.assign(german,{'Kayıtları yenile':'Datensätze aktualisieren'});
+
+Object.assign(german,{
+ 'Geçerli bir tarih aralığı girin.':'Bitte einen gültigen Datumsbereich eingeben.',
+ 'Bitiş tarihi başlangıç tarihinden önce olamaz.':'Das Enddatum darf nicht vor dem Startdatum liegen.',
+ 'Borç döneminin başlangıç ve bitiş tarihlerini kontrol edin.':'Bitte Beginn und Ende des Forderungszeitraums prüfen.',
+ 'Gelir ve gider sütunlarına pozitif tutar yazın; eksi veya artı işareti kullanmayın.':'In Einnahmen- und Ausgabenspalten positive Beträge ohne Minus- oder Pluszeichen eingeben.',
+ 'Daire A-1–A-10 veya B-1–B-10 olmalıdır.':'Die Wohnung muss A-1 bis A-10 oder B-1 bis B-10 sein.',
+ 'Geçersiz tarih':'Ungültiges Datum'
+});

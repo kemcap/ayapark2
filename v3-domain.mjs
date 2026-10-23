@@ -1,5 +1,6 @@
 // Domain rules shared by views and the local demonstration. Amounts are integer kuruş.
 import {summarize} from './core.mjs';
+import {t as tr} from './i18n.mjs';
 export const norm=s=>String(s||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').replace(/[^a-z0-9]/g,'');
 export const today=()=>new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'});
 export const activeAt=(l,day=today())=>l.active!==false&&(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day);
@@ -19,15 +20,27 @@ export function selectedRange(s,kind='bank'){
  const f=kind==='report'?(s.reportFilter||{preset:'all'}):s.filter;
  return f.preset==='custom'?{from:f.from||'',to:f.to||''}:rangeFor(f.preset||'all');
 }
+export function rangeError({from='',to=''}={}){
+ if(from&&!dateValid(from)||to&&!dateValid(to))return tr('Geçerli bir tarih aralığı girin.');
+ return from&&to&&to<from?tr('Bitiş tarihi başlangıç tarihinden önce olamaz.'):'';
+}
+export function assertRange(range){const error=rangeError(range);if(error)throw Error(error);return range;}
 export function inRange(date,{from='',to=''}={}){return (!from||date>=from)&&(!to||date<=to);}
-export function filteredTransactions(s){const f=s.filter,r=selectedRange(s);return s.data.transactions.filter(t=>inRange(t.date,r)&&(f.type==='all'||!f.type||(f.type==='in'?t.cents>0:f.type==='unmatched'?t.cents>0&&!t.reversal_of&&!s.data.transactions.some(x=>x.reversal_of===t.id)&&t.cents-s.data.allocations.filter(a=>a.entry_id===t.id&&!a.void_reason).reduce((n,a)=>n+a.cents,0)-creditAvailable(s.data,t)>0:t.cents<0))&&norm(t.desc+' '+t.category+' '+(t.bank_reference||'')).includes(norm(f.q)));}
+export function filteredTransactions(s){const f=s.filter,r=assertRange(selectedRange(s));return s.data.transactions.filter(t=>inRange(t.date,r)&&(f.type==='all'||!f.type||(f.type==='in'?t.cents>0:f.type==='unmatched'?t.cents>0&&!t.reversal_of&&!s.data.transactions.some(x=>x.reversal_of===t.id)&&t.cents-s.data.allocations.filter(a=>a.entry_id===t.id&&!a.void_reason).reduce((n,a)=>n+a.cents,0)-creditAvailable(s.data,t)>0:t.cents<0))&&norm(t.desc+' '+t.category+' '+(t.bank_reference||'')).includes(norm(f.q)));}
 export function financialSeries(d,range={},group='year'){
+ assertRange(range);
  const buckets=new Map(),categories=new Map();
  for(const row of d.summaryDays||[]){if(!inRange(row.date,range))continue;const key=row.date.slice(0,group==='month'?7:4),b=buckets.get(key)||{period:key,income:0,expense:0};b.income+=Number(row.income_cents);b.expense+=Number(row.expense_cents);buckets.set(key,b);for(const[c,v]of Object.entries(row.categories||{}))categories.set(c,(categories.get(c)||0)+Number(v));}
  return {buckets:[...buckets.values()].sort((a,b)=>a.period.localeCompare(b.period)),categories:[...categories],income:[...buckets.values()].reduce((n,b)=>n+b.income,0),expense:[...buckets.values()].reduce((n,b)=>n+b.expense,0)};
 }
 export function buildSummaryDays(d){const days=new Map();for(const t of d.transactions){if(t.reversal_of||d.transactions.some(x=>x.reversal_of===t.id)||t.category==='Transfer')continue;const r=days.get(t.date)||{date:t.date,income_cents:0,expense_cents:0,categories:{}};if(t.cents>0)r.income_cents+=t.cents;else{r.expense_cents-=t.cents;r.categories[t.category]=(r.categories[t.category]||0)-t.cents;}days.set(t.date,r);}return [...days.values()];}
-export function announcementActive(a,now=new Date().toISOString()){return a.published&&(!a.starts_at||a.starts_at<=now)&&(!a.ends_at||a.ends_at>now);}
+export function announcementStatus(a,now=Date.now()){
+ if(!a.published)return 'Taslak';
+ const current=typeof now==='number'?now:new Date(now).getTime(),start=a.starts_at?Date.parse(a.starts_at):null,end=a.ends_at?Date.parse(a.ends_at):null;
+ if(!Number.isFinite(current)||start!==null&&!Number.isFinite(start)||end!==null&&!Number.isFinite(end))return 'Geçersiz tarih';
+ return start!==null&&start>current?'Planlandı':end!==null&&end<=current?'Arşiv':'Yayımlandı';
+}
+export function announcementActive(a,now=Date.now()){return announcementStatus(a,now)==='Yayımlandı';}
 export const acknowledgementKey=a=>a.id+':'+(a.revision||1);
 export function suggestUnits(d,t){
  const desc=norm(t.desc),codes=(t.desc||'').toUpperCase().match(/\b[AB][ -]?\d{1,2}\b/g)||[];const found=new Set();const reasons=[];

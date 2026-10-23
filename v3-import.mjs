@@ -1,4 +1,5 @@
 import {parseLegacyCsv} from './core.mjs';
+import {t as tr} from './i18n.mjs';
 export const templateHeader='date;reference;counterparty;description;income;expense;unit;iban;balance';
 export const template=templateHeader+'\r\n';
 export function csvRows(raw){const rows=[];let row=[],cell='',quoted=false,closed=false;const delimiter=raw.split(/\r?\n/)[0].includes(';')?';':',';
@@ -15,6 +16,8 @@ export function parseImport(raw){
   if(r.length!==9)throw Error('CSV: row '+(i+2)+' / 9 columns required');
   const [date,reference,counterparty,description,income,expense,unit,iban,balance]=r.map(x=>x.trim());
   if(!income&&!expense||income&&expense)throw Error('CSV: row '+(i+2)+' / choose income OR expense');
+  if(!/^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/.test(income||expense))throw Error(tr('Satır ')+(i+2)+': '+tr('Gelir ve gider sütunlarına pozitif tutar yazın; eksi veya artı işareti kullanmayın.'));
+  if(unit&&!/^[AB][- ]?(?:[1-9]|10)$/i.test(unit))throw Error(tr('Satır ')+(i+2)+': '+tr('Daire A-1–A-10 veya B-1–B-10 olmalıdır.'));
   if(reference.length>100||counterparty.length>150||unit&&!/^[AB][- ]?\d{1,2}$/i.test(unit)||iban.length>40)throw Error('CSV: row '+(i+2)+' / invalid reference, unit or IBAN');
   const desc=[counterparty,description].filter(Boolean).join(' · ');
   const parsed=parseLegacyCsv('tarih;aciklama;tutar\n'+[date,desc,(expense?'-':'')+(income||expense)].map(esc).join(';')).entries[0];

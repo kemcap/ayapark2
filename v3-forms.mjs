@@ -76,7 +76,7 @@ export function buildV3Form(s,action,args={}){
 }
 export function payloadV3(action,form,ctx){
  const special=['person_link','occupancy','edit_link','user_access','person','link','end_link','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_note','classify_entry'];
- if(!special.includes(action)){const p=payloadLegacy(action,form,ctx);if(action==='entry'&&p.category==='Diğer'&&!p.desc)throw Error(tr('Açıklama gerekli.'));return p;}
+ if(!special.includes(action)){const p=payloadLegacy(action,form,ctx);if(action==='charge'&&(p.period_from||p.period_to)&&(!dateValid(p.period_from)||!dateValid(p.period_to)||p.period_to<p.period_from))throw Error(tr('Borç döneminin başlangıç ve bitiş tarihlerini kontrol edin.'));if(action==='entry'&&p.category==='Diğer'&&!p.desc)throw Error(tr('Açıklama gerekli.'));return p;}
  if(action==='user_access'&&(!form.get('person_id')||!form.has('confirmation')))throw Error(tr('Kişi seçin ve erişimi onaylayın.'));
  const p={...ctx};for(const[k,v]of form)p[k]=String(v).trim();const get=k=>String(form.get(k)||'').trim();
  if(['switch_tenant','void_credit'].includes(action)&&!form.has('confirmation'))throw Error(tr('Devam etmek için onay kutusunu işaretleyin.'));
