@@ -110,10 +110,10 @@ BEGIN
  SELECT range_agg(daterange(starts_on,ends_on,'[]')) INTO coverage FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='owner';
  FOR x IN SELECT * FROM public.ay3_links WHERE site_id=s AND unit_id=u AND id=ANY(changed) LOOP
   IF EXISTS(SELECT 1 FROM public.ay3_links y WHERE y.site_id=s AND y.unit_id=u AND y.id<>x.id AND (y.person_id=x.person_id AND y.role=x.role OR y.role='tenant' AND x.role='tenant') AND daterange(y.starts_on,y.ends_on,'[]')&&daterange(x.starts_on,x.ends_on,'[]')) THEN RAISE EXCEPTION 'Bu dönemde çakışan bir kayıt var. Kiracı değişimi seçin veya tarihleri düzeltin.';END IF;
-  IF x.role IN ('tenant','representative') AND NOT coalesce(coverage @> daterange(x.starts_on,x.ends_on,'[]'),false) THEN RAISE EXCEPTION 'Bu dönemin tamamı için ev sahibi kaydı gerekli. Önce ev sahibi bilgisini kontrol edin.';END IF;
+  IF x.role='tenant' AND NOT coalesce(coverage @> daterange(x.starts_on,x.ends_on,'[]'),false) THEN RAISE EXCEPTION 'Bu dönemin tamamı için ev sahibi kaydı gerekli. Önce ev sahibi bilgisini kontrol edin.';END IF;
  END LOOP;
  IF old.role='owner' OR k='tenant_to_owner' THEN
-  FOR x IN SELECT * FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role IN ('tenant','representative') LOOP
+  FOR x IN SELECT * FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='tenant' LOOP
    IF k='correction' THEN target:=daterange(x.starts_on,x.ends_on,'[]');
    ELSE
     IF x.ends_on<day THEN CONTINUE;END IF;

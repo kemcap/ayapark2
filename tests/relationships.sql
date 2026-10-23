@@ -18,7 +18,7 @@ BEGIN
  r:=public.ay2_command(s,'person','{"first_name":"QA","last_name":"Owner"}');o:=(r->>'id')::uuid;
  r:=public.ay2_command(s,'person','{"first_name":"QA","last_name":"Buyer"}');b:=(r->>'id')::uuid;
  r:=public.ay2_command(s,'person','{"first_name":"QA","last_name":"Tenant"}');t:=(r->>'id')::uuid;
- FOR u IN SELECT id FROM public.site_units WHERE site_id=s LOOP
+ FOR u IN SELECT id FROM public.site_units WHERE site_id=s AND number<>5 LOOP
   PERFORM public.ay2_command(s,'link',jsonb_build_object('unit_id',u,'person_id',o,'role','owner','starts_on','2022-01-01'));
  END LOOP;
  SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=1;
@@ -73,6 +73,26 @@ BEGIN
  p:=jsonb_build_object('request_id',gen_random_uuid(),'unit_id',u,'kind','add','new_person',true,'first_name','Added','last_name','Representative','role','representative','effective_on','2026-11-01','occupancy','keep');
  PERFORM public.ay2_command(s,'relationship_change',p);
  INSERT INTO pg_temp.qa_relationship_results SELECT 'new person and relationship are saved together',count(*)=1 FROM public.ay3_links l JOIN public.ay3_persons p ON p.id=l.person_id WHERE l.unit_id=u AND p.full_name='Added Representative' AND l.role='representative';
+ -- A representative is a contact role and may be recorded before any owner history.
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=5;
+ p:=jsonb_build_object('request_id',gen_random_uuid(),'unit_id',u,'kind','add','person_id',t,'role','representative','effective_on','2026-01-01','occupancy','keep');
+ PERFORM public.ay2_command(s,'relationship_change',p);
+ INSERT INTO pg_temp.qa_relationship_results SELECT 'representative without owner succeeds',
+   EXISTS(SELECT 1 FROM public.ay3_links WHERE site_id=s AND unit_id=u AND person_id=t AND role='representative')
+   AND NOT EXISTS(SELECT 1 FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='owner');
+ p:=jsonb_build_object('request_id',gen_random_uuid(),'unit_id',u,'kind','add','person_id',b,'role','tenant','effective_on','2026-01-01','occupancy','keep');
+ failed:=false;BEGIN PERFORM public.ay2_command(s,'relationship_change',p);EXCEPTION WHEN raise_exception THEN failed:=true;END;
+ INSERT INTO pg_temp.qa_relationship_results VALUES('tenant without owner still rejected',failed);
+ -- Exact regression: tenant recorded from 09.10.2026 becomes a representative with unknown start.
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=6;
+ SELECT id INTO lid FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='owner';
+ PERFORM public.ay2_command(s,'edit_link',jsonb_build_object('id',lid,'starts_on','2026-10-09'));
+ r:=public.ay2_command(s,'link',jsonb_build_object('unit_id',u,'person_id',t,'role','tenant','starts_on','2026-10-09'));tid:=(r->>'id')::uuid;
+ p:=jsonb_build_object('request_id',gen_random_uuid(),'unit_id',u,'kind','correction','link_id',tid,'expected',jsonb_build_array(tid,t,u,'tenant','2026-10-09',null)::text,'role','representative','starts_on',null,'start_unknown',true,'ends_on',null,'reason','Correct representative role','occupancy','keep');
+ PERFORM public.ay2_command(s,'relationship_change',p);
+ INSERT INTO pg_temp.qa_relationship_results SELECT 'tenant to representative with unknown start preserves owner',
+   EXISTS(SELECT 1 FROM public.ay3_links WHERE id=tid AND role='representative' AND starts_on IS NULL)
+   AND EXISTS(SELECT 1 FROM public.ay3_links WHERE id=lid AND role='owner' AND starts_on='2026-10-09' AND ends_on IS NULL);
  -- Site isolation and permission checks are enforced by the server.
  PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',gen_random_uuid(),'role','authenticated')::text,true);
  failed:=false;BEGIN PERFORM public.ay2_command(s,'relationship_change',p||jsonb_build_object('request_id',gen_random_uuid()));EXCEPTION WHEN insufficient_privilege THEN failed:=true;END;

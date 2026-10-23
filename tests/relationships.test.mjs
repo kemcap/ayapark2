@@ -14,3 +14,28 @@ test('stale records cannot overwrite changes and retry does not duplicate',()=>{
 test('unknown dates, leap boundaries and complete owner coverage are checked',()=>{assert.equal(previousDay('2028-03-01'),'2028-02-29');const d=fixture();d.links[0].starts_on=null;assert.doesNotThrow(()=>planRelationship(d,payload(d)));const gap=fixture();gap.links[0].ends_on='2026-10-01';assert.throws(()=>planRelationship(gap,payload(gap,'add',{person_id:'buyer',role:'tenant',effective_on:'2026-10-02',occupancy:'keep'})));});
 test('guided add payload supports a new person and has no client data in request',()=>{const d=fixture(),s={data:d,mode:'demo'},b=buildForm(s,'relationship_change',{unit:'A-4',kind:'add'}),f=new FormData();for(const[k,v]of Object.entries({kind:'add',unit_id:'A-4',effective_on:'2026-11-01',person_id:'__new__',first_name:'QA',last_name:'New',role:'representative',occupancy:'keep'}))f.set(k,v);const p=payloadFor('relationship_change',f,b.context);assert.equal(p.new_person,true);assert.equal(p.relationshipData,undefined);demoCommand(d,'relationship_change',p);assert(d.persons.some(x=>x.full_name==='QA New'));});
 test('departure form uses last dwelling day and starts vacancy on following day',()=>{const d=fullDemo(),b=buildForm({data:d},'relationship_change',{unit:'A-4',kind:'moveout'}),f=new FormData();for(const[k,v]of Object.entries({kind:'moveout',unit_id:'A-4',link_id:'demo-tenant-link',departure_on:'2026-10-22',occupancy:'vacant'}))f.set(k,v);const p=payloadFor('relationship_change',f,b.context);assert.equal(p.effective_on,'2026-10-23');const plan=planRelationship(d,p);assert.equal(plan.links.find(x=>x.id==='demo-tenant-link').ends_on,'2026-10-22');});
+
+test('representative can be added without owner, while tenants still require owner coverage',()=>{
+ const d=fixture();d.links=d.links.filter(l=>l.unit_id!=='A-4');const before=JSON.stringify({charges:d.charges,transactions:d.transactions});
+ const p={request_id:'qa-representative',kind:'add',unit_id:'A-4',person_id:'buyer',role:'representative',effective_on:'2026-10-01',occupancy:'keep'};
+ const plan=planRelationship(d,p);assert(plan.summary.some(s=>/Temsilci|Vertreter/.test(s)));
+ demoCommand(d,'relationship_change',p);
+ assert(d.links.some(l=>l.unit_id==='A-4'&&l.person_id==='buyer'&&l.role==='representative'));
+ assert.equal(JSON.stringify({charges:d.charges,transactions:d.transactions}),before);
+ assert.throws(()=>planRelationship(d,{...p,role:'tenant',request_id:'qa-tenant'}));
+});
+test('representative can predate recorded owner without rewriting owner history',()=>{
+ const d=fixture(),owner=d.links.find(l=>l.id==='demo-owner-link'),old=linkVersion(owner);
+ assert.doesNotThrow(()=>planRelationship(d,{request_id:'qa-representative-early',kind:'add',unit_id:'A-4',person_id:'buyer',role:'representative',effective_on:'2021-01-01',occupancy:'keep'}));
+ assert.equal(linkVersion(owner),old);
+});
+
+test('retroactive correction from tenant to representative accepts unknown start and preserves recorded owner',()=>{
+ const d=fixture(),owner=d.links.find(l=>l.id==='demo-owner-link');owner.starts_on='2026-10-09';
+ const tenant={id:'qa-tenant-link',unit_id:'A-4',person_id:'buyer',role:'tenant',starts_on:'2026-10-09',ends_on:null};d.links.push(tenant);
+ const original=linkVersion(owner),finances=JSON.stringify({charges:d.charges,transactions:d.transactions});
+ const p={request_id:'qa-retro-correction',kind:'correction',unit_id:'A-4',link_id:tenant.id,expected:linkVersion(tenant),role:'representative',starts_on:null,start_unknown:true,ends_on:'',reason:'Rolle war falsch',occupancy:'keep'};
+ assert.doesNotThrow(()=>planRelationship(d,p));demoCommand(d,'relationship_change',p);
+ assert.equal(d.links.find(l=>l.id===tenant.id).role,'representative');assert.equal(d.links.find(l=>l.id===tenant.id).starts_on,null);
+ assert.equal(linkVersion(owner),original);assert.equal(JSON.stringify({charges:d.charges,transactions:d.transactions}),finances);
+});
