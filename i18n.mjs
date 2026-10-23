@@ -839,3 +839,5 @@ Object.assign(german,{
  'Bu kişiye bağlı ödeme kaydı var. Bunun yerine bağlantıyı bitirin.':'Diese Person hat verknüpfte Zahlungen. Bitte stattdessen die Zuordnung beenden.',
  'Kiracı varken ev sahibi bağlantısını kaldıramazsınız.':'Ein Eigentümereintrag kann bei bestehenden Mietverhältnissen nicht einfach entfernt werden.'
 });
+
+Object.assign(german,{'Yanlış atanan rolü kaldırın. Kişi ve banka kayıtları korunur. Portal erişimi ayrı yönetilir. Gerçek taşınma veya görev bitişinde Bağlantıyı bitir seçeneğini kullanın.':'Entferne eine versehentlich zugeordnete Rolle. Die Person und die Bankdaten bleiben erhalten. Portalzugang wird separat verwaltet. Bei tatsächlichem Auszug oder Rollenende stattdessen „Zuordnung beenden“ verwenden.'});
