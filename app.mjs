@@ -1,3 +1,5 @@
+import {personManager} from './people-ui.mjs';
+import {mayPreview,residentPreviewOptions,previewProjection} from './access-preview.mjs';
 import {bindInstall} from './install.mjs';
 import {bindPasswordEyes} from './password-eye.mjs';
 import {sha256} from './hash.mjs';
@@ -19,7 +21,13 @@ bindInstall();
 const state={data:fullDemo(),mode:new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},stale:false};
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null;
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
+function isAccessPreview(){return state.mode==='connected'&&mayPreview(state.fullData)&&['staff','resident'].includes(state.viewRole);}
 function render(focus=false){
+ if(state.mode==='connected'){
+  if(mayPreview(state.data)&&state.data!==state.fullData)state.fullData=state.data;
+  if(mayPreview(state.fullData))state.data=previewProjection(state.fullData,state.viewRole||'super',state.previewSelection||'');
+ }else{state.fullData=null;state.viewRole='super';state.previewSelection='';}
+
  document.documentElement.lang=getLanguage();
  $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> '+getLanguage().toUpperCase();$('languageToggle').title=getLanguage()==='tr'?'Deutsch':'Türkçe';
  if(!pages(state).includes(state.page))state.page='overview';
@@ -27,9 +35,18 @@ function render(focus=false){
  const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2';
  $('nav').innerHTML=navigation(state,labels,window.matchMedia('(max-width:1000px)').matches);
  $('breadcrumb').textContent=roleName(d.role)+' / '+labels[state.page];
- $('roleControl').hidden=state.mode!=='demo';$('roleSelect').value=d.role;
+ const previewAllowed=state.mode==='connected'&&mayPreview(state.fullData);
+ $('roleControl').hidden=state.mode!=='demo'&&!previewAllowed;$('roleSelect').value=d.role;
+ $('roleLabel').textContent=tr(previewAllowed?'Görünüm':'Görünümü dene');
+ $('residentPreviewControl').hidden=!previewAllowed||d.role!=='resident';
+ if(previewAllowed&&d.role==='resident'){
+  const options=residentPreviewOptions(state.fullData);$('residentPreviewSelect').innerHTML=options.map(o=>`<option value="${e(o.id)}">${e(o.label.replace(/ · owner$/,' · '+tr('Ev sahibi')).replace(/ · tenant$/,' · '+tr('Kiracı')))}</option>`).join('');
+  if(!options.some(o=>o.id===state.previewSelection))state.previewSelection=options[0]?.id||'';
+  $('residentPreviewSelect').value=state.previewSelection;
+ }
  $('modeBadge').textContent=state.mode==='demo'?tr("Örnek veriler"):tr("Bağlı hesap");$('modeBadge').classList.toggle('connected',state.mode!=='demo');
  $('contextText').textContent=state.mode==='demo'?tr("Örnek çalışma alanı · Değişiklikler bu sayfayla sınırlıdır."):state.stale?tr("Kayıt kaydedildi; görünüm yenilenemedi. Yenile düğmesine basın."):tr("Son okuma ")+(d.loadedAt||'')+tr(" · Kayıtlar hesabınızın yetkileriyle gösterilir.");
+ if(isAccessPreview())$('contextText').textContent=tr('Görünüm önizlemesi · İşlemler kaydedilmez. Süper Admin görünümüne dönerek düzenleyin.');
  $('footerMode').textContent=state.mode==='demo'?tr("Örnek veriler"):tr("Hesabınız");$('connectionButton').textContent=state.mode==='demo'?tr("Hesabımla giriş"):tr("Çıkış yap");$('refreshButton').hidden=state.mode==='demo';
  document.body.classList.toggle('signed-out',state.mode==='signedout');
  $('modeBadge').hidden=state.mode==='signedout';$('refreshButton').hidden=state.mode!=='connected';
@@ -43,6 +60,8 @@ function navigate(page){state.page=page;state.filter={q:'',block:'all',status:'a
 function closeDialogs(){for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}
 async function mutate(action,payload){
+ if(action==='person_link')action='link';
+ if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
  if(state.mode==='demo'&&action==='user_access')return {ok:true};
  if(action==='user_access'){const result=await api.provision({...payload,site_id:state.data.site.id});await reload();return result;}
  if(state.mode==='demo'){const r=demoCommand(state.data,action,payload);state.data.transactions.sort((a,b)=>b.date.localeCompare(a.date));refreshDebts(state.data);render();return r;}
@@ -50,8 +69,9 @@ async function mutate(action,payload){
  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
  return result;
 }
-function permissionFor(action){return ['user_access','settings','permissions','publish_report'].includes(action)?'admin':['person','link','edit_link','occupancy','end_link','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
+function permissionFor(action){return ['user_access','settings','permissions','publish_report'].includes(action)?'admin':['person','person_link','link','edit_link','occupancy','end_link','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
 function showForm(action,args={}){
+ if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
  if(writeBusy)throw Error(tr("Önce devam eden işlemin tamamlanmasını bekleyin."));
  if(!can(state,permissionFor(action)))throw Error(tr("Bu işlem için yetkiniz yok."));
  if($('detailDialog').open)$('detailDialog').close();
@@ -71,7 +91,7 @@ function exportReport(){
 }
 const urgentShown=new Set();
 function checkUrgent(){
- if(state.mode==='signedout'||state.data.role!=='resident'||!$('urgentDialog'))return;
+ if(isAccessPreview()||state.mode==='signedout'||state.data.role!=='resident'||!$('urgentDialog'))return;
  const a=state.data.announcements.find(a=>a.priority==='urgent'&&announcementActive(a)&&!urgentShown.has(acknowledgementKey(a))&&!state.data.acknowledgements?.some(x=>x.announcement_id===a.id&&x.revision===(a.revision||1)&&(!x.user_id||x.user_id===state.data.userId||state.mode==='demo')));
  if(!a||$('urgentDialog').open)return;
  $('urgentTitle').textContent=a.title;$('urgentBody').textContent=a.body;$('ackUrgent').dataset.id=a.id;$('ackUrgent').dataset.key=acknowledgementKey(a);$('urgentDialog').showModal();
@@ -92,6 +112,7 @@ document.addEventListener('click',event=>{
  const yr=event.target.closest('[data-year]');if(yr){state.reportFilter={preset:'custom',from:yr.dataset.year+'-01-01',to:yr.dataset.year+'-12-31'};state.reportGroup='month';render();return;}
  const b=event.target.closest('[data-action]');if(!b)return;const action=b.dataset.action;
  try{
+  if(action==='person_manage'){detailView={action,id:b.dataset.id};return showDetail(personManager(state,b.dataset.id));}
   if(action==='unit'){detailView={action,id:b.dataset.id};return showDetail(unitDetail(state,b.dataset.id));}
   if(action==='transaction'){if(can(state,'finance')){detailView={action,id:b.dataset.id};showDetail(transactionDetail(state,b.dataset.id));}return;}
   if(action==='charge_detail'){detailView={action,id:b.dataset.id};return showDetail(chargeDetail(state,b.dataset.id));}
@@ -103,6 +124,7 @@ document.addEventListener('click',event=>{
   if(action==='export_report')return exportReport();
   if(action==='export_bank'){if(!can(state,'finance'))return;downloadCsv('ayapark2-banka-'+(state.mode==='demo'?'ornek':'kayitlar')+'.csv',[[tr("Tarih"),tr("Açıklama"),tr("Kategori"),tr("Tutar TL"),tr("Referans")],...filteredTransactions(state).map(t=>[t.date,t.desc,t.category,t.cents/100,t.bank_reference||t.reference||''])]);return;}
   if(action==='import'){
+   if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
    if(!can(state,'import'))return;importPayload=null;$('csvFile').value='';$('importPreview').textContent=tr("Henüz dosya seçilmedi.");$('commitImport').disabled=true;$('importDialog').showModal();return;
   }
   showForm(action,{id:b.dataset.id,unit:b.dataset.unit,entry:b.dataset.entry,charge:b.dataset.charge});
@@ -113,7 +135,7 @@ $('languageToggle').addEventListener('click',()=>{
  setLanguage(getLanguage()==='tr'?'de':'tr');applyStaticLanguage();render();
  if($('detailDialog').open&&detailView){
   if(detailView.action==='staged')staged();
-  else showDetail(detailView.action==='unit'?unitDetail(state,detailView.id):detailView.action==='charge_detail'?chargeDetail(state,detailView.id):detailView.action==='provider_detail'?providerDetail(state,detailView.id):transactionDetail(state,detailView.id));
+  else showDetail(detailView.action==='person_manage'?personManager(state,detailView.id):detailView.action==='unit'?unitDetail(state,detailView.id):detailView.action==='charge_detail'?chargeDetail(state,detailView.id):detailView.action==='provider_detail'?providerDetail(state,detailView.id):transactionDetail(state,detailView.id));
  }
  if($('actionDialog').open&&formAction){
   const built=buildForm(state,formAction.action,{period:state.period,...formAction.args});
@@ -123,9 +145,17 @@ $('languageToggle').addEventListener('click',()=>{
  updateConditionalForm();document.dispatchEvent(new Event('ay2:languagechange'));
 });
 window.addEventListener('hashchange',()=>navigate(location.hash.slice(1)));
-$('roleSelect').addEventListener('change',event=>{if(state.mode!=='demo')return;closeDialogs();state.data.role=event.target.value;render();});
+$('roleSelect').addEventListener('change',event=>{
+ if(writeBusy||loginBusy){event.target.value=state.data.role;return;}
+ closeDialogs();
+ if(state.mode==='demo')state.data.role=event.target.value;
+ else if(mayPreview(state.fullData))state.viewRole=event.target.value;else return;
+ state.page='overview';state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.reportFilter={preset:'all'};render(true);
+});
+$('residentPreviewSelect').addEventListener('change',event=>{if(!mayPreview(state.fullData))return;closeDialogs();state.previewSelection=event.target.value;render();});
 document.addEventListener('input',event=>{
  if(event.target.id==='unitSearch'){state.filter.q=event.target.value;$('unitResults').innerHTML=unitResults(state);$('resultCount').textContent=filteredUnits(state).length+tr(" daire");}
+ if(event.target.id==='peopleSearch'){state.peopleQuery=event.target.value;const pos=event.target.selectionStart;render();$('peopleSearch').focus();$('peopleSearch').setSelectionRange(pos,pos);}
  if(event.target.id==='providerSearch'){state.providerQuery=event.target.value;const start=event.target.selectionStart;render();$('providerSearch').focus();$('providerSearch').setSelectionRange(start,start);}
  if(event.target.id==='txnSearch'){state.filter.q=event.target.value;$('transactionResults').innerHTML=transactionTable(state);}
 });
@@ -139,6 +169,7 @@ document.addEventListener('change',event=>{
  if(event.target.dataset.range){const kind=event.target.dataset.range,f=kind==='report'?state.reportFilter:state.filter;f[event.target.dataset.rangeField]=event.target.value;state.bankPage=0;render();return;}
  if(id==='reportGroup'){state.reportGroup=event.target.value;render();}
  if(id==='reportYear'){state.reportFilter=event.target.value==='all'?{preset:'all'}:{preset:'custom',from:event.target.value+'-01-01',to:event.target.value+'-12-31'};state.reportGroup=event.target.value==='all'?'year':'month';render();}
+ if(id==='peopleFilter'){state.peopleFilter=event.target.value;render();}
  if(id==='providerCategory'){state.providerCategory=event.target.value;render();}
  if(id==='reportPeriod'&&/^\d{4}-\d{2}$/.test(event.target.value)){state.period=event.target.value;render();}
 });

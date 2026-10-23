@@ -1,5 +1,18 @@
 # Ayapark 2
 
+## 3.5
+
+- Restore Super-Admin-only view switching for real connected accounts.
+- Preview standard Admin and selected apartment/person resident views.
+- Keep preview read-only and preserve the actual server role.
+- Restore full data when returning to Super-Admin; reset on logout.
+- Add searchable Persons with standalone creation and apartment assignments in both directions.
+- Consolidate apartment contact actions under Edit, including entry/departure and tenant replacement.
+- Expose a safe read-only provider contact directory to authenticated residents.
+- Add a theme-aware, illustrated Android/iPhone installation guide.
+- Fix announcement list rendering after creation; validate schedules and show specific errors.
+
+
 ## 3.4
 
 - Default to password login; email codes remain optional.

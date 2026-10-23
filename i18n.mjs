@@ -727,3 +727,35 @@ Object.assign(german,{
 });
 
 Object.assign(german,{'İlişkiyi bitir':'Zuordnung beenden'});
+
+Object.assign(german,{
+ 'Görünüm':'Ansicht','Daire / Kişi':'Wohnung / Person','Sakin önizlemesi için daire ve kişi':'Wohnung und Person für die Bewohner-Vorschau',
+ 'Görünüm önizlemesi · İşlemler kaydedilmez. Süper Admin görünümüne dönerek düzenleyin.':'Ansichtsvorschau · Änderungen werden hier nicht gespeichert. Zum Bearbeiten zur Super-Admin-Ansicht zurückkehren.',
+ 'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'In der Vorschau sind keine Änderungen möglich. Bitte zur Super-Admin-Ansicht zurückkehren.'
+});
+
+Object.assign(german,{
+ 'Kişiler':'Personen','Kişiyi bir kez kaydedin, ilgili dairelere bağlayın.':'Person einmal erfassen und den passenden Wohnungen zuordnen.',
+ 'Kişi ara':'Person suchen','Ad, telefon, e-posta veya daire ara':'Name, Telefon, E-Mail oder Wohnung suchen','Kişi filtresi':'Personenfilter','Tüm kişiler':'Alle Personen','Güncel dairesi olmayanlar':'Ohne aktuelle Wohnungszuordnung',
+ 'Güncel daire bağlantısı yok.':'Keine aktuelle Wohnungszuordnung.','Kişi bilgileri':'Personendaten','Daire bağlantıları':'Wohnungszuordnungen','Daireye bağla':'Wohnung zuordnen','Daireyi aç':'Wohnung öffnen','Henüz daire bağlantısı yok.':'Noch keine Wohnung zugeordnet.'
+});
+
+Object.assign(german,{
+ 'Kişi bilgilerini düzenle':'Personendaten bearbeiten','Kişi bulunamadı.':'Keine Person gefunden.',
+ 'Ana ekrana ekleme rehberi':'Anleitung zum Hinzufügen zum Startbildschirm','Rehberi kapat':'Anleitung schließen',
+ 'Bir dokunuşla sitene ulaş.':'Mit einem Tippen zur Wohnanlage.','Ayapark 2’yi ana ekranına ekle.':'Füge Ayapark 2 zum Startbildschirm hinzu.',
+ 'Telefon seçimi':'Telefon auswählen','Telefon ekranındaki kurulum adımı':'Installationsschritt auf dem Telefon',
+ 'Temsili ekran · Menü adları cihazına göre değişebilir.':'Beispielansicht · Menünamen können je nach Gerät abweichen.',
+ 'Tarayıcı menüsünü aç':'Browsermenü öffnen','Sağ üst köşedeki üç noktaya dokun.':'Tippe oben rechts auf die drei Punkte.',
+ 'Ana ekrana ekle seçeneğini bul':'Zum Startbildschirm hinzufügen wählen','Menüde “Ana ekrana ekle” veya “Uygulamayı yükle” seçeneğine dokun.':'Tippe im Menü auf „Zum Startbildschirm hinzufügen“ oder „App installieren“.',
+ 'Yüklemeyi tamamla':'Installation abschließen','“Yükle” veya “Ekle” düğmesine dokun. Ayapark 2 simgesi ana ekranında görünecek.':'Tippe auf „Installieren“ oder „Hinzufügen“. Das Symbol erscheint auf deinem Startbildschirm.',
+ 'Paylaş menüsünü aç':'Teilen-Menü öffnen','Safari’de paylaş simgesine dokun. Bu örnekte simge alt çubukta gösteriliyor.':'Tippe in Safari auf das Teilen-Symbol. Im Beispiel befindet es sich in der unteren Leiste.',
+ 'Ana Ekrana Ekle seçeneğini bul':'Zum Home-Bildschirm wählen','Açılan listedeki “Ana Ekrana Ekle” seçeneğine dokun. Gerekirse listeyi aşağı kaydır.':'Tippe auf „Zum Home-Bildschirm“. Scrolle bei Bedarf nach unten.',
+ 'Eklemeyi onayla':'Hinzufügen bestätigen','Sağ üstteki “Ekle” seçeneğine dokun. Ayapark 2 simgesi ana ekranında görünecek.':'Tippe oben rechts auf „Hinzufügen“. Das Symbol erscheint auf deinem Home-Bildschirm.',
+ 'Geri':'Zurück','İleri →':'Weiter →','Tamam, anladım':'Verstanden','Ana ekranında görüşürüz.':'Bis zum nächsten Tippen.','Ayapark 2 simgesine dokunman yeterli.':'Tippe einfach auf das Symbol von Ayapark 2.','Rehberi yeniden aç':'Anleitung erneut öffnen',
+ 'Hoş geldiniz.':'Willkommen.','DAİRENİZ':'DEINE WOHNUNG','Bilgilerin tek bir yerde.':'Alle Informationen an einem Ort.','Buraya dokun':'Hier tippen',
+ 'Yeni sekme':'Neuer Tab','Tarama geçmişi':'Verlauf','İndirilenler':'Downloads','Ana ekrana ekle':'Zum Startbildschirm hinzufügen','Ayarlar':'Einstellungen','Kopyala':'Kopieren','Yer İşareti Ekle':'Lesezeichen hinzufügen','Ana Ekrana Ekle':'Zum Home-Bildschirm','Uygulamayı yükle':'App installieren','Vazgeç':'Abbrechen','Ekle':'Hinzufügen','Yükle':'Installieren',
+ 'Duyuru tarihini ve saatini kontrol edin.':'Prüfe Datum und Uhrzeit der Ankündigung.','Duyuru başlığı en fazla 150 karakter olabilir.':'Der Titel darf höchstens 150 Zeichen enthalten.','Duyuru metni en fazla 5000 karakter olabilir.':'Der Text darf höchstens 5000 Zeichen enthalten.','Duyuru önem düzeyini seçin.':'Wähle die Wichtigkeit der Ankündigung.','Yayın bitişi başlangıçtan sonra olmalıdır.':'Das Veröffentlichungsende muss nach dem Beginn liegen.'
+});
+
+Object.assign(german,{'Hizmet verenlerin iletişim bilgileri.':'Kontaktdaten der Dienstleister.'});

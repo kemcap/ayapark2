@@ -1,0 +1,10 @@
+import {activeAt} from './v3-domain.mjs';
+export const mayPreview=d=>d?.role==='super'&&d?.serverRole==='manager'&&d?.capabilities?.admin===true;
+export function residentPreviewOptions(d){return (d.units||[]).flatMap(u=>{const ls=(d.links||[]).filter(l=>l.unit_id===u.id&&['owner','tenant'].includes(l.role)&&activeAt(l));return ls.length?ls.map(l=>({id:l.id,unitId:u.id,personId:l.person_id,label:u.code+' · '+(d.persons?.find(p=>p.id===l.person_id)?.full_name||'—')+' · '+l.role})):[{id:'unit:'+u.id,unitId:u.id,personId:null,label:u.code}];});}
+export function previewProjection(source,role='super',selection=''){
+ if(!mayPreview(source)||!['staff','resident'].includes(role))return source;
+ const d=structuredClone(source);d.role=role;d.capabilities=Object.fromEntries(Object.keys(source.capabilities).map(k=>[k,role==='staff'&&['finance','people','announcements'].includes(k)]));d.staff=[];d.permissions=[];d.residentAccounts=[];
+ if(role==='staff')return d;
+ const opts=residentPreviewOptions(source),o=opts.find(o=>o.id===selection)||opts[0];d.ownIds=o?[o.unitId]:[];d.ownPersonIds=o?.personId?[o.personId]:[];
+ d.units=d.units.filter(u=>d.ownIds.includes(u.id));d.persons=(d.persons||[]).filter(p=>d.ownPersonIds.includes(p.id));d.links=(d.links||[]).filter(l=>d.ownIds.includes(l.unit_id)&&d.ownPersonIds.includes(l.person_id));d.charges=d.charges.filter(c=>d.ownPersonIds.includes(c.person_id));d.allocations=d.allocations.filter(a=>d.charges.some(c=>c.id===a.charge_id));d.transactions=d.transactions.filter(t=>d.allocations.some(a=>a.entry_id===t.id&&!a.void_reason)).map(t=>({...t,desc:'Ödeme',sender_name:'',sender_iban:'',iban:'',counterparty:''}));d.credits=(d.credits||[]).filter(c=>d.ownPersonIds.includes(c.person_id));d.people=[];d.announcements=d.announcements.filter(a=>a.published);d.staged=[];d.audit=[];d.providerNotes=[];d.matchRules=[];d.acknowledgements=[];d.providers=(d.providers||[]).filter(p=>p.status!=='avoid').map(({id,name,category,contact,phone,email,status})=>({id,name,category,contact,phone,email,status}));return d;
+}

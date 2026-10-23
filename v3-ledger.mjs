@@ -1,6 +1,6 @@
 import {randomId} from './core.mjs';
 import {t as tr} from './i18n.mjs';
-import {activeAt,personLinks,effectivePayer,buildSummaryDays,creditAvailable} from './v3-domain.mjs';
+import {activeAt,personLinks,today,effectivePayer,buildSummaryDays,creditAvailable} from './v3-domain.mjs';
 export function enrichDemo(d){
  d.persons=[{id:'demo-owner',first_name:'Deniz',last_name:'Örnek',full_name:'Deniz Örnek',language:'de',phone:'',email:'',notes:''},{id:'demo-tenant',first_name:'Sakin',last_name:'Örnek',full_name:'Sakin Örnek',language:'tr',notes:''},{id:'demo-former',first_name:'Eski',last_name:'Örnek',full_name:'Eski Örnek',language:'tr',notes:''}];
  d.links=[{id:'demo-owner-link',person_id:'demo-owner',unit_id:'A-4',role:'owner',starts_on:'2022-01-01'}, {id:'demo-tenant-link',person_id:'demo-tenant',unit_id:'A-4',role:'tenant',starts_on:'2026-10-01'}, {id:'demo-former-link',person_id:'demo-former',unit_id:'A-4',role:'tenant',starts_on:'2025-01-01',ends_on:'2026-09-30'}];
@@ -20,7 +20,7 @@ export function demoV3(d,action,p){
   if(person)Object.assign(person,item);else d.persons.push(item);
   if(p.unit_id)demoV3(d,'link',{...p,person_id:ident});
  }else if(action==='link'){
-  if(['tenant','representative'].includes(p.role)&&!personLinks(d,p.unit_id,p.starts_on).some(l=>l.role==='owner'))throw Error(tr('Önce ev sahibini ekleyin.'));
+  if(['tenant','representative'].includes(p.role)&&!personLinks(d,p.unit_id,p.starts_on||today()).some(l=>l.role==='owner'))throw Error(tr('Önce ev sahibini ekleyin.'));
   if(p.role==='tenant'&&d.links.some(l=>l.unit_id===p.unit_id&&l.role==='tenant'&&(!l.ends_on||l.ends_on>=p.starts_on)&&(!p.ends_on||l.starts_on<=p.ends_on)))throw Error(tr('Bu tarihlerde başka bir kiracı var.'));
   if(!d.persons.some(x=>x.id===p.person_id))throw Error(tr('Kişi seçin.'));
   if(!p.starts_on&&!p.start_unknown||p.starts_on&&p.ends_on&&p.ends_on<p.starts_on)throw Error(tr('Tarih aralığını kontrol edin.'));

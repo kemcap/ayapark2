@@ -1,15 +1,15 @@
-# Ayapark 2 · V3.3
+# Ayapark 2 · V3.5
 
 Browser app with Supabase Auth and row-level data access.
 
 - Current app: https://kemcap.github.io/ayapark2/
 - Archived original: https://kemcap.github.io/ayapark2/old/
-- Existing private preview: https://ayapark2-v2-private.kemcap.chatgpt.site
+- Owner-only preview: https://ayapark2-v2-private.kemcap.chatgpt.site
 
-GitHub Pages publishes the root of main. Legacy portal entrypoints forward to the current app, preserving Auth callback fragments. Archived pages retain the previous application; their browser-local state belongs to their original application keys and is not automatically migrated into V3.
+V3.5 adds Persons and apartment assignment in both directions, a unified contact Edit menu, illustrated phone installation, read-only Super-Admin role previews, and a safe resident provider directory. Announcement creation/list rendering and publication date validation are fixed.
 
-Read AUTH-SETUP.md before enabling OTP for residents. Code requests, password login and password recovery are available. Persisted sessions are scoped to the app path. New users are provisioned by a manager; the browser never receives privileged keys.
+Read AUTH-SETUP.md for remaining mail configuration and real-device verification. Password is the default login method; System is the default appearance. Browser sessions persist until logout, local data removal, or server-side expiry/revocation.
 
-The repository contains interface code, server functions, schema snapshots, documentation and fictitious test data. Original bank statements and resident records stay outside GitHub. Public publishable client keys are intentional; access enforcement remains in the database and server functions.
+The public distribution contains application code and fictitious test data. Bank statements and resident records remain outside the repository. The browser receives only the public client key; permissions are enforced server-side. Role preview does not change memberships or server authorization.
 
-Run `node --test tests/*.test.mjs`. The private Site source keeps tests with the dist layout.
+Run `node --test tests/*.test.mjs`. The private Site source keeps assets in `dist/`. GitHub Pages uses the root distribution and preserves the original application under `old/`.

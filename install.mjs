@@ -1,3 +1,4 @@
+import {openInstallTutorial} from './install-tutorial.mjs';
 import {t as tr} from './i18n.mjs';
 export function bindInstall(){
  let pending=null;const button=document.getElementById('installApp');
@@ -8,8 +9,7 @@ export function bindInstall(){
  window.addEventListener('appinstalled',()=>{pending=null;button.hidden=true;});
  button.addEventListener('click',async()=>{
   if(pending){const prompt=pending;pending=null;await prompt.prompt();await prompt.userChoice;return;}
-  const dialog=document.createElement('dialog'),h=document.createElement('h2'),p=document.createElement('p'),close=document.createElement('button');
-  h.textContent=tr('Başlangıç ekranına ekle');p.textContent=tr('iPhone: Paylaş menüsünü açın ve Ana Ekrana Ekle seçeneğini kullanın. Android: Tarayıcı menüsünde Uygulamayı yükle veya Ana ekrana ekle seçeneğini kullanın.');close.textContent=tr('Kapat');close.className='button';close.addEventListener('click',()=>dialog.close());dialog.append(h,p,close);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+  openInstallTutorial();
  });
  if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
