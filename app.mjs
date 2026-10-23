@@ -4,7 +4,7 @@ import {mayPreview,residentPreviewOptions,previewProjection} from './access-prev
 import {bindInstall} from './install.mjs';
 import {bindPasswordEyes} from './password-eye.mjs';
 import {sha256} from './hash.mjs';
-import {navigation,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs';
 import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs';
 import {template} from './v3-import.mjs';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs';
@@ -20,7 +20,8 @@ const hideLoginPassword=bindPasswordEyes();
 let detailView=null,loginMethod='password';
 bindInstall();
 const state={data:fullDemo(),mode:new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},stale:false};
-let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null;
+let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null;
+function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
 function isAccessPreview(){return state.mode==='connected'&&mayPreview(state.fullData)&&['staff','resident'].includes(state.viewRole);}
 function render(focus=false){
@@ -34,7 +35,7 @@ function render(focus=false){
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
  const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2';
- $('nav').innerHTML=navigation(state,labels,window.matchMedia('(max-width:1000px)').matches);
+ renderNavigation();
  $('breadcrumb').textContent=roleName(d.role)+' / '+labels[state.page];
  const previewAllowed=state.mode==='connected'&&mayPreview(state.fullData);
  $('roleControl').hidden=state.mode!=='demo'&&!previewAllowed;$('roleSelect').value=d.role;
@@ -57,7 +58,7 @@ function render(focus=false){
  for(const [id,value] of [['statusFilter',state.filter.status],['txnFilter',state.filter.type],['periodFilter',state.filter.period]])if($(id))$(id).value=value;
  if(focus)$('content').focus({preventScroll:true});
 }
-function navigate(page){state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
+function navigate(page){mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
 function closeDialogs(){for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}
 async function mutate(action,payload){
@@ -107,6 +108,20 @@ $('ackUrgent').addEventListener('click',async()=>{const b=$('ackUrgent');b.disab
 $('urgentDialog').addEventListener('cancel',event=>event.preventDefault());
 
 document.addEventListener('click',event=>{
+ const navToggle=event.target.closest('#nav [data-nav-group]');
+ if(navToggle){
+  const group=Number(navToggle.dataset.navGroup);
+  mobileNavGroup=nextMobileNavGroup(mobileNavGroup,group);
+  renderNavigation();
+  $('nav').querySelector('[data-nav-group="'+group+'"]')?.focus({preventScroll:true});
+  return;
+ }
+ const navLink=event.target.closest('#nav a[href^="#"]');
+ if(navLink){
+  mobileNavGroup=null;
+  if(navLink.getAttribute('href')===location.hash){event.preventDefault();renderNavigation();}
+  return;
+ }
  const blockButton=event.target.closest('[data-block]');
  if(blockButton){
   const block=blockButton.dataset.block;if(!['A','B'].includes(block))return;
@@ -282,7 +297,7 @@ function labelTables(){
  for(const table of document.querySelectorAll('table')){const headers=Array.from(table.querySelectorAll('thead th')).map(x=>x.textContent);for(const row of table.querySelectorAll('tbody tr'))Array.from(row.children).forEach((cell,i)=>{if(headers[i])cell.dataset.label=headers[i];});}
 }
 
-window.matchMedia('(max-width:1000px)').addEventListener('change',()=>{$('nav').innerHTML=navigation(state,labels,window.matchMedia('(max-width:1000px)').matches);});
+window.matchMedia('(max-width:1000px)').addEventListener('change',()=>{mobileNavGroup=null;renderNavigation();});
 
 // Page hints open on hover; dialog disclosures open only by click or keyboard.
 document.addEventListener('pointerover',event=>{if(event.pointerType!=='mouse'||event.target.closest('dialog'))return;const el=event.target.closest('.info-help');if(el&&!el.open){el.dataset.hoverOpen='1';el.open=true;}});
