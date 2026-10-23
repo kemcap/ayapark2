@@ -29,3 +29,13 @@ test('representative can predate recorded owner without rewriting owner history'
  assert.doesNotThrow(()=>planRelationship(d,{request_id:'qa-representative-early',kind:'add',unit_id:'A-4',person_id:'buyer',role:'representative',effective_on:'2021-01-01',occupancy:'keep'}));
  assert.equal(linkVersion(owner),old);
 });
+
+test('retroactive correction from tenant to representative accepts unknown start and preserves recorded owner',()=>{
+ const d=fixture(),owner=d.links.find(l=>l.id==='demo-owner-link');owner.starts_on='2026-10-09';
+ const tenant={id:'qa-tenant-link',unit_id:'A-4',person_id:'buyer',role:'tenant',starts_on:'2026-10-09',ends_on:null};d.links.push(tenant);
+ const original=linkVersion(owner),finances=JSON.stringify({charges:d.charges,transactions:d.transactions});
+ const p={request_id:'qa-retro-correction',kind:'correction',unit_id:'A-4',link_id:tenant.id,expected:linkVersion(tenant),role:'representative',starts_on:null,start_unknown:true,ends_on:'',reason:'Rolle war falsch',occupancy:'keep'};
+ assert.doesNotThrow(()=>planRelationship(d,p));demoCommand(d,'relationship_change',p);
+ assert.equal(d.links.find(l=>l.id===tenant.id).role,'representative');assert.equal(d.links.find(l=>l.id===tenant.id).starts_on,null);
+ assert.equal(linkVersion(owner),original);assert.equal(JSON.stringify({charges:d.charges,transactions:d.transactions}),finances);
+});
