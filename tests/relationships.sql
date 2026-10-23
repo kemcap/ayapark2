@@ -83,6 +83,16 @@ BEGIN
  p:=jsonb_build_object('request_id',gen_random_uuid(),'unit_id',u,'kind','add','person_id',b,'role','tenant','effective_on','2026-01-01','occupancy','keep');
  failed:=false;BEGIN PERFORM public.ay2_command(s,'relationship_change',p);EXCEPTION WHEN raise_exception THEN failed:=true;END;
  INSERT INTO pg_temp.qa_relationship_results VALUES('tenant without owner still rejected',failed);
+ -- Exact regression: tenant recorded from 09.10.2026 becomes a representative with unknown start.
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=6;
+ SELECT id INTO lid FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='owner';
+ PERFORM public.ay2_command(s,'edit_link',jsonb_build_object('id',lid,'starts_on','2026-10-09'));
+ r:=public.ay2_command(s,'link',jsonb_build_object('unit_id',u,'person_id',t,'role','tenant','starts_on','2026-10-09'));tid:=(r->>'id')::uuid;
+ p:=jsonb_build_object('request_id',gen_random_uuid(),'unit_id',u,'kind','correction','link_id',tid,'expected',jsonb_build_array(tid,t,u,'tenant','2026-10-09',null)::text,'role','representative','starts_on',null,'start_unknown',true,'ends_on',null,'reason','Correct representative role','occupancy','keep');
+ PERFORM public.ay2_command(s,'relationship_change',p);
+ INSERT INTO pg_temp.qa_relationship_results SELECT 'tenant to representative with unknown start preserves owner',
+   EXISTS(SELECT 1 FROM public.ay3_links WHERE id=tid AND role='representative' AND starts_on IS NULL)
+   AND EXISTS(SELECT 1 FROM public.ay3_links WHERE id=lid AND role='owner' AND starts_on='2026-10-09' AND ends_on IS NULL);
  -- Site isolation and permission checks are enforced by the server.
  PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',gen_random_uuid(),'role','authenticated')::text,true);
  failed:=false;BEGIN PERFORM public.ay2_command(s,'relationship_change',p||jsonb_build_object('request_id',gen_random_uuid()));EXCEPTION WHEN insufficient_privilege THEN failed:=true;END;
