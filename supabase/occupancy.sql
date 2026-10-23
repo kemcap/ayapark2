@@ -50,7 +50,7 @@ begin
   pid:=(p->>'person_id')::uuid;uid:=(p->>'unit_id')::uuid;start_date:=nullif(p->>'starts_on','')::date;end_date:=nullif(p->>'ends_on','')::date;
   if end_date is not null and end_date<start_date then raise exception 'Tarih aralığını kontrol edin.';end if;
   if start_date is null and not coalesce((p->>'start_unknown')::boolean,false) then raise exception 'Başlangıç tarihini girin veya bilinmiyor seçin.';end if;
-  if p->>'role' in ('tenant','representative') and not exists(select 1 from public.ay3_links where site_id=s and unit_id=uid and role='owner' and (starts_on is null or start_date is null or starts_on<=start_date) and (ends_on is null or ends_on>=coalesce(end_date,start_date,(now() at time zone 'Europe/Istanbul')::date))) then raise exception 'Önce ev sahibini ekleyin.';end if;
+  if p->>'role'='tenant' and not exists(select 1 from public.ay3_links where site_id=s and unit_id=uid and role='owner' and (starts_on is null or start_date is null or starts_on<=start_date) and (ends_on is null or ends_on>=coalesce(end_date,start_date,(now() at time zone 'Europe/Istanbul')::date))) then raise exception 'Önce ev sahibini ekleyin.';end if;
   if exists(select 1 from public.ay3_links where site_id=s and unit_id=uid and person_id=pid and role=p->>'role' and daterange(starts_on,ends_on,'[]')&&daterange(start_date,end_date,'[]')) then raise exception 'Bu kişi zaten bu dönem için bağlı.';end if;
   if p->>'role'='tenant' and exists(select 1 from public.ay3_links where site_id=s and unit_id=uid and role='tenant' and daterange(starts_on,ends_on,'[]')&&daterange(start_date,end_date,'[]')) then raise exception 'Bu tarihlerde başka bir kiracı var. Sakin değiştir seçeneğini kullanın.';end if;
   insert into public.ay3_links(site_id,person_id,unit_id,role,starts_on,ends_on,responsibility,primary_contact) values(s,pid,uid,p->>'role',start_date,end_date,coalesce(p->>'responsibility',''),coalesce((p->>'primary_contact')::boolean,false)) returning id into ident;
@@ -59,7 +59,7 @@ begin
   if not found then raise exception 'Bağlantı bulunamadı.';end if;
   if nullif(p->>'ends_on','') is null then raise exception 'Çıkış tarihi gerekli.';end if;
   if l.starts_on is not null and (p->>'ends_on')::date<l.starts_on then raise exception 'Çıkış tarihi başlangıç tarihinden önce olamaz.';end if;
-  if l.role='owner' and exists(select 1 from public.ay3_links t where t.site_id=s and t.unit_id=l.unit_id and t.role in ('tenant','representative') and (t.ends_on is null or t.ends_on>(p->>'ends_on')::date)) and not exists(select 1 from public.ay3_links o where o.site_id=s and o.unit_id=l.unit_id and o.role='owner' and o.id<>l.id and o.starts_on<=(p->>'ends_on')::date+1 and o.ends_on is null) then raise exception 'Önce yeni ev sahibini ekleyin veya diğer bağlantıları bitirin.';end if;
+  if l.role='owner' and exists(select 1 from public.ay3_links t where t.site_id=s and t.unit_id=l.unit_id and t.role='tenant' and (t.ends_on is null or t.ends_on>(p->>'ends_on')::date)) and not exists(select 1 from public.ay3_links o where o.site_id=s and o.unit_id=l.unit_id and o.role='owner' and o.id<>l.id and o.starts_on<=(p->>'ends_on')::date+1 and o.ends_on is null) then raise exception 'Önce yeni ev sahibini ekleyin veya diğer bağlantıları bitirin.';end if;
   update public.ay3_links set ends_on=(p->>'ends_on')::date where site_id=s and id=(p->>'id')::uuid returning id into ident;
   if not found then raise exception 'Bağlantı bulunamadı.';end if;
  elsif act='switch_tenant' then
