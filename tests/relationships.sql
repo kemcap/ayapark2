@@ -93,6 +93,40 @@ BEGIN
  INSERT INTO pg_temp.qa_relationship_results SELECT 'tenant to representative with unknown start preserves owner',
    EXISTS(SELECT 1 FROM public.ay3_links WHERE id=tid AND role='representative' AND starts_on IS NULL)
    AND EXISTS(SELECT 1 FROM public.ay3_links WHERE id=lid AND role='owner' AND starts_on='2026-10-09' AND ends_on IS NULL);
+ -- Incorrect apartment representative can be removed without removing the person.
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=5;
+ SELECT id INTO lid FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='representative';
+ p:=jsonb_build_object('request_id',gen_random_uuid(),'id',lid,'expected',(SELECT jsonb_build_array(id,person_id,unit_id,role,starts_on,ends_on)::text FROM public.ay3_links WHERE id=lid),
+   'reason','Incorrect representative assignment','confirmation',true);
+ r:=public.ay2_command(s,'unlink',p);
+ INSERT INTO pg_temp.qa_relationship_results SELECT 'wrong representative can be removed, person is retained',
+  NOT EXISTS(SELECT 1 FROM public.ay3_links WHERE id=lid) AND EXISTS(SELECT 1 FROM public.ay3_persons WHERE site_id=s AND id=t);
+ INSERT INTO pg_temp.qa_relationship_results SELECT 'wrong representative removal is audited',
+  EXISTS(SELECT 1 FROM public.ay2_audit WHERE site_id=s AND action='unlink' AND details->>'request_id'=p->>'request_id' AND details->'before'->>'id'=lid::text);
+ r:=public.ay2_command(s,'unlink',p);
+ INSERT INTO pg_temp.qa_relationship_results VALUES('repeat representative removal is idempotent',coalesce((r->>'already_recorded')::boolean,false));
+ -- Preserve financial history when it refers to a link.
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=8;
+ r:=public.ay2_command(s,'link',jsonb_build_object('unit_id',u,'person_id',t,'role','representative','starts_on','2026-01-01'));lid:=(r->>'id')::uuid;
+ PERFORM public.ay2_command(s,'charge',jsonb_build_object('unit_id',u,'link_id',lid,'category','Aidat','label','QA representative charge','cents',1000,'due_on','2026-10-01','payer','review','reference','qa-rep-finance'));
+ p:=jsonb_build_object('request_id',gen_random_uuid(),'id',lid,'expected',(SELECT jsonb_build_array(id,person_id,unit_id,role,starts_on,ends_on)::text FROM public.ay3_links WHERE id=lid),
+   'reason','Incorrect assignment','confirmation',true);
+ failed:=false;BEGIN PERFORM public.ay2_command(s,'unlink',p);EXCEPTION WHEN raise_exception THEN failed:=true;END;
+ INSERT INTO pg_temp.qa_relationship_results SELECT 'linked finance prevents hard removal',failed AND EXISTS(SELECT 1 FROM public.ay3_links WHERE id=lid);
+ -- Owner cannot be removed while it is necessary for a tenant.
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=7;
+ SELECT id INTO lid FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='owner';
+ PERFORM public.ay2_command(s,'link',jsonb_build_object('unit_id',u,'person_id',t,'role','tenant','starts_on','2026-01-01'));
+ p:=jsonb_build_object('request_id',gen_random_uuid(),'id',lid,'expected',(SELECT jsonb_build_array(id,person_id,unit_id,role,starts_on,ends_on)::text FROM public.ay3_links WHERE id=lid),
+   'reason','Incorrect owner','confirmation',true);
+ failed:=false;BEGIN PERFORM public.ay2_command(s,'unlink',p);EXCEPTION WHEN raise_exception THEN failed:=true;END;
+ INSERT INTO pg_temp.qa_relationship_results SELECT 'owner supporting a tenant cannot be removed',failed AND EXISTS(SELECT 1 FROM public.ay3_links WHERE id=lid);
+ -- Stale snapshots cannot remove a different updated assignment.
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=6;
+ SELECT id INTO lid FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='representative';
+ p:=jsonb_build_object('request_id',gen_random_uuid(),'id',lid,'expected','[]','reason','Incorrect role','confirmation',true);
+ failed:=false;BEGIN PERFORM public.ay2_command(s,'unlink',p);EXCEPTION WHEN raise_exception THEN failed:=true;END;
+ INSERT INTO pg_temp.qa_relationship_results VALUES('stale unlink rejected',failed);
  -- Site isolation and permission checks are enforced by the server.
  PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',gen_random_uuid(),'role','authenticated')::text,true);
  failed:=false;BEGIN PERFORM public.ay2_command(s,'relationship_change',p||jsonb_build_object('request_id',gen_random_uuid()));EXCEPTION WHEN insufficient_privilege THEN failed:=true;END;
