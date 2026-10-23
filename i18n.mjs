@@ -828,3 +828,14 @@ Object.assign(german,{
  'Daire A-1–A-10 veya B-1–B-10 olmalıdır.':'Die Wohnung muss A-1 bis A-10 oder B-1 bis B-10 sein.',
  'Geçersiz tarih':'Ungültiges Datum'
 });
+
+Object.assign(german,{
+ 'Hatalı bağlantıyı kaldır':'Fehlzuordnung entfernen',
+ 'Kaldırma gerekçesi':'Grund der Entfernung',
+ 'Bu yanlış bağlantıyı kaldırmayı onaylıyorum.':'Diese falsche Wohnungszuordnung wirklich entfernen.',
+ 'Yanlış atanan rolü kaldırın. Kişi ve banka kayıtları korunur. Gerçek taşınma veya görev bitişinde Bağlantıyı bitir seçeneğini kullanın.':'Entferne eine versehentlich zugeordnete Rolle. Die Person und die Bankdaten bleiben erhalten. Bei tatsächlichem Auszug oder Rollenende stattdessen „Zuordnung beenden“ verwenden.',
+ 'Seçilen gün rolün son günüdür. Ertesi gün artık güncel görünmez.':'Das Datum ist der letzte Tag dieser Rolle. Ab dem Folgetag erscheint sie nicht mehr als aktuell.',
+ 'Bu role bağlı borç var. Geçmişi korumak için bağlantıyı bitirin.':'Dieser Rolle sind Forderungen zugeordnet. Bitte die Zuordnung beenden, um die Historie zu erhalten.',
+ 'Bu kişiye bağlı ödeme kaydı var. Bunun yerine bağlantıyı bitirin.':'Diese Person hat verknüpfte Zahlungen. Bitte stattdessen die Zuordnung beenden.',
+ 'Kiracı varken ev sahibi bağlantısını kaldıramazsınız.':'Ein Eigentümereintrag kann bei bestehenden Mietverhältnissen nicht einfach entfernt werden.'
+});
