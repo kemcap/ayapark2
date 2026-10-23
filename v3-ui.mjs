@@ -5,7 +5,7 @@ import {remaining,paid,unassigned} from './ledger.mjs';
 import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs';
 import {norm,today,activeAt,personLinks,personName,scopedCharges,filteredTransactions,selectedRange,financialSeries,buildSummaryDays,announcementActive,suggestUnits,creditAvailable,acknowledgementKey,unitSearchMatches} from './v3-domain.mjs';
 export const roleLabel=r=>tr({owner:'Ev sahibi',tenant:'Kiracı',representative:'Temsilci',debtor:'Borçlu',source:'Kaynak kaydı'}[r]||'Kişi');
-export const info=(short,detail)=>`<div class="help-line"><span>${tr(short)}</span><details class="info-help"><summary aria-label="${tr('Ayrıntılı bilgi')}">ⓘ</summary><p>${tr(detail)}</p></details></div>`;
+export const info=(short,detail)=>`<details class="help-line info-help help-disclosure"><summary><span>${e(tr(short))}</span><span aria-hidden="true">ⓘ</span></summary><p>${e(tr(detail))}</p></details>`;
 const chargeName=c=>c.reference?.startsWith('demo-')?tr('Açık borç'):c.category==='Aidat'&&/^\d{4}-\d{2}$/.test(c.label)?tr('Aidat')+' · '+c.label:e(c.label);
 const chargePerson=(d,c)=>personName(d,c.person_id)||(d.staged||[]).find(r=>c.reference?.startsWith('staged:'+r.id))?.person_label||tr('Kişi belirlenmedi');
 export const former=(d,c)=>!!(d.links||[]).find(l=>l.id===c.link_id&&l.ends_on&&l.ends_on<today());

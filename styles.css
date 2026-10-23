@@ -1474,3 +1474,13 @@ td .button { margin:3px; min-height:34px; padding:6px 9px; font-size:11px; }
 .person-card .row{justify-content:flex-start;gap:10px}.badge.role-owner{background:#1d5777;color:#fff;border:1px solid #153e56}.badge.role-tenant{background:#e9dca9;color:#443500;border:1px solid #c1a84c}.badge.role-representative{background:#e5d9f1;color:#50326b;border:1px solid #b79ace}.role-badge{font-weight:750;flex-shrink:0}:root[data-theme="dark"] .badge.role-owner{background:#276f96;color:#fff;border-color:#6dafd0}
 
 #roleControl,#residentPreviewControl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}#residentPreviewSelect{max-width:min(100%,340px);min-height:36px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:7px}.context-bar{flex-wrap:wrap;gap:12px}#residentPreviewControl[hidden],#roleControl[hidden]{display:none!important}
+
+/* Dialog help stays in normal flow so it cannot escape a scrolling modal. */
+.help-disclosure{display:block;width:fit-content;max-width:100%;min-width:0}
+.help-disclosure>summary{display:flex;align-items:baseline;gap:10px;font:inherit;color:var(--ink);padding:0}
+.help-disclosure>summary>span:last-child{color:var(--primary);font-size:1.2rem}
+.help-disclosure[open]>p{left:0;right:auto}
+dialog .help-disclosure{width:100%;margin:16px 0}
+dialog .info-help[open]>p,dialog .info-help[open]>.tooltip-body{position:static;inset:auto;width:100%;max-width:100%;box-sizing:border-box;box-shadow:none;margin:10px 0 0}
+dialog .help-disclosure>p{font-size:.85rem}
+dialog #detailTitle:focus{outline:none}

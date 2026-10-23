@@ -1,5 +1,12 @@
 # Ayapark 2
 
+## 3.7
+
+- Keep help disclosures in normal document flow within dialogs; prevent left-edge clipping.
+- Focus the dialog heading and reset scroll when switching details; suppress automatic focus/hover expansion in dialogs.
+- Preserve page hover help, native keyboard/touch toggling and resident claim scoping.
+- Prepare the bilingual email-code template and record remaining deployment/device prerequisites honestly.
+
 ## 3.6
 
 - Close the login dialog after both password/code sign-in and automatic session restoration.

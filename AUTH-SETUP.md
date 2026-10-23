@@ -1,8 +1,8 @@
-# Ayapark 2 · V3.3 authentication
+# Ayapark 2 · authentication and deployment checks
 
 ## Deployment configuration still required
 
-Supabase Authentication → Email templates → Magic Link: retain the existing link and add the one-time token:
+Prepared template: `supabase/templates/magic-link.html`. Supabase Authentication → Email templates → Magic Link: retain the existing link and add the one-time token:
 
 ```html
 <h2>Ayapark 2</h2>
@@ -34,3 +34,13 @@ System is the default appearance, manual selection persists. Installation is opt
 ## Remaining checks
 
 Real OTP delivery, real password recovery after URL configuration, phone installation and a real persistent login require an authorized user/device. The original building photo was not available in the current source or attached source documents. Financial source confirmations remain a separate review and were not guessed.
+
+## Verification status · 23 October 2026
+
+- The automated suite verifies persistent sessions, refresh rotation, invalid-session cleanup, manual sign-in vs. background restore, login-dialog completion and recovery isolation.
+- Manifest scope and relative start URL are correct for GitHub Pages; PNG app icons match the declared 192×192 and 512×512 dimensions.
+- Resident detail help was observed outside the dialog before the fix and measured fully inside it after the fix. Focus goes to the heading; help opens deliberately by click or keyboard. The reported browser renderer crash has not been reproduced, so its root cause is not claimed to be resolved.
+- Dashboard email settings currently require sign-in in the working browser. The prepared template, redirect configuration and SMTP delivery are not claimed deployed or verified until that sign-in succeeds.
+- Real phone installation, real resident onboarding, OTP delivery and a full recovery/password change need the user or an authorized real device/account. Automated tests do not change a user's password or send mail.
+- Four historic balance items still require source clarification. They remain unposted rather than assigning financial liability from ambiguous evidence.
+- No original building photograph was available in the current attachments or identified by the file search.

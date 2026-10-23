@@ -78,12 +78,18 @@ function showForm(action,args={}){
  const built=buildForm(state,action,{period:state.period,...args});formAction={action,args,context:built.context};
  $('actionTitle').textContent=built.title;$('actionFields').innerHTML=built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('actionDialog').showModal();updateConditionalForm();
 }
-function showDetail(html){if(!html)return;$('detailContent').innerHTML=html;if(!$('detailDialog').open)$('detailDialog').showModal();labelTables();}
+function showDetail(html){
+ if(!html)return;
+ const dialog=$('detailDialog');$('detailContent').innerHTML=html;
+ const title=$('detailTitle');if(title){title.tabIndex=-1;title.setAttribute('autofocus','');}
+ if(!dialog.open)dialog.showModal();
+ dialog.scrollTop=0;title?.focus({preventScroll:true});labelTables();
+}
 function staged(){
  detailView={action:'staged'};
  if(!can(state,'finance'))return;
  const rows=state.data.staged.filter(x=>!x.confirmed_charge&&!x.ignored_reason);
- showDetail(`<div class="dialog-kicker">${tr("DEVİR KONTROLÜ")}</div><h2 id="detailTitle">${tr("Eski bakiye kayıtları")}</h2><p class="muted">${info('Eski yönetimden kalan tutarları aktarmadan önce kontrol edin.','Her kayıtta daireyi, dönemi ve ödemenin yapılıp yapılmadığını kontrol edin. Aynı borcu iki kez kaydetmeyin. Yalnızca onayladığınız kayıtlar borç olarak işlenir.')}</p><div class="table-wrap"><table><thead><tr><th>${tr("Kişi / Kaynak daire")}</th><th class="numeric">${tr("Tutar")}</th><th>${tr("Kontrol")}</th><th>${tr("İşlem")}</th></tr></thead><tbody>${rows.map(r=>{const check=analyzeStage(r,state.data);return `<tr><td>${e(r.person_label)}<small class="block-small">${e(r.unit_hint||tr("Daire belirtilmedi"))} · ${r.kind==='enforcement'?tr("İcra listesi"):tr("Genel liste")}</small></td><td class="numeric">${money(Number(r.cents))}</td><td>${check.suggestedCode?e(check.suggestedCode)+' · '+(check.basis==='document'?tr("Belgede"):tr("Banka önerisi")):tr("Blok teyidi gerekli")}${check.paymentCandidates.length?`<small class="block-small error">${tr("Sonraki tahsilatı inceleyin")}</small>`:''}${check.overlaps.length?`<small class="block-small error">${tr("Başka devir kaydı da var")}</small>`:''}</td><td>${button(tr("Teyit et"),'confirm_staged',`data-id="${e(r.id)}"`)}${button(tr("Hariç tut"),'ignore_staged',`data-id="${e(r.id)}"`)}</td></tr>`;}).join('')||`<tr><td colspan="4">${tr("Bekleyen devir kaydı yok.")}</td></tr>`}</tbody></table></div>`);
+ showDetail(`<div class="dialog-kicker">${tr("DEVİR KONTROLÜ")}</div><h2 id="detailTitle">${tr("Eski bakiye kayıtları")}</h2><div class="muted">${info('Eski yönetimden kalan tutarları aktarmadan önce kontrol edin.','Her kayıtta daireyi, dönemi ve ödemenin yapılıp yapılmadığını kontrol edin. Aynı borcu iki kez kaydetmeyin. Yalnızca onayladığınız kayıtlar borç olarak işlenir.')}</div><div class="table-wrap"><table><thead><tr><th>${tr("Kişi / Kaynak daire")}</th><th class="numeric">${tr("Tutar")}</th><th>${tr("Kontrol")}</th><th>${tr("İşlem")}</th></tr></thead><tbody>${rows.map(r=>{const check=analyzeStage(r,state.data);return `<tr><td>${e(r.person_label)}<small class="block-small">${e(r.unit_hint||tr("Daire belirtilmedi"))} · ${r.kind==='enforcement'?tr("İcra listesi"):tr("Genel liste")}</small></td><td class="numeric">${money(Number(r.cents))}</td><td>${check.suggestedCode?e(check.suggestedCode)+' · '+(check.basis==='document'?tr("Belgede"):tr("Banka önerisi")):tr("Blok teyidi gerekli")}${check.paymentCandidates.length?`<small class="block-small error">${tr("Sonraki tahsilatı inceleyin")}</small>`:''}${check.overlaps.length?`<small class="block-small error">${tr("Başka devir kaydı da var")}</small>`:''}</td><td>${button(tr("Teyit et"),'confirm_staged',`data-id="${e(r.id)}"`)}${button(tr("Hariç tut"),'ignore_staged',`data-id="${e(r.id)}"`)}</td></tr>`;}).join('')||`<tr><td colspan="4">${tr("Bekleyen devir kaydı yok.")}</td></tr>`}</tbody></table></div>`);
 }
 function downloadCsv(filename,rows){const cell=v=>'"'+String(v??'').replaceAll('"','""')+'"';const safe=v=>/^[=+@\-\t\r]/.test(String(v))?"'"+v:v;const csv='\uFEFF'+rows.map(r=>r.map(v=>cell(typeof v==='number'?v.toLocaleString('tr-TR',{useGrouping:false,maximumFractionDigits:2}):safe(v))).join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function exportReport(){
@@ -263,11 +269,11 @@ function labelTables(){
 
 window.matchMedia('(max-width:1000px)').addEventListener('change',()=>{$('nav').innerHTML=navigation(state,labels,window.matchMedia('(max-width:1000px)').matches);});
 
-// Hover opens descriptions for mouse users; native details retains touch toggling.
-document.addEventListener('pointerover',event=>{if(event.pointerType!=='mouse')return;const el=event.target.closest('.info-help');if(el&&!el.open){el.dataset.hoverOpen='1';el.open=true;}});
-document.addEventListener('pointerout',event=>{const el=event.target.closest('.info-help');if(el?.dataset.hoverOpen&&!el.contains(event.relatedTarget)){el.open=false;delete el.dataset.hoverOpen;}});
-document.addEventListener('focusin',event=>{const el=event.target.closest('.info-help');if(el&&window.matchMedia('(hover:hover)').matches&&!el.open){el.dataset.focusOpen='1';el.open=true;}});
-document.addEventListener('focusout',event=>{const el=event.target.closest('.info-help');if(el?.dataset.focusOpen&&!el.contains(event.relatedTarget)){el.open=false;delete el.dataset.focusOpen;}});
+// Page hints open on hover; dialog disclosures open only by click or keyboard.
+document.addEventListener('pointerover',event=>{if(event.pointerType!=='mouse'||event.target.closest('dialog'))return;const el=event.target.closest('.info-help');if(el&&!el.open){el.dataset.hoverOpen='1';el.open=true;}});
+document.addEventListener('pointerout',event=>{if(event.target.closest('dialog'))return;const el=event.target.closest('.info-help');if(el?.dataset.hoverOpen&&!el.contains(event.relatedTarget)){el.open=false;delete el.dataset.hoverOpen;}});
+document.addEventListener('focusin',event=>{if(event.target.closest('dialog'))return;const el=event.target.closest('.info-help');if(el&&window.matchMedia('(hover:hover)').matches&&!el.open){el.dataset.focusOpen='1';el.open=true;}});
+document.addEventListener('focusout',event=>{if(event.target.closest('dialog'))return;const el=event.target.closest('.info-help');if(el?.dataset.focusOpen&&!el.contains(event.relatedTarget)){el.open=false;delete el.dataset.focusOpen;}});
 
 async function resumeSession(){
  if(state.mode==='demo'||loginBusy)return;
