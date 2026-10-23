@@ -1484,3 +1484,26 @@ dialog .help-disclosure{width:100%;margin:16px 0}
 dialog .info-help[open]>p,dialog .info-help[open]>.tooltip-body{position:static;inset:auto;width:100%;max-width:100%;box-sizing:border-box;box-shadow:none;margin:10px 0 0}
 dialog .help-disclosure>p{font-size:.85rem}
 dialog #detailTitle:focus{outline:none}
+
+/* Quiet header surfaces, with compact appearance and refresh controls. */
+:root{--header-bg:#eeece7;--header-control:#faf9f6;--header-line:#d6d5cf;--header-ink:#455052;--header-hover:#e4e1da}
+:root[data-theme="dark"]{--header-bg:#252c30;--header-control:#2e373b;--header-line:#485256;--header-ink:#dedbd5;--header-hover:#3a4449}
+.topbar{background:var(--header-bg);border-bottom-color:var(--header-line)}
+.header-actions .button{background:var(--header-control);border-color:var(--header-line);color:var(--header-ink)}
+.header-actions .button:hover{background:var(--header-hover);border-color:var(--header-line)}
+.header-actions .header-icon{width:38px;min-width:38px;height:38px;min-height:38px;padding:8px;display:inline-flex;align-items:center;justify-content:center}
+.header-icon .icon{width:19px;height:19px}
+.theme-menu{position:relative;flex-shrink:0}
+.theme-menu>summary{list-style:none;cursor:pointer}
+.theme-menu>summary::-webkit-details-marker{display:none}
+.theme-menu[open]>summary{background:var(--header-hover)}
+.theme-options{position:absolute;z-index:60;right:0;top:calc(100% + 8px);display:flex;gap:4px;padding:6px;border:1px solid var(--header-line);border-radius:12px;background:var(--paper);box-shadow:0 8px 24px #0002}
+.theme-options>button{display:grid;place-items:center;width:44px;height:44px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted)}
+.theme-options>button:hover{background:var(--header-hover);color:var(--header-ink)}
+.theme-options>button[aria-pressed="true"]{background:var(--soft);border-color:var(--primary);color:var(--primary)}
+.theme-options .icon{width:20px;height:20px}
+.theme-menu summary:focus-visible,.theme-options button:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+#refreshButton[aria-busy="true"] .icon{animation:header-refresh 1s linear infinite}
+@keyframes header-refresh{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#refreshButton .icon{animation:none!important}}
+@media(max-width:600px){.header-actions .header-icon{width:36px;min-width:36px;padding:7px}.theme-options{right:-44px}}

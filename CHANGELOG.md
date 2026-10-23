@@ -1,5 +1,12 @@
 # Ayapark 2
 
+## 3.8
+
+- Soften header colors with neutral surfaces in both themes.
+- Replace the appearance dropdown with automatic, sun and moon icons; retain device default and saved manual choice.
+- Remove the decorative A2 avatar and hide the redundant connected-account badge; keep demo identification.
+- Make manual refresh an accessible icon with a loading state.
+
 ## 3.7
 
 - Keep help disclosures in normal document flow within dialogs; prevent left-edge clipping.

@@ -44,12 +44,12 @@ function render(focus=false){
   if(!options.some(o=>o.id===state.previewSelection))state.previewSelection=options[0]?.id||'';
   $('residentPreviewSelect').value=state.previewSelection;
  }
- $('modeBadge').textContent=state.mode==='demo'?tr("Örnek veriler"):tr("Bağlı hesap");$('modeBadge').classList.toggle('connected',state.mode!=='demo');
+ $('modeBadge').textContent=tr("Örnek veriler");
  $('contextText').textContent=state.mode==='demo'?tr("Örnek çalışma alanı · Değişiklikler bu sayfayla sınırlıdır."):state.stale?tr("Kayıt kaydedildi; görünüm yenilenemedi. Yenile düğmesine basın."):tr("Son okuma ")+(d.loadedAt||'')+tr(" · Kayıtlar hesabınızın yetkileriyle gösterilir.");
  if(isAccessPreview())$('contextText').textContent=tr('Görünüm önizlemesi · İşlemler kaydedilmez. Süper Admin görünümüne dönerek düzenleyin.');
  $('footerMode').textContent=state.mode==='demo'?tr("Örnek veriler"):tr("Hesabınız");$('connectionButton').textContent=state.mode==='demo'?tr("Hesabımla giriş"):tr("Çıkış yap");$('refreshButton').hidden=state.mode==='demo';
  document.body.classList.toggle('signed-out',state.mode==='signedout');
- $('modeBadge').hidden=state.mode==='signedout';$('refreshButton').hidden=state.mode!=='connected';
+ $('modeBadge').hidden=state.mode!=='demo';$('refreshButton').hidden=state.mode!=='connected';
  $('connectionButton').textContent=state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/buildings.svg" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>`:renderPage(state);
  labelTables();checkUrgent();
@@ -228,10 +228,10 @@ $('loginForm').addEventListener('submit',async event=>{
  finally{if(attempt===epoch){loginBusy=false;$('loginSubmit').disabled=false;}}
 });
 $('refreshButton').addEventListener('click',async()=>{
- if(state.mode!=='connected')return;const attempt=epoch;$('refreshButton').disabled=true;
+ if(state.mode!=='connected')return;const attempt=epoch;$('refreshButton').disabled=true;$('refreshButton').setAttribute('aria-busy','true');
  try{await reload();toast(tr("Kayıtlar güncellendi."));}
  catch(error){if(attempt!==epoch)return;if([400,401,403].includes(error.status)){epoch++;closeDialogs();void api.logout().catch(()=>{});state.mode='signedout';state.data=fullDemo();navigate('overview');toast(tr("Erişim doğrulanamadı. Yeniden giriş yapın."));}else{state.stale=true;render();toast(tr("Veriler yenilenemedi. Ekranda önceki okuma var."));}}
- finally{$('refreshButton').disabled=false;}
+ finally{$('refreshButton').disabled=false;$('refreshButton').setAttribute('aria-busy','false');}
 });
 $('csvFile').addEventListener('change',async()=>{
  const generation=++fileGeneration,file=$('csvFile').files[0];importPayload=null;$('commitImport').disabled=true;if(!file)return;

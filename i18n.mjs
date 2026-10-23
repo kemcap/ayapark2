@@ -759,3 +759,5 @@ Object.assign(german,{
 });
 
 Object.assign(german,{'Hizmet verenlerin iletişim bilgileri.':'Kontaktdaten der Dienstleister.'});
+
+Object.assign(german,{'Kayıtları yenile':'Datensätze aktualisieren'});
