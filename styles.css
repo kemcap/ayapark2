@@ -1514,3 +1514,14 @@ dialog #detailTitle:focus{outline:none}
 #relationshipEditor select,#relationshipEditor input:not([type="checkbox"]){min-width:0;width:100%;max-width:100%;box-sizing:border-box}
 #relationshipEditor select{min-height:44px;text-overflow:ellipsis}
 #relationshipReview ul{padding-inline-start:1.2rem}
+
+/* Mobile nav: one full-width in-flow submenu instead of overlapping absolute popovers. */
+#nav .nav-group-toggle{width:100%;min-height:48px;padding:12px;display:flex;align-items:center;gap:10px;border:0;border-radius:12px;background:transparent;color:var(--nav-text);font:inherit;font-size:13px;font-weight:550;text-align:left;cursor:pointer;white-space:normal;overflow-wrap:anywhere}
+#nav .nav-group-toggle:hover{background:var(--nav-hover)}
+#nav .nav-group.current .nav-group-toggle,#nav .nav-group-toggle[aria-expanded="true"]{background:var(--nav-active);color:var(--nav-active-ink)}
+#nav .nav-group-toggle:focus-visible,#nav .nav-submenu a:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+#nav .nav-submenu[hidden]{display:none}
+#nav .nav-submenu{grid-column:1/-1;min-width:0;position:static;display:grid;gap:4px;padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--paper);box-shadow:none}
+#nav .nav-submenu a{min-height:44px;padding:10px 12px;display:flex;align-items:center;border-radius:8px;overflow-wrap:anywhere}
+#nav .nav-submenu a[aria-current="page"]{background:var(--nav-active);color:var(--nav-active-ink);font-weight:700}
+@media(max-width:1000px){.sidebar #nav>.nav-group>.nav-group-toggle{min-height:64px;padding:9px 3px;display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;font-size:.72rem;line-height:1.3;text-align:center}.sidebar #nav .nav-submenu{position:static;inset:auto;z-index:auto;width:auto;max-width:100%;box-shadow:none}.sidebar #nav .nav-submenu a{font-size:.9rem;min-height:44px}}
