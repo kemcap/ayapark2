@@ -1,3 +1,4 @@
+grant usage on schema ay2_private to service_role;
 create or replace function ay2_private.access_target(p_actor uuid,p_person uuid,p_role text)
 returns jsonb language plpgsql security definer set search_path='' as $$
 declare p public.ay3_persons; u uuid;
