@@ -1,4 +1,4 @@
-import {buildRelationshipForm,relationshipPayload,effectiveOccupancy} from './relationships.mjs';
+import {buildRelationshipForm,relationshipPayload,effectiveOccupancy,linkVersion} from './relationships.mjs';
 import {announcementTime,validateAnnouncement} from './announcement-validation.mjs';
 import {t as tr} from './i18n.mjs';
 import {escapeHtml as e,randomId,money} from './core.mjs';
@@ -38,9 +38,18 @@ export function buildV3Form(s,action,args={}){
   if(!(d.persons||[]).length)throw Error(tr('Önce bir kişi ekleyin.'));context.unit_id=args.unit;
   title=tr('Kayıtlı kişi bağla');body=sel('person_id','Kişi',personOptions(d))+sel('role','Rol',roles,'owner')+field('starts_on',tr('Başlangıç'),'date','','required')+check('start_unknown','Başlangıç tarihi bilinmiyor')+field('ends_on',tr('Bitiş'),'date')+field('responsibility',tr('Sorumluluk'),'text','','maxlength="1000"')+check('primary_contact','İlk aranacak kişi')+`<p class="fine">${tr('Kiracı için ev sahibi kaydı gereklidir. Temsilci bağımsız olarak eklenebilir.')}</p>`;
  }
+ else if(action==='unlink'){
+  const l=d.links.find(x=>x.id===args.id);if(!l)throw Error(tr('Kayıt bulunamadı.'));
+  context.id=l.id;context.expected=linkVersion(l);title=tr('Hatalı bağlantıyı kaldır');
+  body=`<div class="info-strip"><strong>${e(personName(d,l.person_id))}</strong> · ${e(d.units.find(u=>u.id===l.unit_id)?.code||'—')} · ${e(roleLabel(l.role))}</div>`+
+   `<p class="fine">${tr('Yanlış atanan rolü kaldırın. Kişi ve banka kayıtları korunur. Portal erişimi ayrı yönetilir. Gerçek taşınma veya görev bitişinde Bağlantıyı bitir seçeneğini kullanın.')}</p>`+
+   field('reason',tr('Kaldırma gerekçesi'),'text','','required minlength="3" maxlength="500"')+
+   check('confirmation','Bu yanlış bağlantıyı kaldırmayı onaylıyorum.');
+ }
  else if(action==='switch_tenant'||action==='end_link'){
   const l=d.links.find(l=>l.id===args.id);if(!l)throw Error(tr('Kayıt bulunamadı.'));context.link_start=l.starts_on;
   title=tr(action==='switch_tenant'?'Sakin değiştir':'Bağlantıyı bitir');body=`<p>${e(personName(d,l.person_id))} · ${e(d.units.find(u=>u.id===l.unit_id)?.code)}</p>`+field('ends_on',tr('Çıkış tarihi'),'date',today(),'required');
+  if(action==='end_link')body+=`<p class="fine">${tr('Seçilen gün rolün son günüdür. Ertesi gün artık güncel görünmez.')}</p>`;
   if(action==='switch_tenant')body+=sel('person_id','Yeni sakin',[...personOptions(d).filter(([id])=>id!==l.person_id),['__new__',tr('Yeni kişi')]])+`<div id="newTenantFields" hidden>${field('first_name',tr('Ad'),'text','','maxlength="75"')}${field('last_name',tr('Soyad'),'text','','maxlength="75"')}${field('phone',tr('Telefon'),'tel','','maxlength="60"')}${field('email',tr('E-posta'),'email','','maxlength="254"')}${text('notes','Notlar')}</div>`+field('starts_on',tr('Giriş tarihi'),'date','','required')+`<p class="info-strip">${tr('Açık borçlar önceki kişide kalır. Yeni sakine aktarılmaz.')}</p>`+check('confirmation','Değişikliği onaylıyorum.');
  }
  else if(action==='bind_charge'){
@@ -78,15 +87,17 @@ export function buildV3Form(s,action,args={}){
 }
 export function payloadV3(action,form,ctx){
  if(action==='relationship_change')return relationshipPayload(form,ctx,ctx.relationshipData,ctx.version);
- const special=['person_link','occupancy','edit_link','user_access','person','link','end_link','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_note','classify_entry'];
+ const special=['person_link','occupancy','edit_link','user_access','person','link','end_link','unlink','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_note','classify_entry'];
  if(!special.includes(action)){const p=payloadLegacy(action,form,ctx);if(action==='charge'&&(p.period_from||p.period_to)&&(!dateValid(p.period_from)||!dateValid(p.period_to)||p.period_to<p.period_from))throw Error(tr('Borç döneminin başlangıç ve bitiş tarihlerini kontrol edin.'));if(action==='entry'&&p.category==='Diğer'&&!p.desc)throw Error(tr('Açıklama gerekli.'));return p;}
  if(action==='user_access'&&(!form.get('person_id')||!form.has('confirmation')))throw Error(tr('Kişi seçin ve erişimi onaylayın.'));
  const p={...ctx};for(const[k,v]of form)p[k]=String(v).trim();const get=k=>String(form.get(k)||'').trim();
- if(['switch_tenant','void_credit'].includes(action)&&!form.has('confirmation'))throw Error(tr('Devam etmek için onay kutusunu işaretleyin.'));
+ if(['switch_tenant','void_credit','unlink'].includes(action)&&!form.has('confirmation'))throw Error(tr('Devam etmek için onay kutusunu işaretleyin.'));
+ if(action==='unlink'&&(get('reason').length<3||get('reason').length>500))throw Error(tr('En az üç karakterlik gerekçe yazın.'));
  if(action==='person'&&(!get('first_name')||!get('last_name')))throw Error(tr('Ad ve soyad gerekli.'));
  p.start_unknown=form.has('start_unknown');if(p.start_unknown)p.starts_on=null;
  if(['person_link','link','edit_link'].includes(action)||(action==='person'&&ctx.unit_id)){if(!p.start_unknown&&!dateValid(get('starts_on')))throw Error(tr('Başlangıç tarihini girin veya bilinmiyor seçin.'));}
  if(['person_link','edit_link','end_link','switch_tenant','link'].includes(action)){const start=action==='end_link'||action==='switch_tenant'?ctx.link_start:p.starts_on;if(get('ends_on')&&!dateValid(get('ends_on')))throw Error(tr('Geçerli bir çıkış tarihi girin.'));if(start&&get('ends_on')&&get('ends_on')<start)throw Error(tr('Çıkış tarihi başlangıç tarihinden önce olamaz.')+' '+tr('Kayıtlı başlangıç')+': '+start);}
+ if(action==='unlink')p.confirmation=true;
  p.primary_contact=form.has('primary_contact');if(action==='user_access')p.confirmation=true;
  if(['link','switch_tenant','bind_charge'].includes(action)&&!get(action==='bind_charge'?'link_id':'person_id'))throw Error(tr('Kişi seçin.'));
  if(action==='switch_tenant'){if(p.person_id==='__new__'){p.person_id='';if(!get('first_name')||!get('last_name'))throw Error(tr('Ad ve soyad gerekli.'));}p.confirmation=true;if(!get('ends_on')||!get('starts_on')||get('starts_on')<=get('ends_on'))throw Error(tr('Tarih aralığını kontrol edin.'));}

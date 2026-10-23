@@ -22,11 +22,23 @@ export function demoV3(d,action,p){
   if(person)Object.assign(person,item);else d.persons.push(item);
   if(p.unit_id)demoV3(d,'link',{...p,person_id:ident});
  }else if(action==='link'){
-  if(['tenant','representative'].includes(p.role)&&!personLinks(d,p.unit_id,p.starts_on||today()).some(l=>l.role==='owner'))throw Error(tr('Önce ev sahibini ekleyin.'));
+  if(p.role==='tenant'&&!personLinks(d,p.unit_id,p.starts_on||today()).some(l=>l.role==='owner'))throw Error(tr('Önce ev sahibini ekleyin.'));
   if(p.role==='tenant'&&d.links.some(l=>l.unit_id===p.unit_id&&l.role==='tenant'&&(!l.ends_on||l.ends_on>=p.starts_on)&&(!p.ends_on||l.starts_on<=p.ends_on)))throw Error(tr('Bu tarihlerde başka bir kiracı var.'));
   if(!d.persons.some(x=>x.id===p.person_id))throw Error(tr('Kişi seçin.'));
   if(!p.starts_on&&!p.start_unknown||p.starts_on&&p.ends_on&&p.ends_on<p.starts_on)throw Error(tr('Tarih aralığını kontrol edin.'));
   ident=id();d.links.push({...p,id:ident});
+  }else if(action==='unlink'){
+  if(d.audit.some(x=>x.action==='unlink'&&x.details?.request_id===p.request_id))return {ok:true,already_recorded:true};
+  const l=d.links.find(x=>x.id===p.id);
+  if(!l||p.expected!==JSON.stringify([l.id,l.person_id,l.unit_id,l.role,l.starts_on||null,l.ends_on||null]))throw Error(tr('Kayıt başka bir işlemde değişti. Görünümü yenileyip tekrar kontrol edin.'));
+  if(!p.confirmation||!p.reason||p.reason.trim().length<3)throw Error(tr('En az üç karakterlik gerekçe yazın.'));
+  if(d.charges.some(c=>c.link_id===l.id))throw Error(tr('Bu role bağlı borç var. Geçmişi korumak için bağlantıyı bitirin.'));
+  const other=d.links.some(x=>x.id!==l.id&&x.unit_id===l.unit_id&&x.person_id===l.person_id);
+  if(!other&&((d.credits||[]).some(c=>c.unit_id===l.unit_id&&c.person_id===l.person_id&&!c.void_reason)||(d.matchRules||[]).some(m=>m.unit_id===l.unit_id&&m.person_id===l.person_id)))throw Error(tr('Bu kişiye bağlı ödeme kaydı var. Bunun yerine bağlantıyı bitirin.'));
+  if(l.role==='owner'&&d.links.some(x=>x.unit_id===l.unit_id&&x.role==='tenant'&&(!x.ends_on||!l.starts_on||x.ends_on>=l.starts_on)))throw Error(tr('Kiracı varken ev sahibi bağlantısını kaldıramazsınız.'));
+  d.links=d.links.filter(x=>x.id!==l.id);
+  d.audit.unshift({id:id(),action:'unlink',at:new Date().toISOString(),details:{reason:p.reason,request_id:p.request_id,before:{...l}}});
+  return {ok:true};
  }else if(action==='end_link'){const l=d.links.find(l=>l.id===p.id);if(!l||l.starts_on&&p.ends_on<l.starts_on)throw Error(tr('Tarih aralığını kontrol edin.'));l.ends_on=p.ends_on;
  }else if(action==='switch_tenant'){
   const l=d.links.find(l=>l.id===p.id);if(!l||!p.confirmation||!p.ends_on||p.starts_on<=p.ends_on)throw Error(tr('Tarih aralığını kontrol edin.'));
