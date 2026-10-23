@@ -1,3 +1,12 @@
+## V3.10 · 2026-10-23
+
+- Replace separate relationship date/switch actions with a guided change form, available from apartment and person editing in German and Turkish.
+- Support ownership transfer, owner staying as tenant, tenant replacement/departure, tenant purchase, erroneous-role/date correction with reason, and atomic person creation with a role.
+- Review the complete change before saving. Server validates site permissions, role compatibility, date order, tenant overlaps, owner coverage, stale edits and idempotent retries under a per-site transaction lock.
+- Preserve original debt/person/link assignments, payments, authentication identities and management rights. Audit stores the previous relationships and correction reason.
+- Keep physical occupancy separate and date its changes. Future occupancy takes effect on the selected date; manual occupancy updates use the same history. Planned relationships are labeled clearly.
+- Validation: 67 Node regression tests, 16 rolled-back authenticated SQL assertions, browser checks for review/save/error behavior and responsive layout.
+
 ## V3.9 · 2026-10-23
 
 - Residents see their own open debts after departure in dues and apartment details; another person's debts remain hidden.

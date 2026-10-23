@@ -1507,3 +1507,10 @@ dialog #detailTitle:focus{outline:none}
 @keyframes header-refresh{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){#refreshButton .icon{animation:none!important}}
 @media(max-width:600px){.header-actions .header-icon{width:36px;min-width:36px;padding:7px}.theme-options{right:-44px}}
+
+/* Guided relationship changes must fit narrow phone dialogs and long names. */
+#relationshipEditor,#relationshipFields,#relationshipReview{min-width:0;max-width:100%;overflow-wrap:anywhere}
+#relationshipEditor .field{min-width:0}
+#relationshipEditor select,#relationshipEditor input:not([type="checkbox"]){min-width:0;width:100%;max-width:100%;box-sizing:border-box}
+#relationshipEditor select{min-height:44px;text-overflow:ellipsis}
+#relationshipReview ul{padding-inline-start:1.2rem}

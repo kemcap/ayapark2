@@ -1,6 +1,6 @@
 import {t as tr} from './i18n.mjs';
 import {escapeHtml as e} from './core.mjs';
-import {activeAt} from './v3-domain.mjs';
+import {activeAt,today} from './v3-domain.mjs';
 import {can,heading,card,button,badge,date} from './ui.mjs';
 import {roleLabel} from './v3-ui.mjs';
 const role=l=>badge(roleLabel(l.role),'role-badge role-'+l.role);
@@ -13,5 +13,5 @@ export function peoplePage(s){
 export function personManager(s,id){
  if(!can(s,'people'))return null;const d=s.data,p=d.persons.find(p=>p.id===id);if(!p)return null;
  const links=d.links.filter(l=>l.person_id===id).sort((a,b)=>Number(activeAt(b))-Number(activeAt(a)));
- return `<h2 id="detailTitle">${e(p.full_name)}</h2><section class="person-card"><h3>${tr('Kişi bilgileri')}</h3><p>${e(p.phone||'—')} · ${e(p.email||'—')}</p>${p.notes?`<p class="pre-wrap">${e(p.notes)}</p>`:''}${button(tr('Kişi bilgilerini düzenle'),'person',`data-id="${e(id)}"`)}</section><section class="person-card"><div class="row"><h3>${tr('Daire bağlantıları')}</h3>${button(tr('Daireye bağla'),'person_link',`data-id="${e(id)}"`)}</div>${links.map(l=>`<article class="person-card"><div class="row">${role(l)}<strong>${e(d.units.find(u=>u.id===l.unit_id)?.code||'—')}</strong>${badge(tr(activeAt(l)?'Güncel':'Geçmiş'),'neutral')}</div><p>${tr('Başlangıç')}: ${l.starts_on?date(l.starts_on):tr('Bilinmiyor')} · ${tr('Bitiş')}: ${l.ends_on?date(l.ends_on):'—'}</p><div class="row-actions">${button(tr('Daireyi aç'),'unit',`data-id="${e(l.unit_id)}"`)}${button(tr('Giriş / çıkış tarihleri'),'edit_link',`data-id="${e(l.id)}"`)}${l.role==='tenant'&&!l.ends_on?button(tr('Sakin değiştir'),'switch_tenant',`data-id="${e(l.id)}"`):''}</div></article>`).join('')||`<p>${tr('Henüz daire bağlantısı yok.')}</p>`}</section>`;
+ return `<h2 id="detailTitle">${e(p.full_name)}</h2><section class="person-card"><h3>${tr('Kişi bilgileri')}</h3><p>${e(p.phone||'—')} · ${e(p.email||'—')}</p>${p.notes?`<p class="pre-wrap">${e(p.notes)}</p>`:''}${button(tr('Kişi bilgilerini düzenle'),'person',`data-id="${e(id)}"`)}</section><section class="person-card"><div class="row"><h3>${tr('Daire bağlantıları')}</h3>${button(tr('Kişi ve rol ekle'),'relationship_change',`data-person="${e(id)}" data-kind="add"`)}</div>${links.map(l=>`<article class="person-card"><div class="row">${role(l)}<strong>${e(d.units.find(u=>u.id===l.unit_id)?.code||'—')}</strong>${badge(tr(activeAt(l)?'Güncel':l.starts_on>today()?'Planlandı':'Geçmiş'),'neutral')}</div><p>${tr('Başlangıç')}: ${l.starts_on?date(l.starts_on):tr('Bilinmiyor')} · ${tr('Bitiş')}: ${l.ends_on?date(l.ends_on):'—'}</p><div class="row-actions">${button(tr('Daireyi aç'),'unit',`data-id="${e(l.unit_id)}"`)}${button(tr('Daire ilişkisini değiştir'),'relationship_change',`data-id="${e(l.id)}" data-kind="${l.ends_on?'correction':l.role==='tenant'?'tenant_change':l.role==='owner'?'owner_change':'correction'}"`)}</div></article>`).join('')||`<p>${tr('Henüz daire bağlantısı yok.')}</p>`}</section>`;
 }

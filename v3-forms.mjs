@@ -1,3 +1,4 @@
+import {buildRelationshipForm,relationshipPayload,effectiveOccupancy} from './relationships.mjs';
 import {announcementTime,validateAnnouncement} from './announcement-validation.mjs';
 import {t as tr} from './i18n.mjs';
 import {escapeHtml as e,randomId,money} from './core.mjs';
@@ -11,13 +12,14 @@ const amount=()=>field('amount',tr('Tutar (TL)'),'text','','inputmode="decimal" 
 const roles=['owner','tenant','representative'].map(r=>[r,roleLabel(r)]);
 const personOptions=d=>[['',tr('Kişi seçin.')],...(d.persons||[]).map(p=>[p.id,p.full_name])];
 export function buildV3Form(s,action,args={}){
+ if(action==='relationship_change')return buildRelationshipForm(s.data,args);
  const d=s.data;let title='',body='',context={...args,request_id:randomId()};
  if(action==='user_access'){
   title=tr('Kullanıcı erişimi');
   body=sel('person_id','Kişi',personOptions(d))+sel('access_role','Erişim rolü',[['resident',tr('Site Sakini')],['deputy',tr('Yönetim')],['manager',tr('Süper Admin')]],'resident')+`<p class="fine">${tr('Kişinin e-posta adresi ve güncel daire ilişkisi kayıtlı olmalıdır. Kullanıcı giriş ekranından kod ister. Bu işlem e-posta göndermez.')}</p>`+check('confirmation','Erişimi tanımlamayı onaylıyorum.');
  }
  else if(action==='occupancy'){
-  const u=d.units.find(u=>u.id===args.unit);context.unit_id=args.unit;title=tr('Kullanımı düzenle');body=sel('status','Kullanım',[['occupied',tr('Dolu')],['vacant',tr('Boş')],['unknown',tr('Bilinmiyor')]],u?.occupancy_status||'unknown')+`<p class="fine">${tr('Kullanım durumu kişi kaydından ayrıdır. Ev sahibi dairede oturabilir; eski borçlar değişmez.')}</p>`;
+  const u=d.units.find(u=>u.id===args.unit);context.unit_id=args.unit;title=tr('Kullanımı düzenle');body=sel('status','Kullanım',[['occupied',tr('Dolu')],['vacant',tr('Boş')],['unknown',tr('Bilinmiyor')]],u?effectiveOccupancy(d,u):'unknown')+`<p class="fine">${tr('Kullanım durumu kişi kaydından ayrıdır. Ev sahibi dairede oturabilir; eski borçlar değişmez.')}</p>`;
  }
  else if(action==='edit_link'){
   const l=d.links.find(l=>l.id===args.id);if(!l)throw Error(tr('Kayıt bulunamadı.'));context.link_start=l.starts_on;
@@ -75,6 +77,7 @@ export function buildV3Form(s,action,args={}){
  return {title,body,context};
 }
 export function payloadV3(action,form,ctx){
+ if(action==='relationship_change')return relationshipPayload(form,ctx,ctx.relationshipData,ctx.version);
  const special=['person_link','occupancy','edit_link','user_access','person','link','end_link','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_note','classify_entry'];
  if(!special.includes(action)){const p=payloadLegacy(action,form,ctx);if(action==='charge'&&(p.period_from||p.period_to)&&(!dateValid(p.period_from)||!dateValid(p.period_to)||p.period_to<p.period_from))throw Error(tr('Borç döneminin başlangıç ve bitiş tarihlerini kontrol edin.'));if(action==='entry'&&p.category==='Diğer'&&!p.desc)throw Error(tr('Açıklama gerekli.'));return p;}
  if(action==='user_access'&&(!form.get('person_id')||!form.has('confirmation')))throw Error(tr('Kişi seçin ve erişimi onaylayın.'));

@@ -1,3 +1,4 @@
+import {applyRelationshipDemo} from './relationships.mjs';
 import {randomId} from './core.mjs';
 import {t as tr} from './i18n.mjs';
 import {activeAt,personLinks,today,effectivePayer,buildSummaryDays,creditAvailable} from './v3-domain.mjs';
@@ -10,9 +11,10 @@ export function enrichDemo(d){
  d.charges.forEach(c=>{if(c.label==='Örnek devir bakiyesi')c.label='Açık borç';});d.summaryDays=buildSummaryDays(d);return d;
 }
 export function demoV3(d,action,p){
+ if(action==='relationship_change')return applyRelationshipDemo(d,p);
  const id=()=>randomId(),now=()=>new Date().toISOString();let ident;
  if(action==='occupancy'){
-  const u=d.units.find(u=>u.id===p.unit_id);if(!u||!['occupied','vacant','unknown'].includes(p.status))throw Error(tr('Geçerli bir kullanım durumu seçin.'));u.occupancy_status=p.status;
+  const u=d.units.find(u=>u.id===p.unit_id);if(!u||!['occupied','vacant','unknown'].includes(p.status))throw Error(tr('Geçerli bir kullanım durumu seçin.'));u.occupancy_status=p.status;d.occupancyChanges=[...(d.occupancyChanges||[]).filter(x=>x.unit_id!==u.id||x.effective_on!==today()),{unit_id:u.id,effective_on:today(),status:p.status}];
  }else if(action==='edit_link'){
   const l=d.links.find(l=>l.id===p.id);if(!l)throw Error(tr('Kayıt bulunamadı.'));if(p.starts_on&&p.ends_on&&p.ends_on<p.starts_on)throw Error(tr('Çıkış tarihi başlangıç tarihinden önce olamaz.'));Object.assign(l,{starts_on:p.starts_on||null,ends_on:p.ends_on||null});
  }else if(action==='person'){
