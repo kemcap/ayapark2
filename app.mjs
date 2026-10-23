@@ -14,7 +14,7 @@ import {analyzeStage} from './reconcile.mjs';
 const $=id=>document.getElementById(id),api=new AyaparkApi();
 const applyStaticLanguage=bindStaticText(document.body);
 const hideLoginPassword=bindPasswordEyes();
-let detailView=null,loginMethod='code';
+let detailView=null,loginMethod='password';
 bindInstall();
 const state={data:fullDemo(),mode:new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},stale:false};
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null;
@@ -50,7 +50,7 @@ async function mutate(action,payload){
  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
  return result;
 }
-function permissionFor(action){return ['user_access','settings','permissions','publish_report'].includes(action)?'admin':['person','link','end_link','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
+function permissionFor(action){return ['user_access','settings','permissions','publish_report'].includes(action)?'admin':['person','link','edit_link','occupancy','end_link','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
 function showForm(action,args={}){
  if(writeBusy)throw Error(tr("Önce devam eden işlemin tamamlanmasını bekleyin."));
  if(!can(state,permissionFor(action)))throw Error(tr("Bu işlem için yetkiniz yok."));
@@ -131,7 +131,7 @@ document.addEventListener('input',event=>{
 });
 document.addEventListener('change',event=>{
  const id=event.target.id;
- if(event.target.name==='category'||event.target.name==='relation'||event.target.name==='person_id')updateConditionalForm();
+ if(event.target.name==='category'||event.target.name==='relation'||event.target.name==='person_id'||event.target.name==='start_unknown')updateConditionalForm();
  if(['statusFilter','txnFilter','periodFilter'].includes(id)){
   const key={statusFilter:'status',txnFilter:'type',periodFilter:'period'}[id];state.filter[key]=event.target.value;
   if(id==='statusFilter'){$('unitResults').innerHTML=unitResults(state);$('resultCount').textContent=filteredUnits(state).length+tr(" daire");}else $('transactionResults').innerHTML=transactionTable(state);
@@ -173,7 +173,7 @@ $('requestCode').addEventListener('click',async()=>{
  catch(error){$('loginMessage').textContent=error.message;}
  finally{setTimeout(()=>{b.disabled=false;},Math.max(0,nextCodeAt-Date.now()));}
 });
-selectLogin('code');
+selectLogin('password');
 
 $('loginForm').addEventListener('submit',async event=>{
  event.preventDefault();if(loginBusy)return;loginBusy=true;const attempt=++epoch;$('loginSubmit').disabled=true;$('loginMessage').textContent=tr("Hesap ve erişim yetkileri doğrulanıyor…");$('loginMessage').classList.remove('error');
@@ -211,6 +211,8 @@ document.dispatchEvent(new Event('ay2:languagechange'));
 if(!new URLSearchParams(location.hash.slice(1)).has('access_token')&&!new URLSearchParams(location.hash.slice(1)).has('error'))navigate(location.hash.slice(1)||'overview');
 
 function updateConditionalForm(){
+ const unknown=$('actionFields').querySelector('[name="start_unknown"]'),start=$('actionFields').querySelector('[name="starts_on"]');if(unknown&&start){start.disabled=unknown.checked;start.required=!unknown.checked;if(unknown.checked)start.value='';}
+
  const block=$('newTenantFields');if(block){const fresh=$('actionFields').querySelector('[name="person_id"]')?.value==='__new__';block.hidden=!fresh;for(const node of block.querySelectorAll('[name="first_name"],[name="last_name"]'))node.required=fresh;}
  if(formAction?.action!=='entry')return;const category=$('actionFields').querySelector('[name="category"]'),desc=$('actionFields').querySelector('[name="desc"]');if(desc){desc.placeholder=tr(category?.value==='Diğer'?'İşlem ne için yapıldı?':'Açıklama girin');desc.required=true;}
 }

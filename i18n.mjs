@@ -714,3 +714,16 @@ Object.assign(german,{
 });
 
 Object.assign(german,{'Kod, e-posta veya şifre geçersiz olabilir. Tekrar kontrol edin.':'Code, E-Mail oder Passwort können ungültig sein. Bitte prüfe deine Eingabe.'});
+
+Object.assign(german,{
+ 'Kullanımı düzenle':'Belegung bearbeiten','Bilinmiyor':'Unbekannt','Giriş / çıkış tarihleri':'Einzug / Auszug bearbeiten','Çıkış kaydet':'Auszug erfassen',
+ 'Başlangıç tarihi bilinmiyor':'Einzugs-/Beginn-Datum unbekannt','Başlangıç tarihini girin veya bilinmiyor seçin.':'Bitte gib das Einzugs-/Beginn-Datum an oder wähle „Unbekannt“.',
+ 'Gerçek tarihleri girin. Kayıt veya içe aktarma tarihi giriş tarihi değildir. Çıkış boşsa ilişki devam eder.':'Trage die tatsächlichen Daten ein. Das Erfassungs- oder Importdatum ist kein Einzugsdatum. Ohne Auszugsdatum bleibt die Zuordnung bestehen.',
+ 'Kullanım durumu kişi kaydından ayrıdır. Ev sahibi dairede oturabilir; eski borçlar değişmez.':'Die Belegung wird getrennt von der Person erfasst. Auch ein Eigentümer kann dort wohnen. Bestehende Forderungen bleiben unverändert.',
+ 'Çıkış tarihi başlangıç tarihinden önce olamaz.':'Das Auszugsdatum liegt vor dem gespeicherten Beginn. Bitte korrigiere zuerst den Beginn oder kennzeichne ihn als unbekannt.',
+ 'Kayıtlı başlangıç':'Gespeicherter Beginn','Geçerli bir çıkış tarihi girin.':'Bitte gib ein gültiges Auszugsdatum ein.',
+ 'Bu tarih aralığı başka bir belegeyle çakışıyor.':'Dieser Zeitraum überschneidet sich mit einer anderen Belegung.',
+ 'Geçerli bir kullanım durumu seçin.':'Bitte wähle eine gültige Belegung.','Çıkış tarihi gerekli.':'Bitte gib das Auszugsdatum ein.'
+});
+
+Object.assign(german,{'İlişkiyi bitir':'Zuordnung beenden'});

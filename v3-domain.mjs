@@ -37,7 +37,7 @@ export function suggestUnits(d,t){
  for(const rule of d.matchRules||[]){if((rule.iban&&norm(t.iban)===norm(rule.iban))||(rule.alias&&norm(rule.alias).length>=4&&desc.includes(norm(rule.alias)))){found.add(rule.unit_id);reasons.push('saved');}}
  return {unitIds:[...found],ambiguous:found.size!==1,reasons:[...new Set(reasons)]};
 }
-export function effectivePayer(d,unit,payer,day){const roles=payer==='owner'?['owner']:payer==='tenant'?['tenant']:[];const l=personLinks(d,unit,day).filter(l=>roles.includes(l.role));return l.length===1?l[0]:null;}
+export function effectivePayer(d,unit,payer,day){const roles=payer==='owner'?['owner']:payer==='tenant'?['tenant']:[];const l=personLinks(d,unit,day).filter(l=>l.starts_on&&roles.includes(l.role));return l.length===1?l[0]:null;}
 export function creditAvailable(d,t){return (d.credits||[]).filter(x=>x.entry_id===t.id&&!x.void_reason).reduce((n,x)=>n+x.cents,0);}
 
 // Search only permitted apartment contents; a block letter is never a code match.

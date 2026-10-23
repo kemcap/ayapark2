@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#f4f5f0">
 <meta name="robots" content="noindex,nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https://eisozwhhinqszfikemot.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Ayapark 2 · Site Yönetimi V3.3</title>
+<title>Ayapark 2 · Site Yönetimi V3.4</title>
 <script src="./theme.js"></script>
 <link rel="icon" href="./assets/buildings.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -20,7 +20,7 @@
 <div class="shell">
 <aside class="sidebar">
  <a href="#overview" class="brand" aria-label="Ayapark 2 ana sayfa"><img class="brand-logo" src="./assets/buildings.svg" alt=""><span>AYAPARK 2<small>Birlikte, daha düzenli.</small></span></a>
- <div class="site-label"><span class="site-dot"></span>Döşemealtı, Antalya <span class="version">v3.3</span></div>
+ <div class="site-label"><span class="site-dot"></span>Döşemealtı, Antalya <span class="version">v3.4</span></div>
  <p class="nav-label">YAŞAM & YÖNETİM</p>
  <nav id="nav" aria-label="Ana menü"></nav>
  <div class="sidebar-bottom"><div class="mini-building" aria-hidden="true"><i></i><i></i><i></i></div><strong>Her şey yerli yerinde.</strong><p>Daireniz, ödemeleriniz ve siteniz.<br>Tek bir yerde.</p><div class="side-meta">A + B Blok <span>20 daire</span></div></div>
@@ -29,14 +29,14 @@
  <header class="topbar"><span id="breadcrumb">Yönetim / Genel bakış</span><div class="header-actions"><button id="languageToggle" type="button" class="button small language-toggle" aria-label="Sprache wechseln / Dili değiştir" title="Deutsch" hidden>DE</button><button id="themeToggle" type="button" class="button theme-toggle" aria-label="Koyu tema" aria-pressed="false" title="Koyu temaya geç" hidden><svg class="theme-moon icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></svg><svg class="theme-sun icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button><button type="button" id="installApp" class="button small">Uygulamayı ekle</button><span class="mode" id="modeBadge">Örnek veriler</span><button id="refreshButton" class="button small" hidden>Yenile</button><button id="connectionButton" class="button small">Hesabımla giriş</button><span class="avatar" aria-hidden="true">A2</span></div></header>
  <div class="context-bar"><p id="contextText">Tasarım önizlemesi · Tüm tutarlar örnektir.</p><label id="roleControl">Görünümü dene <select id="roleSelect" aria-label="Örnek rol görünümü"><option value="super">Süper Admin</option><option value="staff">Yönetim</option><option value="resident">Site Sakini</option></select></label></div>
  <main id="content" tabindex="-1"></main>
- <footer>AYAPARK 2 <span>V3.3 · <span id="footerMode">Örnek veriler</span></span></footer>
+ <footer>AYAPARK 2 <span>V3.4 · <span id="footerMode">Örnek veriler</span></span></footer>
 </div>
 </div>
 <dialog id="detailDialog" aria-labelledby="detailTitle"><div id="detailContent"></div><form method="dialog" class="dialog-actions"><button class="button">Kapat</button></form></dialog>
 <dialog id="loginDialog" aria-labelledby="loginTitle">
  <div class="dialog-kicker">AYAPARK 2 HESABINIZ</div><h2 id="loginTitle">Sitenize hoş geldiniz.</h2><p class="muted">Mevcut hesabınızla daire bilgilerinizi görüntüleyin. İşlemler hesabınıza verilen yetkilerle yapılır.</p>
- <div class="row-actions"><button type="button" id="useCode" class="button" aria-pressed="true">E-posta kodu</button><button type="button" id="usePassword" class="button" aria-pressed="false">Şifre</button></div>
- <form id="loginForm"><label class="field">E-posta<input id="email" type="email" required autocomplete="username"></label><div id="passwordFields" hidden><label class="field" for="password">Şifre</label><div class="password-control"><input id="password" type="password" autocomplete="current-password"><button class="button password-eye" type="button" data-password-eye="password" aria-label="Şifreyi göster" aria-pressed="false"></button></div></div><div id="codeFields"><label class="field" for="loginCode">E-posta kodu</label><input id="loginCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10"><button type="button" id="requestCode" class="button">Kod gönder</button><p class="fine">E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.</p></div><p id="loginMessage" role="status"></p><div class="dialog-actions"><button type="button" id="cancelLogin" class="button">Vazgeç</button><button id="loginSubmit" class="button primary" type="submit">Giriş yap</button></div></form><p><a class="text-button" href="./reset.html">Şifremi unuttum</a></p><p class="fine">Bu cihazda oturum açık kalır. Ortak cihazlarda işiniz bitince çıkış yapın.</p>
+ <div class="row-actions"><button type="button" id="useCode" class="button" aria-pressed="false">E-posta kodu</button><button type="button" id="usePassword" class="button" aria-pressed="true">Şifre</button></div>
+ <form id="loginForm"><label class="field">E-posta<input id="email" type="email" required autocomplete="username"></label><div id="passwordFields"><label class="field" for="password">Şifre</label><div class="password-control"><input id="password" type="password" autocomplete="current-password"><button class="button password-eye" type="button" data-password-eye="password" aria-label="Şifreyi göster" aria-pressed="false"></button></div></div><div id="codeFields" hidden><label class="field" for="loginCode">E-posta kodu</label><input id="loginCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10"><button type="button" id="requestCode" class="button">Kod gönder</button><p class="fine">E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.</p></div><p id="loginMessage" role="status"></p><div class="dialog-actions"><button type="button" id="cancelLogin" class="button">Vazgeç</button><button id="loginSubmit" class="button primary" type="submit">Giriş yap</button></div></form><p><a class="text-button" href="./reset.html">Şifremi unuttum</a></p><p class="fine">Bu cihazda oturum açık kalır. Ortak cihazlarda işiniz bitince çıkış yapın.</p>
 </dialog>
 <dialog id="importDialog" aria-labelledby="importTitle">
  <div class="dialog-kicker">DOSYA ÖNİZLEMESİ</div><h2 id="importTitle">Önce kontrol, sonra aktarım.</h2><p class="muted">CSV dosyanızı burada inceleyin. Önizleme yereldir. Kayıt oluşturmak için ayrıca “İçe aktar” düğmesine basın.</p>

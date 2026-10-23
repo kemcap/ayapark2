@@ -1,5 +1,15 @@
 # Ayapark 2
 
+## 3.4
+
+- Default to password login; email codes remain optional.
+- Put clear, colored owner/tenant badges before person names.
+- Add direct occupancy editing and entry/departure editing, including unknown starts.
+- Reject reversed dates with specific translated errors before saving and on the server.
+- Keep confirmed financial claims unchanged when editing occupancy dates.
+- Unknown starts do not automatically assign historic monthly charges.
+
+
 ## 3.3
 
 - Persist verified sessions across reloads and refresh tokens in the background; clear on logout.

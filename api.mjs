@@ -28,7 +28,7 @@ export class AyaparkApi {
  async raw(path,method='GET',body,token) {
   const response=await this.fetcher(URL+path,{method,headers:{apikey:KEY,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',signal:AbortSignal.timeout(15000)});
   const data=await response.json().catch(()=>null);
-  if(!response.ok){const error=Error(path.startsWith('/auth/v1/')&&response.status===400?tr('Kod, e-posta veya şifre geçersiz olabilir. Tekrar kontrol edin.'):response.status===401?tr("Oturum sona erdi. Yeniden giriş yapın."):response.status===429?tr("Çok fazla deneme yapıldı. Biraz sonra tekrar deneyin."):(['P0001','42501'].includes(data?.code)?tr(data.message):tr("İşlem tamamlanamadı. Bağlantıyı, erişimi ve zorunlu alanları kontrol edin.")));error.status=response.status;throw error;}
+  if(!response.ok){const error=Error(data?.code==='23514'&&String(data.message).includes('ay3_links_check')?tr('Çıkış tarihi başlangıç tarihinden önce olamaz.'):response.status===403?tr('Bu işlem için yetkiniz yok.'):path.startsWith('/auth/v1/')&&response.status===400?tr('Kod, e-posta veya şifre geçersiz olabilir. Tekrar kontrol edin.'):response.status===401?tr("Oturum sona erdi. Yeniden giriş yapın."):response.status===429?tr("Çok fazla deneme yapıldı. Biraz sonra tekrar deneyin."):(['P0001','42501'].includes(data?.code)?tr(data.message):tr("İşlem tamamlanamadı. Bağlantıyı, erişimi ve zorunlu alanları kontrol edin.")));error.status=response.status;throw error;}
   return data;
  }
  accept(session,generation){

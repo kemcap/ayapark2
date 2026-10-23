@@ -11,7 +11,11 @@ export function enrichDemo(d){
 }
 export function demoV3(d,action,p){
  const id=()=>randomId(),now=()=>new Date().toISOString();let ident;
- if(action==='person'){
+ if(action==='occupancy'){
+  const u=d.units.find(u=>u.id===p.unit_id);if(!u||!['occupied','vacant','unknown'].includes(p.status))throw Error(tr('Geçerli bir kullanım durumu seçin.'));u.occupancy_status=p.status;
+ }else if(action==='edit_link'){
+  const l=d.links.find(l=>l.id===p.id);if(!l)throw Error(tr('Kayıt bulunamadı.'));if(p.starts_on&&p.ends_on&&p.ends_on<p.starts_on)throw Error(tr('Çıkış tarihi başlangıç tarihinden önce olamaz.'));Object.assign(l,{starts_on:p.starts_on||null,ends_on:p.ends_on||null});
+ }else if(action==='person'){
   const person=d.persons.find(x=>x.id===p.person_id);ident=person?.id||id();const item={...p,id:ident,full_name:(p.first_name+' '+p.last_name).trim()};
   if(person)Object.assign(person,item);else d.persons.push(item);
   if(p.unit_id)demoV3(d,'link',{...p,person_id:ident});
@@ -19,9 +23,9 @@ export function demoV3(d,action,p){
   if(['tenant','representative'].includes(p.role)&&!personLinks(d,p.unit_id,p.starts_on).some(l=>l.role==='owner'))throw Error(tr('Önce ev sahibini ekleyin.'));
   if(p.role==='tenant'&&d.links.some(l=>l.unit_id===p.unit_id&&l.role==='tenant'&&(!l.ends_on||l.ends_on>=p.starts_on)&&(!p.ends_on||l.starts_on<=p.ends_on)))throw Error(tr('Bu tarihlerde başka bir kiracı var.'));
   if(!d.persons.some(x=>x.id===p.person_id))throw Error(tr('Kişi seçin.'));
-  if(!p.starts_on||p.ends_on&&p.ends_on<p.starts_on)throw Error(tr('Tarih aralığını kontrol edin.'));
+  if(!p.starts_on&&!p.start_unknown||p.starts_on&&p.ends_on&&p.ends_on<p.starts_on)throw Error(tr('Tarih aralığını kontrol edin.'));
   ident=id();d.links.push({...p,id:ident});
- }else if(action==='end_link'){const l=d.links.find(l=>l.id===p.id);if(!l||p.ends_on<l.starts_on)throw Error(tr('Tarih aralığını kontrol edin.'));l.ends_on=p.ends_on;
+ }else if(action==='end_link'){const l=d.links.find(l=>l.id===p.id);if(!l||l.starts_on&&p.ends_on<l.starts_on)throw Error(tr('Tarih aralığını kontrol edin.'));l.ends_on=p.ends_on;
  }else if(action==='switch_tenant'){
   const l=d.links.find(l=>l.id===p.id);if(!l||!p.confirmation||!p.ends_on||p.starts_on<=p.ends_on)throw Error(tr('Tarih aralığını kontrol edin.'));
   const old=l.ends_on;l.ends_on=p.ends_on;const personCount=d.persons.length;try{if(!p.person_id){const result=demoV3(d,'person',{first_name:p.first_name,last_name:p.last_name,phone:p.phone,email:p.email,notes:p.notes,language:'tr'});p={...p,person_id:result.id};}demoV3(d,'link',{...p,unit_id:l.unit_id,role:'tenant',ends_on:null});}catch(e){l.ends_on=old;d.persons.splice(personCount);throw e;}
