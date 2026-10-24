@@ -88,3 +88,20 @@ test('vacant occupancy does not hide the existing owner',()=>{
  assert(html.includes('>Boş<'));
  assert(!html.includes('Sakin bilgisi eksik.'));
 });
+
+test('building plan puts B on left and A on right, each ordered from 1 to 10 in row-major order',()=>{
+ const s=sample();
+ s.data.units=[
+  ...Array.from({length:10},(_,i)=>({id:'a'+(10-i),code:'A-'+(10-i),number:10-i,block:'A',occupancy_status:'unknown'})),
+  ...Array.from({length:10},(_,i)=>({id:'b'+(10-i),code:'B-'+(10-i),number:10-i,block:'B',occupancy_status:'unknown'}))
+ ];
+ const html=unitMapV3(s);
+ const bStart=html.indexOf('<h3>B Blok</h3>'),aStart=html.indexOf('<h3>A Blok</h3>');
+ assert(bStart>=0&&aStart>bStart);
+ const b=html.slice(bStart,aStart),a=html.slice(aStart);
+ for(const [segment,block] of [[b,'B'],[a,'A']]){
+  const labels=[...segment.matchAll(/aria-label="([AB]-\\d+)"/g)].map(m=>m[1]);
+  assert.deepEqual(labels,Array.from({length:10},(_,i)=>block+'-'+(i+1)));
+  assert(labels[0]===block+'-1'&&labels.at(-1)===block+'-10');
+ }
+});
