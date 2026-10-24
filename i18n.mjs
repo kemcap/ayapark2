@@ -841,3 +841,14 @@ Object.assign(german,{
 });
 
 Object.assign(german,{'Yanlış atanan rolü kaldırın. Kişi ve banka kayıtları korunur. Portal erişimi ayrı yönetilir. Gerçek taşınma veya görev bitişinde Bağlantıyı bitir seçeneğini kullanın.':'Entferne eine versehentlich zugeordnete Rolle. Die Person und die Bankdaten bleiben erhalten. Portalzugang wird separat verwaltet. Bei tatsächlichem Auszug oder Rollenende stattdessen „Zuordnung beenden“ verwenden.'});
+
+
+Object.assign(german,{
+ 'Başlangıç (isteğe bağlı)':'Beginn (optional)',
+ 'Tarih boş kalırsa başlangıç bilinmiyor olarak kaydedilir.':'Ohne Datumsangabe wird der Beginn als unbekannt gespeichert.',
+ 'Tarih boşsa bugün son oturulan gündür. Daire yarından itibaren boş görünür.':'Ohne Datum ist heute der letzte Wohntag. Ab morgen gilt die Wohnung als unbewohnt.',
+ 'Tarih boşsa değişiklik bugünden itibaren geçerlidir. Geçmiş kayıtlar korunur.':'Ohne Datum gilt die Änderung ab heute. Die bisherige Historie bleibt erhalten.',
+ 'Tarih boşsa bugün rolün son günüdür. Ertesi gün artık güncel görünmez.':'Ohne Datum endet die Rolle heute und ist ab morgen nicht mehr aktuell.',
+ 'Tarihler boşsa eski kiracı bugün çıkar, yeni kiracı yarın başlar. Açık borçlar önceki kişide kalır.':'Ohne Daten endet das bisherige Mietverhältnis heute und das neue beginnt morgen. Alte Forderungen bleiben beim bisherigen Mieter.',
+ 'Geçerli bir başlangıç tarihi girin.':'Bitte ein gültiges Anfangsdatum eingeben.'
+});
