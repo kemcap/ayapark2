@@ -1,6 +1,7 @@
 // Only authored interface text is translated. Stored content is never sent to a service.
 export const german = {
  "İlk kez şifre oluştur": "Erstmals Passwort erstellen",
+ "Şifre oluşturmak için e-postadaki kodu buraya gir. E-postadaki bağlantıyı açma.": "Gib den E-Mail-Code hier ein, um dein Passwort zu erstellen. Öffne nicht den Anmeldelink aus der E-Mail.",
  "Şifre oluştur": "Passwort erstellen",
  "Şifreyi tekrarla": "Passwort wiederholen",
  "E-posta adresin doğrulandı. Bundan sonra şifreyle giriş yapabilirsin.": "Deine E-Mail-Adresse wurde bestätigt. Lege ein Passwort für künftige Anmeldungen fest.",
