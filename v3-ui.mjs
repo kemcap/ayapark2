@@ -26,7 +26,7 @@ function occupancy(u,d){u={...u,occupancy_status:effectiveOccupancy(d,u)};return
 export function unitBalance(s,u){return scopedCharges(s.data).filter(c=>c.unit_id===u.id&&!c.void_reason).reduce((sum,c)=>sum+remaining(s.data,c),0);}
 export function unitCardResidents(d,unitId){
  const day=today();
- const links=personLinks(d,unitId).filter(l=>!l.archived_at&&(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day));
+ const links=personLinks(d,unitId).filter(l=>(d.role!=='resident'||(d.ownPersonIds||[]).includes(l.person_id))&&!l.archived_at&&(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day));
  return ['owner','tenant','representative'].map(role=>{
   const names=[...new Set(links.filter(l=>l.role===role).map(l=>personName(d,l.person_id).trim()).filter(Boolean))];
   return {role,label:role==='representative'?tr('Yetkili kişi'):roleLabel(role),names};

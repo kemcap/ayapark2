@@ -1,8 +1,8 @@
-# Ayapark 2 · V3.14.3
+# Ayapark 2 · V3.15
 
 Browser app with Supabase Auth and row-level data access.
 
-V3.14.3: Apartment history clearly labels former owners, tenants and representatives; outstanding debts appear next to the linked former role for finance-authorized users. A9 database corrections are logged; existing source hint B-9 (EK) is retained in the audit record for verification.
+V3.15: Apartment history clearly labels former owners, tenants and representatives; outstanding debts appear next to the linked former role for finance-authorized users. A9 database corrections are logged; existing source hint B-9 (EK) is retained in the audit record for verification.
 
 
 V3.14.2: B block appears left of A; each block uses two apartment-card columns in ascending number order. The overview's apartment panel is wider while the next-tasks panel is narrower, with responsive stacking for smaller screens. No database records changed.
@@ -48,3 +48,7 @@ Read AUTH-SETUP.md for remaining mail configuration and real-device verification
 The public distribution contains application code and fictitious test data. Bank statements and resident records remain outside the repository. The browser receives only the public client key; permissions are enforced server-side. Role preview does not change memberships or server authorization.
 
 Run `node --test tests/*.test.mjs`. Application assets are in the repository root. GitHub Pages uses the root distribution and preserves the original application under `old/`.
+
+### Datenbank- und Ladeleistung (V3.15)
+
+Messwerte, sichere Migration, Regressionstests und Backup-Grenzen: [PERFORMANCE.md](PERFORMANCE.md). Die produktive Migration ändert ausschließlich Lese-Policies und eine interne Prüfsignatur-Abfrage, keine Anwendungsdaten.
