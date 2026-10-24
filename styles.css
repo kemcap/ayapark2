@@ -1594,3 +1594,7 @@ dialog #detailTitle:focus{outline:none}
 @media(max-width:1350px){.main-grid.overview-main-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:760px){.unit-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.unit-card-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* V3.14.3: Keep former-person balances visible in relationship history. */
+.former-person-debt{margin:9px 0;padding:9px 11px;border-left:3px solid var(--primary);background:var(--info-bg);color:var(--info-ink);border-radius:5px;font-size:.88rem;overflow-wrap:anywhere}
+.former-person-debt strong{font-weight:700}

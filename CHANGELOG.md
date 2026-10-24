@@ -1,3 +1,10 @@
+## V3.14.3 · 2026-10-24
+
+- Apartment history labels now distinguish former owners, tenants and authorized representatives. Their outstanding debts remain attributed to the former person and appear only to finance-authorized users.
+- The archive action explains that its history preserves relations; incorrect entries require a separate permanent correction.
+- On A9, erroneous historical Abdullah Çınar and Fatima Özçelik owner links were erased in Supabase with audit records; Muneeb Ansari is archived as a former tenant, with his 6,620 TL enforcement claim linked to his old role and the original B-9 source hint retained for verification.
+- Client scripts and styles updated to V3.14.3.
+
 ## V3.14.2 · 2026-10-24
 
 - Show B block on the left and A block on the right in Overview and Apartments; list B1–B10 and A1–A10 row by row in two card columns per block.

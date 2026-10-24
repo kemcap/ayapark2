@@ -1,6 +1,9 @@
-# Ayapark 2 · V3.14.2
+# Ayapark 2 · V3.14.3
 
 Browser app with Supabase Auth and row-level data access.
+
+V3.14.3: Apartment history clearly labels former owners, tenants and representatives; outstanding debts appear next to the linked former role for finance-authorized users. A9 database corrections are logged; existing source hint B-9 (EK) is retained in the audit record for verification.
+
 
 V3.14.2: B block appears left of A; each block uses two apartment-card columns in ascending number order. The overview's apartment panel is wider while the next-tasks panel is narrower, with responsive stacking for smaller screens. No database records changed.
 

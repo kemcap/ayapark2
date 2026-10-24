@@ -16,7 +16,7 @@ export function buildAssignmentForm(d,action,args={}){
  const intro=`<p class="assignment-context"><strong>${e(unitName)}</strong>${p?' · '+e(p.full_name):''}${role?' · '+e(tr(role)):''}</p>`;
  let title,body;
  if(action==='assignment_remove'){
-  title=tr('Kişi rolünü kaldır');body=intro+select('reason','Kaldırma nedeni',[['','Neden seçin'],...removalReasons(l.role)])+`<div id="removalNote" hidden>${field('note','Not (isteğe bağlı)','text','','maxlength="500"')}</div><p class="fine">${tr('Yalnızca bu rol kaldırılır. Kişi kaydı, diğer roller, borçlar ve ödemeler korunur.')}</p>`;
+  title=tr('Rolü geçmişe taşı');body=intro+select('reason','Geçmişe taşıma nedeni',[['','Neden seçin'],...removalReasons(l.role)])+`<div id="removalNote" hidden>${field('note','Not (isteğe bağlı)','text','','maxlength="500"')}</div><p class="fine">${tr('Bu işlem ilişkiyi eski rol olarak geçmişe taşır. Açık borçlar ilgili eski kişide kalır. Yanlışlıkla eklenen kayıtlar da geçmişte saklanır; tamamen silinmeleri ayrı bir düzeltmedir.')}</p>`;
  }else if(action==='assignment_restore'){
   title=tr('Rolü geri getir');body=intro+`<p>${tr('Bu rol yeniden güncel olarak eklenecek. Önceki kayıt geçmişte korunur.')}</p>`;
  }else if(action==='assignment_edit'){

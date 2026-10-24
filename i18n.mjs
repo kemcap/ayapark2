@@ -1039,3 +1039,15 @@ Object.assign(german,{'Açık konu yok':'Keine offenen Klärungspunkte'});
 Object.assign(german,{'Klasik (standart)':'Klassisch (Standard)','Standart renklere dön':'Farbwelt auf Standard zurücksetzen','Para tutarlarını gizle':'Geldbeträge ausblenden','Tutarlar bulanık görünür. Görmek için tutara dokunun. Borç ve ödemeler değişmez.':'Beträge werden unscharf angezeigt. Zum Anzeigen den Betrag antippen. Forderungen und Zahlungen bleiben unverändert.'});
 
 Object.assign(german,{"Yüksek kontrast": "Hoher Kontrast", "Renkleri koruyarak yazı ve kontrolleri belirginleştirir.": "Verstärkt Texte und Bedienelemente und erhält die Farbwelt.", "Yazı, renk ve kontrolleri burada deneyin.": "Hier kannst du Schrift, Farben und Bedienelemente beurteilen.", "Etkin": "Aktiv", "Örnek alan": "Beispielfeld", "Bilgi örneği": "Beispielhinweis", "Standart görünüm": "Standardeinstellungen", "Bu bölümdeki tüm tercihleri sıfırlar. Dil Türkçe, tema otomatik olur.": "Setzt alle Einstellungen dieses Bereichs zurück: Sprache Türkisch, Darstellung automatisch.", "Standarda sıfırla": "Auf Standard zurücksetzen"});
+
+Object.assign(german,{
+ 'Eski ev sahibi':'Ehemaliger Eigentümer',
+ 'Eski kiracı':'Ehemaliger Mieter',
+ 'Eski yetkili kişi':'Ehemalige bevollmächtigte Person',
+ 'Eski kişi':'Ehemalige Person',
+ 'Eski kişiye ait açık borç':'Offene Forderung der früheren Person',
+ 'Geçmişe taşı':'Ins Archiv verschieben',
+ 'Rolü geçmişe taşı':'Rolle ins Archiv verschieben',
+ 'Geçmişe taşıma nedeni':'Grund für die Archivierung',
+ 'Bu işlem ilişkiyi eski rol olarak geçmişe taşır. Açık borçlar ilgili eski kişide kalır. Yanlışlıkla eklenen kayıtlar da geçmişte saklanır; tamamen silinmeleri ayrı bir düzeltmedir.':'Diese Zuordnung wird mit ihrer bisherigen Rolle archiviert. Offene Forderungen bleiben der früheren Person zugeordnet. Auch versehentliche Einträge bleiben zunächst in der Historie; die vollständige Löschung ist eine separate Korrektur.'
+});

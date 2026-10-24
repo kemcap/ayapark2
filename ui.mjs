@@ -1,7 +1,7 @@
 import {settingsPage} from './settings-ui.mjs';
 import {effectiveOccupancy} from './relationships.mjs';
 import {peoplePage} from './people-ui.mjs';
-import {charges,duesV3,directoryV3,overviewV3,bankV3,reportV3,announcementsV3,providersV3,filteredUnitsV3,unitDetailV3,transactionDetailV3,transactionTableV3} from './v3-ui.mjs?v=3.14.2';
+import {charges,duesV3,directoryV3,overviewV3,bankV3,reportV3,announcementsV3,providersV3,filteredUnitsV3,unitDetailV3,transactionDetailV3,transactionTableV3} from './v3-ui.mjs?v=3.14.3';
 import {t as tr,locale} from './i18n.mjs';
 import {escapeHtml as e,money,roleName} from './core.mjs';
 import {paid,remaining,unassigned,monthlySummary,withLedgerIndex} from './ledger.mjs';
