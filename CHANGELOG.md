@@ -1,3 +1,12 @@
+## V3.12 · 2026-10-24
+
+- Replace apartment transfer wizards and three add buttons with one searchable person/role form. Direct editing supports role changes and an additional role without ending/recreating relationships manually.
+- Add explicit current/archived link state, technical revision/timestamps and role-specific removal reasons. Preserve persons, other assignments, original financial links, memberships and authentication identities. Archived roles can be restored.
+- Remove owner coverage, single-tenant and historic overlap gates from current assignment writes. Optional dates are annotations; occupancy remains separate.
+- Show actual unpaid charge categories next to apartment balances, with “Mehrere Posten” for mixed categories. Information panels separate ordinary debts from concrete clarification issues and candidate unmatched payments; all use permitted source data.
+- Use “Saldo prüfen” in German. Preserve dark mode and fix narrow-form controls. Refresh apartment/person details after writes.
+- Validation: 82 Node tests; 26 authenticated rolled-back SQL assertions; German/Turkish desktop/mobile browser scenarios. Production finance, person, membership and unit checksums are unchanged.
+
 ## V3.10 · 2026-10-23
 
 - Replace separate relationship date/switch actions with a guided change form, available from apartment and person editing in German and Turkish.

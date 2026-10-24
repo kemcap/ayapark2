@@ -1508,13 +1508,6 @@ dialog #detailTitle:focus{outline:none}
 @media(prefers-reduced-motion:reduce){#refreshButton .icon{animation:none!important}}
 @media(max-width:600px){.header-actions .header-icon{width:36px;min-width:36px;padding:7px}.theme-options{right:-44px}}
 
-/* Guided relationship changes must fit narrow phone dialogs and long names. */
-#relationshipEditor,#relationshipFields,#relationshipReview{min-width:0;max-width:100%;overflow-wrap:anywhere}
-#relationshipEditor .field{min-width:0}
-#relationshipEditor select,#relationshipEditor input:not([type="checkbox"]){min-width:0;width:100%;max-width:100%;box-sizing:border-box}
-#relationshipEditor select{min-height:44px;text-overflow:ellipsis}
-#relationshipReview ul{padding-inline-start:1.2rem}
-
 /* Mobile nav: one full-width in-flow submenu instead of overlapping absolute popovers. */
 #nav .nav-group-toggle{width:100%;min-height:48px;padding:12px;display:flex;align-items:center;gap:10px;border:0;border-radius:12px;background:transparent;color:var(--nav-text);font:inherit;font-size:13px;font-weight:550;text-align:left;cursor:pointer;white-space:normal;overflow-wrap:anywhere}
 #nav .nav-group-toggle:hover{background:var(--nav-hover)}
@@ -1525,3 +1518,14 @@ dialog #detailTitle:focus{outline:none}
 #nav .nav-submenu a{min-height:44px;padding:10px 12px;display:flex;align-items:center;border-radius:8px;overflow-wrap:anywhere}
 #nav .nav-submenu a[aria-current="page"]{background:var(--nav-active);color:var(--nav-active-ink);font-weight:700}
 @media(max-width:1000px){.sidebar #nav>.nav-group>.nav-group-toggle{min-height:64px;padding:9px 3px;display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;font-size:.72rem;line-height:1.3;text-align:center}.sidebar #nav .nav-submenu{position:static;inset:auto;z-index:auto;width:auto;max-width:100%;box-shadow:none}.sidebar #nav .nav-submenu a{font-size:.9rem;min-height:44px}}
+
+/* Direct person and apartment-role editing, including narrow smartphone dialogs. */
+.assignment-form,.assignment-form .field{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.assignment-form input:not([type="radio"]),.assignment-form select,.assignment-form textarea{width:100%;min-width:0;max-width:100%;box-sizing:border-box;font:inherit}
+.assignment-form select{min-height:44px;text-overflow:ellipsis}
+.person-choice{display:grid;gap:12px;border:1px solid var(--line);border-radius:12px;padding:14px;margin:16px 0}
+.person-choice legend{font-weight:600}.person-choice label{display:flex;align-items:center;gap:8px}
+.person-choice input{width:auto;flex:0 0 auto}.assignment-more,.assignment-history{margin:18px 0}.assignment-more summary,.assignment-history summary{cursor:pointer;min-height:40px;padding:8px 0}
+.assignment-more[open]{padding-bottom:8px}.assignment-card .row{flex-wrap:wrap}.assignment-card p{overflow-wrap:anywhere}
+.apartment-balance .debt-category{font-size:.67em;font-weight:400;color:var(--muted);line-height:1.5;white-space:normal}
+.debt-information summary{color:var(--muted)}.tooltip-body h4{margin:8px 0}.tooltip-body li{margin-bottom:7px;overflow-wrap:anywhere}

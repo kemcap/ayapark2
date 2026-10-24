@@ -3,7 +3,7 @@ import {summarize} from './core.mjs';
 import {t as tr} from './i18n.mjs';
 export const norm=s=>String(s||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').replace(/[^a-z0-9]/g,'');
 export const today=()=>new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'});
-export const activeAt=(l,day=today())=>l.active!==false&&(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day);
+export const activeAt=(l,day=today())=>typeof l.active==='boolean'?l.active:(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day);
 export const personName=(d,id)=>d.persons?.find(p=>p.id===id)?.full_name||'';
 export function personLinks(d,unit,day=today()){return (d.links||[]).filter(l=>(!unit||l.unit_id===unit)&&activeAt(l,day));}
 export function scopedCharges(d){return d.role==='resident'?d.charges.filter(c=>c.person_id&&(d.ownPersonIds||[]).includes(c.person_id)):d.charges;}
