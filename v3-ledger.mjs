@@ -1,4 +1,4 @@
-import {applyRelationshipDemo} from './relationships.mjs';
+import {applyRelationshipDemo,tenantOwnerCovered} from './relationships.mjs';
 import {randomId} from './core.mjs';
 import {t as tr} from './i18n.mjs';
 import {activeAt,personLinks,today,effectivePayer,buildSummaryDays,creditAvailable} from './v3-domain.mjs';
@@ -16,18 +16,35 @@ export function demoV3(d,action,p){
  if(action==='occupancy'){
   const u=d.units.find(u=>u.id===p.unit_id);if(!u||!['occupied','vacant','unknown'].includes(p.status))throw Error(tr('Geçerli bir kullanım durumu seçin.'));u.occupancy_status=p.status;d.occupancyChanges=[...(d.occupancyChanges||[]).filter(x=>x.unit_id!==u.id||x.effective_on!==today()),{unit_id:u.id,effective_on:today(),status:p.status}];
  }else if(action==='edit_link'){
-  const l=d.links.find(l=>l.id===p.id);if(!l)throw Error(tr('Kayıt bulunamadı.'));if(p.starts_on&&p.ends_on&&p.ends_on<p.starts_on)throw Error(tr('Çıkış tarihi başlangıç tarihinden önce olamaz.'));Object.assign(l,{starts_on:p.starts_on||null,ends_on:p.ends_on||null});
+  const l=d.links.find(l=>l.id===p.id);if(!l)throw Error(tr('Kayıt bulunamadı.'));
+  const starts=p.start_unknown?null:p.starts_on||null,ends=p.ends_on||null;
+  if(!starts&&!p.start_unknown)throw Error(tr('Başlangıç tarihini girin veya bilinmiyor seçin.'));
+  if(starts&&ends&&ends<starts)throw Error(tr('Çıkış tarihi başlangıç tarihinden önce olamaz.'));
+  const revised=d.links.map(x=>x.id===l.id?{...x,starts_on:starts,ends_on:ends}:x);
+  if(revised.some(x=>x.id!==l.id&&x.unit_id===l.unit_id&&
+    ((x.person_id===l.person_id&&x.role===l.role)||(x.role==='tenant'&&l.role==='tenant'))&&
+    (!ends||!x.starts_on||ends>=x.starts_on)&&(!x.ends_on||!starts||x.ends_on>=starts)))
+   throw Error(tr('Bu dönemde çakışan bir kayıt var. Kiracı değişimi seçin veya tarihleri düzeltin.'));
+  if(['owner','tenant'].includes(l.role)&&!tenantOwnerCovered(revised,l.unit_id))
+   throw Error(tr('Bu dönemin tamamı için ev sahibi kaydı gerekli. Önce ev sahibi bilgisini kontrol edin.'));
+  Object.assign(l,{starts_on:starts,ends_on:ends});
  }else if(action==='person'){
   const person=d.persons.find(x=>x.id===p.person_id);ident=person?.id||id();const item={...p,id:ident,full_name:(p.first_name+' '+p.last_name).trim()};
   if(person)Object.assign(person,item);else d.persons.push(item);
   if(p.unit_id)demoV3(d,'link',{...p,person_id:ident});
  }else if(action==='link'){
-  if(p.role==='tenant'&&!personLinks(d,p.unit_id,p.starts_on||today()).some(l=>l.role==='owner'))throw Error(tr('Önce ev sahibini ekleyin.'));
-  if(p.role==='tenant'&&d.links.some(l=>l.unit_id===p.unit_id&&l.role==='tenant'&&(!l.ends_on||l.ends_on>=p.starts_on)&&(!p.ends_on||l.starts_on<=p.ends_on)))throw Error(tr('Bu tarihlerde başka bir kiracı var.'));
   if(!d.persons.some(x=>x.id===p.person_id))throw Error(tr('Kişi seçin.'));
-  if(!p.starts_on&&!p.start_unknown||p.starts_on&&p.ends_on&&p.ends_on<p.starts_on)throw Error(tr('Tarih aralığını kontrol edin.'));
-  ident=id();d.links.push({...p,id:ident});
-  }else if(action==='unlink'){
+  const starts=p.start_unknown?null:p.starts_on||null,ends=p.ends_on||null;
+  if(!starts&&!p.start_unknown||starts&&ends&&ends<starts)throw Error(tr('Tarih aralığını kontrol edin.'));
+  if(d.links.some(l=>l.unit_id===p.unit_id&&
+     ((l.person_id===p.person_id&&l.role===p.role)||(l.role==='tenant'&&p.role==='tenant'))&&
+     (!ends||!l.starts_on||ends>=l.starts_on)&&(!l.ends_on||!starts||l.ends_on>=starts)))
+   throw Error(tr('Bu tarihlerde başka bir kiracı var.'));
+  ident=id();const candidate={...p,id:ident,starts_on:starts,ends_on:ends};
+  if(p.role==='tenant'&&!tenantOwnerCovered([...d.links,candidate],p.unit_id))
+   throw Error(tr('Bu dönemin tamamı için ev sahibi kaydı gerekli. Önce ev sahibi bilgisini kontrol edin.'));
+  d.links.push(candidate);
+ }else if(action==='unlink'){
   if(d.audit.some(x=>x.action==='unlink'&&x.details?.request_id===p.request_id))return {ok:true,already_recorded:true};
   const l=d.links.find(x=>x.id===p.id);
   if(!l||p.expected!==JSON.stringify([l.id,l.person_id,l.unit_id,l.role,l.starts_on||null,l.ends_on||null]))throw Error(tr('Kayıt başka bir işlemde değişti. Görünümü yenileyip tekrar kontrol edin.'));
@@ -39,7 +56,13 @@ export function demoV3(d,action,p){
   d.links=d.links.filter(x=>x.id!==l.id);
   d.audit.unshift({id:id(),action:'unlink',at:new Date().toISOString(),details:{reason:p.reason,request_id:p.request_id,before:{...l}}});
   return {ok:true};
- }else if(action==='end_link'){const l=d.links.find(l=>l.id===p.id);if(!l||l.starts_on&&p.ends_on<l.starts_on)throw Error(tr('Tarih aralığını kontrol edin.'));l.ends_on=p.ends_on;
+  }else if(action==='end_link'){
+  const l=d.links.find(l=>l.id===p.id);
+  if(!l||!p.ends_on||l.starts_on&&p.ends_on<l.starts_on)throw Error(tr('Tarih aralığını kontrol edin.'));
+  const planned=d.links.map(x=>x.id===l.id?{...x,ends_on:p.ends_on}:x);
+  if(['owner','tenant'].includes(l.role)&&!tenantOwnerCovered(planned,l.unit_id))
+   throw Error(tr('Bu dönemin tamamı için ev sahibi kaydı gerekli. Önce ev sahibi bilgisini kontrol edin.'));
+  l.ends_on=p.ends_on;
  }else if(action==='switch_tenant'){
   const l=d.links.find(l=>l.id===p.id);if(!l||!p.confirmation||!p.ends_on||p.starts_on<=p.ends_on)throw Error(tr('Tarih aralığını kontrol edin.'));
   const old=l.ends_on;l.ends_on=p.ends_on;const personCount=d.persons.length;try{if(!p.person_id){const result=demoV3(d,'person',{first_name:p.first_name,last_name:p.last_name,phone:p.phone,email:p.email,notes:p.notes,language:'tr'});p={...p,person_id:result.id};}demoV3(d,'link',{...p,unit_id:l.unit_id,role:'tenant',ends_on:null});}catch(e){l.ends_on=old;d.persons.splice(personCount);throw e;}

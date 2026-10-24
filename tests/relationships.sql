@@ -127,6 +127,37 @@ BEGIN
  p:=jsonb_build_object('request_id',gen_random_uuid(),'id',lid,'expected','[]','reason','Incorrect role','confirmation',true);
  failed:=false;BEGIN PERFORM public.ay2_command(s,'unlink',p);EXCEPTION WHEN raise_exception THEN failed:=true;END;
  INSERT INTO pg_temp.qa_relationship_results VALUES('stale unlink rejected',failed);
+
+ -- Legacy path: owner start cannot move past continuing tenant.
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=7;
+ SELECT id INTO lid FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='owner';
+ SELECT id INTO tid FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='tenant';
+ failed:=false;BEGIN PERFORM public.ay2_command(s,'edit_link',jsonb_build_object('id',lid,'starts_on','2027-01-01'));EXCEPTION WHEN raise_exception THEN failed:=true;END;
+ INSERT INTO pg_temp.qa_relationship_results SELECT 'legacy owner start cannot move after tenant',failed AND starts_on='2022-01-01' FROM public.ay3_links WHERE id=lid;
+ failed:=false;BEGIN PERFORM public.ay2_command(s,'edit_link',jsonb_build_object('id',tid,'starts_on','2020-01-01'));EXCEPTION WHEN raise_exception THEN failed:=true;END;
+ INSERT INTO pg_temp.qa_relationship_results SELECT 'legacy tenant start cannot predate owner',failed AND starts_on='2026-01-01' FROM public.ay3_links WHERE id=tid;
+ failed:=false;BEGIN PERFORM public.ay2_command(s,'edit_link',jsonb_build_object('id',tid,'start_unknown',true));EXCEPTION WHEN raise_exception THEN failed:=true;END;
+ INSERT INTO pg_temp.qa_relationship_results SELECT 'legacy tenant unknown start needs owner coverage',failed AND starts_on='2026-01-01' FROM public.ay3_links WHERE id=tid;
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=8;
+ failed:=false;BEGIN PERFORM public.ay2_command(s,'link',jsonb_build_object('unit_id',u,'person_id',b,'role','tenant','start_unknown',true));EXCEPTION WHEN raise_exception THEN failed:=true;END;
+ INSERT INTO pg_temp.qa_relationship_results VALUES('legacy link unknown tenant start blocked',failed AND NOT EXISTS(SELECT 1 FROM public.ay3_links WHERE unit_id=u AND role='tenant'));
+ -- Adjacent owner intervals can collectively cover a tenant even when neither owner individually does.
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=5;
+ PERFORM public.ay2_command(s,'link',jsonb_build_object('unit_id',u,'person_id',o,'role','owner','starts_on','2025-01-01','ends_on','2025-12-31'));
+ PERFORM public.ay2_command(s,'link',jsonb_build_object('unit_id',u,'person_id',b,'role','owner','starts_on','2026-01-01'));
+ failed:=false;BEGIN PERFORM public.ay2_command(s,'link',jsonb_build_object('unit_id',u,'person_id',t,'role','tenant','starts_on','2025-08-01'));EXCEPTION WHEN raise_exception THEN failed:=true;END;
+ INSERT INTO pg_temp.qa_relationship_results VALUES('legacy tenant can cross contiguous owner periods',NOT failed AND EXISTS(SELECT 1 FROM public.ay3_links WHERE unit_id=u AND role='tenant' AND person_id=t));
+ -- Truly unknown owner start covers an unknown tenant start.
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=8;
+ SELECT id INTO lid FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='owner';
+ PERFORM public.ay2_command(s,'edit_link',jsonb_build_object('id',lid,'start_unknown',true));
+ failed:=false;BEGIN PERFORM public.ay2_command(s,'link',jsonb_build_object('unit_id',u,'person_id',b,'role','tenant','start_unknown',true));EXCEPTION WHEN raise_exception THEN failed:=true;END;
+ INSERT INTO pg_temp.qa_relationship_results VALUES('unknown tenant start accepted with unknown owner start',NOT failed AND EXISTS(SELECT 1 FROM public.ay3_links WHERE unit_id=u AND role='tenant' AND starts_on IS NULL));
+ -- Extending owner history earlier must remain possible.
+ SELECT id INTO u FROM public.site_units WHERE site_id=s AND number=7;
+ SELECT id INTO lid FROM public.ay3_links WHERE site_id=s AND unit_id=u AND role='owner';
+ failed:=false;BEGIN PERFORM public.ay2_command(s,'edit_link',jsonb_build_object('id',lid,'starts_on','2020-01-01'));EXCEPTION WHEN raise_exception THEN failed:=true;END;
+ INSERT INTO pg_temp.qa_relationship_results SELECT 'moving owner start earlier stays permitted',NOT failed AND starts_on='2020-01-01' FROM public.ay3_links WHERE id=lid;
  -- Site isolation and permission checks are enforced by the server.
  PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',gen_random_uuid(),'role','authenticated')::text,true);
  failed:=false;BEGIN PERFORM public.ay2_command(s,'relationship_change',p||jsonb_build_object('request_id',gen_random_uuid()));EXCEPTION WHEN insufficient_privilege THEN failed:=true;END;
