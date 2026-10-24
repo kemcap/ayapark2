@@ -37,7 +37,7 @@ export function takeRecoveryLocation(location,history){
  const query=new URLSearchParams(location.search);
  const payload={accessToken:hash.get('access_token'),refreshToken:hash.get('refresh_token'),tokenHash:query.get('token_hash'),type:hash.get('type')||query.get('type')};
  const error=hash.has('error')||query.has('error')||hash.has('error_code')||query.has('error_code');
- const present=error||!!(payload.accessToken||payload.refreshToken||payload.tokenHash||query.has('code'));
+ const present=error||payload.type==='recovery'||!!(payload.accessToken||payload.refreshToken||payload.tokenHash||query.has('code'));
  // Remove credentials even when the link is invalid, before any network call or render.
  if(location.hash||location.search)history.replaceState(null,'',location.pathname);
  return {payload,error,present};
