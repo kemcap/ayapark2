@@ -1,5 +1,13 @@
 // Only authored interface text is translated. Stored content is never sent to a service.
 export const german = {
+ "Bağlantı geçersiz veya süresi dolmuş. Yeni bir bağlantı iste veya e-postadaki kodu kullan.": "Der Link ist ungültig oder abgelaufen. Fordere einen neuen Link an oder verwende den Code aus der E-Mail.",
+ "Kod doğrulanıyor…": "Code wird überprüft …",
+ "Kod geçersiz veya süresi dolmuş. Yeni bir kod iste.": "Der Code ist ungültig oder abgelaufen. Fordere einen neuen an.",
+ "Kod doğrulanamadı. Lütfen tekrar dene.": "Code konnte nicht bestätigt werden. Bitte erneut versuchen.",
+ "Bağlantı çalışmıyorsa e-postadaki doğrulama kodunu kullanın.": "Funktioniert der Link nicht, verwende den Code aus der E-Mail.",
+ "Doğrulama kodu": "Bestätigungscode",
+ "Kodu doğrula": "Code bestätigen",
+
  "İlk kez şifre oluştur": "Erstmals Passwort erstellen",
  "Şifre oluşturmak için e-postadaki kodu buraya gir. E-postadaki bağlantıyı açma.": "Gib den E-Mail-Code hier ein, um dein Passwort zu erstellen. Öffne nicht den Anmeldelink aus der E-Mail.",
  "Şifre oluştur": "Passwort erstellen",

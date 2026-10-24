@@ -10,9 +10,20 @@ $('recoveryLanguage').addEventListener('click',()=>{setLanguage(getLanguage()===
 $('requestResetForm').addEventListener('submit',async event=>{
  event.preventDefault();if(busy)return;busy=true;$('requestResetButton').disabled=true;
  message('Bağlantı gönderiliyor…');
- try{await api.requestReset($('recoveryEmail').value.trim(),new URL('./reset.html',location.href).href);message('Bu adresle kayıtlı bir hesap varsa yenileme bağlantısı gönderildi. Gelen kutunu ve spam klasörünü kontrol et.');}
+ try{await api.requestReset($('recoveryEmail').value.trim(),new URL('./reset.html',location.href).href);$('recoveryCodeEmail').value=$('recoveryEmail').value.trim();$('verifyRecoveryCodeForm').hidden=false;message('Bu adresle kayıtlı bir hesap varsa yenileme bağlantısı gönderildi. Gelen kutunu ve spam klasörünü kontrol et.');}
  catch(error){message(error.status===429?'Çok fazla deneme yapıldı. Biraz sonra tekrar deneyin.':'Bağlantı gönderilemedi. Biraz sonra tekrar dene.',true);}
  finally{busy=false;$('requestResetButton').disabled=false;}
+});
+$('verifyRecoveryCodeForm').addEventListener('submit',async event=>{
+ event.preventDefault();if(busy)return;busy=true;$('verifyRecoveryCodeButton').disabled=true;
+ message('Kod doğrulanıyor…');
+ try{
+  await api.beginWithEmailCode($('recoveryCodeEmail').value.trim(),$('recoveryCode').value.trim());
+  phase='verified';$('requestResetForm').hidden=true;$('verifyRecoveryCodeForm').hidden=true;
+  $('newPasswordForm').hidden=false;$('recoveryHelp').textContent=tr('Yeni şifreni belirle.');
+  message('');$('newPassword').focus();
+ }catch(error){message(error.status===400||error.status===401?'Kod geçersiz veya süresi dolmuş. Yeni bir kod iste.':'Kod doğrulanamadı. Lütfen tekrar dene.',true);}
+ finally{busy=false;$('verifyRecoveryCodeButton').disabled=false;}
 });
 $('newPasswordForm').addEventListener('submit',async event=>{
  event.preventDefault();if(busy||completed)return;
@@ -30,5 +41,5 @@ if(incoming.present){
   if(incoming.error)throw Error('Expired link');
   await api.begin(incoming.payload);
   phase='verified';$('recoveryHelp').textContent=tr('Yeni şifreni belirle.');$('newPasswordForm').hidden=false;message('');$('newPassword').focus();
- }catch{api.clear();$('requestResetForm').hidden=false;message('Bağlantı geçersiz veya süresi dolmuş. Yeni bir bağlantı iste.',true);}
+ }catch{api.clear();$('requestResetForm').hidden=false;$('verifyRecoveryCodeForm').hidden=false;message('Bağlantı geçersiz veya süresi dolmuş. Yeni bir bağlantı iste veya e-postadaki kodu kullan.',true);}
 }

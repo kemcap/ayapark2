@@ -1,6 +1,8 @@
-# Ayapark 2 · V3.13.3
+# Ayapark 2 · V3.13.4
 
 Browser app with Supabase Auth and row-level data access.
+
+V3.13.4: Replaces the upper-left generic building icon with a 3 KB 96x96 WebP photo thumbnail; adds a recovery OTP fallback to the reset form and email template for cases where a reset link expires or redirects incorrectly. The published Supabase email template and Auth URL allowlist must still be configured in the dashboard, and the separate GPT preview is not automatically synchronized.
 
 - Current app: https://kemcap.github.io/ayapark2/
 - Archived original: https://kemcap.github.io/ayapark2/old/

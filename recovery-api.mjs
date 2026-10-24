@@ -22,6 +22,14 @@ export class RecoveryApi extends AyaparkApi {
   this.recovery=true;
   return session.user;
  }
+ async beginWithEmailCode(email,code){
+  this.clear();
+  const generation=this.generation;
+  if(!email||!/^[0-9]{6,10}$/.test(String(code)))throw Error('Invalid recovery verification code');
+  const session=await this.raw('/auth/v1/verify','POST',{email,token:String(code),type:'recovery'});
+  this.accept(session,generation);this.recovery=true;
+  return session.user;
+ }
  async savePassword(password){
   if(!this.recovery)throw Error('No verified recovery session');
   const generation=this.generation,token=await this.token();
