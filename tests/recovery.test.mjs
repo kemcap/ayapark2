@@ -38,6 +38,12 @@ test('a recovery callback with missing credentials produces a visible invalid-li
  assert.equal(result.payload.type,'recovery');
 });
 
+test('numeric email recovery codes verify with the recovery type',async()=>{
+ const {api,calls}=client([{access_token:'a',refresh_token:'r',expires_in:3600,user:{id:'u'}}]);
+ await api.beginWithEmailCode('sample@example.invalid','123456');
+ assert.equal(JSON.parse(calls[0].body).type,'recovery');
+ assert.equal(api.recovery,true);
+});
 test('verified recovery updates password once and clears the session',async()=>{
  const {api,calls}=client([{id:'verified-user'}, {id:'verified-user'}, {}]);
  await api.begin({accessToken:'access',refreshToken:'refresh',type:'recovery'});
