@@ -2,7 +2,7 @@ import {t as tr} from './i18n.mjs';
 import {money} from './core.mjs';
 import {can} from './ui.mjs';
 import {remaining,unassigned} from './ledger.mjs';
-import {scopedCharges,personLinks,personName,suggestUnits,creditAvailable} from './v3-domain.mjs';
+import {scopedCharges,personLinks,personName,suggestUnits,creditAvailable,isReversed} from './v3-domain.mjs';
 import {analyzeStage} from './reconcile.mjs';
 export const openUnitCharges=(s,u)=>scopedCharges(s.data).filter(c=>c.unit_id===u.id&&!c.void_reason&&remaining(s.data,c)>0);
 export function unitDebtCategory(s,u){const kinds=[...new Set(openUnitCharges(s,u).map(c=>c.category||'Tür belirtilmedi'))];return kinds.length>1?tr('Birden fazla kalem'):kinds.length?tr(kinds[0]):'';}
@@ -35,7 +35,7 @@ export function apartmentInfo(s,u){
    }
   }
   for(const t of d.transactions||[]){
-   if(t.cents<=0||t.reversal_of||d.transactions.some(x=>x.reversal_of===t.id))continue;
+   if(t.cents<=0||t.reversal_of||isReversed(d,t))continue;
    const available=unassigned(d,t)-creditAvailable(d,t);if(available<=0)continue;
    const suggestion=suggestUnits(d,t);if(!suggestion.unitIds.includes(u.id))continue;
    add('payment',t.id,tr(suggestion.ambiguous?'Ödemenin dairesi kesinleşmedi.':'Ödeme henüz bir borçla eşleştirilmedi.')+' '+money(available)+' · '+t.date+' · '+String(t.desc||'').slice(0,120),tr('Ödeme girişi'),available,'transaction',{id:t.id},true);

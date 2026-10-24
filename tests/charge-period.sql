@@ -23,7 +23,7 @@ BEGIN
  r:=public.ay2_command(s,'charge',p);
  INSERT INTO pg_temp.qa_period_results SELECT 'unbound charge keeps both period dates',period_from='2026-10-01'::date AND period_to='2026-10-31'::date AND person_id IS NULL FROM public.ay2_charges WHERE id=(r->>'id')::uuid;
  r:=public.ay2_command(s,'person',jsonb_build_object('first_name','QA','last_name','Owner'));pid:=(r->>'id')::uuid;
- r:=public.ay2_command(s,'link',jsonb_build_object('unit_id',u,'person_id',pid,'role','owner','starts_on','2026-01-01'));lid:=(r->>'id')::uuid;
+ r:=public.ay2_command(s,'link',jsonb_build_object('request_id',gen_random_uuid(),'unit_id',u,'person_id',pid,'role','owner','starts_on','2026-01-01'));lid:=(r->>'id')::uuid;
  r:=public.ay2_command(s,'charge',p||jsonb_build_object('reference','QA-bound','link_id',lid));
  INSERT INTO pg_temp.qa_period_results SELECT 'bound charge keeps dates and person',period_from='2026-10-01'::date AND period_to='2026-10-31'::date AND person_id=pid AND link_id=lid FROM public.ay2_charges WHERE id=(r->>'id')::uuid;
  r:=public.ay2_command(s,'charge',p||jsonb_build_object('reference','QA-empty','period_from',null,'period_to',null));

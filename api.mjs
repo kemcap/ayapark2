@@ -87,11 +87,14 @@ export class AyaparkApi {
   const result=await this.raw('/rest/v1/rpc/'+name,'POST',body,token);
   if(generation!==this.generation)throw Error(tr("Oturum değişti."));return result;
  }
- async readAll(table,query){let out=[];for(let offset=0;;offset+=1000){const rows=await this.read(table,query+'&limit=1000&offset='+offset);out.push(...rows);if(rows.length<1000)return out;}}
+ async readAll(table,query){const generation=this.generation;let out=[];for(let offset=0;;offset+=1000){const rows=await this.read(table,query+'&limit=1000&offset='+offset);if(generation!==this.generation)throw Error(tr("Oturum değişti."));out.push(...rows);if(rows.length<1000)return out;}}
  async command(site,action,payload){return this.rpc('ay2_command',{p_site:site,p_action:action,p_payload:payload});}
  async load(){
+  const generation=this.generation;
+  const assertSession=()=>{if(generation!==this.generation)throw Error(tr("Oturum değişti."));};
   const userId=encodeURIComponent(this.session?.user.id||'');
   const sites=await this.read('site_sites','select=id,name,slug&slug=eq.aya-park-2&limit=1');
+  assertSession();
   if(!sites.length){const error=Error(tr("Ayapark 2 erişiminiz bulunamadı. Yöneticiye danışın."));error.status=403;throw error;}
   const site=sites[0],sid=encodeURIComponent(site.id);
   const [memberships,units,blocks,links]=await Promise.all([
@@ -100,14 +103,17 @@ export class AyaparkApi {
    this.read('site_blocks',`select=id,code&site_id=eq.${sid}`),
    this.read('site_resident_units',`select=unit_id&user_id=eq.${userId}&active=eq.true`)
   ]);
+  assertSession();
   const serverRole=memberships[0]?.role||'resident';
   const role=serverRole==='manager'?'super':['deputy','auditor'].includes(serverRole)?'staff':'resident';
   const ownIds=links.map(l=>l.unit_id);
   const [byName,summary,reviewState,staff,residentAccounts]=await Promise.all([this.rpc('ay2_workspace',{p_site:site.id}),this.rpc('ay3_financial_summary',{p_site:site.id}),this.rpc('ay3_review_state',{p_site:site.id}),role==='super'?this.rpc('ay3_staff_directory',{p_site:site.id}):Promise.resolve([]),role==='super'?this.readAll('site_resident_units',`select=user_id,unit_id&active=eq.true&unit_id=in.(${units.map(u=>u.id).join(',')})`):Promise.resolve([])]);
+  assertSession();
   if(!byName)throw Error(tr("Çalışma alanı erişimi doğrulanamadı."));
   const capabilities=byName.capabilities;
   if(!capabilities.people)byName.providers=await this.rpc('ay3_provider_directory',{p_site:site.id});
 
+  assertSession();
   const linksV3=byName.links||[],persons=byName.persons||[];
   const ownPersonIds=[...new Set(linksV3.filter(l=>role==='resident'||persons.find(p=>p.id===l.person_id)?.auth_user_id===this.session.user.id).map(l=>l.person_id))];
   for(const link of linksV3)if(role==='resident'&&!ownIds.includes(link.unit_id))ownIds.push(link.unit_id);
