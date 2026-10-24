@@ -549,6 +549,7 @@ export const german = {
 Object.assign(german,{
  "Ev sahibi": "Eigentümer",
  "Temsilci": "Vertreter",
+ "Yetkili kişi": "Bevollmächtigte Person",
  "Acil": "Dringend",
  "Ad": "Vorname",
  "Ad ve soyad gerekli.": "Vor- und Nachname sind erforderlich.",
