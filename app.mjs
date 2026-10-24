@@ -287,7 +287,7 @@ if(!new URLSearchParams(location.hash.slice(1)).has('access_token')&&!new URLSea
 function updateConditionalForm(changed=''){
  if(formAction?.action==='relationship_change'){updateRelationshipForm($('actionFields'),state.data,formAction.context,changed);const fresh=$('actionFields').querySelector('[name="person_id"]')?.value==='__new__',box=$('newRelationshipPerson');if(box){box.hidden=!fresh;for(const n of box.querySelectorAll('input')){n.disabled=!fresh;n.required=fresh&&['first_name','last_name'].includes(n.name);}}}
 
- const unknown=$('actionFields').querySelector('[name="start_unknown"]'),start=$('actionFields').querySelector('[name="starts_on"]');if(unknown&&start){start.disabled=unknown.checked;start.required=!unknown.checked;if(unknown.checked)start.value='';}
+ const unknown=$('actionFields').querySelector('[name="start_unknown"]'),start=$('actionFields').querySelector('[name="starts_on"]');if(unknown&&start){start.disabled=unknown.checked;start.required=false;if(unknown.checked)start.value='';}
 
  const block=$('newTenantFields');if(block){const fresh=$('actionFields').querySelector('[name="person_id"]')?.value==='__new__';block.hidden=!fresh;for(const node of block.querySelectorAll('[name="first_name"],[name="last_name"]'))node.required=fresh;}
  if(formAction?.action!=='entry')return;const category=$('actionFields').querySelector('[name="category"]'),desc=$('actionFields').querySelector('[name="desc"]');if(desc){desc.placeholder=tr(category?.value==='Diğer'?'İşlem ne için yapıldı?':'Açıklama girin');desc.required=true;}
