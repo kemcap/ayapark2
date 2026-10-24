@@ -1,3 +1,8 @@
+## V3.14.1 · 2026-10-24
+
+- Refresh apartment-card UI assets using versioned module/style URLs to prevent older cached JavaScript from hiding owner, tenant and authorized-person names after deployment.
+- No Supabase person, apartment or financial data changed.
+
 ## V3.14 · 2026-10-24
 
 - Add Ayapark 2 brand palette from meadow, sky and caramel facade tones, with light/dark surfaces.
