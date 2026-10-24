@@ -88,6 +88,11 @@ export function planRelationship(d,p){
  summary.push(tr(p.occupancy==='keep'?'Kullanım değişmez.':p.occupancy==='occupied'?'Daire dolu olarak gösterilir.':'Daire boş olarak gösterilir.')+(p.occupancy!=='keep'?' · '+(kind==='correction'?today():day):''));
  return {links,persons,events,summary,newPerson,added,unit};
 }
+// Use the same complete, inclusive owner-history rule for guided and direct edits.
+export function tenantOwnerCovered(links,unitId){
+ const owners=links.filter(l=>l.unit_id===unitId&&l.role==='owner');
+ return links.filter(l=>l.unit_id===unitId&&l.role==='tenant').every(l=>covered(owners,l.starts_on||null,l.ends_on||null));
+}
 export function effectiveOccupancy(d,unit,day=today()){
  const events=(d.occupancyChanges||[]).slice().reverse().filter(x=>x.unit_id===unit.id&&x.effective_on<=day).sort((a,b)=>b.effective_on.localeCompare(a.effective_on));return events[0]?.status||unit.occupancy_status;
 }
