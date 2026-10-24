@@ -29,7 +29,7 @@ export function updateRelationshipForm(container,d,ctx,changed=''){
  else {
   const isAdd=kind==='add';
   html+=input(kind==='moveout'?'departure_on':'effective_on',isAdd?'Başlangıç (isteğe bağlı)':kind==='moveout'?'Çıkış tarihi (son oturulan gün)':'Yeni durumun ilk günü','date','')+
-    `<p class="fine">${tr(isAdd?'Tarih boş kalırsa başlangıç bilinmiyor olarak kaydedilir.':kind==='moveout'?'Tarih optional: Leer bedeutet Auszug heute (letzter Tag); Leerstand beginnt morgen.':'Datum optional: Leer bedeutet Änderung ab heute. Alte Zuordnungen bleiben historisch erhalten.')}</p>`;
+    `<p class="fine">${tr(isAdd?'Tarih boş kalırsa başlangıç bilinmiyor olarak kaydedilir.':kind==='moveout'?'Tarih boşsa bugün son oturulan gündür. Daire yarından itibaren boş görünür.':'Tarih boşsa değişiklik bugünden itibaren geçerlidir. Geçmiş kayıtlar korunur.')}</p>`;
   if(['owner_change','owner_to_tenant','tenant_change','add'].includes(kind))html+=select('person_id',kind.startsWith('owner')?'Yeni ev sahibi':kind==='tenant_change'?'Yeni kiracı':'Kişi',persons,ctx.preferred_person||'')+`<div id="newRelationshipPerson" hidden>${input('first_name','Ad','text','','maxlength="75"')}${input('last_name','Soyad','text','','maxlength="75"')}${input('phone','Telefon','tel','','maxlength="60"')}${input('email','E-posta','email','','maxlength="254"')}</div>`;
   if(kind==='add')html+=select('role','Rol',roles.map(([v,l])=>[v,tr(l)]),'owner');
  }
