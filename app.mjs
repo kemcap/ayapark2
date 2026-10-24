@@ -248,13 +248,14 @@ $('loginDialog').addEventListener('close',()=>{
 
 function selectLogin(method){
  loginMethod=method;const code=method==='code'||method==='setup';
- $('loginMethodChooser').hidden=false;$('loginEmailField').hidden=false;$('email').required=true;
+ $('loginMethodChooser').hidden=method==='setup';$('loginEmailField').hidden=false;$('email').required=true;
  $('passwordFields').hidden=method!=='password';$('codeFields').hidden=!code;$('setupPasswordFields').hidden=true;
  $('password').required=method==='password';$('loginCode').required=code;
  $('setupPassword').required=false;$('setupPasswordConfirm').required=false;
  $('usePassword').setAttribute('aria-pressed',String(method==='password'));
  $('useCode').setAttribute('aria-pressed',String(code));
- $('loginTitle').textContent=tr('Sitenize hoş geldiniz.');
+ $('loginTitle').textContent=tr(method==='setup'?'Şifre oluştur':'Sitenize hoş geldiniz.');
+ $('codeHelp').textContent=tr(method==='setup'?'Şifre oluşturmak için e-postadaki kodu buraya gir. E-postadaki bağlantıyı açma.':'E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.');
  $('loginSubmit').textContent=tr(method==='setup'?'Devam et':'Giriş yap');
  hideLoginPassword();$('password').value='';$('loginCode').value='';
  $('setupPassword').value='';$('setupPasswordConfirm').value='';$('loginMessage').textContent='';
