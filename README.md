@@ -1,4 +1,4 @@
-# Ayapark 2 · V3.12
+# Ayapark 2 · V3.13
 
 Browser app with Supabase Auth and row-level data access.
 
@@ -6,7 +6,15 @@ Browser app with Supabase Auth and row-level data access.
 - Archived original: https://kemcap.github.io/ayapark2/old/
 - Owner-only preview: https://ayapark2-v2-private.kemcap.chatgpt.site
 
-V3.12: Relationship start dates can be omitted and then remain unknown. Undated changes and departures use today as the effective date, without changing historical finance records. This behavior is covered by targeted regressions.
+V3.13 adds compact, collapsed clarification tasks with direct actions, multi-selection and audited review receipts. Reviewing never creates payments, assigns debtors or confirms imported charges. Mandatory missing information must be corrected; receipts become stale when source records change. The selected record is preserved in review history.
+
+Personal appearance is under Settings for all roles: five CSS palettes, five CSS preloaders, font size, contrast, spacing, reduced motion, amount privacy and language. The header retains only the existing automatic/light/dark switch. Preferences are owner-scoped in Supabase, cached locally, and pending offline changes retry on the next session. Indicators appear after 300 ms and add no network requests. Actual load completion controls dismissal.
+
+Access setup supports existing people and new external contacts without apartment assignments for management. Email validation is corrected; provisioning reports specific authored errors. Legacy resident person foreign keys are not repointed or deleted. Staff names/email and localized rights replace UUID fragments/internal role names. Audit is loaded on demand with true backend pagination (10/50/100, default 10). Bookkeeping setup is collapsed under Bookkeeping details.
+
+Performance: independent workspace, financial summary, review and staff requests run concurrently. Audit no longer travels with every workspace refresh; person search is debounced. A synchronous rendering index shares payment allocation sums without caching across mutations. A synthetic 500-charge/5,000-allocation benchmark gave identical totals at about 294 ms without indexing and 2 ms with indexing; this is not an end-to-end production speed claim.
+
+Validation: 94 Node tests and 54 SQL assertions (28 comfort/access plus 26 assignment regressions), synthetic fixtures rolled back; no real auth accounts created or emails sent. Browser checks cover German/Turkish, role-specific settings, direct external-access fields, review selection/history, dark mode and 320px layout with large text. Real email delivery and cross-device behavior remain manual acceptance checks.
 
 V3.12 replaces transfer/date wizards with direct apartment-role editing. Apartments have one **Person hinzufügen / Kişi ekle** action. Choose an existing person with local search or create a person, choose the role, and save. Current assignments have **Bearbeiten / Düzenle** and **Entfernen / Kaldır**. Removal asks for one role-specific reason; free text and dates are optional.
 

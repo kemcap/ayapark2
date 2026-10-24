@@ -1,3 +1,12 @@
+## V3.13 · 2026-10-24
+
+- Compact apartment information; clarification panel collapsed by default with direct actions and multi-selection. Reviewed items retain actor/time/source fingerprint without changing finance records.
+- External management contacts can be entered during access setup. Corrected email validation and legacy resident-person FK handling; clearer provisioning errors.
+- Staff identity and localized rights replace internal UUID/role labels. Audit pagination 10/50/100, default 10, fetched on demand. Bookkeeping setup collapsed.
+- Personal account-synced appearance: five palettes and preloaders, text size, contrast, density, reduced motion, language and optional amount privacy. Only the existing theme control remains in the header.
+- Delayed CSS loading indicators; parallel independent reads, render-scoped payment index, debounced person search and a people icon.
+- Validation: 94 Node tests and 54 rolled-back SQL assertions; mobile/desktop, DE/TR and permissions checks. Email delivery not exercised with real accounts.
+
 ## V3.12 · 2026-10-24
 
 - Replace apartment transfer wizards and three add buttons with one searchable person/role form. Direct editing supports role changes and an additional role without ending/recreating relationships manually.

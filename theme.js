@@ -26,12 +26,13 @@
   old.replaceWith(menu);
   menu.addEventListener('click',event=>{
    const choice=event.target.closest('[data-theme-choice]');if(!choice)return;
-   preference=choice.dataset.themeChoice;try{localStorage.setItem(key,preference);}catch{}apply();menu.open=false;document.getElementById('themeToggle').focus();
+   preference=choice.dataset.themeChoice;try{localStorage.setItem(key,preference);}catch{}apply();document.dispatchEvent(new CustomEvent('ay2:themechanged',{detail:preference}));menu.open=false;document.getElementById('themeToggle').focus();
   });
   document.addEventListener('click',event=>{if(menu.open&&!menu.contains(event.target))menu.open=false;});
   menu.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();menu.open=false;document.getElementById('themeToggle').focus();}});
   apply();
  });
+ document.addEventListener('ay2:settheme',event=>{if(modes.includes(event.detail)){preference=event.detail;try{localStorage.setItem(key,preference);}catch{}apply();}});
  document.addEventListener('ay2:languagechange',apply);system.addEventListener('change',()=>{if(preference==='system')apply();});
  window.addEventListener('storage',event=>{if(event.key!==key&&event.key!==null)return;preference=modes.includes(event.newValue)?event.newValue:'system';apply();});
 })();

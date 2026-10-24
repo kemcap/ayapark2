@@ -1,3 +1,5 @@
+import {apartmentInfo} from './apartment-info.mjs';
+import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,preferences,beginLoading} from './preferences.mjs';
 import {updateAssignmentForm} from './assignments.mjs';
 import {personManager} from './people-ui.mjs';
 import {mayPreview,residentPreviewOptions,previewProjection} from './access-preview.mjs';
@@ -8,7 +10,7 @@ import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,in
 import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs';
 import {template} from './v3-import.mjs';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs';
-import {escapeHtml as e,money,roleName,parseCsv} from './core.mjs';
+import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs';
 import {AyaparkApi} from './api.mjs';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs';
@@ -19,7 +21,9 @@ const applyStaticLanguage=bindStaticText(document.body);
 const hideLoginPassword=bindPasswordEyes();
 let detailView=null,loginMethod='password';
 bindInstall();
+initializePreferences();
 const state={data:fullDemo(),mode:new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},stale:false};
+let peopleSearchTimer;
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
@@ -34,7 +38,7 @@ function render(focus=false){
  $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> '+getLanguage().toUpperCase();$('languageToggle').title=getLanguage()==='tr'?'Deutsch':'Türkçe';
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
- const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2';
+ const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V3.13';
  renderNavigation();
  $('breadcrumb').textContent=roleName(d.role)+' / '+labels[state.page];
  const previewAllowed=state.mode==='connected'&&mayPreview(state.fullData);
@@ -54,14 +58,16 @@ function render(focus=false){
  $('modeBadge').hidden=state.mode!=='demo';$('refreshButton').hidden=state.mode!=='connected';
  $('connectionButton').textContent=state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/buildings.svg" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>`:renderPage(state);
- labelTables();checkUrgent();
+ labelTables();applyAmountPrivacy();checkUrgent();
+ if(state.page==='settings'&&can(state,'admin')&&!state.auditLoading&&state.auditData!==state.data){void loadAuditPage(0);}
  for(const [id,value] of [['statusFilter',state.filter.status],['txnFilter',state.filter.type],['periodFilter',state.filter.period]])if($(id))$(id).value=value;
  if(focus)$('content').focus({preventScroll:true});
 }
 function navigate(page){mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
 function closeDialogs(){for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
-async function reload(){const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}
-async function mutate(action,payload){
+async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
+async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
+async function mutateInner(action,payload){
  if(action==='person_link')action='link';
  if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
  if(state.mode==='demo'&&action==='user_access')return {ok:true};
@@ -85,7 +91,7 @@ function showDetail(html){
  const dialog=$('detailDialog');$('detailContent').innerHTML=html;
  const title=$('detailTitle');if(title){title.tabIndex=-1;title.setAttribute('autofocus','');}
  if(!dialog.open)dialog.showModal();
- dialog.scrollTop=0;title?.focus({preventScroll:true});labelTables();
+ dialog.scrollTop=0;title?.focus({preventScroll:true});labelTables();applyAmountPrivacy();
 }
 function staged(){
  detailView={action:'staged'};
@@ -107,7 +113,7 @@ function checkUrgent(){
 $('ackUrgent').addEventListener('click',async()=>{const b=$('ackUrgent');b.disabled=true;try{await mutate('acknowledge',{id:b.dataset.id});urgentShown.add(b.dataset.key);$('urgentDialog').close();checkUrgent();}catch(e){toast(e.message);}finally{b.disabled=false;}});
 $('urgentDialog').addEventListener('cancel',event=>event.preventDefault());
 
-document.addEventListener('click',event=>{
+document.addEventListener('click',async event=>{
  const navToggle=event.target.closest('#nav [data-nav-group]');
  if(navToggle){
   const group=Number(navToggle.dataset.navGroup);
@@ -132,8 +138,11 @@ document.addEventListener('click',event=>{
  }
  const tab=event.target.closest('[data-tab]');if(tab){const history=tab.dataset.tab==='history';$('unitCurrent').hidden=history;$('unitHistory').hidden=!history;for(const node of document.querySelectorAll('[data-tab]'))node.setAttribute('aria-pressed',String(node===tab));return;}
  const yr=event.target.closest('[data-year]');if(yr){state.reportFilter={preset:'custom',from:yr.dataset.year+'-01-01',to:yr.dataset.year+'-12-31'};state.reportGroup='month';render();return;}
+ const hiddenAmount=event.target.closest('.amount-private');if(hiddenAmount){hiddenAmount.classList.remove('amount-private');hiddenAmount.removeAttribute('aria-label');return;}
  const b=event.target.closest('[data-action]');if(!b)return;const action=b.dataset.action;
  try{
+  if(action==='audit_page'){if(can(state,'admin'))await loadAuditPage(Number(b.dataset.page));return;}
+  if(action==='review_selected'){await reviewSelected();return;}
   if(action==='person_manage'){detailView={action,id:b.dataset.id};return showDetail(personManager(state,b.dataset.id));}
   if(action==='unit'){detailView={action,id:b.dataset.id};return showDetail(unitDetail(state,b.dataset.id));}
   if(action==='transaction'){if(can(state,'finance')){detailView={action,id:b.dataset.id};showDetail(transactionDetail(state,b.dataset.id));}return;}
@@ -154,7 +163,7 @@ document.addEventListener('click',event=>{
 });
 $('languageToggle').addEventListener('click',()=>{
  const controls=Array.from($('actionFields').querySelectorAll('input,select,textarea')).map(node=>({name:node.name,value:node.value,checked:node.checked}));
- setLanguage(getLanguage()==='tr'?'de':'tr');applyStaticLanguage();render();
+ changePreference('language',getLanguage()==='tr'?'de':'tr',state.mode==='connected'?api:null);applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));
  if($('detailDialog').open&&detailView){
   if(detailView.action==='staged')staged();
   else showDetail(detailView.action==='person_manage'?personManager(state,detailView.id):detailView.action==='unit'?unitDetail(state,detailView.id):detailView.action==='charge_detail'?chargeDetail(state,detailView.id):detailView.action==='provider_detail'?providerDetail(state,detailView.id):transactionDetail(state,detailView.id));
@@ -179,13 +188,14 @@ $('residentPreviewSelect').addEventListener('change',event=>{if(!mayPreview(stat
 document.addEventListener('input',event=>{
  if(formAction?.action.startsWith('assignment_')&&event.target.closest('#actionFields')){if(event.target.name==='person_search')updateConditionalForm('person_search');$('actionMessage').textContent='';}
  if(event.target.id==='unitSearch'){state.filter.q=event.target.value;$('unitResults').innerHTML=unitResults(state);$('resultCount').textContent=filteredUnits(state).length+tr(" daire");}
- if(event.target.id==='peopleSearch'){state.peopleQuery=event.target.value;const pos=event.target.selectionStart;render();$('peopleSearch').focus();$('peopleSearch').setSelectionRange(pos,pos);}
+ if(event.target.id==='peopleSearch'){clearTimeout(peopleSearchTimer);const value=event.target.value,pos=event.target.selectionStart;peopleSearchTimer=setTimeout(()=>{state.peopleQuery=value;render();$('peopleSearch')?.focus();$('peopleSearch')?.setSelectionRange(pos,pos);},160);return;}
+
  if(event.target.id==='providerSearch'){state.providerQuery=event.target.value;const start=event.target.selectionStart;render();$('providerSearch').focus();$('providerSearch').setSelectionRange(start,start);}
  if(event.target.id==='txnSearch'){state.filter.q=event.target.value;$('transactionResults').innerHTML=transactionTable(state);}
 });
 document.addEventListener('change',event=>{
  const id=event.target.id;
- if(formAction?.action.startsWith('assignment_')&&event.target.closest('#actionFields'))updateConditionalForm(event.target.name);
+ if((formAction?.action.startsWith('assignment_')||formAction?.action==='user_access')&&event.target.closest('#actionFields'))updateConditionalForm(event.target.name);
  if(event.target.name==='category'||event.target.name==='relation'||event.target.name==='person_id'||event.target.name==='start_unknown')updateConditionalForm();
  if(['statusFilter','txnFilter','periodFilter'].includes(id)){
   const key={statusFilter:'status',txnFilter:'type',periodFilter:'period'}[id];state.filter[key]=event.target.value;
@@ -201,20 +211,21 @@ document.addEventListener('change',event=>{
 $('cancelAction').addEventListener('click',()=>{if(!writeBusy)$('actionDialog').close();});
 $('actionDialog').addEventListener('cancel',event=>{if(writeBusy)event.preventDefault();});
 $('actionForm').addEventListener('submit',async event=>{
- event.preventDefault();if(writeBusy||!formAction)return;const attempt=epoch;
+ event.preventDefault();if(writeBusy||!formAction)return;const attempt=epoch;let stopLoading=()=>{};
  try{
   $('actionMessage').textContent='';$('actionMessage').classList.remove('error');
   const {action,context}=formAction;
   const payload=payloadFor(action,new FormData($('actionForm')),context);
-  writeBusy=true;$('saveAction').disabled=true;$('cancelAction').disabled=true;$('actionMessage').textContent=tr("Kaydediliyor…");
+  writeBusy=true;$('saveAction').disabled=true;$('cancelAction').disabled=true;$('actionMessage').textContent='';stopLoading=beginLoading($('actionMessage'),tr('Kaydediliyor…'));
   await mutate(action==='ignore_staged'?'confirm_staged':action,payload);
   if(attempt!==epoch)return;$('actionDialog').close();if(action.startsWith('assignment_')&&!state.stale&&detailView){if(detailView.action==='unit')showDetail(unitDetail(state,detailView.id));else if(detailView.action==='person_manage')showDetail(personManager(state,detailView.id));}toast(state.stale?tr("Kaydedildi; görünüm yenilenemedi. Yenile düğmesine basın."):state.mode==='demo'?tr("Örnek çalışma alanında kaydedildi."):tr("Kayıt tamamlandı."));
  }catch(error){if(attempt===epoch){$('actionMessage').textContent=error.message;$('actionMessage').classList.add('error');}}
- finally{writeBusy=false;$('saveAction').disabled=false;$('cancelAction').disabled=false;}
+ finally{stopLoading();writeBusy=false;$('saveAction').disabled=false;$('cancelAction').disabled=false;}
 });
+document.addEventListener('ay2:themechanged',event=>changePreference('theme',event.detail,state.mode==='connected'?api:null));
 $('connectionButton').addEventListener('click',async()=>{
  if(state.mode!=='connected'){$('loginMessage').textContent='';$('loginDialog').showModal();return;}
- epoch++;closeDialogs();state.mode='signedout';state.data=fullDemo();state.stale=false;navigate('overview');
+ endPreferenceSession();epoch++;closeDialogs();state.mode='signedout';state.data=fullDemo();state.stale=false;navigate('overview');
  try{await api.logout();toast(tr("Oturum kapatıldı."));}catch{toast(tr("Bu sekmedeki oturum temizlendi; sunucu çıkışı doğrulanamadı."));}
 });
 $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
@@ -224,7 +235,7 @@ function completeSignIn(loaded){
  // Closing a completed login must not trigger the pending-login cancellation handler.
  loginBusy=false;$('loginSubmit').disabled=false;
  if($('loginDialog').open)$('loginDialog').close();
- $('loginForm').reset();navigate('overview');
+ $('loginForm').reset();navigate('overview');void syncPreferences(api,()=>{applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));});
 }
 
 $('loginDialog').addEventListener('close',()=>{hideLoginPassword();$('password').value='';if(loginBusy){epoch++;void api.logout().catch(()=>{});loginBusy=false;$('loginSubmit').disabled=false;}});
@@ -235,18 +246,18 @@ $('usePassword').addEventListener('click',()=>selectLogin('password'));
 let nextCodeAt=0;
 $('requestCode').addEventListener('click',async()=>{
  if(loginBusy||Date.now()<nextCodeAt||!$('email').reportValidity())return;
- const b=$('requestCode'),email=$('email').value.trim();b.disabled=true;
+ const b=$('requestCode'),email=$('email').value.trim();b.disabled=true;const stopLoading=beginLoading($('loginMessage'));
  try{await api.requestCode(email);nextCodeAt=Date.now()+60000;$('loginMessage').textContent=tr('Hesap tanımlıysa giriş e-postası gönderildi. Gelen kutunu ve spam klasörünü kontrol et.');}
  catch(error){$('loginMessage').textContent=error.message;}
- finally{setTimeout(()=>{b.disabled=false;},Math.max(0,nextCodeAt-Date.now()));}
+ finally{stopLoading();setTimeout(()=>{b.disabled=false;},Math.max(0,nextCodeAt-Date.now()));}
 });
 selectLogin('password');
 
 $('loginForm').addEventListener('submit',async event=>{
- event.preventDefault();if(loginBusy)return;loginBusy=true;const attempt=++epoch;$('loginSubmit').disabled=true;$('loginMessage').textContent=tr("Hesap ve erişim yetkileri doğrulanıyor…");$('loginMessage').classList.remove('error');
+ event.preventDefault();if(loginBusy)return;const stopLoading=beginLoading($('loginMessage'),tr('Hesap ve erişim yetkileri doğrulanıyor…'));loginBusy=true;const attempt=++epoch;$('loginSubmit').disabled=true;$('loginMessage').textContent='';$('loginMessage').classList.remove('error');
  try{if(loginMethod==='code')await api.verifyCode($('email').value.trim(),$('loginCode').value.trim());else await api.login($('email').value.trim(),$('password').value);$('password').value='';const loaded=await api.load();if(attempt!==epoch)return;completeSignIn(loaded);toast(tr("Hesabınız açıldı."));}
  catch(error){if(attempt!==epoch)return;if([400,401,403].includes(error.status))await api.logout().catch(()=>{});if(attempt!==epoch)return;$('loginMessage').textContent=error.message;$('loginMessage').classList.add('error');}
- finally{if(attempt===epoch){loginBusy=false;$('loginSubmit').disabled=false;}}
+ finally{stopLoading();if(attempt===epoch){loginBusy=false;$('loginSubmit').disabled=false;}}
 });
 $('refreshButton').addEventListener('click',async()=>{
  if(state.mode!=='connected')return;const attempt=epoch;$('refreshButton').disabled=true;$('refreshButton').setAttribute('aria-busy','true');
@@ -278,6 +289,8 @@ document.dispatchEvent(new Event('ay2:languagechange'));
 if(!new URLSearchParams(location.hash.slice(1)).has('access_token')&&!new URLSearchParams(location.hash.slice(1)).has('error'))navigate(location.hash.slice(1)||'overview');
 
 function updateConditionalForm(changed=''){
+ if(formAction?.action==='user_access'){const fresh=$('actionFields').querySelector('[name="person_mode"]:checked')?.value==='new';for(const[id,enabled]of [['accessExisting',!fresh],['accessNew',fresh]]){const container=$(id);if(!container)continue;container.hidden=!enabled;for(const input of container.querySelectorAll('input,select')){input.disabled=!enabled;input.required=enabled;}}return;}
+
  if(formAction?.action.startsWith('assignment_'))updateAssignmentForm($('actionFields'),state.data,changed);
 
  if(formAction?.action!=='entry')return;const category=$('actionFields').querySelector('[name="category"]'),desc=$('actionFields').querySelector('[name="desc"]');if(desc){desc.placeholder=tr(category?.value==='Diğer'?'İşlem ne için yapıldı?':'Açıklama girin');desc.required=true;}
@@ -295,10 +308,37 @@ document.addEventListener('pointerout',event=>{if(event.target.closest('dialog')
 document.addEventListener('focusin',event=>{if(event.target.closest('dialog'))return;const el=event.target.closest('.info-help');if(el&&window.matchMedia('(hover:hover)').matches&&!el.open){el.dataset.focusOpen='1';el.open=true;}});
 document.addEventListener('focusout',event=>{if(event.target.closest('dialog'))return;const el=event.target.closest('.info-help');if(el?.dataset.focusOpen&&!el.contains(event.relatedTarget)){el.open=false;delete el.dataset.focusOpen;}});
 
+function applyAmountPrivacy(){if(!preferences().hideAmounts)return;for(const node of document.querySelectorAll('.apartment-balance,.numeric,.money-pair dd,.detail-grid strong,.metric strong,.report-total strong,.amount,.review-item strong,.compact-info,.debt-card strong,.bookkeeping-details strong')){if(/(?:TL|₺|TRY)/.test(node.textContent)){node.classList.add('amount-private');node.tabIndex=0;node.setAttribute('role','button');node.setAttribute('aria-label',tr('Tutarı göster'));}}}
+document.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)&&event.target.classList.contains('amount-private')){event.preventDefault();event.target.click();}});
+async function loadAuditPage(page=0){
+ if(state.auditLoading||!can(state,'admin'))return;
+ const attempt=epoch,size=state.auditSize||10;state.auditLoading=true;state.auditError='';state.auditPage=Math.max(0,page);state.auditData=state.data;render();
+ try{const result=state.mode==='demo'?{rows:state.data.audit.slice().reverse().slice(state.auditPage*size,(state.auditPage+1)*size),total:state.data.audit.length}:await api.rpc('ay3_audit_page',{p_site:state.data.site.id,p_limit:size,p_offset:state.auditPage*size});if(attempt!==epoch)return;state.auditState=result;}
+ catch(error){if(attempt===epoch)state.auditError=error.message;}
+ finally{if(attempt===epoch){state.auditLoading=false;render();}}
+}
+async function reviewSelected(){
+ if(writeBusy||isAccessPreview()||!detailView||detailView.action!=='unit')return;
+ if(!can(state,'finance'))throw Error(tr('Bu işlem için yetkiniz yok.'));
+ const info=apartmentInfo(state,state.data.units.find(u=>u.id===detailView.id)),keys=new Set([...document.querySelectorAll('[data-review-key]:checked')].map(x=>x.dataset.reviewKey));
+ const items=info.openIssues.filter(i=>i.reviewable&&keys.has(i.key)).map(({unit_id,kind,source_id,fingerprint})=>({unit_id,kind,source_id,fingerprint}));if(!items.length)return;
+ if(items.length>100)throw Error(tr('Bir seferde en fazla 100 konu seçin.'));
+ writeBusy=true;const attempt=epoch,b=document.querySelector('[data-action="review_selected"]');b.disabled=true;const stop=beginLoading(b,tr('Kaydediliyor…'));
+ try{if(state.mode==='demo'){state.data.reviewState||={sources:[],receipts:[]};for(const item of items){state.data.reviewState.receipts.push({...item,reviewed_at:new Date().toISOString()});state.data.audit.push({id:randomId(),at:new Date().toISOString(),action:'review_checked',details:item});}render();}else{await api.rpc('ay3_review_selected',{p_site:state.data.site.id,p_items:items});await reload();}if(attempt===epoch){showDetail(unitDetail(state,detailView.id));toast(tr('Seçilen konular kontrol edildi olarak kaydedildi.'));}}
+ finally{stop();writeBusy=false;if(b.isConnected)b.disabled=false;}
+}
+document.addEventListener('change',event=>{
+ const preference=event.target.dataset.preference;
+ if(preference){changePreference(preference,event.target.type==='checkbox'?event.target.checked:event.target.value,state.mode==='connected'?api:null,message=>{const status=$('preferenceStatus');if(status)status.textContent=message;});applyStaticLanguage();const open=document.querySelector('.appearance-settings')?.open;render();if(open&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;document.dispatchEvent(new Event('ay2:languagechange'));return;}
+ if(event.target.id==='auditSize'){state.auditSize=Number(event.target.value);void loadAuditPage(0);return;}
+ if(event.target.matches('[data-review-all]'))for(const box of document.querySelectorAll('[data-review-key]'))box.checked=event.target.checked;
+ if(event.target.matches('[data-review-all],[data-review-key]')){const all=[...document.querySelectorAll('[data-review-key]')],n=all.filter(x=>x.checked).length,select=document.querySelector('[data-review-all]'),b=document.querySelector('[data-action="review_selected"]');if(select){select.checked=n===all.length&&n>0;select.indeterminate=n>0&&n<all.length;}if(b)b.disabled=n===0||writeBusy;const count=document.querySelector('[data-review-count]');if(count)count.textContent=n+' '+tr('seçildi');}
+});
 async function resumeSession(){
  if(state.mode==='demo'||loginBusy)return;
+ const stopLoading=beginLoading($('content'),tr('Yükleniyor…'),{skeleton:true});
  const attempt=++epoch,hash=new URLSearchParams(location.hash.slice(1));
- if(hash.get('type')==='recovery'){location.replace(new URL('./reset.html',location.href).href+location.hash);return;}
+ if(hash.get('type')==='recovery'){stopLoading();location.replace(new URL('./reset.html',location.href).href+location.hash);return;}
  try{
   let restored=false;
   if(hash.has('access_token')||hash.has('error')){
@@ -310,6 +350,7 @@ async function resumeSession(){
   const loaded=await api.load();if(attempt!==epoch)return;
   completeSignIn(loaded);
  }catch(error){if(attempt===epoch)toast(error.message);}
+ finally{stopLoading();}
 }
 window.addEventListener('storage',event=>{
  if(state.mode==='demo'||(event.key!==api.storageKey&&event.key!==null))return;
