@@ -25,3 +25,29 @@ test('only actual unpaid categories determine the label, settled/voided charges 
 test('normal known open debt is not a clarification; missing debtors and matching pending payments are',()=>{const s=state(),u=s.data.units.find(u=>u.id==='A-7');assign(s,u.id,'owner','demo-owner');s.data.staged=[];s.data.transactions=[];s.data.charges=[{id:'c',unit_id:u.id,person_id:'demo-owner',category:'Demirbaş',cents:750000,payer:'owner'}];assert.equal(unitClarifications(s,u).reasons.length,0);assert(unitClarifications(s,u).debts[0].includes('7.500'));s.data.charges[0].person_id=null;assert(unitClarifications(s,u).reasons.some(r=>r.includes('7500')||r.includes('7.500')));s.data.transactions=[{id:'payment',date:'2026-10-24',cents:10000,desc:'A-7 payment'}];assert(unitClarifications(s,u).reasons.some(r=>r.includes('2026-10-24')));});
 test('resident cards show only own debts and never other persons or management actions',()=>{const s=state();s.data.role='resident';s.data.capabilities={};s.data.ownIds=['A-4'];s.data.ownPersonIds=['demo-tenant'];const html=unitDetailV3(s,'A-4'),map=unitMapV3(s);assert(!html.includes('assignment_edit'));assert(!map.includes('Eski Örnek'));assert(!map.includes('Deniz Örnek'));assert(!map.includes('7.200'));});
 test('German and Turkish removal reasons and simple UI labels are complete',()=>{const s=state();setLanguage('de');const b=buildForm(s,'assignment_remove',{id:'demo-tenant-link'});assert(b.body.includes('Versehentlich hinzugefügt'));assert(b.body.includes('Mietverhältnis beendet'));assert(b.body.includes('Anderer Grund'));assert.equal(removalReasons('representative')[1][1],'Temsilcilik sona erdi');setLanguage('tr');assert.equal(buildForm(s,'assignment_add',{unit:'A-7'}).title,'Kişi ekle');});
+
+test('archived assignment uses former role labels, preserves old debt and keeps the current person separate',()=>{
+ const s=state(),old=assign(s,'A-7','tenant','demo-tenant');
+ command(s,'assignment_remove',{id:old.id,revision:old.revision??1,reason:'ended'});
+ const archived=s.data.links.find(l=>l.id===old.id);
+ s.data.charges.push({id:'old-history-debt',unit_id:'A-7',person_id:archived.person_id,link_id:archived.id,category:'İcra',label:'Historical balance',cents:662000,due_on:'2026-10-09'});
+ const html=unitDetailV3(s,'A-7');
+ assert(html.includes('Eski kiracı'));
+ assert(html.includes('Eski kişiye ait açık borç'));
+ assert(html.includes('₺6.620,00'));
+ const current=html.slice(html.indexOf('<section id="unitCurrent">'),html.indexOf('<section id="unitHistory"'));
+ assert(!current.includes('Historical balance'));
+ const history=html.slice(html.indexOf('<section id="unitHistory"'));
+ assert(history.includes('Historical balance'));
+ assert(history.includes('Eski kiracı'));
+});
+test('former ownership and representation are labeled explicitly in the history',()=>{
+ const s=state();
+ for(const role of ['owner','representative']){
+  const link=assign(s,'A-7',role,'demo-tenant');
+  command(s,'assignment_remove',{id:link.id,revision:link.revision??1,reason:'ended'});
+ }
+ const html=unitDetailV3(s,'A-7');
+ assert(html.includes('Eski ev sahibi'));
+ assert(html.includes('Eski yetkili kişi'));
+});
