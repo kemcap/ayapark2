@@ -4,7 +4,7 @@ export const german = {
  "Kod doğrulanıyor…": "Code wird überprüft …",
  "Kod geçersiz veya süresi dolmuş. Yeni bir kod iste.": "Der Code ist ungültig oder abgelaufen. Fordere einen neuen an.",
  "Kod doğrulanamadı. Lütfen tekrar dene.": "Code konnte nicht bestätigt werden. Bitte erneut versuchen.",
- "Bağlantı çalışmıyorsa, e-postadaki doğrulama kodunu kullanın. / Funktioniert der Link nicht, verwende den Code aus der E-Mail.": "Funktioniert der Link nicht, verwende den Code aus der E-Mail.",
+ "Bağlantı çalışmıyorsa e-postadaki doğrulama kodunu kullanın.": "Funktioniert der Link nicht, verwende den Code aus der E-Mail.",
  "Doğrulama kodu": "Bestätigungscode",
  "Kodu doğrula": "Code bestätigen",
 
