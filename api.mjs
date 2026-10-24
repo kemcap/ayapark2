@@ -38,6 +38,13 @@ export class AyaparkApi {
   if(!session?.access_token||!session.user?.id)throw Error(tr("Geçerli oturum alınamadı."));
   this.session=session;this.expiry=Date.now()+Number(session.expires_in??3600)*1000;this.persist();
  }
+ async setPassword(password){
+  if(!this.session)throw Error(tr('Giriş yapın.'));
+  const generation=this.generation,token=await this.token();
+  const updated=await this.raw('/auth/v1/user','PUT',{password},token);
+  if(generation!==this.generation)throw Error(tr('Oturum değişti.'));
+  return updated;
+ }
  async login(email,password){
   this.clear();const generation=this.generation;
   this.accept(await this.raw('/auth/v1/token?grant_type=password','POST',{email,password}),generation);
