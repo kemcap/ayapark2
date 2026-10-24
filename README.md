@@ -1,4 +1,4 @@
-# Ayapark 2 · V3.13
+# Ayapark 2 · V3.13.1
 
 Browser app with Supabase Auth and row-level data access.
 
@@ -8,7 +8,9 @@ Browser app with Supabase Auth and row-level data access.
 
 V3.13 adds compact, collapsed clarification tasks with direct actions, multi-selection and audited review receipts. Reviewing never creates payments, assigns debtors or confirms imported charges. Mandatory missing information must be corrected; receipts become stale when source records change. The selected record is preserved in review history.
 
-Personal appearance is under Settings for all roles: five CSS palettes, five CSS preloaders, font size, contrast, spacing, reduced motion, amount privacy and language. The header retains only the existing automatic/light/dark switch. Preferences are owner-scoped in Supabase, cached locally, and pending offline changes retry on the next session. Indicators appear after 300 ms and add no network requests. Actual load completion controls dismissal.
+V3.13.1 labels the original palette as Classic (default), adds a palette-only reset, removes the manual animation setting in favor of the device preference, and explains amount privacy.
+
+Personal appearance is under Settings for all roles: five CSS palettes, five CSS preloaders, font size, contrast, spacing, automatic device motion preference, amount privacy and language. The header retains only the existing automatic/light/dark switch. Preferences are owner-scoped in Supabase, cached locally, and pending offline changes retry on the next session. Indicators appear after 300 ms and add no network requests. Actual load completion controls dismissal.
 
 Access setup supports existing people and new external contacts without apartment assignments for management. Email validation is corrected; provisioning reports specific authored errors. Legacy resident person foreign keys are not repointed or deleted. Staff names/email and localized rights replace UUID fragments/internal role names. Audit is loaded on demand with true backend pagination (10/50/100, default 10). Bookkeeping setup is collapsed under Bookkeeping details.
 

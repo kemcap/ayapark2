@@ -1,3 +1,9 @@
+## V3.13.1 · 2026-10-24
+
+- Mark the original palette as Classic (default), with a palette-only reset.
+- Remove the animation preference control; respect device reduced-motion settings automatically.
+- Explain the optional amount privacy control in German and Turkish. No financial or permission changes.
+
 ## V3.13 · 2026-10-24
 
 - Compact apartment information; clarification panel collapsed by default with direct actions and multi-selection. Reviewed items retain actor/time/source fingerprint without changing finance records.

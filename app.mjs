@@ -38,7 +38,7 @@ function render(focus=false){
  $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> '+getLanguage().toUpperCase();$('languageToggle').title=getLanguage()==='tr'?'Deutsch':'Türkçe';
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
- const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V3.13';
+ const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V3.13.1';
  renderNavigation();
  $('breadcrumb').textContent=roleName(d.role)+' / '+labels[state.page];
  const previewAllowed=state.mode==='connected'&&mayPreview(state.fullData);
@@ -114,6 +114,7 @@ $('ackUrgent').addEventListener('click',async()=>{const b=$('ackUrgent');b.disab
 $('urgentDialog').addEventListener('cancel',event=>event.preventDefault());
 
 document.addEventListener('click',async event=>{
+ if(event.target.closest('[data-reset-palette]')){const select=document.querySelector('[data-preference="palette"]');if(select){select.value='classic';select.dispatchEvent(new Event('change',{bubbles:true}));}return;}
  const navToggle=event.target.closest('#nav [data-nav-group]');
  if(navToggle){
   const group=Number(navToggle.dataset.navGroup);
