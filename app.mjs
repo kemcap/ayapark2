@@ -229,21 +229,50 @@ $('connectionButton').addEventListener('click',async()=>{
  endPreferenceSession();epoch++;closeDialogs();state.mode='signedout';state.data=fullDemo();state.stale=false;navigate('overview');
  try{await api.logout();toast(tr("Oturum kapatıldı."));}catch{toast(tr("Bu sekmedeki oturum temizlendi; sunucu çıkışı doğrulanamadı."));}
 });
+let pendingSetupLoaded=null;
 $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 function completeSignIn(loaded){
  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;
  state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
  // Closing a completed login must not trigger the pending-login cancellation handler.
- loginBusy=false;$('loginSubmit').disabled=false;
+ loginBusy=false;pendingSetupLoaded=null;$('loginSubmit').disabled=false;
  if($('loginDialog').open)$('loginDialog').close();
  $('loginForm').reset();navigate('overview');void syncPreferences(api,()=>{applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));});
 }
 
-$('loginDialog').addEventListener('close',()=>{hideLoginPassword();$('password').value='';if(loginBusy){epoch++;void api.logout().catch(()=>{});loginBusy=false;$('loginSubmit').disabled=false;}});
+$('loginDialog').addEventListener('close',()=>{
+ hideLoginPassword();$('password').value='';$('setupPassword').value='';$('setupPasswordConfirm').value='';
+ if(loginBusy||pendingSetupLoaded){epoch++;pendingSetupLoaded=null;void api.logout().catch(()=>{});loginBusy=false;$('loginSubmit').disabled=false;}
+ selectLogin('password');
+});
 
-function selectLogin(method){loginMethod=method;$('passwordFields').hidden=method!=='password';$('codeFields').hidden=method!=='code';$('password').required=method==='password';$('loginCode').required=method==='code';$('usePassword').setAttribute('aria-pressed',String(method==='password'));$('useCode').setAttribute('aria-pressed',String(method==='code'));hideLoginPassword();$('password').value='';$('loginCode').value='';$('loginMessage').textContent='';}
+function selectLogin(method){
+ loginMethod=method;const code=method==='code'||method==='setup';
+ $('loginMethodChooser').hidden=method==='setup';$('loginEmailField').hidden=false;$('email').required=true;
+ $('passwordFields').hidden=method!=='password';$('codeFields').hidden=!code;$('setupPasswordFields').hidden=true;
+ $('password').required=method==='password';$('loginCode').required=code;
+ $('setupPassword').required=false;$('setupPasswordConfirm').required=false;
+ $('usePassword').setAttribute('aria-pressed',String(method==='password'));
+ $('useCode').setAttribute('aria-pressed',String(code));
+ $('loginTitle').textContent=tr(method==='setup'?'Şifre oluştur':'Sitenize hoş geldiniz.');
+ $('codeHelp').textContent=tr(method==='setup'?'Şifre oluşturmak için e-postadaki kodu buraya gir. E-postadaki bağlantıyı açma.':'E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.');
+ $('loginSubmit').textContent=tr(method==='setup'?'Devam et':'Giriş yap');
+ hideLoginPassword();$('password').value='';$('loginCode').value='';
+ $('setupPassword').value='';$('setupPasswordConfirm').value='';$('loginMessage').textContent='';
+}
+function showFirstPasswordForm(loaded){
+ pendingSetupLoaded=loaded;loginMethod='setup_password';
+ $('loginMethodChooser').hidden=true;$('loginEmailField').hidden=true;$('email').required=false;
+ $('passwordFields').hidden=true;$('codeFields').hidden=true;$('setupPasswordFields').hidden=false;
+ $('password').required=false;$('loginCode').required=false;
+ $('setupPassword').required=true;$('setupPasswordConfirm').required=true;
+ $('loginTitle').textContent=tr('Şifre oluştur');
+ $('loginSubmit').textContent=tr('Şifreyi kaydet');
+ $('setupPassword').focus();
+}
 $('useCode').addEventListener('click',()=>selectLogin('code'));
 $('usePassword').addEventListener('click',()=>selectLogin('password'));
+$('createPasswordEntry').addEventListener('click',()=>selectLogin('setup'));
 let nextCodeAt=0;
 $('requestCode').addEventListener('click',async()=>{
  if(loginBusy||Date.now()<nextCodeAt||!$('email').reportValidity())return;
@@ -256,8 +285,28 @@ selectLogin('password');
 
 $('loginForm').addEventListener('submit',async event=>{
  event.preventDefault();if(loginBusy)return;const stopLoading=beginLoading($('loginMessage'),tr('Hesap ve erişim yetkileri doğrulanıyor…'));loginBusy=true;const attempt=++epoch;$('loginSubmit').disabled=true;$('loginMessage').textContent='';$('loginMessage').classList.remove('error');
- try{if(loginMethod==='code')await api.verifyCode($('email').value.trim(),$('loginCode').value.trim());else await api.login($('email').value.trim(),$('password').value);$('password').value='';const loaded=await api.load();if(attempt!==epoch)return;completeSignIn(loaded);toast(tr("Hesabınız açıldı."));}
- catch(error){if(attempt!==epoch)return;if([400,401,403].includes(error.status))await api.logout().catch(()=>{});if(attempt!==epoch)return;$('loginMessage').textContent=error.message;$('loginMessage').classList.add('error');}
+ try{
+  if(loginMethod==='setup_password'){
+   if($('setupPassword').value!==$('setupPasswordConfirm').value)throw Error(tr('Şifreler aynı değil.'));
+   await api.setPassword($('setupPassword').value);
+   if(attempt!==epoch)return;
+   completeSignIn(pendingSetupLoaded);toast(tr('Şifren kaydedildi.'));return;
+  }
+  if(loginMethod==='code'||loginMethod==='setup')await api.verifyCode($('email').value.trim(),$('loginCode').value.trim());
+  else await api.login($('email').value.trim(),$('password').value);
+  $('password').value='';
+  const loaded=await api.load();if(attempt!==epoch)return;
+  if(loginMethod==='setup'){showFirstPasswordForm(loaded);return;}
+  completeSignIn(loaded);toast(tr("Hesabınız açıldı."));
+ }
+ catch(error){
+  if(attempt!==epoch)return;
+  if((loginMethod!=='setup_password'&&[400,401,403].includes(error.status))||(loginMethod==='setup_password'&&[401,403].includes(error.status))){
+   await api.logout().catch(()=>{});
+  }
+  if(attempt!==epoch)return;
+  $('loginMessage').textContent=error.message;$('loginMessage').classList.add('error');
+ }
  finally{stopLoading();if(attempt===epoch){loginBusy=false;$('loginSubmit').disabled=false;}}
 });
 $('refreshButton').addEventListener('click',async()=>{

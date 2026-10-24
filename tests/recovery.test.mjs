@@ -32,6 +32,12 @@ test('URL credentials and errors are removed before any API request',()=>{
  assert.equal(cleaned,'/reset.html');assert.equal(r.payload.type,'recovery');assert.equal(r.present,true);
  const e=takeRecoveryLocation({hash:'#error=access_denied&error_code=otp_expired',search:'',pathname:'/reset.html'},{replaceState:()=>{}});assert.equal(e.error,true);
 });
+test('a recovery callback with missing credentials produces a visible invalid-link state',()=>{
+ const result=takeRecoveryLocation({hash:'',search:'?type=recovery',pathname:'/reset.html'},{replaceState(){}});
+ assert.equal(result.present,true);
+ assert.equal(result.payload.type,'recovery');
+});
+
 test('verified recovery updates password once and clears the session',async()=>{
  const {api,calls}=client([{id:'verified-user'}, {id:'verified-user'}, {}]);
  await api.begin({accessToken:'access',refreshToken:'refresh',type:'recovery'});
