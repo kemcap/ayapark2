@@ -1,6 +1,8 @@
-# Ayapark 2 · V3.14
+# Ayapark 2 · V3.14.2
 
 Browser app with Supabase Auth and row-level data access.
+
+V3.14.2: B block appears left of A; each block uses two apartment-card columns in ascending number order. The overview's apartment panel is wider while the next-tasks panel is narrower, with responsive stacking for smaller screens. No database records changed.
 
 V3.14: Appearance settings add the **Ayapark 2** palette, inspired by the uploaded building photo: meadow green, sky blue and caramel timber. Six looks support normal/high contrast in light/dark modes. A switch next to the palette improves text, inputs, buttons, cards, navigation and focus indicators without removing each palette's identity. The preview and full reset occupy separate desktop columns and stack on mobile. Reset restores all nine preferences, including Turkish language and automatic theme. Existing explicit language choices remain intact until reset. Personal settings remain owner-scoped; the only database change expands the palette validator allowlist.
 
