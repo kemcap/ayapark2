@@ -1,3 +1,9 @@
+## V3.14.2 · 2026-10-24
+
+- Show B block on the left and A block on the right in Overview and Apartments; list B1–B10 and A1–A10 row by row in two card columns per block.
+- Widen the Overview apartment area, narrow the right-hand next-tasks panel, and preserve responsive layouts on smaller screens.
+- Bust entrypoint/style/module caches under V3.14.2; no person or financial records changed.
+
 ## V3.14.1 · 2026-10-24
 
 - Refresh apartment-card UI assets using versioned module/style URLs to prevent older cached JavaScript from hiding owner, tenant and authorized-person names after deployment.
