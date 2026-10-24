@@ -11,7 +11,7 @@
  <script type="module" src="./recovery.mjs"></script>
 </head>
 <body class="recovery-page">
- <header class="recovery-header"><a href="./" class="brand"><img class="brand-logo" src="./assets/buildings.svg" alt=""><strong>AYAPARK 2</strong></a><div class="header-actions"><button id="recoveryLanguage" class="button language-toggle" type="button"></button><button id="themeToggle" class="button" type="button">◐</button></div></header>
+ <header class="recovery-header"><a href="./" class="brand"><img class="brand-logo" src="./assets/ayapark2-header.webp" alt="Ayapark 2 bina fotoğrafı" width="46" height="46"><strong>AYAPARK 2</strong></a><div class="header-actions"><button id="recoveryLanguage" class="button language-toggle" type="button"></button><button id="themeToggle" class="button" type="button">◐</button></div></header>
  <main class="recovery-main"><section class="recovery-card" aria-labelledby="recoveryTitle">
   <img class="recovery-logo" src="./assets/buildings.svg" alt="">
   <div class="dialog-kicker">AYAPARK 2</div><h1 id="recoveryTitle">Şifre yenile</h1>
@@ -20,6 +20,12 @@
   <form id="requestResetForm">
    <label class="field">E-posta<input id="recoveryEmail" type="email" required autocomplete="username"></label>
    <button id="requestResetButton" class="button primary" type="submit">Yenileme bağlantısı gönder</button>
+  </form>
+  <form id="verifyRecoveryCodeForm" hidden>
+   <p class="fine">Bağlantı çalışmıyorsa, e-postadaki doğrulama kodunu kullanın. / Funktioniert der Link nicht, verwende den Code aus der E-Mail.</p>
+   <label class="field">E-posta<input id="recoveryCodeEmail" type="email" required autocomplete="username"></label>
+   <label class="field">Doğrulama kodu<input id="recoveryCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10" required></label>
+   <button id="verifyRecoveryCodeButton" class="button" type="submit">Kodu doğrula</button>
   </form>
   <form id="newPasswordForm" hidden>
    <label class="field" for="newPassword">Yeni şifre</label>
