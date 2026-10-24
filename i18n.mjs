@@ -1004,3 +1004,5 @@ Object.assign(german,{
 Object.assign(german,{'açıklığa kavuşturulacak konu':'Punkt zu klären'});
 
 Object.assign(german,{'Açık konu yok':'Keine offenen Klärungspunkte'});
+
+Object.assign(german,{'Klasik (standart)':'Klassisch (Standard)','Standart renklere dön':'Farbwelt auf Standard zurücksetzen','Para tutarlarını gizle':'Geldbeträge ausblenden','Tutarlar bulanık görünür. Görmek için tutara dokunun. Borç ve ödemeler değişmez.':'Beträge werden unscharf angezeigt. Zum Anzeigen den Betrag antippen. Forderungen und Zahlungen bleiben unverändert.'});
