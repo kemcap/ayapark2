@@ -1,3 +1,12 @@
+## V3.15 · 2026-10-24
+
+- Cache allowed-site sets once per SQL statement in three existing read policies, preserving the same permission checks and grants.
+- Aggregate review fingerprint inputs once per site; preserve previous signatures including voided records and reversals.
+- Compute apartment balances in linear passes and load administrator resident-account links in parallel.
+- Keep resident apartment-card names scoped to their own person identities; retain upstream V3.14.1–V3.14.3 changes.
+- 124 Node tests, 89 rolled-back SQL assertions, 6,687 equivalent synthetic review signatures. All 33 public application tables unchanged after migration; no new security advisor findings.
+- Separate private application-data snapshot taken; not a complete Supabase/Auth/Storage backup. See PERFORMANCE.md for measured results, backup limitations and follow-up recommendations.
+
 ## V3.14.3 · 2026-10-24
 
 - Apartment history labels now distinguish former owners, tenants and authorized representatives. Their outstanding debts remain attributed to the former person and appear only to finance-authorized users.

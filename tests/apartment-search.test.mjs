@@ -100,7 +100,7 @@ test('building plan puts B on left and A on right, each ordered from 1 to 10 in 
  assert(bStart>=0&&aStart>bStart);
  const b=html.slice(bStart,aStart),a=html.slice(aStart);
  for(const [segment,block] of [[b,'B'],[a,'A']]){
-  const labels=[...segment.matchAll(/aria-label="([AB]-\\d+)"/g)].map(m=>m[1]);
+  const labels=[...segment.matchAll(/aria-label="([AB]-\d+)"/g)].map(m=>m[1]);
   assert.deepEqual(labels,Array.from({length:10},(_,i)=>block+'-'+(i+1)));
   assert(labels[0]===block+'-1'&&labels.at(-1)===block+'-10');
  }

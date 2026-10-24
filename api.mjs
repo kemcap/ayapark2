@@ -103,7 +103,7 @@ export class AyaparkApi {
   const serverRole=memberships[0]?.role||'resident';
   const role=serverRole==='manager'?'super':['deputy','auditor'].includes(serverRole)?'staff':'resident';
   const ownIds=links.map(l=>l.unit_id);
-  const [byName,summary,reviewState,staff]=await Promise.all([this.rpc('ay2_workspace',{p_site:site.id}),this.rpc('ay3_financial_summary',{p_site:site.id}),this.rpc('ay3_review_state',{p_site:site.id}),role==='super'?this.rpc('ay3_staff_directory',{p_site:site.id}):Promise.resolve([])]);
+  const [byName,summary,reviewState,staff,residentAccounts]=await Promise.all([this.rpc('ay2_workspace',{p_site:site.id}),this.rpc('ay3_financial_summary',{p_site:site.id}),this.rpc('ay3_review_state',{p_site:site.id}),role==='super'?this.rpc('ay3_staff_directory',{p_site:site.id}):Promise.resolve([]),role==='super'?this.readAll('site_resident_units',`select=user_id,unit_id&active=eq.true&unit_id=in.(${units.map(u=>u.id).join(',')})`):Promise.resolve([])]);
   if(!byName)throw Error(tr("Çalışma alanı erişimi doğrulanamadı."));
   const capabilities=byName.capabilities;
   if(!capabilities.people)byName.providers=await this.rpc('ay3_provider_directory',{p_site:site.id});
@@ -113,9 +113,11 @@ export class AyaparkApi {
   for(const link of linksV3)if(role==='resident'&&!ownIds.includes(link.unit_id))ownIds.push(link.unit_id);
   const transactions=byName.entries.map(t=>({...t,date:t.booked_on,desc:t.description,iban:t.sender_iban||'',cents:Number(t.cents)})).sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
   const charges=byName.charges.map(c=>({...c,cents:Number(c.cents)})),allocations=byName.allocations.map(a=>({...a,cents:Number(a.cents)}));
-  const unitData=units.filter(u=>role!=='resident'||ownIds.includes(u.id)).map(u=>({...u,block:blocks.find(b=>b.id===u.block_id)?.code||'?',debt:capabilities.finance||ownIds.includes(u.id)?charges.filter(c=>c.unit_id===u.id&&!c.void_reason).reduce((n,c)=>n+c.cents-allocations.filter(a=>a.charge_id===c.id&&!a.void_reason).reduce((x,a)=>x+a.cents,0),0):null}));
-
-  const residentAccounts=capabilities.admin?await this.readAll('site_resident_units',`select=user_id,unit_id&active=eq.true&unit_id=in.(${units.map(u=>u.id).join(',')})`):[];
+  // Index once per response; repeated charge/allocation scans grow quadratically.
+  const paidByCharge=new Map(),debtByUnit=new Map(),blockById=new Map(blocks.map(b=>[b.id,b.code]));
+  for(const a of allocations)if(!a.void_reason)paidByCharge.set(a.charge_id,(paidByCharge.get(a.charge_id)||0)+a.cents);
+  for(const c of charges)if(!c.void_reason)debtByUnit.set(c.unit_id,(debtByUnit.get(c.unit_id)||0)+c.cents-(paidByCharge.get(c.id)||0));
+  const unitData=units.filter(u=>role!=='resident'||ownIds.includes(u.id)).map(u=>({...u,block:blockById.get(u.block_id)||'?',debt:capabilities.finance||ownIds.includes(u.id)?debtByUnit.get(u.id)||0:null}));
   return {reviewState,userId:this.session.user.id,persons,links:linksV3,occupancyChanges:byName.occupancy_changes||[],credits:(byName.credits||[]).map(c=>({...c,cents:Number(c.cents)})),ownPersonIds,matchRules:byName.match_rules||[],providers:byName.providers||[],providerNotes:byName.provider_notes||[],acknowledgements:byName.acknowledgements||[],residentAccounts:[...new Map(residentAccounts.filter(r=>r.user_id).map(r=>[r.user_id,{...r,label:(units.find(u=>u.id===r.unit_id)?.code||'')+' · '+r.user_id.slice(0,8)}])).values()],summaryDays:summary?.days||[],summaryOpening:summary?.opening_cents==null?null:Number(summary.opening_cents),summaryBalance:summary?.balance_cents==null?null:Number(summary.balance_cents),sourceLastDate:summary?.source_last_date,site,role,serverRole,ownIds,capabilities,transactions,charges,allocations,people:byName.people,announcements:byName.announcements,reports:byName.reports,staged:byName.staged_charges,audit:byName.audit,permissions:byName.permissions,staff,opening:byName.settings[0]?.initialized?Number(byName.settings[0].opening_cents):null,openingDate:byName.settings[0]?.opening_date||null,units:unitData};
  }
  async logout(){const token=this.session?.access_token;this.clear();if(token)await this.raw('/auth/v1/logout?scope=local','POST',undefined,token);}

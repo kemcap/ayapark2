@@ -3,7 +3,7 @@ import {escapeHtml as e,money} from './core.mjs';
 import {activeAt,personName} from './v3-domain.mjs';
 import {can,heading,card,button,badge,date} from './ui.mjs';
 import {remaining} from './ledger.mjs';
-import {roleLabel} from './v3-ui.mjs?v=3.14.3';
+import {roleLabel} from './v3-ui.mjs?v=3.15';
 import {removalReasons} from './assignments.mjs';
 export const historicalRoleLabel=r=>tr({owner:'Eski ev sahibi',tenant:'Eski kiracı',representative:'Eski yetkili kişi'}[r]||'Eski kişi');
 const role=l=>badge(activeAt(l)?roleLabel(l.role):historicalRoleLabel(l.role),'role-badge role-'+l.role);
