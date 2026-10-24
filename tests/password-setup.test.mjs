@@ -13,6 +13,15 @@ test('recovery callback at root goes to reset page with credentials preserved',(
  assert.equal(new URL(redirected).pathname,'/ayapark2/reset.html');
  assert.equal(new URL(redirected).hash,new URL(original).hash);
 });
+test('recovery link without credentials still reaches the error page, not a silent reset loop',()=>{
+ const script=readFileSync(new URL('../recovery-redirect.js',import.meta.url),'utf8');
+ const href='https://kemcap.github.io/ayapark2/?type=recovery';
+ let redirected='';
+ const location={href,hash:'',search:'?type=recovery',replace:uri=>{redirected=uri;}};
+ vm.runInNewContext(script,{location,URL,URLSearchParams});
+ assert.equal(new URL(redirected).pathname,'/ayapark2/reset.html');
+});
+
 test('normal login URLs do not redirect to the reset page',()=>{
  const script=readFileSync(new URL('../recovery-redirect.js',import.meta.url),'utf8');
  let called=false;const href='https://kemcap.github.io/ayapark2/#access_token=sample&type=magiclink';
