@@ -24,8 +24,16 @@ export function duesV3(s){const d=s.data,list=scopedCharges(d),old=list.filter(c
 export const unitClarifications=apartmentInfo;
 function occupancy(u,d){u={...u,occupancy_status:effectiveOccupancy(d,u)};return badge(tr(u.occupancy_status==='vacant'?'Boş':u.occupancy_status==='occupied'?'Dolu':'Belirtilmedi'),u.occupancy_status==='occupied'?'occupied':u.occupancy_status==='vacant'?'vacant':'neutral');}
 export function unitBalance(s,u){return scopedCharges(s.data).filter(c=>c.unit_id===u.id&&!c.void_reason).reduce((sum,c)=>sum+remaining(s.data,c),0);}
+export function unitCardResident(d,unitId){
+ const links=personLinks(d,unitId);
+ for(const role of ['tenant','owner','representative']){
+  const link=links.find(l=>l.role===role&&personName(d,l.person_id).trim());
+  if(link)return personName(d,link.person_id).trim()+' · '+roleLabel(role);
+ }
+ return '';
+}
 export function unitMapV3(s,list=visible(s)){return `<div class="building-plan">${['A','B'].map(block=>{const units=list.filter(u=>u.block===block).sort((a,b)=>a.number-b.number);return units.length?`<section class="building-block"><h3>${block} ${tr('Blok')}</h3><div class="unit-card-grid">${units.map(u=>{
- const d=s.data,balance=unitBalance(s,u),check=unitClarifications(s,u),tenant=personLinks(d,u.id).find(l=>l.role==='tenant'),name=tenant?personName(d,tenant.person_id):'',old=scopedCharges(d).filter(c=>c.unit_id===u.id&&former(d,c)).reduce((n,c)=>n+remaining(d,c),0);
+ const d=s.data,balance=unitBalance(s,u),check=unitClarifications(s,u),name=unitCardResident(d,u.id),old=scopedCharges(d).filter(c=>c.unit_id===u.id&&former(d,c)).reduce((n,c)=>n+remaining(d,c),0);
  return `<article class="apartment-card"><button class="apartment-open" data-action="unit" data-id="${e(u.id)}" aria-label="${e(u.code)}"><span class="apartment-heading"><strong>${e(u.code)}</strong>${occupancy(u,s.data)}</span><span class="apartment-resident">${e(name||tr(effectiveOccupancy(d,u)==='vacant'?'Boş':'Sakin bilgisi eksik.'))}</span><span class="apartment-balance ${balance>0?'debt-amount':''}">${balance>0?money(balance)+' <small class="debt-category">· '+e(unitDebtCategory(s,u))+'</small>':check.stages.length?tr('Bakiye kontrol bekliyor.'):tr('Borç yok')}</span>${balance>0?`<small class="apartment-source-note">${tr('Onaylı açık tutar')}${check.stages.length?' · '+tr('Ek kayıtlar kontrol bekliyor.'):''}</small>`:''}${old>0?badge(tr('Eski borçlar'),'old-balance'):''}</button>${check.reasons.length||check.debts.length||check.notices.length?`<details class="clarification info-help ${check.reasons.length?'needs-clarification':'debt-information'}"><summary><span aria-hidden="true">ⓘ</span> ${tr(check.reasons.length?'Kontrol gerekli':check.debts.length?'Açık borç kalemleri':'Bilgi')}</summary><div class="tooltip-body compact-info">${check.openIssues.length?compactReview(check):balance>0?e(unitDebtCategory(s,u))+' · '+money(balance):tr('Kişi bilgilerini kontrol et')}${button(tr('Detayları gör'),'unit',`data-id="${e(u.id)}"`)}</div></details>`:''}</article>`;
  }).join('')}</div></section>`:'';}).join('')}</div>`;}
 export function filteredUnitsV3(s){const f=s.filter,roles={owner:roleLabel('owner'),tenant:roleLabel('tenant'),representative:roleLabel('representative')};return visible(s).filter(u=>(!String(f.q||'').trim()||unitSearchMatches(s.data,u,f.q,can(s,'people'),roles).length>0)&&(f.block==='all'||u.block===f.block)&&(f.status==='all'||(f.status==='debt'?unitBalance(s,u)>0:f.status==='paid'?unitBalance(s,u)===0:effectiveOccupancy(s.data,u)===f.status)));}
