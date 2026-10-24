@@ -7,6 +7,7 @@ export const german = {
  "E-posta adresin doğrulandı. Bundan sonra şifreyle giriş yapabilirsin.": "Deine E-Mail-Adresse wurde bestätigt. Lege ein Passwort für künftige Anmeldungen fest.",
  "Devam et": "Weiter",
  "Şifren kaydedildi.": "Dein Passwort wurde gespeichert.",
+ "Yeni kullanıcı mısınız? Giriş ekranında “İlk kez şifre oluştur” seçeneğiyle e-posta kodundan sonra şifre oluşturabilirsiniz.": "Neu hier? Wähle auf der Anmeldeseite „Erstmals Passwort erstellen“, um nach dem E-Mail-Code ein Passwort festzulegen.",
 
  "Bilgi": "Hinweis",
  "Kişi ekle": "Person hinzufügen",
