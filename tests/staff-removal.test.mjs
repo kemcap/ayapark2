@@ -34,9 +34,9 @@ test('remove form explains boundaries and requires confirmation and reason',()=>
 
 test('a manager cannot remove themself or the last manager',()=>{
  assert.throws(()=>buildV3Form({data},'staff_remove',{id:'actor'}));
- const last={...data,staff:[staff[0],staff[1].role==='deputy'?staff[1]:{...staff[1],role:'deputy'}]};
+ const last={...data,userId:'other',staff:[staff[0],staff[1]]};
  assert.throws(()=>buildV3Form({data:last},'staff_remove',{id:'actor'}));
- const onlyManager={...data,staff:[staff[0]]};
+ const onlyManager={...data,userId:'other',staff:[staff[0]]};
  assert.throws(()=>buildV3Form({data:onlyManager},'staff_remove',{id:'actor'}));
 });
 
