@@ -1,3 +1,11 @@
+## V3.14 · 2026-10-24
+
+- Add Ayapark 2 brand palette from meadow, sky and caramel facade tones, with light/dark surfaces.
+- Add a contrast switch beside the palette; hue-preserving high contrast for every look and stronger controls, navigation and focus states.
+- Rebuild preview and reset as two desktop columns, one mobile column. Full reset restores every appearance preference, Turkish and automatic theme.
+- Preserve existing explicit language choices and upstream V3.13.3/V3.13.4 first-password/recovery and header-image changes.
+- 106 Node tests; palette persistence checked with a rolled-back SQL transaction; desktop/mobile visual and contrast checks.
+
 ## V3.13.2 · 2026-10-24
 
 - Match page backgrounds, cards/dialogs, sidebar and header surfaces to each color palette in both light and dark modes. Classic keeps the original appearance.

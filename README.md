@@ -1,6 +1,10 @@
-# Ayapark 2 · V3.13.5
+# Ayapark 2 · V3.14
 
 Browser app with Supabase Auth and row-level data access.
+
+V3.14: Appearance settings add the **Ayapark 2** palette, inspired by the uploaded building photo: meadow green, sky blue and caramel timber. Six looks support normal/high contrast in light/dark modes. A switch next to the palette improves text, inputs, buttons, cards, navigation and focus indicators without removing each palette's identity. The preview and full reset occupy separate desktop columns and stack on mobile. Reset restores all nine preferences, including Turkish language and automatic theme. Existing explicit language choices remain intact until reset. Personal settings remain owner-scoped; the only database change expands the palette validator allowlist.
+
+Validation: 110 Node regression tests (including upstream first-password/recovery tests); 12 high-contrast palette/mode combinations checked for text, button, navigation and boundary contrast; new palette save tested in a rolled-back transaction; desktop and 320px mobile with very large text checked in the browser. No production person, finance, role or SMTP settings were changed by this appearance update.
 
 V3.13.5: In **Verwaltungsrechte / Yönetim yetkileri**, the Superadmin can remove another management member after entering a reason and confirming the action. This revokes the site staff membership and supplementary capabilities, preserving the Supabase Auth user account, apartment relationships, accounting records, and audit history. Removing your own membership or the final manager is blocked by the database. Migration: `20261024194000_remove_management_member.sql`.
 

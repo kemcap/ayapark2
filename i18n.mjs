@@ -1036,3 +1036,5 @@ Object.assign(german,{'açıklığa kavuşturulacak konu':'Punkt zu klären'});
 Object.assign(german,{'Açık konu yok':'Keine offenen Klärungspunkte'});
 
 Object.assign(german,{'Klasik (standart)':'Klassisch (Standard)','Standart renklere dön':'Farbwelt auf Standard zurücksetzen','Para tutarlarını gizle':'Geldbeträge ausblenden','Tutarlar bulanık görünür. Görmek için tutara dokunun. Borç ve ödemeler değişmez.':'Beträge werden unscharf angezeigt. Zum Anzeigen den Betrag antippen. Forderungen und Zahlungen bleiben unverändert.'});
+
+Object.assign(german,{"Yüksek kontrast": "Hoher Kontrast", "Renkleri koruyarak yazı ve kontrolleri belirginleştirir.": "Verstärkt Texte und Bedienelemente und erhält die Farbwelt.", "Yazı, renk ve kontrolleri burada deneyin.": "Hier kannst du Schrift, Farben und Bedienelemente beurteilen.", "Etkin": "Aktiv", "Örnek alan": "Beispielfeld", "Bilgi örneği": "Beispielhinweis", "Standart görünüm": "Standardeinstellungen", "Bu bölümdeki tüm tercihleri sıfırlar. Dil Türkçe, tema otomatik olur.": "Setzt alle Einstellungen dieses Bereichs zurück: Sprache Türkisch, Darstellung automatisch.", "Standarda sıfırla": "Auf Standard zurücksetzen"});

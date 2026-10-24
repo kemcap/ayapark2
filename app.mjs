@@ -1,5 +1,5 @@
 import {apartmentInfo} from './apartment-info.mjs';
-import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,preferences,beginLoading} from './preferences.mjs';
+import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs';
 import {updateAssignmentForm} from './assignments.mjs';
 import {personManager} from './people-ui.mjs';
 import {mayPreview,residentPreviewOptions,previewProjection} from './access-preview.mjs';
@@ -38,7 +38,7 @@ function render(focus=false){
  $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> '+getLanguage().toUpperCase();$('languageToggle').title=getLanguage()==='tr'?'Deutsch':'Türkçe';
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
- const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V3.13.5';
+ const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V3.14';
  renderNavigation();
  $('breadcrumb').textContent=roleName(d.role)+' / '+labels[state.page];
  const previewAllowed=state.mode==='connected'&&mayPreview(state.fullData);
@@ -128,7 +128,7 @@ $('ackUrgent').addEventListener('click',async()=>{const b=$('ackUrgent');b.disab
 $('urgentDialog').addEventListener('cancel',event=>event.preventDefault());
 
 document.addEventListener('click',async event=>{
- if(event.target.closest('[data-reset-palette]')){const select=document.querySelector('[data-preference="palette"]');if(select){select.value='classic';select.dispatchEvent(new Event('change',{bubbles:true}));}return;}
+ if(event.target.closest('[data-reset-appearance]')){resetPreferences(state.mode==='connected'?api:null,message=>{const el=$('preferenceStatus');if(el)el.textContent=message;});applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));const panel=document.querySelector('.appearance-settings');if(panel)panel.open=true;document.querySelector('[data-reset-appearance]')?.focus();return;}
  const navToggle=event.target.closest('#nav [data-nav-group]');
  if(navToggle){
   const group=Number(navToggle.dataset.navGroup);
@@ -393,7 +393,7 @@ async function reviewSelected(){
 }
 document.addEventListener('change',event=>{
  const preference=event.target.dataset.preference;
- if(preference){changePreference(preference,event.target.type==='checkbox'?event.target.checked:event.target.value,state.mode==='connected'?api:null,message=>{const status=$('preferenceStatus');if(status)status.textContent=message;});applyStaticLanguage();const open=document.querySelector('.appearance-settings')?.open;render();if(open&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;document.dispatchEvent(new Event('ay2:languagechange'));return;}
+ if(preference){changePreference(preference,preference==='contrast'?(event.target.checked?'high':'normal'):event.target.type==='checkbox'?event.target.checked:event.target.value,state.mode==='connected'?api:null,message=>{const status=$('preferenceStatus');if(status)status.textContent=message;});applyStaticLanguage();const open=document.querySelector('.appearance-settings')?.open;render();if(open&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;document.dispatchEvent(new Event('ay2:languagechange'));return;}
  if(event.target.id==='auditSize'){state.auditSize=Number(event.target.value);void loadAuditPage(0);return;}
  if(event.target.matches('[data-review-all]'))for(const box of document.querySelectorAll('[data-review-key]'))box.checked=event.target.checked;
  if(event.target.matches('[data-review-all],[data-review-key]')){const all=[...document.querySelectorAll('[data-review-key]')],n=all.filter(x=>x.checked).length,select=document.querySelector('[data-review-all]'),b=document.querySelector('[data-action="review_selected"]');if(select){select.checked=n===all.length&&n>0;select.indeterminate=n>0&&n<all.length;}if(b)b.disabled=n===0||writeBusy;const count=document.querySelector('[data-review-count]');if(count)count.textContent=n+' '+tr('seçildi');}
