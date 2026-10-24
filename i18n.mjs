@@ -1018,6 +1018,19 @@ Object.assign(german,{
  "Bu yetkiler yalnızca V3 alanı içindir. Süper Admin yetkisi vermez.": "Hiermit werden einzelne Verwaltungsrechte vergeben. Die Super-Admin-Rolle bleibt unverändert."
 });
 
+Object.assign(german,{
+ 'İşlemler':'Aktionen',
+ 'Üyeyi kaldır':'Mitglied entfernen',
+ 'Kendi hesabınız':'Eigenes Konto',
+ 'Son Süper Admin':'Letzter Superadmin',
+ 'Yönetim üyesi bulunamadı.':'Verwaltungsmitglied nicht gefunden.',
+ 'Kendi yönetim erişiminizi kaldıramazsınız.':'Die eigene Verwaltungsberechtigung kann nicht entfernt werden.',
+ 'Son Süper Admin kaldırılamaz.':'Der letzte Superadmin darf nicht entfernt werden.',
+ 'Bu kişinin yönetim yetkileri kaldırılacak. Kullanıcı hesabı, daire ilişkileri ve muhasebe kayıtları silinmeyecek.':'Die Verwaltungsberechtigung dieser Person wird entfernt. Das Benutzerkonto, die Wohnungszuordnungen und die Buchungen bleiben erhalten.',
+ 'Yönetim üyeliğini kaldırmayı onaylıyorum.':'Ich bestätige das Entfernen aus der Verwaltung.',
+ 'Yönetim üyeliği kaldırıldı':'Verwaltungsmitglied entfernt'
+});
+
 Object.assign(german,{'açıklığa kavuşturulacak konu':'Punkt zu klären'});
 
 Object.assign(german,{'Açık konu yok':'Keine offenen Klärungspunkte'});
