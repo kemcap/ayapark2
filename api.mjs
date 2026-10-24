@@ -29,7 +29,8 @@ export class AyaparkApi {
   const response=await this.fetcher(URL+path,{method,headers:{apikey:KEY,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',signal:AbortSignal.timeout(15000)});
   const data=await response.json().catch(()=>null);
   if(!response.ok){const announcementErrors={ay2_announcements_title_check:tr('Duyuru başlığı en fazla 150 karakter olabilir.'),ay2_announcements_body_check:tr('Duyuru metni en fazla 5000 karakter olabilir.'),ay2_announcements_check:tr('Yayın bitişi başlangıçtan sonra olmalıdır.')};const knownAnnouncement=Object.entries(announcementErrors).find(([constraint])=>String(data?.message).includes('\"'+constraint+'\"'))?.[1];
-  const error=Error(knownAnnouncement||(data?.code==='23514'&&String(data.message).includes('ay3_links_check')?tr('Çıkış tarihi başlangıç tarihinden önce olamaz.'):response.status===403?tr('Bu işlem için yetkiniz yok.'):path.startsWith('/auth/v1/')&&response.status===400?tr('Kod, e-posta veya şifre geçersiz olabilir. Tekrar kontrol edin.'):response.status===401?tr("Oturum sona erdi. Yeniden giriş yapın."):response.status===429?tr("Çok fazla deneme yapıldı. Biraz sonra tekrar deneyin."):(['P0001','42501'].includes(data?.code)?tr(data.message):tr("İşlem tamamlanamadı. Bağlantıyı, erişimi ve zorunlu alanları kontrol edin."))));error.status=response.status;throw error;}
+  const accessMessages={access_denied:'Yalnızca Süper Admin kullanıcı erişimi verebilir.',invalid_email:'Geçerli bir e-posta adresi girin.',apartment_required:'Sakin erişimi için önce güncel bir daire ilişkisi ekleyin.',account_mismatch:'Bu kişi başka bir hesaba bağlı. Hesap bağlantısını kontrol edin.',role_conflict:'Bu hesabın farklı bir yönetim rolü var. Mevcut rolü önce kontrol edin.',invalid_person:'Ad, soyad ve geçerli e-posta gerekli.',account_failed:'Hesap hazırlanamadı. Lütfen tekrar deneyin.',assignment_failed:'Erişim kaydedilemedi. Lütfen yöneticiye bildirin.',invalid_request:'Kişi, rol ve onay alanlarını kontrol edin.'};
+  const error=Error((path.startsWith('/functions/v1/ay3-user-access')&&accessMessages[data?.error]?tr(accessMessages[data.error]):null)||knownAnnouncement||(data?.code==='23514'&&String(data.message).includes('ay3_links_check')?tr('Çıkış tarihi başlangıç tarihinden önce olamaz.'):response.status===403?tr('Bu işlem için yetkiniz yok.'):path.startsWith('/auth/v1/')&&response.status===400?tr('Kod, e-posta veya şifre geçersiz olabilir. Tekrar kontrol edin.'):response.status===401?tr("Oturum sona erdi. Yeniden giriş yapın."):response.status===429?tr("Çok fazla deneme yapıldı. Biraz sonra tekrar deneyin."):(['P0001','42501'].includes(data?.code)?tr(data.message):tr("İşlem tamamlanamadı. Bağlantıyı, erişimi ve zorunlu alanları kontrol edin."))));error.status=response.status;throw error;}
   return data;
  }
  accept(session,generation){
@@ -74,7 +75,7 @@ export class AyaparkApi {
   return data;
  }
  async rpc(name,body){
-  if(!['ay2_command','ay2_capabilities','ay2_workspace','ay3_financial_summary','ay3_provider_directory'].includes(name))throw Error(tr("İşlem kapsam dışında."));
+  if(!['ay2_command','ay2_capabilities','ay2_workspace','ay3_financial_summary','ay3_provider_directory','ay3_preferences','ay3_review_state','ay3_review_selected','ay3_staff_directory','ay3_audit_page'].includes(name))throw Error(tr("İşlem kapsam dışında."));
   const generation=this.generation,token=await this.token();
   const result=await this.raw('/rest/v1/rpc/'+name,'POST',body,token);
   if(generation!==this.generation)throw Error(tr("Oturum değişti."));return result;
@@ -95,20 +96,20 @@ export class AyaparkApi {
   const serverRole=memberships[0]?.role||'resident';
   const role=serverRole==='manager'?'super':['deputy','auditor'].includes(serverRole)?'staff':'resident';
   const ownIds=links.map(l=>l.unit_id);
-  const byName=await this.rpc('ay2_workspace',{p_site:site.id});
+  const [byName,summary,reviewState,staff]=await Promise.all([this.rpc('ay2_workspace',{p_site:site.id}),this.rpc('ay3_financial_summary',{p_site:site.id}),this.rpc('ay3_review_state',{p_site:site.id}),role==='super'?this.rpc('ay3_staff_directory',{p_site:site.id}):Promise.resolve([])]);
   if(!byName)throw Error(tr("Çalışma alanı erişimi doğrulanamadı."));
   const capabilities=byName.capabilities;
   if(!capabilities.people)byName.providers=await this.rpc('ay3_provider_directory',{p_site:site.id});
-  const summary=await this.rpc('ay3_financial_summary',{p_site:site.id});
+
   const linksV3=byName.links||[],persons=byName.persons||[];
   const ownPersonIds=[...new Set(linksV3.filter(l=>role==='resident'||persons.find(p=>p.id===l.person_id)?.auth_user_id===this.session.user.id).map(l=>l.person_id))];
   for(const link of linksV3)if(role==='resident'&&!ownIds.includes(link.unit_id))ownIds.push(link.unit_id);
   const transactions=byName.entries.map(t=>({...t,date:t.booked_on,desc:t.description,iban:t.sender_iban||'',cents:Number(t.cents)})).sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
   const charges=byName.charges.map(c=>({...c,cents:Number(c.cents)})),allocations=byName.allocations.map(a=>({...a,cents:Number(a.cents)}));
   const unitData=units.filter(u=>role!=='resident'||ownIds.includes(u.id)).map(u=>({...u,block:blocks.find(b=>b.id===u.block_id)?.code||'?',debt:capabilities.finance||ownIds.includes(u.id)?charges.filter(c=>c.unit_id===u.id&&!c.void_reason).reduce((n,c)=>n+c.cents-allocations.filter(a=>a.charge_id===c.id&&!a.void_reason).reduce((x,a)=>x+a.cents,0),0):null}));
-  const staff=role==='super'?await this.read('site_staff_memberships',`select=user_id,role&site_id=eq.${sid}`):[];
+
   const residentAccounts=capabilities.admin?await this.readAll('site_resident_units',`select=user_id,unit_id&active=eq.true&unit_id=in.(${units.map(u=>u.id).join(',')})`):[];
-  return {userId:this.session.user.id,persons,links:linksV3,occupancyChanges:byName.occupancy_changes||[],credits:(byName.credits||[]).map(c=>({...c,cents:Number(c.cents)})),ownPersonIds,matchRules:byName.match_rules||[],providers:byName.providers||[],providerNotes:byName.provider_notes||[],acknowledgements:byName.acknowledgements||[],residentAccounts:[...new Map(residentAccounts.filter(r=>r.user_id).map(r=>[r.user_id,{...r,label:(units.find(u=>u.id===r.unit_id)?.code||'')+' · '+r.user_id.slice(0,8)}])).values()],summaryDays:summary?.days||[],summaryOpening:summary?.opening_cents==null?null:Number(summary.opening_cents),summaryBalance:summary?.balance_cents==null?null:Number(summary.balance_cents),sourceLastDate:summary?.source_last_date,site,role,serverRole,ownIds,capabilities,transactions,charges,allocations,people:byName.people,announcements:byName.announcements,reports:byName.reports,staged:byName.staged_charges,audit:byName.audit,permissions:byName.permissions,staff,opening:byName.settings[0]?.initialized?Number(byName.settings[0].opening_cents):null,openingDate:byName.settings[0]?.opening_date||null,units:unitData};
+  return {reviewState,userId:this.session.user.id,persons,links:linksV3,occupancyChanges:byName.occupancy_changes||[],credits:(byName.credits||[]).map(c=>({...c,cents:Number(c.cents)})),ownPersonIds,matchRules:byName.match_rules||[],providers:byName.providers||[],providerNotes:byName.provider_notes||[],acknowledgements:byName.acknowledgements||[],residentAccounts:[...new Map(residentAccounts.filter(r=>r.user_id).map(r=>[r.user_id,{...r,label:(units.find(u=>u.id===r.unit_id)?.code||'')+' · '+r.user_id.slice(0,8)}])).values()],summaryDays:summary?.days||[],summaryOpening:summary?.opening_cents==null?null:Number(summary.opening_cents),summaryBalance:summary?.balance_cents==null?null:Number(summary.balance_cents),sourceLastDate:summary?.source_last_date,site,role,serverRole,ownIds,capabilities,transactions,charges,allocations,people:byName.people,announcements:byName.announcements,reports:byName.reports,staged:byName.staged_charges,audit:byName.audit,permissions:byName.permissions,staff,opening:byName.settings[0]?.initialized?Number(byName.settings[0].opening_cents):null,openingDate:byName.settings[0]?.opening_date||null,units:unitData};
  }
  async logout(){const token=this.session?.access_token;this.clear();if(token)await this.raw('/auth/v1/logout?scope=local','POST',undefined,token);}
 }
