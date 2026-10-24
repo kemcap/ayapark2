@@ -1,4 +1,4 @@
-# Ayapark 2 · V3.13.2
+# Ayapark 2 · V3.13.3
 
 Browser app with Supabase Auth and row-level data access.
 
