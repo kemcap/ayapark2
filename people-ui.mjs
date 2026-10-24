@@ -2,7 +2,7 @@ import {t as tr} from './i18n.mjs';
 import {escapeHtml as e} from './core.mjs';
 import {activeAt,personName} from './v3-domain.mjs';
 import {can,heading,card,button,badge,date} from './ui.mjs';
-import {roleLabel} from './v3-ui.mjs';
+import {roleLabel} from './v3-ui.mjs?v=3.14.1';
 import {removalReasons} from './assignments.mjs';
 const role=l=>badge(roleLabel(l.role),'role-badge role-'+l.role);
 export function assignmentCard(s,l,showUnit=false){
