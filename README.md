@@ -1,4 +1,4 @@
-# Ayapark 2 · V3.13.1
+# Ayapark 2 · V3.13.2
 
 Browser app with Supabase Auth and row-level data access.
 
@@ -7,6 +7,8 @@ Browser app with Supabase Auth and row-level data access.
 - Owner-only preview: https://ayapark2-v2-private.kemcap.chatgpt.site
 
 V3.13 adds compact, collapsed clarification tasks with direct actions, multi-selection and audited review receipts. Reviewing never creates payments, assigns debtors or confirms imported charges. Mandatory missing information must be corrected; receipts become stale when source records change. The selected record is preserved in review history.
+
+V3.13.2 extends each non-classic palette to the page, cards/dialogs, sidebar, header and neutral surfaces in light and dark mode. Classic retains its existing surfaces. Device reduced-motion and high-contrast overrides remain active.
 
 V3.13.1 labels the original palette as Classic (default), adds a palette-only reset, removes the manual animation setting in favor of the device preference, and explains amount privacy.
 
