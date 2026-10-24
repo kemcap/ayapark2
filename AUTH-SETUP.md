@@ -29,6 +29,9 @@ For arbitrary residents, a working custom SMTP provider is required if the defau
 - Supabase dashboard redirect URLs and live email templates must be reviewed separately: repository changes cannot silently change them.
 - Do not paste genuine OTPs or one-time recovery URLs into issues or chats. Only an authorized user can confirm end-to-end email delivery and password setting.
 
+## Reset loop and OTP fallback (V3.13.4)
+The reset email template in `supabase/templates/recovery.html` contains both `{{ .ConfirmationURL }}` and `{{ .Token }}`. **Copy this template into Supabase Authentication → Email Templates → Reset Password**; a GitHub code change alone does not modify the Supabase email template. A recovery link is one-use and expires. If a link fails, request a fresh reset email and enter its numeric code into `/reset.html` without clicking the link. The new form verifies the recovery code with `type: recovery` and only then permits setting a password. Check Authentication → URL Configuration for the GitHub Pages reset URL and set the current site URL. Never send recovery links or OTPs to support.
+
 ## User onboarding
 
 A manager records the person's email and current apartment relationship, then selects Benutzerzugang / Kullanıcı erişimi in settings. This prepares an unconfirmed Auth account and grants the selected role through a server-only transaction. It does not send an email. The user requests an OTP on the login screen; verification proves mailbox ownership. All account creation and role assignment is authorized server-side against the manager membership. Existing management roles are not silently downgraded.
