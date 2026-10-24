@@ -1,3 +1,9 @@
+## V3.13.2 · 2026-10-24
+
+- Match page backgrounds, cards/dialogs, sidebar and header surfaces to each color palette in both light and dark modes. Classic keeps the original appearance.
+- Keep high-contrast overrides and semantic warning/debt colors. Header browser chrome follows the selected surface color.
+- Verified eight palette/mode combinations for body/secondary-text contrast, existing regression tests and browser appearance.
+
 ## V3.13.1 · 2026-10-24
 
 - Mark the original palette as Classic (default), with a palette-only reset.

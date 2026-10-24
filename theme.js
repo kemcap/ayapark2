@@ -8,7 +8,7 @@
  function apply(){
   const theme=preference==='system'?(system.matches?'dark':'light'):preference;
   root.dataset.theme=theme;root.dataset.themePreference=preference;
-  const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=theme==='dark'?'#252c30':'#eeece7';
+  const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=getComputedStyle(root).getPropertyValue('--header-bg').trim()||(theme==='dark'?'#252c30':'#eeece7');
   const menu=document.getElementById('themeMenu');if(!menu)return;
   const de=root.lang==='de',names=de?['Automatisch','Hell','Dunkel']:['Otomatik','Açık','Koyu'];
   const label=(de?'Darstellung: ':'Görünüm: ')+names[modes.indexOf(preference)],toggle=document.getElementById('themeToggle');
