@@ -1,4 +1,4 @@
-import {updateRelationshipForm,relationshipPayload,planRelationship} from './relationships.mjs';
+import {updateAssignmentForm} from './assignments.mjs';
 import {personManager} from './people-ui.mjs';
 import {mayPreview,residentPreviewOptions,previewProjection} from './access-preview.mjs';
 import {bindInstall} from './install.mjs';
@@ -71,14 +71,14 @@ async function mutate(action,payload){
  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
  return result;
 }
-function permissionFor(action){return ['user_access','settings','permissions','publish_report'].includes(action)?'admin':['relationship_change','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
+function permissionFor(action){return ['user_access','settings','permissions','publish_report'].includes(action)?'admin':['assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
 function showForm(action,args={}){
  if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
  if(writeBusy)throw Error(tr("Önce devam eden işlemin tamamlanmasını bekleyin."));
  if(!can(state,permissionFor(action)))throw Error(tr("Bu işlem için yetkiniz yok."));
  if($('detailDialog').open)$('detailDialog').close();
  const built=buildForm(state,action,{period:state.period,...args});formAction={action,args,context:built.context};
- $('actionTitle').textContent=built.title;$('actionFields').innerHTML=built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=tr(action==='relationship_change'?'Değişikliği kontrol et':'Kaydet');$('actionDialog').showModal();updateConditionalForm();
+ $('actionTitle').textContent=built.title;$('actionFields').innerHTML=built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=tr(action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');$('actionDialog').showModal();updateConditionalForm();
 }
 function showDetail(html){
  if(!html)return;
@@ -134,7 +134,6 @@ document.addEventListener('click',event=>{
  const yr=event.target.closest('[data-year]');if(yr){state.reportFilter={preset:'custom',from:yr.dataset.year+'-01-01',to:yr.dataset.year+'-12-31'};state.reportGroup='month';render();return;}
  const b=event.target.closest('[data-action]');if(!b)return;const action=b.dataset.action;
  try{
-  if(action==='relationship_back'){if(formAction?.action==='relationship_change'){$('relationshipEditor').hidden=false;$('relationshipReview').hidden=true;formAction.reviewed=null;$('saveAction').textContent=tr('Değişikliği kontrol et');$('actionDialog').scrollTop=0;}return;}
   if(action==='person_manage'){detailView={action,id:b.dataset.id};return showDetail(personManager(state,b.dataset.id));}
   if(action==='unit'){detailView={action,id:b.dataset.id};return showDetail(unitDetail(state,b.dataset.id));}
   if(action==='transaction'){if(can(state,'finance')){detailView={action,id:b.dataset.id};showDetail(transactionDetail(state,b.dataset.id));}return;}
@@ -163,12 +162,7 @@ $('languageToggle').addEventListener('click',()=>{
  if($('actionDialog').open&&formAction){
   const built=buildForm(state,formAction.action,{period:state.period,...formAction.args});
   $('actionTitle').textContent=built.title;$('actionFields').innerHTML=built.body;
-  if(formAction.action==='relationship_change'){
-   for(const saved of controls.filter(x=>['unit_id','kind'].includes(x.name))){const node=$('actionFields').querySelector(`[name="${saved.name}"]`);if(node)node.value=saved.value;}
-   updateRelationshipForm($('actionFields'),state.data,formAction.context);
-   const savedLink=controls.find(x=>x.name==='link_id');if(savedLink){const node=$('actionFields').querySelector('[name="link_id"]');if(node){node.value=savedLink.value;updateRelationshipForm($('actionFields'),state.data,formAction.context,'link_id');}}
-   formAction.reviewed=null;$('saveAction').textContent=tr('Değişikliği kontrol et');
-  }
+  if(formAction.action.startsWith('assignment_'))updateAssignmentForm($('actionFields'),state.data);
   for(const saved of controls){const node=$('actionFields').querySelector(`[name="${saved.name}"]`);if(node){node.value=saved.value;if(node.type==='checkbox')node.checked=saved.checked;}}
  }
  updateConditionalForm();document.dispatchEvent(new Event('ay2:languagechange'));
@@ -183,7 +177,7 @@ $('roleSelect').addEventListener('change',event=>{
 });
 $('residentPreviewSelect').addEventListener('change',event=>{if(!mayPreview(state.fullData))return;closeDialogs();state.previewSelection=event.target.value;render();});
 document.addEventListener('input',event=>{
- if(formAction?.action==='relationship_change'&&event.target.closest('#actionFields')){formAction.reviewed=null;$('relationshipReview').hidden=true;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=tr('Değişikliği kontrol et');updateConditionalForm(event.target.name);}
+ if(formAction?.action.startsWith('assignment_')&&event.target.closest('#actionFields')){if(event.target.name==='person_search')updateConditionalForm('person_search');$('actionMessage').textContent='';}
  if(event.target.id==='unitSearch'){state.filter.q=event.target.value;$('unitResults').innerHTML=unitResults(state);$('resultCount').textContent=filteredUnits(state).length+tr(" daire");}
  if(event.target.id==='peopleSearch'){state.peopleQuery=event.target.value;const pos=event.target.selectionStart;render();$('peopleSearch').focus();$('peopleSearch').setSelectionRange(pos,pos);}
  if(event.target.id==='providerSearch'){state.providerQuery=event.target.value;const start=event.target.selectionStart;render();$('providerSearch').focus();$('providerSearch').setSelectionRange(start,start);}
@@ -191,7 +185,7 @@ document.addEventListener('input',event=>{
 });
 document.addEventListener('change',event=>{
  const id=event.target.id;
- if(formAction?.action==='relationship_change'&&event.target.closest('#actionFields')){formAction.reviewed=null;$('relationshipReview').hidden=true;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=tr('Değişikliği kontrol et');updateConditionalForm(event.target.name);}
+ if(formAction?.action.startsWith('assignment_')&&event.target.closest('#actionFields'))updateConditionalForm(event.target.name);
  if(event.target.name==='category'||event.target.name==='relation'||event.target.name==='person_id'||event.target.name==='start_unknown')updateConditionalForm();
  if(['statusFilter','txnFilter','periodFilter'].includes(id)){
   const key={statusFilter:'status',txnFilter:'type',periodFilter:'period'}[id];state.filter[key]=event.target.value;
@@ -211,11 +205,10 @@ $('actionForm').addEventListener('submit',async event=>{
  try{
   $('actionMessage').textContent='';$('actionMessage').classList.remove('error');
   const {action,context}=formAction;
-  const payload=action==='relationship_change'?relationshipPayload(new FormData($('actionForm')),context,state.data,$('relationshipFields').dataset.version):payloadFor(action,new FormData($('actionForm')),context);
-  if(action==='relationship_change'&&formAction.reviewed!==JSON.stringify(payload)){const plan=planRelationship(state.data,payload);$('relationshipReview').innerHTML='<h3>'+tr('Değişikliği kontrol edin')+'</h3><ul>'+plan.summary.map(line=>'<li>'+e(line)+'</li>').join('')+'</ul><p>'+tr('Tüm değişiklikler birlikte kaydedilir. Mevcut borçlar, ödemeler ve hesap yetkileri değişmez.')+'</p><button type="button" class="button" data-action="relationship_back">'+tr('Bilgileri düzenle')+'</button>'; $('relationshipEditor').hidden=true;$('relationshipReview').hidden=false;$('relationshipReview').tabIndex=-1;$('relationshipReview').focus();formAction.reviewed=JSON.stringify(payload);$('saveAction').textContent=tr('Onayla ve kaydet');$('actionDialog').scrollTop=0;return;}
+  const payload=payloadFor(action,new FormData($('actionForm')),context);
   writeBusy=true;$('saveAction').disabled=true;$('cancelAction').disabled=true;$('actionMessage').textContent=tr("Kaydediliyor…");
   await mutate(action==='ignore_staged'?'confirm_staged':action,payload);
-  if(attempt!==epoch)return;$('actionDialog').close();toast(state.stale?tr("Kaydedildi; görünüm yenilenemedi. Yenile düğmesine basın."):state.mode==='demo'?tr("Örnek çalışma alanında kaydedildi."):tr("Kayıt tamamlandı."));
+  if(attempt!==epoch)return;$('actionDialog').close();if(action.startsWith('assignment_')&&!state.stale&&detailView){if(detailView.action==='unit')showDetail(unitDetail(state,detailView.id));else if(detailView.action==='person_manage')showDetail(personManager(state,detailView.id));}toast(state.stale?tr("Kaydedildi; görünüm yenilenemedi. Yenile düğmesine basın."):state.mode==='demo'?tr("Örnek çalışma alanında kaydedildi."):tr("Kayıt tamamlandı."));
  }catch(error){if(attempt===epoch){$('actionMessage').textContent=error.message;$('actionMessage').classList.add('error');}}
  finally{writeBusy=false;$('saveAction').disabled=false;$('cancelAction').disabled=false;}
 });
@@ -285,11 +278,8 @@ document.dispatchEvent(new Event('ay2:languagechange'));
 if(!new URLSearchParams(location.hash.slice(1)).has('access_token')&&!new URLSearchParams(location.hash.slice(1)).has('error'))navigate(location.hash.slice(1)||'overview');
 
 function updateConditionalForm(changed=''){
- if(formAction?.action==='relationship_change'){updateRelationshipForm($('actionFields'),state.data,formAction.context,changed);const fresh=$('actionFields').querySelector('[name="person_id"]')?.value==='__new__',box=$('newRelationshipPerson');if(box){box.hidden=!fresh;for(const n of box.querySelectorAll('input')){n.disabled=!fresh;n.required=fresh&&['first_name','last_name'].includes(n.name);}}}
+ if(formAction?.action.startsWith('assignment_'))updateAssignmentForm($('actionFields'),state.data,changed);
 
- const unknown=$('actionFields').querySelector('[name="start_unknown"]'),start=$('actionFields').querySelector('[name="starts_on"]');if(unknown&&start){start.disabled=unknown.checked;start.required=false;if(unknown.checked)start.value='';}
-
- const block=$('newTenantFields');if(block){const fresh=$('actionFields').querySelector('[name="person_id"]')?.value==='__new__';block.hidden=!fresh;for(const node of block.querySelectorAll('[name="first_name"],[name="last_name"]'))node.required=fresh;}
  if(formAction?.action!=='entry')return;const category=$('actionFields').querySelector('[name="category"]'),desc=$('actionFields').querySelector('[name="desc"]');if(desc){desc.placeholder=tr(category?.value==='Diğer'?'İşlem ne için yapıldı?':'Açıklama girin');desc.required=true;}
 }
 

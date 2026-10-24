@@ -38,5 +38,5 @@ test('zero posted balance with pending source is review pending, not settled',()
 });
 test('source overlap and missing current responsibility remain clarification reasons',()=>{
  const s=sample();s.data.charges=[{id:'c',unit_id:'x',person_id:'person',cents:100}];s.data.staged=[{id:'a',unit_hint:'A-4',person_label:'Test Person',as_of:'2026-10-09',cents:100},{id:'b',unit_hint:'A-4',person_label:'Test Person',as_of:'2026-10-09',cents:200}];
- const review=unitClarifications(s,s.data.units[0]);assert.equal(review.stages[0].check.overlaps.length,1);assert(review.reasons.includes('Kişinin güncel daire ilişkisi kontrol edilmeli.'));
+ const review=unitClarifications(s,s.data.units[0]);assert.equal(review.stages[0].check.overlaps.length,1);assert(review.reasons.some(r=>r.includes('Borçlunun kişi bilgisi eksik.')));
 });
