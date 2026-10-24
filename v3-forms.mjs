@@ -18,6 +18,18 @@ export function buildV3Form(s,action,args={}){
   title=tr('Kullanıcı erişimi');
   body=`<fieldset class="person-choice"><legend>${tr('Kişi seçimi')}</legend><label class="check-field"><input type="radio" name="person_mode" value="existing" checked>${tr('Kayıtlı kişi seç')}</label><label class="check-field"><input type="radio" name="person_mode" value="new">${tr('Yeni kişi oluştur')}</label></fieldset><div id="accessExisting">${sel('person_id','Kişi',personOptions(d))}</div><div id="accessNew" hidden>${field('first_name',tr('Ad'),'text','','maxlength="75" disabled')}${field('last_name',tr('Soyad'),'text','','maxlength="75" disabled')}${field('email',tr('E-posta'),'email','','maxlength="254" disabled')}</div>`+sel('access_role','Erişim rolü',[['resident',tr('Site Sakini')],['deputy',tr('Yönetim')],['manager',tr('Süper Admin')]],'deputy')+`<p class="fine">${tr('Yönetim için daire ilişkisi gerekmez. Sakin erişimi için güncel bir daire ilişkisi ve her durumda geçerli e-posta gerekir. Bu işlem e-posta göndermez.')}</p>`+check('confirmation','Erişimi tanımlamayı onaylıyorum.');
  }
+ else if(action==='staff_remove'){
+  const member=d.staff.find(x=>x.user_id===args.id);
+  if(!member)throw Error(tr('Yönetim üyesi bulunamadı.'));
+  if(member.user_id===d.userId)throw Error(tr('Kendi yönetim erişiminizi kaldıramazsınız.'));
+  if(member.role==='manager'&&d.staff.filter(x=>x.role==='manager').length<=1)throw Error(tr('Son Süper Admin kaldırılamaz.'));
+  context.user_id=member.user_id;
+  const label=member.name||d.persons.find(p=>p.auth_user_id===member.user_id)?.full_name||member.email||tr('Ad bağlanmadı');
+  title=tr('Üyeyi kaldır');
+  body=`<div class="info-strip"><strong>${e(label)}</strong><p>${tr('Bu kişinin yönetim yetkileri kaldırılacak. Kullanıcı hesabı, daire ilişkileri ve muhasebe kayıtları silinmeyecek.')}</p></div>`+
+    `<label class="field">${tr('Gerekçe')}<textarea name="reason" minlength="3" maxlength="500" required rows="3"></textarea></label>`+
+    check('confirmation','Yönetim üyeliğini kaldırmayı onaylıyorum.');
+ }
  else if(action==='occupancy'){
   const u=d.units.find(u=>u.id===args.unit);context.unit_id=args.unit;title=tr('Kullanımı düzenle');body=sel('status','Kullanım',[['occupied',tr('Dolu')],['vacant',tr('Boş')],['unknown',tr('Bilinmiyor')]],u?effectiveOccupancy(d,u):'unknown')+`<p class="fine">${tr('Kullanım durumu kişi kaydından ayrıdır. Ev sahibi dairede oturabilir; eski borçlar değişmez.')}</p>`;
  }
@@ -61,12 +73,15 @@ export function buildV3Form(s,action,args={}){
 }
 export function payloadV3(action,form,ctx){
  if(action.startsWith('assignment_'))return assignmentPayload(action,form,ctx);
- const special=['person_link','occupancy','edit_link','user_access','person','link','end_link','unlink','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_note','classify_entry'];
+ const special=['person_link','occupancy','edit_link','user_access','staff_remove','person','link','end_link','unlink','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_note','classify_entry'];
  if(!special.includes(action)){const p=payloadLegacy(action,form,ctx);if(action==='charge'&&(p.period_from||p.period_to)&&(!dateValid(p.period_from)||!dateValid(p.period_to)||p.period_to<p.period_from))throw Error(tr('Borç döneminin başlangıç ve bitiş tarihlerini kontrol edin.'));if(action==='entry'&&p.category==='Diğer'&&!p.desc)throw Error(tr('Açıklama gerekli.'));return p;}
+ if(action==='staff_remove'&&(!form.has('confirmation')||!ctx.user_id))throw Error(tr('Devam etmek için onay kutusunu işaretleyin.'));
+ if(action==='staff_remove'&&String(form.get('reason')||'').trim().length<3)throw Error(tr('En az üç karakterlik gerekçe yazın.'));
  if(action==='user_access'&&((form.get('person_mode')!=='new'&&!form.get('person_id'))||!form.has('confirmation')))throw Error(tr('Kişi seçin ve erişimi onaylayın.'));
  const p={...ctx};for(const[k,v]of form)p[k]=String(v).trim();const get=k=>String(form.get(k)||'').trim();
  if(['void_credit'].includes(action)&&!form.has('confirmation'))throw Error(tr('Devam etmek için onay kutusunu işaretleyin.'));
  if(action==='person'&&(!get('first_name')||!get('last_name')))throw Error(tr('Ad ve soyad gerekli.'));
+ if(action==='staff_remove'){p.user_id=ctx.user_id;p.confirmation=true;}
  p.primary_contact=form.has('primary_contact');if(action==='user_access'){p.confirmation=true;p.new_person=get('person_mode')==='new';if(p.new_person&&(!get('first_name')||!get('last_name')||!get('email')))throw Error(tr('Ad, soyad ve geçerli e-posta gerekli.'));}
  if(action==='bind_charge'&&!get('link_id'))throw Error(tr('Kişi seçin.'));
  if(action==='void_credit'&&get('reason').length<3)throw Error(tr('Gerekçe gerekli.'));

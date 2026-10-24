@@ -82,7 +82,7 @@ export class AyaparkApi {
   return data;
  }
  async rpc(name,body){
-  if(!['ay2_command','ay2_capabilities','ay2_workspace','ay3_financial_summary','ay3_provider_directory','ay3_preferences','ay3_review_state','ay3_review_selected','ay3_staff_directory','ay3_audit_page'].includes(name))throw Error(tr("İşlem kapsam dışında."));
+  if(!['ay2_command','ay2_capabilities','ay2_workspace','ay3_financial_summary','ay3_provider_directory','ay3_preferences','ay3_review_state','ay3_review_selected','ay3_staff_directory','ay3_audit_page','ay3_remove_staff_member'].includes(name))throw Error(tr("İşlem kapsam dışında."));
   const generation=this.generation,token=await this.token();
   const result=await this.raw('/rest/v1/rpc/'+name,'POST',body,token);
   if(generation!==this.generation)throw Error(tr("Oturum değişti."));return result;

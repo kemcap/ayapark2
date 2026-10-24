@@ -1,6 +1,8 @@
-# Ayapark 2 · V3.13.4
+# Ayapark 2 · V3.13.5
 
 Browser app with Supabase Auth and row-level data access.
+
+V3.13.5: In **Verwaltungsrechte / Yönetim yetkileri**, the Superadmin can remove another management member after entering a reason and confirming the action. This revokes the site staff membership and supplementary capabilities, preserving the Supabase Auth user account, apartment relationships, accounting records, and audit history. Removing your own membership or the final manager is blocked by the database. Migration: `20261024194000_remove_management_member.sql`.
 
 V3.13.4: Replaces the upper-left generic building icon with a 3 KB 96x96 WebP photo thumbnail; adds a recovery OTP fallback to the reset form and email template for cases where a reset link expires or redirects incorrectly. The published Supabase email template and Auth URL allowlist must still be configured in the dashboard, and the separate GPT preview is not automatically synchronized.
 

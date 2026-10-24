@@ -38,7 +38,7 @@ function render(focus=false){
  $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> '+getLanguage().toUpperCase();$('languageToggle').title=getLanguage()==='tr'?'Deutsch':'Türkçe';
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
- const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V3.13.2';
+ const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V3.13.5';
  renderNavigation();
  $('breadcrumb').textContent=roleName(d.role)+' / '+labels[state.page];
  const previewAllowed=state.mode==='connected'&&mayPreview(state.fullData);
@@ -72,19 +72,33 @@ async function mutateInner(action,payload){
  if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
  if(state.mode==='demo'&&action==='user_access')return {ok:true};
  if(action==='user_access'){const result=await api.provision({...payload,site_id:state.data.site.id});await reload();return result;}
+ if(action==='staff_remove'){
+  if(state.mode==='demo'){
+   const member=state.data.staff.find(x=>x.user_id===payload.user_id);
+   if(!member||member.user_id===state.data.userId||member.role==='manager'&&state.data.staff.filter(x=>x.role==='manager').length<=1)throw Error(tr('Bu işlem için yetkiniz yok.'));
+   state.data.staff=state.data.staff.filter(x=>x.user_id!==payload.user_id);
+   state.data.permissions=state.data.permissions.filter(x=>x.user_id!==payload.user_id);
+   state.data.audit.push({id:randomId(),at:new Date().toISOString(),actor:state.data.userId,action:'staff_remove',details:{reason:payload.reason}});
+   render();return {ok:true};
+  }
+  const attempt=epoch,result=await api.rpc('ay3_remove_staff_member',{p_site:state.data.site.id,p_user:payload.user_id,p_confirm:payload.confirmation,p_reason:payload.reason});
+  if(attempt!==epoch)throw Error(tr('Oturum değişti.'));
+  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
+  return result;
+ }
  if(state.mode==='demo'){const r=demoCommand(state.data,action,payload);state.data.transactions.sort((a,b)=>b.date.localeCompare(a.date));refreshDebts(state.data);render();return r;}
  const attempt=epoch,result=await api.command(state.data.site.id,action,payload);if(attempt!==epoch)throw Error(tr("Oturum değişti."));
  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
  return result;
 }
-function permissionFor(action){return ['user_access','settings','permissions','publish_report'].includes(action)?'admin':['assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
+function permissionFor(action){return ['user_access','staff_remove','settings','permissions','publish_report'].includes(action)?'admin':['assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
 function showForm(action,args={}){
  if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
  if(writeBusy)throw Error(tr("Önce devam eden işlemin tamamlanmasını bekleyin."));
  if(!can(state,permissionFor(action)))throw Error(tr("Bu işlem için yetkiniz yok."));
  if($('detailDialog').open)$('detailDialog').close();
  const built=buildForm(state,action,{period:state.period,...args});formAction={action,args,context:built.context};
- $('actionTitle').textContent=built.title;$('actionFields').innerHTML=built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=tr(action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');$('actionDialog').showModal();updateConditionalForm();
+ $('actionTitle').textContent=built.title;$('actionFields').innerHTML=built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');$('actionDialog').showModal();updateConditionalForm();
 }
 function showDetail(html){
  if(!html)return;
