@@ -1,10 +1,12 @@
-# Ayapark 2 · V3.10
+# Ayapark 2 · V3.11
 
 Browser app with Supabase Auth and row-level data access.
 
 - Current app: https://kemcap.github.io/ayapark2/
 - Archived original: https://kemcap.github.io/ayapark2/old/
 - Owner-only preview: https://ayapark2-v2-private.kemcap.chatgpt.site
+
+V3.11: Relationship start dates can be omitted and then remain unknown. Undated changes and departures use today as the effective date, without changing historical finance records. This behavior is covered by targeted regressions.
 
 V3.10 adds a guided, bilingual relationship workflow: ownership transfer, owner staying as tenant, tenant replacement, departure, tenant buying the unit, correction with reason, and adding a person with a role from either direction. A review step precedes one atomic save. Existing debts, payments, authentication identities and management privileges stay unchanged.
 

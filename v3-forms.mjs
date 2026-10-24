@@ -1,4 +1,4 @@
-import {buildRelationshipForm,relationshipPayload,effectiveOccupancy,linkVersion} from './relationships.mjs';
+import {buildRelationshipForm,relationshipPayload,effectiveOccupancy,linkVersion,followingDay} from './relationships.mjs';
 import {announcementTime,validateAnnouncement} from './announcement-validation.mjs';
 import {t as tr} from './i18n.mjs';
 import {escapeHtml as e,randomId,money} from './core.mjs';
@@ -29,14 +29,14 @@ export function buildV3Form(s,action,args={}){
   const p=d.persons?.find(x=>x.id===args.id);context.person_id=p?.id||'';const unit=args.unit;
   title=tr(p?'Kişi bilgilerini düzenle':'Yeni kişi');
   body=field('first_name',tr('Ad'),'text',p?.first_name||'','required maxlength="75"')+field('last_name',tr('Soyad'),'text',p?.last_name||'','required maxlength="75"')+field('phone',tr('Telefon'),'tel',p?.phone||'','maxlength="60"')+field('email',tr('E-posta'),'email',p?.email||'','maxlength="254"')+sel('language','İletişim dili',[['tr','Türkçe'],['de','Deutsch'],['en','English'],['fr','Français'],['ru','Русский'],['other',tr('Başka dil')]],p?.language||'tr')+text('notes','Notlar',p?.notes||'')+(s.data.role==='super'?sel('auth_user_id','Uygulama hesabı',[['',tr('Hesap bağlanmadı')],...(d.residentAccounts||[]).map(a=>[a.user_id,a.label||a.user_id])],p?.auth_user_id||''):'');
-  if(unit&&!p){context.unit_id=unit;const owner=personLinks(d,unit).some(l=>l.role==='owner');body+=`<p class="info-strip">${tr(owner?'Rol ve başlangıç tarihini seçin.':'Kiracı eklemek için önce ev sahibini kaydedin. Temsilciyi şimdi ekleyebilirsiniz.')}</p>`+sel('role','Rol',owner?roles:roles.filter(([r])=>r!=='tenant'),'owner')+field('starts_on',tr('Başlangıç'),'date','','required')+check('start_unknown','Başlangıç tarihi bilinmiyor')+field('responsibility',tr('Sorumluluk'),'text','','maxlength="1000"')+check('primary_contact','İlk aranacak kişi');}
+  if(unit&&!p){context.unit_id=unit;const owner=personLinks(d,unit).some(l=>l.role==='owner');body+=`<p class="info-strip">${tr(owner?'Rol ve başlangıç tarihini seçin.':'Kiracı eklemek için önce ev sahibini kaydedin. Temsilciyi şimdi ekleyebilirsiniz.')}</p>`+sel('role','Rol',owner?roles:roles.filter(([r])=>r!=='tenant'),'owner')+field('starts_on',tr('Başlangıç (isteğe bağlı)'),'date','')+check('start_unknown','Başlangıç tarihi bilinmiyor')+`<p class="fine">${tr('Tarih boş kalırsa başlangıç bilinmiyor olarak kaydedilir.')}</p>`+field('responsibility',tr('Sorumluluk'),'text','','maxlength="1000"')+check('primary_contact','İlk aranacak kişi');}
  }
  else if(action==='person_link'){
-  context.person_id=args.id;title=tr('Daireye bağla');body=sel('unit_id','Daire',d.units.map(u=>[u.id,u.code]))+sel('role','Rol',roles,'owner')+field('starts_on',tr('Başlangıç'),'date','','required')+check('start_unknown','Başlangıç tarihi bilinmiyor')+field('ends_on',tr('Bitiş'),'date')+field('responsibility',tr('Sorumluluk'),'text','','maxlength="1000"')+check('primary_contact','İlk aranacak kişi');
+  context.person_id=args.id;title=tr('Daireye bağla');body=sel('unit_id','Daire',d.units.map(u=>[u.id,u.code]))+sel('role','Rol',roles,'owner')+field('starts_on',tr('Başlangıç (isteğe bağlı)'),'date','')+check('start_unknown','Başlangıç tarihi bilinmiyor')+`<p class="fine">${tr('Tarih boş kalırsa başlangıç bilinmiyor olarak kaydedilir.')}</p>`+field('ends_on',tr('Bitiş'),'date')+field('responsibility',tr('Sorumluluk'),'text','','maxlength="1000"')+check('primary_contact','İlk aranacak kişi');
  }
  else if(action==='link'){
   if(!(d.persons||[]).length)throw Error(tr('Önce bir kişi ekleyin.'));context.unit_id=args.unit;
-  title=tr('Kayıtlı kişi bağla');body=sel('person_id','Kişi',personOptions(d))+sel('role','Rol',roles,'owner')+field('starts_on',tr('Başlangıç'),'date','','required')+check('start_unknown','Başlangıç tarihi bilinmiyor')+field('ends_on',tr('Bitiş'),'date')+field('responsibility',tr('Sorumluluk'),'text','','maxlength="1000"')+check('primary_contact','İlk aranacak kişi')+`<p class="fine">${tr('Kiracı için ev sahibi kaydı gereklidir. Temsilci bağımsız olarak eklenebilir.')}</p>`;
+  title=tr('Kayıtlı kişi bağla');body=sel('person_id','Kişi',personOptions(d))+sel('role','Rol',roles,'owner')+field('starts_on',tr('Başlangıç (isteğe bağlı)'),'date','')+check('start_unknown','Başlangıç tarihi bilinmiyor')+`<p class="fine">${tr('Tarih boş kalırsa başlangıç bilinmiyor olarak kaydedilir.')}</p>`+field('ends_on',tr('Bitiş'),'date')+field('responsibility',tr('Sorumluluk'),'text','','maxlength="1000"')+check('primary_contact','İlk aranacak kişi')+`<p class="fine">${tr('Kiracı için ev sahibi kaydı gereklidir. Temsilci bağımsız olarak eklenebilir.')}</p>`;
  }
  else if(action==='unlink'){
   const l=d.links.find(x=>x.id===args.id);if(!l)throw Error(tr('Kayıt bulunamadı.'));
@@ -48,9 +48,9 @@ export function buildV3Form(s,action,args={}){
  }
  else if(action==='switch_tenant'||action==='end_link'){
   const l=d.links.find(l=>l.id===args.id);if(!l)throw Error(tr('Kayıt bulunamadı.'));context.link_start=l.starts_on;
-  title=tr(action==='switch_tenant'?'Sakin değiştir':'Bağlantıyı bitir');body=`<p>${e(personName(d,l.person_id))} · ${e(d.units.find(u=>u.id===l.unit_id)?.code)}</p>`+field('ends_on',tr('Çıkış tarihi'),'date',today(),'required');
-  if(action==='end_link')body+=`<p class="fine">${tr('Seçilen gün rolün son günüdür. Ertesi gün artık güncel görünmez.')}</p>`;
-  if(action==='switch_tenant')body+=sel('person_id','Yeni sakin',[...personOptions(d).filter(([id])=>id!==l.person_id),['__new__',tr('Yeni kişi')]])+`<div id="newTenantFields" hidden>${field('first_name',tr('Ad'),'text','','maxlength="75"')}${field('last_name',tr('Soyad'),'text','','maxlength="75"')}${field('phone',tr('Telefon'),'tel','','maxlength="60"')}${field('email',tr('E-posta'),'email','','maxlength="254"')}${text('notes','Notlar')}</div>`+field('starts_on',tr('Giriş tarihi'),'date','','required')+`<p class="info-strip">${tr('Açık borçlar önceki kişide kalır. Yeni sakine aktarılmaz.')}</p>`+check('confirmation','Değişikliği onaylıyorum.');
+  title=tr(action==='switch_tenant'?'Sakin değiştir':'Bağlantıyı bitir');body=`<p>${e(personName(d,l.person_id))} · ${e(d.units.find(u=>u.id===l.unit_id)?.code)}</p>`+field('ends_on',tr('Çıkış tarihi'),'date','');
+  if(action==='end_link')body+=`<p class="fine">${tr('Tarih boşsa bugün rolün son günüdür. Ertesi gün artık güncel görünmez.')}</p>`;
+  if(action==='switch_tenant')body+=sel('person_id','Yeni sakin',[...personOptions(d).filter(([id])=>id!==l.person_id),['__new__',tr('Yeni kişi')]])+`<div id="newTenantFields" hidden>${field('first_name',tr('Ad'),'text','','maxlength="75"')}${field('last_name',tr('Soyad'),'text','','maxlength="75"')}${field('phone',tr('Telefon'),'tel','','maxlength="60"')}${field('email',tr('E-posta'),'email','','maxlength="254"')}${text('notes','Notlar')}</div>`+field('starts_on',tr('Giriş tarihi'),'date','')+`<p class="info-strip">${tr('Tarihler boşsa eski kiracı bugün çıkar, yeni kiracı yarın başlar. Açık borçlar önceki kişide kalır.')}</p>`+check('confirmation','Değişikliği onaylıyorum.');
  }
  else if(action==='bind_charge'){
   const c=d.charges.find(c=>c.id===args.id);title=tr('Sorumlu kişiyi seçin');body=sel('link_id','Kişi',[['',tr('Kişi seçin.')],...d.links.filter(l=>l.unit_id===c?.unit_id).map(l=>[l.id,personName(d,l.person_id)+' · '+roleLabel(l.role)+' · '+l.starts_on+(l.ends_on?' – '+l.ends_on:'')])])+`<p class="fine">${tr('Borç bu kişiye bağlanır. Sonraki sakin değişiklikleri bunu değiştirmez.')}</p>`;
@@ -94,13 +94,18 @@ export function payloadV3(action,form,ctx){
  if(['switch_tenant','void_credit','unlink'].includes(action)&&!form.has('confirmation'))throw Error(tr('Devam etmek için onay kutusunu işaretleyin.'));
  if(action==='unlink'&&(get('reason').length<3||get('reason').length>500))throw Error(tr('En az üç karakterlik gerekçe yazın.'));
  if(action==='person'&&(!get('first_name')||!get('last_name')))throw Error(tr('Ad ve soyad gerekli.'));
- p.start_unknown=form.has('start_unknown');if(p.start_unknown)p.starts_on=null;
- if(['person_link','link','edit_link'].includes(action)||(action==='person'&&ctx.unit_id)){if(!p.start_unknown&&!dateValid(get('starts_on')))throw Error(tr('Başlangıç tarihini girin veya bilinmiyor seçin.'));}
- if(['person_link','edit_link','end_link','switch_tenant','link'].includes(action)){const start=action==='end_link'||action==='switch_tenant'?ctx.link_start:p.starts_on;if(get('ends_on')&&!dateValid(get('ends_on')))throw Error(tr('Geçerli bir çıkış tarihi girin.'));if(start&&get('ends_on')&&get('ends_on')<start)throw Error(tr('Çıkış tarihi başlangıç tarihinden önce olamaz.')+' '+tr('Kayıtlı başlangıç')+': '+start);}
+ p.start_unknown=form.has('start_unknown')||(['person','person_link','link','edit_link'].includes(action)&&!get('starts_on'));
+ if(p.start_unknown)p.starts_on=null;
+ if(['end_link','switch_tenant'].includes(action)){
+  p.ends_on=get('ends_on')||today();
+  if(action==='switch_tenant')p.starts_on=get('starts_on')||followingDay(p.ends_on);
+ }
+ if(['person_link','link','edit_link'].includes(action)||(action==='person'&&ctx.unit_id)){if(!p.start_unknown&&!dateValid(p.starts_on))throw Error(tr('Başlangıç tarihini girin veya bilinmiyor seçin.'));}
+ if(['person_link','edit_link','end_link','switch_tenant','link'].includes(action)){const start=action==='end_link'||action==='switch_tenant'?ctx.link_start:p.starts_on;if(p.ends_on&&!dateValid(p.ends_on))throw Error(tr('Geçerli bir çıkış tarihi girin.'));if(start&&p.ends_on&&p.ends_on<start)throw Error(tr('Çıkış tarihi başlangıç tarihinden önce olamaz.')+' '+tr('Kayıtlı başlangıç')+': '+start);}
  if(action==='unlink')p.confirmation=true;
  p.primary_contact=form.has('primary_contact');if(action==='user_access')p.confirmation=true;
  if(['link','switch_tenant','bind_charge'].includes(action)&&!get(action==='bind_charge'?'link_id':'person_id'))throw Error(tr('Kişi seçin.'));
- if(action==='switch_tenant'){if(p.person_id==='__new__'){p.person_id='';if(!get('first_name')||!get('last_name'))throw Error(tr('Ad ve soyad gerekli.'));}p.confirmation=true;if(!get('ends_on')||!get('starts_on')||get('starts_on')<=get('ends_on'))throw Error(tr('Tarih aralığını kontrol edin.'));}
+ if(action==='switch_tenant'){if(p.person_id==='__new__'){p.person_id='';if(!get('first_name')||!get('last_name'))throw Error(tr('Ad ve soyad gerekli.'));}p.confirmation=true;if(!dateValid(p.ends_on)||!dateValid(p.starts_on)||p.starts_on<=p.ends_on)throw Error(tr('Tarih aralığını kontrol edin.'));}
  if(action==='void_credit'&&get('reason').length<3)throw Error(tr('Gerekçe gerekli.'));
  if(['credit','match_rule'].includes(action)){const l=ctx.targets.find(l=>l.id===get('target'));if(!l)throw Error(tr('Kişi seçin.'));p.unit_id=l.unit_id;p.person_id=l.person_id;delete p.targets;
   if(action==='credit')p.cents=payloadLegacy('allocate',form,ctx).cents;

@@ -7,6 +7,7 @@ const roleName=r=>tr(roles.find(x=>x[0]===r)?.[1]||'Kişi');
 const select=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}" aria-label="${e(tr(label))}">${options.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(l)}</option>`).join('')}</select></label>`;
 const input=(name,label,type='text',value='',attrs='')=>`<label class="field">${tr(label)}<input name="${name}" type="${type}" value="${e(value)}" ${attrs}></label>`;
 export const previousDay=day=>new Date(Date.parse(day+'T12:00:00Z')-86400000).toISOString().slice(0,10);
+export const followingDay=day=>new Date(Date.parse(day+'T12:00:00Z')+86400000).toISOString().slice(0,10);
 export const linkVersion=l=>JSON.stringify([l.id,l.person_id,l.unit_id,l.role,l.starts_on||null,l.ends_on||null]);
 export function buildRelationshipForm(d,args={}){
  const link=d.links.find(l=>l.id===args.id),unit=args.unit||link?.unit_id||d.units[0]?.id;
@@ -24,9 +25,11 @@ export function updateRelationshipForm(container,d,ctx,changed=''){
  let html='';
  if(kind!=='add')html+=select('link_id','Değiştirilecek kayıt',choices.length?choices.map(l=>[l.id,personName(d,l.person_id)+' · '+roleName(l.role)+' · '+(l.starts_on||'?')+' – '+(l.ends_on||tr('Devam ediyor'))]):[['',tr('Uygun kayıt yok. Önce hatalı kaydı düzeltin veya kişi ve rol ekleyin.')]],selected);
  if(kind==='tenant_to_owner')html+=select('owner_link_id','Biten ev sahipliği kaydı',[['',tr('Değiştirilecek kaydı seçin.')],...all.filter(x=>x.role==='owner'&&!x.ends_on).map(x=>[x.id,personName(d,x.person_id)])]);
- if(kind==='correction')html+=`<p class="info-strip">${tr('Bu seçenek yanlış kaydı düzeltir. Gerçek bir değişiklik için diğer seçenekleri kullanın.')}</p>`+select('role','Doğru rol',roles.map(([v,l])=>[v,tr(l)]),l?.role||'owner')+input('starts_on','Başlangıç','date',l?.starts_on||'')+`<label class="check-field"><input name="start_unknown" type="checkbox" ${!l?.starts_on?'checked':''}>${tr('Başlangıç tarihi bilinmiyor')}</label>`+input('ends_on','Bitiş','date',l?.ends_on||'')+input('reason','Düzeltme nedeni','text','','required minlength="3" maxlength="500"');
+ if(kind==='correction')html+=`<p class="info-strip">${tr('Bu seçenek yanlış kaydı düzeltir. Gerçek bir değişiklik için diğer seçenekleri kullanın.')}</p>`+select('role','Doğru rol',roles.map(([v,l])=>[v,tr(l)]),l?.role||'owner')+input('starts_on','Başlangıç (isteğe bağlı)','date',l?.starts_on||'')+`<p class="fine">${tr('Tarih boş kalırsa başlangıç bilinmiyor olarak kaydedilir.')}</p><label class="check-field"><input name="start_unknown" type="checkbox" ${!l?.starts_on?'checked':''}>${tr('Başlangıç tarihi bilinmiyor')}</label>`+input('ends_on','Bitiş','date',l?.ends_on||'')+input('reason','Düzeltme nedeni','text','','required minlength="3" maxlength="500"');
  else {
-  html+=input(kind==='moveout'?'departure_on':'effective_on',kind==='moveout'?'Çıkış tarihi (son oturulan gün)':'Yeni durumun ilk günü','date',today(),'required')+`<p class="fine">${tr(kind==='moveout'?'Kira ilişkisi bu gün sona erer. Yeni kullanım ertesi gün başlar.':'Eski ilişki bir önceki gün sona erer. Bu tarih, yeni durumun ilk günüdür.')}</p>`;
+  const isAdd=kind==='add';
+  html+=input(kind==='moveout'?'departure_on':'effective_on',isAdd?'Başlangıç (isteğe bağlı)':kind==='moveout'?'Çıkış tarihi (son oturulan gün)':'Yeni durumun ilk günü','date','')+
+    `<p class="fine">${tr(isAdd?'Tarih boş kalırsa başlangıç bilinmiyor olarak kaydedilir.':kind==='moveout'?'Tarih boşsa bugün son oturulan gündür. Daire yarından itibaren boş görünür.':'Tarih boşsa değişiklik bugünden itibaren geçerlidir. Geçmiş kayıtlar korunur.')}</p>`;
   if(['owner_change','owner_to_tenant','tenant_change','add'].includes(kind))html+=select('person_id',kind.startsWith('owner')?'Yeni ev sahibi':kind==='tenant_change'?'Yeni kiracı':'Kişi',persons,ctx.preferred_person||'')+`<div id="newRelationshipPerson" hidden>${input('first_name','Ad','text','','maxlength="75"')}${input('last_name','Soyad','text','','maxlength="75"')}${input('phone','Telefon','tel','','maxlength="60"')}${input('email','E-posta','email','','maxlength="254"')}</div>`;
   if(kind==='add')html+=select('role','Rol',roles.map(([v,l])=>[v,tr(l)]),'owner');
  }
@@ -44,9 +47,12 @@ function covered(owners,from,to){
 }
 export function relationshipPayload(form,ctx,d,version){
  const p={request_id:ctx.request_id};for(const[k,v]of form)p[k]=String(v).trim();p.expected=version||ctx.versions?.[p.link_id]||'';p.owner_expected=ctx.versions?.[p.owner_link_id]||'';p.start_unknown=form.has('start_unknown');
- if(p.kind==='moveout'){if(!dateValid(p.departure_on))throw Error(tr('Geçerli bir çıkış tarihi girin.'));p.effective_on=new Date(Date.parse(p.departure_on+'T12:00:00Z')+86400000).toISOString().slice(0,10);}
+ if(p.kind==='moveout'){p.departure_on=p.departure_on||today();if(!dateValid(p.departure_on))throw Error(tr('Geçerli bir çıkış tarihi girin.'));p.effective_on=followingDay(p.departure_on);}
+ else if(p.kind==='add'){if(!p.effective_on){p.effective_on=null;p.start_unknown=true;}}
+ else if(p.kind!=='correction'){p.effective_on=p.effective_on||today();}
  if(p.person_id==='__new__'){p.person_id='';p.new_person=true;}else p.new_person=false;
- if(!p.start_unknown&&p.kind==='correction'&&!dateValid(p.starts_on))throw Error(tr('Başlangıç tarihini girin veya bilinmiyor seçin.'));
+ if(p.kind==='correction'&&!p.starts_on)p.start_unknown=true;
+ if(!p.start_unknown&&p.kind==='correction'&&!dateValid(p.starts_on))throw Error(tr('Geçerli bir başlangıç tarihi girin.'));
  if(p.start_unknown)p.starts_on=null;
  planRelationship(d,p);return p;
 }
@@ -58,8 +64,8 @@ export function planRelationship(d,p){
  if(l&&p.expected!==linkVersion(original))fail('Kayıt başka bir işlemde değişti. Görünümü yenileyip tekrar kontrol edin.');
  if(kind!=='correction'&&l?.ends_on)fail('Bu ilişki zaten sona ermiş veya bitişi planlanmış. Tarihi düzeltmek için Hatalı kaydı düzelt seçin.');
  if(kind.startsWith('owner')&&l?.role!=='owner'||['tenant_change','moveout','tenant_to_owner'].includes(kind)&&l?.role!=='tenant')fail('Seçilen kayıt bu değişiklik için uygun değil.');
- const day=kind==='correction'?p.starts_on:p.effective_on;
- if(kind!=='correction'&&!dateValid(day))fail('Geçerli bir değişiklik tarihi girin.');
+ const day=kind==='correction'?(p.starts_on||null):kind==='add'?(p.effective_on||null):(p.effective_on||(kind==='moveout'?followingDay(today()):today()));
+ if(kind!=='correction'&&kind!=='add'&&!dateValid(day)||kind==='add'&&day&&!dateValid(day))fail('Geçerli bir değişiklik tarihi girin.');
  if(kind!=='correction'&&l?.starts_on&&day<=l.starts_on)fail('Değişiklik mevcut başlangıçtan sonra olmalı. Yanlış kayıt için Hatalı kaydı düzelt seçin.');
  if(!['keep','occupied','vacant'].includes(p.occupancy))fail('Geçerli bir kullanım durumu seçin.');
  if(kind==='correction'&&(!p.reason||p.reason.length<3))fail('Düzeltme nedenini yazın.');
@@ -78,14 +84,15 @@ export function planRelationship(d,p){
  const touched=kind==='correction'?[l]:added,unitLinks=links.filter(x=>x.unit_id===unit.id),owners=unitLinks.filter(x=>x.role==='owner');
  for(const x of touched){const conflict=unitLinks.find(y=>x.id!==y.id&&(x.person_id===y.person_id&&x.role===y.role||x.role==='tenant'&&y.role==='tenant')&&overlap(x,y));if(conflict)throw Error(tr('Bu dönemde çakışan bir kayıt var. Kiracı değişimi seçin veya tarihleri düzeltin.')+' '+personName(d,conflict.person_id)+' · '+roleName(conflict.role)+' · '+(conflict.starts_on||'?')+' – '+(conflict.ends_on||tr('Devam ediyor')));if(x.role==='tenant'&&!covered(owners,x.starts_on,x.ends_on))fail('Bu dönemin tamamı için ev sahibi kaydı gerekli. Önce ev sahibi bilgisini kontrol edin.');}
  if(original?.role==='owner')for(const x of unitLinks.filter(x=>x.role==='tenant')){const from=kind==='correction'?x.starts_on:!x.starts_on||x.starts_on<day?day:x.starts_on;if(x.ends_on&&from&&x.ends_on<from)continue;if(!covered(owners,from,x.ends_on))fail('Değişiklik devam eden kiracı veya temsilciyi ev sahibisiz bırakıyor. Yeni ev sahibini aynı işlemde belirtin.');}
- if(p.occupancy==='vacant'&&unitLinks.some(x=>x.role==='tenant'&&activeAt(x,kind==='correction'?today():day)))fail('Bu tarihte kiracı kaydı devam ediyor. Önce kiracı çıkışını kaydedin veya Dolu seçin.');
- const occupancyDay=kind==='correction'?today():day;const events=(d.occupancyChanges||[]).filter(x=>p.occupancy==='keep'||x.unit_id!==unit.id||x.effective_on!==occupancyDay).map(x=>({...x}));if(p.occupancy!=='keep')events.push({unit_id:unit.id,effective_on:kind==='correction'?today():day,status:p.occupancy,request_id:p.request_id});
+ const eventDay=kind==='correction'||kind==='add'&&!day?today():day;
+ if(p.occupancy==='vacant'&&unitLinks.some(x=>x.role==='tenant'&&activeAt(x,eventDay)))fail('Bu tarihte kiracı kaydı devam ediyor. Önce kiracı çıkışını kaydedin veya Dolu seçin.');
+ const occupancyDay=eventDay;const events=(d.occupancyChanges||[]).filter(x=>p.occupancy==='keep'||x.unit_id!==unit.id||x.effective_on!==occupancyDay).map(x=>({...x}));if(p.occupancy!=='keep')events.push({unit_id:unit.id,effective_on:occupancyDay,status:p.occupancy,request_id:p.request_id});
  const name=id=>persons.find(x=>x.id===id)?.full_name||'',summary=[];
   if(touched.some(x=>x.role==='representative'&&!covered(owners,x.starts_on,x.ends_on)))summary.push(tr('Seçilen dönemde ev sahibi bilgileri eksik. Temsilci kaydını yine de ekleyebilirsiniz.'));
  if(kind==='correction')summary.push(name(l.person_id)+' · '+roleName(l.role)+' · '+(l.starts_on||tr('Bilinmiyor'))+' – '+(l.ends_on||tr('Devam ediyor')));
- else {if(l)summary.push(name(l.person_id)+' · '+roleName(original.role)+' · '+tr('Bitiş')+': '+l.ends_on);for(const x of added)summary.push(name(x.person_id)+' · '+roleName(x.role)+' · '+tr('Başlangıç')+': '+x.starts_on);}
+ else {if(l)summary.push(name(l.person_id)+' · '+roleName(original.role)+' · '+tr('Bitiş')+': '+l.ends_on);for(const x of added)summary.push(name(x.person_id)+' · '+roleName(x.role)+' · '+tr('Başlangıç')+': '+(x.starts_on||tr('Bilinmiyor')));}
  if(kind==='tenant_to_owner'){const owner=d.links.find(x=>x.id===p.owner_link_id);summary.unshift(name(owner.person_id)+' · '+roleName('owner')+' · '+tr('Bitiş')+': '+previousDay(day));}
- summary.push(tr(p.occupancy==='keep'?'Kullanım değişmez.':p.occupancy==='occupied'?'Daire dolu olarak gösterilir.':'Daire boş olarak gösterilir.')+(p.occupancy!=='keep'?' · '+(kind==='correction'?today():day):''));
+ summary.push(tr(p.occupancy==='keep'?'Kullanım değişmez.':p.occupancy==='occupied'?'Daire dolu olarak gösterilir.':'Daire boş olarak gösterilir.')+(p.occupancy!=='keep'?' · '+occupancyDay:''));
  return {links,persons,events,summary,newPerson,added,unit};
 }
 // Use the same complete, inclusive owner-history rule for guided and direct edits.
