@@ -77,3 +77,14 @@ test('German provider categories are translated and searchable without changing 
  const s=state();s.data.providers=[{id:'qa',name:'Temizlik Ltd',category:'Temizlik',status:'preferred',phone:'05550000000'}];
  setLanguage('de');try{s.providerQuery='Reinigung';const html=providersV3(s);assert(html.includes('value="Temizlik">Reinigung</option>'));assert(html.includes('Temizlik Ltd'));assert(html.includes('<p>Reinigung</p>'));assert.equal(s.data.providers[0].category,'Temizlik');}finally{setLanguage('tr');}
 });
+
+test('overview uses the same B-first apartment plan and a wider dedicated layout',()=>{
+ const s=state();s.data.units=[
+  {id:'A-1',code:'A-1',number:1,block:'A',occupancy_status:'unknown'},
+  {id:'B-1',code:'B-1',number:1,block:'B',occupancy_status:'unknown'}
+ ];
+ const html=overviewV3(s);
+ assert(html.includes('class="main-grid overview-main-grid"'));
+ assert(html.indexOf('<h3>B Blok</h3>') < html.indexOf('<h3>A Blok</h3>'));
+ assert(html.includes('data-action="unit"'));
+});
