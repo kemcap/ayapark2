@@ -1,3 +1,14 @@
+# Ayapark 2 · V4.0 Entwicklungsvorschau
+
+Diese Branch ist **nicht zur Produktivveröffentlichung freigegeben**. Produktion bleibt V3.15. Die separate V4-Vorschau verwendet Beispieldaten; Live-API und Recovery sind gesperrt.
+
+- [UI/UX-Audit, Verbesserungen und Freigabevorschläge](UI-UX-AUDIT-V4.md)
+- [Release-Gates und Rollback](V4-RELEASE-PLAN.md)
+- [Übernommener Datenbank-Audit](AUDIT-20261025.md)
+- Tests: `npm test`, `npm run test:sql`, `npm run qa:prepare`. Die drei dokumentierten SQL-Baselinefehler bleiben rot.
+
+---
+
 # Ayapark 2 · V3.15
 
 Browser app with Supabase Auth and row-level data access.

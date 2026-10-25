@@ -2,28 +2,31 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
+<meta name="ayapark-stage" content="preview">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f4f5f0">
 <meta name="robots" content="noindex,nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https://eisozwhhinqszfikemot.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Ayapark 2 · Site Yönetimi V3.15</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Ayapark 2 · Site Yönetimi V4.0 Preview</title>
 <script src="./preferences-boot.js"></script>
 <script src="./theme.js"></script>
 <script src="./recovery-redirect.js"></script>
 <link rel="icon" href="./assets/buildings.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./assets/app-icon.png">
-<link rel="stylesheet" href="./styles.css?v=3.15">
+<link rel="stylesheet" href="./styles.css?v=4.0-preview">
 <link rel="stylesheet" href="./recovery.css">
 <link rel="stylesheet" href="./install-tutorial.css">
-<script type="module" src="./app.mjs?v=3.15"></script>
+<script type="module" src="./app.mjs?v=4.0-preview"></script>
+<link rel="stylesheet" href="./v4-ui.css?v=4.0-preview">
 </head>
 <body>
 <a class="skip" href="#content">İçeriğe geç</a>
+<div id="previewBanner" class="preview-banner" role="note">V4.0 önizleme · Örnek veriler · Canlı kayıtlara erişim yok</div>
 <div class="shell">
 <aside class="sidebar">
  <a href="#overview" class="brand" aria-label="Ayapark 2 ana sayfa"><img class="brand-logo" src="./assets/ayapark2-header.webp" alt="Ayapark 2 bina fotoğrafı" width="46" height="46"><span>AYAPARK 2<small>Birlikte, daha düzenli.</small></span></a>
- <div class="site-label"><span class="site-dot"></span>Döşemealtı, Antalya <span class="version">v3.15</span></div>
+ <div class="site-label"><span class="site-dot"></span>Döşemealtı, Antalya <span class="version">v4.0-preview</span></div>
  <p class="nav-label">YAŞAM & YÖNETİM</p>
  <nav id="nav" aria-label="Ana menü"></nav>
  <div class="sidebar-bottom"><div class="mini-building" aria-hidden="true"><i></i><i></i><i></i></div><strong>Her şey yerli yerinde.</strong><p>Daireniz, ödemeleriniz ve siteniz.<br>Tek bir yerde.</p><div class="side-meta">A + B Blok <span>20 daire</span></div></div>
@@ -32,7 +35,7 @@
  <header class="topbar"><span id="breadcrumb">Yönetim / Genel bakış</span><div class="header-actions"><button id="languageToggle" type="button" class="button small language-toggle" aria-label="Sprache wechseln / Dili değiştir" title="Deutsch" hidden>DE</button><button id="themeToggle" type="button" class="button header-icon" aria-label="Görünüm: Otomatik" title="Görünüm: Otomatik" hidden>◐</button><button type="button" id="installApp" class="button small">Uygulamayı ekle</button><span class="mode" id="modeBadge">Örnek veriler</span><button id="refreshButton" type="button" class="button header-icon" title="Kayıtları yenile" aria-label="Kayıtları yenile" hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17"/></svg></button><button id="connectionButton" class="button small">Hesabımla giriş</button></div></header>
  <div class="context-bar"><p id="contextText">Tasarım önizlemesi · Tüm tutarlar örnektir.</p><label id="roleControl"><span id="roleLabel">Görünümü dene</span> <select id="roleSelect" aria-label="Örnek rol görünümü"><option value="super">Süper Admin</option><option value="staff">Yönetim</option><option value="resident">Site Sakini</option></select></label><label id="residentPreviewControl" hidden><span>Daire / Kişi</span> <select id="residentPreviewSelect" aria-label="Sakin önizlemesi için daire ve kişi"></select></label></div>
  <main id="content" tabindex="-1"></main>
- <footer>AYAPARK 2 <span>V3.15 · <span id="footerMode">Örnek veriler</span></span></footer>
+ <footer>AYAPARK 2 <span>V4.0 Preview · <span id="footerMode">Örnek veriler</span></span></footer>
 </div>
 </div>
 <dialog id="detailDialog" aria-labelledby="detailTitle"><div id="detailContent"></div><form method="dialog" class="dialog-actions"><button class="button">Kapat</button></form></dialog>
@@ -44,7 +47,7 @@
 <dialog id="importDialog" aria-labelledby="importTitle">
  <div class="dialog-kicker">DOSYA ÖNİZLEMESİ</div><h2 id="importTitle">Önce kontrol, sonra aktarım.</h2><p class="muted">CSV dosyanızı burada inceleyin. Önizleme yereldir. Kayıt oluşturmak için ayrıca “İçe aktar” düğmesine basın.</p>
  <label class="file-drop">CSV dosyası seçin<input id="csvFile" type="file" accept=".csv,text/csv"><small>En fazla 2 MB / 2.000 satır</small></label>
- <p class="fine"><a href="./import-template.csv" download class="text-button">CSV şablonu indir</a> · <a href="./import-ai-instructions.txt" download class="text-button">KI / AI talimatı indir</a></p><p class="fine">Sütunlar: <code>tarih;aciklama;tutar</code><br>Örnek: <code>2026-10-20;Ekim aidatı;3.600,00</code><br>Eski şablonda gideri eksi yazın. PDF veya Excel dosyasını önce uygun CSV dosyasına dönüştürün. Ödeme eşleştirmelerini ayrıca kontrol edin.</p>
+ <p class="fine"><a href="./import-template.csv" download class="text-button">CSV şablonu indir</a> · <a href="./import-ai-instructions.txt" download class="text-button">KI / AI talimatı indir</a></p><details class="import-help"><summary>CSV dosyası nasıl hazırlanır?</summary><p class="fine">Güncel CSV şablonunu indirin. Gelir ve gideri ayrı sütunlara pozitif tutar olarak yazın (ör. 3.600,00). Her satırda yalnızca bir gelir veya gider bulunmalıdır.</p><p class="fine">Sütunlar: <code>date;reference;counterparty;description;income;expense;unit;iban;balance</code></p><p class="fine">Eski üç sütunlu biçim de desteklenir. PDF veya Excel dosyasını önce CSV dosyasına dönüştürün. Ödeme eşleştirmelerini ayrıca kontrol edin.</p></details>
  <div id="importPreview" role="status">Henüz dosya seçilmedi.</div><form method="dialog" class="dialog-actions"><button class="button">Kapat</button><button class="button primary" id="commitImport" type="button" disabled>İçe aktar</button></form>
 </dialog>
 <dialog id="urgentDialog" aria-labelledby="urgentTitle"><div class="dialog-kicker">Önemli duyuru</div><h2 id="urgentTitle"></h2><p id="urgentBody" class="pre-wrap"></p><div class="dialog-actions"><button id="ackUrgent" class="button primary">Okudum</button></div></dialog>

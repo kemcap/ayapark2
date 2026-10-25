@@ -1,3 +1,4 @@
+import {fieldError} from './ui-feedback.mjs';
 import {t as tr} from './i18n.mjs';
 import {escapeHtml as e,randomId} from './core.mjs';
 import {activeAt,dateValid,norm,personName} from './v3-domain.mjs';
@@ -16,7 +17,7 @@ export function buildAssignmentForm(d,action,args={}){
  const intro=`<p class="assignment-context"><strong>${e(unitName)}</strong>${p?' · '+e(p.full_name):''}${role?' · '+e(tr(role)):''}</p>`;
  let title,body;
  if(action==='assignment_remove'){
-  title=tr('Rolü geçmişe taşı');body=intro+select('reason','Geçmişe taşıma nedeni',[['','Neden seçin'],...removalReasons(l.role)])+`<div id="removalNote" hidden>${field('note','Not (isteğe bağlı)','text','','maxlength="500"')}</div><p class="fine">${tr('Bu işlem ilişkiyi eski rol olarak geçmişe taşır. Açık borçlar ilgili eski kişide kalır. Yanlışlıkla eklenen kayıtlar da geçmişte saklanır; tamamen silinmeleri ayrı bir düzeltmedir.')}</p>`;
+  title=tr('Rolü kaldır');body=intro+select('reason','Kaldırma nedeni',[['','Neden seçin'],...removalReasons(l.role)])+`<div id="removalNote" hidden>${field('note','Not (isteğe bağlı)','text','','maxlength="500"')}</div><p class="fine">${tr('Yalnızca bu dairedeki rol kaldırılır. Kişi, diğer roller ve açık borçlar korunur. İşlem geçmişte saklanır.')}</p>`;
  }else if(action==='assignment_restore'){
   title=tr('Rolü geri getir');body=intro+`<p>${tr('Bu rol yeniden güncel olarak eklenecek. Önceki kayıt geçmişte korunur.')}</p>`;
  }else if(action==='assignment_edit'){
@@ -44,14 +45,14 @@ export function updateAssignmentForm(container,d,changed=''){
 }
 export function assignmentPayload(action,form,ctx){
  const p={request_id:ctx.request_id,id:ctx.id,unit_id:ctx.unit_id,revision:ctx.revision};for(const[k,v]of form)if(k!=='person_search')p[k]=String(v).trim();
- if(action==='assignment_add'){p.new_person=p.person_mode==='new';if(!p.new_person&&!p.person_id)throw Error(tr('Kişi seçin.'));}
- if(action==='assignment_edit'||action==='assignment_add'&&p.new_person){if(!p.first_name||!p.last_name)throw Error(tr('Ad ve soyad gerekli.'));}
+ if(action==='assignment_add'){p.new_person=p.person_mode==='new';if(!p.new_person&&!p.person_id)throw fieldError(tr('Kişi seçin.'),'person_id');}
+ if(action==='assignment_edit'||action==='assignment_add'&&p.new_person){if(!p.first_name||!p.last_name)throw fieldError(tr('Ad ve soyad gerekli.'),!p.first_name?'first_name':'last_name');}
  if(['assignment_add','assignment_edit'].includes(action)){
   if(!assignmentRoles.some(([r])=>r===p.role))throw Error(tr('Geçerli bir rol seçin.'));
-  for(const key of ['starts_on','ends_on']){if(p[key]&&!dateValid(p[key]))throw Error(tr('Geçerli bir tarih girin veya boş bırakın.'));p[key]=p[key]||null;}
-  if(p.starts_on&&p.ends_on&&p.ends_on<p.starts_on)throw Error(tr('Bitiş tarihi başlangıç tarihinden önce olamaz.'));
+  for(const key of ['starts_on','ends_on']){if(p[key]&&!dateValid(p[key]))throw fieldError(tr('Geçerli bir tarih girin veya boş bırakın.'),key);p[key]=p[key]||null;}
+  if(p.starts_on&&p.ends_on&&p.ends_on<p.starts_on)throw fieldError(tr('Bitiş tarihi başlangıç tarihinden önce olamaz.'),'ends_on');
  }
- if(action==='assignment_remove'&&!['mistake','ended','other'].includes(p.reason))throw Error(tr('Kaldırma nedenini seçin.'));
+ if(action==='assignment_remove'&&!['mistake','ended','other'].includes(p.reason))throw fieldError(tr('Kaldırma nedenini seçin.'),'reason');
  return p;
 }
 export function applyAssignmentDemo(d,action,p){
@@ -69,7 +70,7 @@ function changeDemo(d,action,p){
   const existing=d.links.find(x=>x.unit_id===unit&&x.person_id===pid&&x.role===role&&activeAt(x));if(existing)return existing.id;
   const row={id:randomId(),unit_id:unit,person_id:pid,role,active:true,starts_on:starts||null,ends_on:ends||null,revision:1,responsibility:source?.responsibility||'',primary_contact:source?.primary_contact||false};d.links.push(row);return row.id;
  };
- if(action==='assignment_remove'){if(!['mistake','ended','other'].includes(p.reason))throw Error(tr('Kaldırma nedenini seçin.'));Object.assign(l,{active:false,archived_at:new Date().toISOString(),archive_reason:p.reason,archive_note:p.note||'',revision:(l.revision??1)+1});}
+ if(action==='assignment_remove'){if(!['mistake','ended','other'].includes(p.reason))throw fieldError(tr('Kaldırma nedenini seçin.'),'reason');Object.assign(l,{active:false,archived_at:new Date().toISOString(),archive_reason:p.reason,archive_note:p.note||'',revision:(l.revision??1)+1});}
  else if(action==='assignment_restore'){id=add(l.role,l.starts_on,l.ends_on,l);}
  else {
   if(!assignmentRoles.some(([r])=>r===p.role))throw Error(tr('Geçerli bir rol seçin.'));

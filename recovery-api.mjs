@@ -2,7 +2,7 @@ import {AyaparkApi} from './api.mjs';
 
 // Recovery sessions stay in memory. This client never reads apartment or finance data.
 export class RecoveryApi extends AyaparkApi {
- constructor(fetcher){super(fetcher,{persist:false});}
+ constructor(fetcher,options={}){super(fetcher,{...options,persist:false});}
  clear(){super.clear();this.recovery=false;}
  async requestReset(email,redirectTo){
   const target=new URL(redirectTo);

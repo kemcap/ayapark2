@@ -1,3 +1,13 @@
+## V4.0 Entwicklungsvorschau · 2026-10-25 · kein Produktivrelease
+
+- Gemeinsame Entwicklungsbranch auf Basis V3.15 plus separatem Datenbank-Audit; keine produktiven Datenbankänderungen durch diesen UI-Auftrag.
+- Entfernen statt technischer Archivierungsaktion; rollenabhängiger Grund und unveränderter Historien-/Finanzschutz.
+- Feldbezogene Fehlermeldungen, Datenerhalt und Fokus; nach Abbrechen oder Speichern zur geöffneten Wohnung/Person zurückkehren.
+- Konsistente Touchgrößen, Formular-/Fokus-/Dialog-Tokens und semantische Tabellenlabels.
+- CSV-Hilfe an die neunspaltige Vorlage angepasst; Strukturfehler in DE/TR.
+- Getrennte Beispieldaten-Vorschau mit Browser-/API-Netzwerksperre. Kein Merge und keine Änderung der bestehenden Pages-/GPT-Version.
+- Größere Navigations-, Dashboard- und Backendänderungen als Freigabevorschläge dokumentiert. Ergebnisse und Testgrenzen: UI-UX-AUDIT-V4.md.
+
 ## V3.15 · 2026-10-24
 
 - Cache allowed-site sets once per SQL statement in three existing read policies, preserving the same permission checks and grants.

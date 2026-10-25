@@ -4,8 +4,8 @@ const URL='https://eisozwhhinqszfikemot.supabase.co';
 const KEY='sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc';
 const TABLES=new Set(['site_sites','site_units','site_blocks','site_staff_memberships','site_resident_units','ay2_settings','ay2_permissions','ay2_entries','ay2_charges','ay2_allocations','ay2_people','ay2_announcements','ay2_reports','ay2_audit','ay2_staged_charges']);
 export class AyaparkApi {
- constructor(fetcher=(...args)=>globalThis.fetch(...args),{persist=true,storage}={}) {
-  this.fetcher=fetcher;this.generation=0;this.session=null;this.expiry=0;this.refreshing=null;
+ constructor(fetcher=(...args)=>globalThis.fetch(...args),{persist=true,storage,previewOnly=false}={}) {
+  this.previewOnly=previewOnly;this.fetcher=fetcher;this.generation=0;this.session=null;this.expiry=0;this.refreshing=null;
   try{this.storage=persist?(storage??globalThis.localStorage):null;}catch{this.storage=null;}this.storageKey='ayapark2-v3-session:'+((globalThis.location&&new globalThis.URL('.',globalThis.location.href).pathname)||'/');
  }
  clear(remove=true){this.generation++;this.session=null;this.expiry=0;this.refreshing=null;if(remove)try{this.storage?.removeItem(this.storageKey);}catch{}}
@@ -26,6 +26,7 @@ export class AyaparkApi {
  }
  async provision(payload){return this.raw('/functions/v1/ay3-user-access','POST',payload,await this.token());}
  async raw(path,method='GET',body,token) {
+  if(this.previewOnly)throw Error(tr('Bu önizleme yalnızca örnek veriler kullanır. Canlı hesaba bağlanılmaz.'));
   const response=await this.fetcher(URL+path,{method,headers:{apikey:KEY,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',signal:AbortSignal.timeout(15000)});
   const data=await response.json().catch(()=>null);
   if(!response.ok){const announcementErrors={ay2_announcements_title_check:tr('Duyuru başlığı en fazla 150 karakter olabilir.'),ay2_announcements_body_check:tr('Duyuru metni en fazla 5000 karakter olabilir.'),ay2_announcements_check:tr('Yayın bitişi başlangıçtan sonra olmalıdır.')};const knownAnnouncement=Object.entries(announcementErrors).find(([constraint])=>String(data?.message).includes('\"'+constraint+'\"'))?.[1];
