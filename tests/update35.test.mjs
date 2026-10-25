@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {fullDemo,demoCommand} from '../ledger.mjs?v=4.0.1';
-import {buildForm,payloadFor} from '../forms.mjs?v=4.0.1';
-import {announcementsV3,providersV3} from '../v3-ui.mjs?v=4.0.1';
-import {peoplePage,personManager} from '../people-ui.mjs?v=4.0.1';
-import {mayPreview,previewProjection,residentPreviewOptions} from '../access-preview.mjs?v=4.0.1';
-import {announcementTime} from '../announcement-validation.mjs?v=4.0.1';
+import {fullDemo,demoCommand} from '../ledger.mjs?v=5.0.0';
+import {buildForm,payloadFor} from '../forms.mjs?v=5.0.0';
+import {announcementsV3,providersV3} from '../v3-ui.mjs?v=5.0.0';
+import {peoplePage,personManager} from '../people-ui.mjs?v=5.0.0';
+import {mayPreview,previewProjection,residentPreviewOptions} from '../access-preview.mjs?v=5.0.0';
+import {announcementTime} from '../announcement-validation.mjs?v=5.0.0';
 const state=()=>({data:fullDemo(),mode:'demo'});
 function announce(s,overrides={}){const f=new FormData();for(const [k,v] of Object.entries({title:'Test announcement',body:'Test body',priority:'normal',...overrides}))f.set(k,v);return payloadFor('announcement',f,buildForm(s,'announcement').context);}
 test('creating and editing an announcement renders the resulting list',()=>{const s=state(),p=announce(s);demoCommand(s.data,'announcement',p);assert.match(announcementsV3(s),/Test announcement/);const a=s.data.announcements.find(a=>a.title===p.title);demoCommand(s.data,'announcement',{...p,id:a.id,title:'Changed announcement',published:true});assert.match(announcementsV3(s),/Changed announcement/);});

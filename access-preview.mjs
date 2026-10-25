@@ -1,4 +1,4 @@
-import {activeAt} from './v3-domain.mjs?v=4.0.1';
+import {activeAt} from './v3-domain.mjs?v=5.0.0';
 export const mayPreview=d=>d?.role==='super'&&d?.serverRole==='manager'&&d?.capabilities?.admin===true;
 export function residentPreviewOptions(d){return (d.units||[]).flatMap(u=>{const ls=(d.links||[]).filter(l=>l.unit_id===u.id&&['owner','tenant'].includes(l.role)&&activeAt(l));return ls.length?ls.map(l=>({id:l.id,unitId:u.id,personId:l.person_id,label:u.code+' · '+(d.persons?.find(p=>p.id===l.person_id)?.full_name||'—')+' · '+l.role})):[{id:'unit:'+u.id,unitId:u.id,personId:null,label:u.code}];});}
 export function previewProjection(source,role='super',selection=''){

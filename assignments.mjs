@@ -1,7 +1,7 @@
-import {fieldError} from './ui-feedback.mjs?v=4.0.1';
-import {t as tr} from './i18n.mjs?v=4.0.1';
-import {escapeHtml as e,randomId} from './core.mjs?v=4.0.1';
-import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=4.0.1';
+import {fieldError} from './ui-feedback.mjs?v=5.0.0';
+import {t as tr} from './i18n.mjs?v=5.0.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=5.0.0';
+import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=5.0.0';
 export const assignmentRoles=[['owner','Ev sahibi'],['tenant','Kiracı'],['representative','Temsilci']];
 export const removalReasons=role=>[['mistake','Yanlışlıkla eklendi'],['ended',role==='owner'?'Mülkiyet ilişkisi sona erdi':role==='tenant'?'Kiracılık sona erdi':'Temsilcilik sona erdi'],['other','Diğer neden']];
 const select=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}" aria-label="${e(tr(label))}">${options.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(tr(l))}</option>`).join('')}</select></label>`;
@@ -29,6 +29,7 @@ export function buildAssignmentForm(d,action,args={}){
    `<div id="existingPersonFields">${field('person_search','Kişi ara','search','','placeholder="'+e(tr('Ad, telefon veya e-posta ara'))+'"')}${select('person_id','Kişi',[['','Kişi seçin.'],...d.persons.map(p=>[p.id,p.full_name])],p?.id||'')}</div><div id="newPersonFields" hidden>${personFields(null)}</div>`+
    select('role','Dairedeki rol',assignmentRoles,'tenant')+dates(null);
  }
+ if(['assignment_add','assignment_edit','assignment_restore'].includes(action))body+=`<details><summary>${tr('Temsilci bildirim yetkisi')}</summary><p>${tr('Yalnızca temsilci rolü için. Ek borç oluşturmaz.')}</p><label class="check-field"><input type="checkbox" name="mandate_owners" ${l?.mandates?.includes('owners')?'checked':''}>${tr('Malik duyurularını alabilir')}</label><label class="check-field"><input type="checkbox" name="mandate_residents" ${l?.mandates?.includes('residents')?'checked':''}>${tr('Sakin duyurularını alabilir')}</label></details>`;
  return {title,body:`<div class="assignment-form">${body}</div>`,context};
 }
 export function updateAssignmentForm(container,d,changed=''){
@@ -53,6 +54,7 @@ export function assignmentPayload(action,form,ctx){
   if(p.starts_on&&p.ends_on&&p.ends_on<p.starts_on)throw fieldError(tr('Bitiş tarihi başlangıç tarihinden önce olamaz.'),'ends_on');
  }
  if(action==='assignment_remove'&&!['mistake','ended','other'].includes(p.reason))throw fieldError(tr('Kaldırma nedenini seçin.'),'reason');
+ if(['assignment_add','assignment_edit','assignment_restore'].includes(action))p.mandates=[...(form.has('mandate_owners')?['owners']:[]),...(form.has('mandate_residents')?['residents']:[])];
  return p;
 }
 export function applyAssignmentDemo(d,action,p){
@@ -81,5 +83,6 @@ function changeDemo(d,action,p){
   else {if(l)Object.assign(l,{active:false,archive_reason:'role_changed',archived_at:new Date().toISOString(),revision:(l.revision??1)+1});id=add(p.role,p.starts_on,p.ends_on,l);}
   if(p.additional_role&&p.additional_role!==p.role){if(!assignmentRoles.some(([r])=>r===p.additional_role))throw Error(tr('Geçerli bir rol seçin.'));add(p.additional_role,p.starts_on,p.ends_on);}
  }
- d.audit.unshift({id:randomId(),action,at:new Date().toISOString(),details:{request_id:p.request_id,before,reason:p.reason,note:p.note,person_id:pid}});return {ok:true,id};
+ const changed=d.links.find(x=>x.id===id);if(changed&&p.mandates)changed.mandates=changed.role==='representative'?[...new Set(p.mandates)]:[];
+ d.audit.unshift({id:randomId(),action,at:new Date().toISOString(),details:{request_id:p.request_id,before,after:changed?{...changed}:null,reason:p.reason,note:p.note,person_id:pid}});return {ok:true,id};
 }

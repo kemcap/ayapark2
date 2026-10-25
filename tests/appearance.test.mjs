@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
-import {appearanceSettings,preferenceDefaults,applyPreferences,preferences,resetPreferences,cleanPreferences,preferenceOptions} from '../preferences.mjs?v=4.0.1';
-import {setLanguage} from '../i18n.mjs?v=4.0.1';
+import {appearanceSettings,preferenceDefaults,applyPreferences,preferences,resetPreferences,cleanPreferences,preferenceOptions} from '../preferences.mjs?v=5.0.0';
+import {setLanguage} from '../i18n.mjs?v=5.0.0';
 const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8').replace(/\/\*[\s\S]*?\*\//g,'').replace(/@media\s*print\s*\{(?:[^{}]|\{[^{}]*\})*\}/g,'');
 function props(palette,dark,high){const result={};for(const m of [...css.matchAll(/([^{}]+)\{([^{}]+)\}/g)].sort((a,b)=>(a[1].match(/\[/g)||[]).length-(b[1].match(/\[/g)||[]).length)){const selector=m[1].trim();if(!selector.startsWith(':root')||selector.includes(' '))continue;const attrs=[...selector.matchAll(/\[data-(\w+)="([^"]+)"\]/g)];const expected={palette,theme:dark?'dark':'light',contrast:high?'high':'normal'};if(!attrs.every(x=>expected[x[1]]===x[2]))continue;for(const v of m[2].matchAll(/--([\w-]+):([^;]+)/g))result[v[1]]=v[2].trim();}return result;}
 function contrast(a,b){const l=hex=>{const c=hex.length===4?'#'+hex.slice(1).split('').map(x=>x+x).join(''):hex;return [1,3,5].map(i=>parseInt(c.slice(i,i+2),16)/255).reduce((n,v,i)=>n+(v<=.04045?v/12.92:((v+.055)/1.055)**2.4)*[.2126,.7152,.0722][i],0);};const [x,y]=[l(a),l(b)].sort((a,b)=>a-b);return (y+.05)/(x+.05);}

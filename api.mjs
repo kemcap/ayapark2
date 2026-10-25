@@ -1,4 +1,4 @@
-import {t as tr} from './i18n.mjs?v=4.0.1';
+import {t as tr} from './i18n.mjs?v=5.0.0';
 // Existing site tables are read-only; V2 mutations use a checked transactional RPC.
 const URL='https://eisozwhhinqszfikemot.supabase.co';
 const KEY='sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc';
@@ -83,13 +83,13 @@ export class AyaparkApi {
   return data;
  }
  async rpc(name,body){
-  if(!['ay2_command','ay2_capabilities','ay2_workspace','ay3_financial_summary','ay3_provider_directory','ay3_preferences','ay3_review_state','ay3_review_selected','ay3_staff_directory','ay3_audit_page','ay3_remove_staff_member'].includes(name))throw Error(tr("İşlem kapsam dışında."));
+  if(!['ay5_command','ay5_workspace','ay5_payment_plan','ay2_command','ay2_capabilities','ay2_workspace','ay3_financial_summary','ay3_provider_directory','ay3_preferences','ay3_review_state','ay3_review_selected','ay3_staff_directory','ay3_audit_page','ay3_remove_staff_member'].includes(name))throw Error(tr("İşlem kapsam dışında."));
   const generation=this.generation,token=await this.token();
   const result=await this.raw('/rest/v1/rpc/'+name,'POST',body,token);
   if(generation!==this.generation)throw Error(tr("Oturum değişti."));return result;
  }
  async readAll(table,query){const generation=this.generation;let out=[];for(let offset=0;;offset+=1000){const rows=await this.read(table,query+'&limit=1000&offset='+offset);if(generation!==this.generation)throw Error(tr("Oturum değişti."));out.push(...rows);if(rows.length<1000)return out;}}
- async command(site,action,payload){return this.rpc('ay2_command',{p_site:site,p_action:action,p_payload:payload});}
+ async command(site,action,payload){return this.rpc(['batch_charge','monthly_v5','auto_allocate','monthly_exception','disable_exception','budget'].includes(action)?'ay5_command':'ay2_command',{p_site:site,p_action:action,p_payload:payload});}
  async load(){
   const generation=this.generation;
   const assertSession=()=>{if(generation!==this.generation)throw Error(tr("Oturum değişti."));};
@@ -108,7 +108,7 @@ export class AyaparkApi {
   const serverRole=memberships[0]?.role||'resident';
   const role=serverRole==='manager'?'super':['deputy','auditor'].includes(serverRole)?'staff':'resident';
   const ownIds=links.map(l=>l.unit_id);
-  const [byName,summary,reviewState,staff,residentAccounts]=await Promise.all([this.rpc('ay2_workspace',{p_site:site.id}),this.rpc('ay3_financial_summary',{p_site:site.id}),this.rpc('ay3_review_state',{p_site:site.id}),role==='super'?this.rpc('ay3_staff_directory',{p_site:site.id}):Promise.resolve([]),role==='super'?this.readAll('site_resident_units',`select=user_id,unit_id&active=eq.true&unit_id=in.(${units.map(u=>u.id).join(',')})`):Promise.resolve([])]);
+  const [byName,summary,reviewState,staff,residentAccounts]=await Promise.all([this.rpc('ay5_workspace',{p_site:site.id}),this.rpc('ay3_financial_summary',{p_site:site.id}),this.rpc('ay3_review_state',{p_site:site.id}),role==='super'?this.rpc('ay3_staff_directory',{p_site:site.id}):Promise.resolve([]),role==='super'?this.readAll('site_resident_units',`select=user_id,unit_id&active=eq.true&unit_id=in.(${units.map(u=>u.id).join(',')})`):Promise.resolve([])]);
   assertSession();
   if(!byName)throw Error(tr("Çalışma alanı erişimi doğrulanamadı."));
   const capabilities=byName.capabilities;
@@ -125,7 +125,7 @@ export class AyaparkApi {
   for(const a of allocations)if(!a.void_reason)paidByCharge.set(a.charge_id,(paidByCharge.get(a.charge_id)||0)+a.cents);
   for(const c of charges)if(!c.void_reason)debtByUnit.set(c.unit_id,(debtByUnit.get(c.unit_id)||0)+c.cents-(paidByCharge.get(c.id)||0));
   const unitData=units.filter(u=>role!=='resident'||ownIds.includes(u.id)).map(u=>({...u,block:blockById.get(u.block_id)||'?',debt:capabilities.finance||ownIds.includes(u.id)?debtByUnit.get(u.id)||0:null}));
-  return {reviewState,userId:this.session.user.id,persons,links:linksV3,occupancyChanges:byName.occupancy_changes||[],credits:(byName.credits||[]).map(c=>({...c,cents:Number(c.cents)})),ownPersonIds,matchRules:byName.match_rules||[],providers:byName.providers||[],providerNotes:byName.provider_notes||[],acknowledgements:byName.acknowledgements||[],residentAccounts:[...new Map(residentAccounts.filter(r=>r.user_id).map(r=>[r.user_id,{...r,label:(units.find(u=>u.id===r.unit_id)?.code||'')+' · '+r.user_id.slice(0,8)}])).values()],summaryDays:summary?.days||[],summaryOpening:summary?.opening_cents==null?null:Number(summary.opening_cents),summaryBalance:summary?.balance_cents==null?null:Number(summary.balance_cents),sourceLastDate:summary?.source_last_date,site,role,serverRole,ownIds,capabilities,transactions,charges,allocations,people:byName.people,announcements:byName.announcements,reports:byName.reports,staged:byName.staged_charges,audit:byName.audit,permissions:byName.permissions,staff,opening:byName.settings[0]?.initialized?Number(byName.settings[0].opening_cents):null,openingDate:byName.settings[0]?.opening_date||null,units:unitData};
+  return {v5:byName.v5,financialUnitIds:byName.v5?ownIds:[],exceptions:byName.exceptions||[],budget:byName.budget||null,reviewState,userId:this.session.user.id,persons,links:linksV3,occupancyChanges:byName.occupancy_changes||[],credits:(byName.credits||[]).map(c=>({...c,cents:Number(c.cents)})),ownPersonIds,matchRules:byName.match_rules||[],providers:byName.providers||[],providerNotes:byName.provider_notes||[],acknowledgements:byName.acknowledgements||[],residentAccounts:[...new Map(residentAccounts.filter(r=>r.user_id).map(r=>[r.user_id,{...r,label:(units.find(u=>u.id===r.unit_id)?.code||'')+' · '+r.user_id.slice(0,8)}])).values()],summaryDays:summary?.days||[],summaryOpening:summary?.opening_cents==null?null:Number(summary.opening_cents),summaryBalance:summary?.balance_cents==null?null:Number(summary.balance_cents),sourceLastDate:summary?.source_last_date,site,role,serverRole,ownIds,capabilities,transactions,charges,allocations,people:byName.people,announcements:byName.announcements,reports:byName.reports,staged:byName.staged_charges,audit:byName.audit,permissions:byName.permissions,staff,opening:byName.settings[0]?.initialized?Number(byName.settings[0].opening_cents):null,openingDate:byName.settings[0]?.opening_date||null,units:unitData};
  }
  async logout(){const token=this.session?.access_token;this.clear();if(token)await this.raw('/auth/v1/logout?scope=local','POST',undefined,token);}
 }

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {AyaparkApi} from '../api.mjs?v=4.0.1';
+import {AyaparkApi} from '../api.mjs?v=5.0.0';
 
 const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};};
 function fixture(role='manager',count=6){
@@ -12,7 +12,7 @@ function fixture(role='manager',count=6){
  const workspace={capabilities,entries:[],charges,allocations,settings:[],people:[],links:[],persons:[]};
  api.read=async(table,q)=>{calls.push([table,q]);return ({site_sites:[{id:'s'}],site_staff_memberships:role==='resident'?[]:[{role}],site_units:units,site_blocks:[{id:'b',code:'A'}],site_resident_units:[{unit_id:'u1'}]})[table];};
  api.readAll=async(table,q)=>{calls.push(['all:'+table,q]);return [{user_id:'resident',unit_id:'u1'}];};
- api.rpc=async(name)=>{calls.push([name]);return name==='ay2_workspace'?workspace:name==='ay3_staff_directory'?[]:{};};
+ api.rpc=async(name)=>{calls.push([name]);return name==='ay5_workspace'?workspace:name==='ay3_staff_directory'?[]:{};};
  return {api,calls,units,charges,allocations,workspace};
 }
 test('workspace debt matches existing accounting semantics, including voids and missing allocations',async()=>{
@@ -24,7 +24,7 @@ test('workspace debt matches existing accounting semantics, including voids and 
 });
 test('administrator resident-account load starts before workspace finishes',async()=>{
  const f=fixture(),gate=deferred(),started=deferred(),original=f.api.rpc;
- f.api.rpc=async(name)=>{if(name==='ay2_workspace'){started.resolve();await gate.promise;}return original(name);};
+ f.api.rpc=async(name)=>{if(name==='ay5_workspace'){started.resolve();await gate.promise;}return original(name);};
  const pending=f.api.load();await started.promise;
  assert(f.calls.some(([name])=>name==='all:site_resident_units'));
  gate.resolve();await pending;

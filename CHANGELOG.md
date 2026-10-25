@@ -1,3 +1,12 @@
+## V5.0 · Entwicklungsstand · 2026-10-25
+
+- Modern als Standard; kompakter Header, vier mobile Hauptbereiche, Designwahl in den Einstellungen und Bewohner-Installationsbanner.
+- Glocke, Zielgruppen und optionale wichtige Pop-ups mit vorhandenen versionierten Bestätigungen; isolierter Superadmin-Test ohne Versand.
+- Centgenaue Sammelforderungen, explizite Schuldner, befristete Hausgeldausnahmen und bestätigte automatische Zahlungszuordnung mit getrennten Gruppen/Guthaben.
+- Additive, noch nicht produktiv ausgeführte Migration: aktuelle Wohnungssicht und minimale Zahlungsprojektion; Bankdaten bleiben geschützt.
+- Zweisprachige Rechtsinformationen mit amtlichem Prüfstand. Tests, Grenzen und Rückfallstrategie: V5-REVIEW.md.
+- Keine Veröffentlichung auf GitHub Pages, keine produktive Datenänderung.
+
 ## V4.0 · 2026-10-25
 
 - Einheitliche Versions-URLs für den gesamten ES-Modulgraphen verhindern beim Update eine Mischung aus alten und neuen Dateien.
