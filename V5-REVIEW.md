@@ -56,9 +56,9 @@ SQL-Tests initialisieren PGlite ausschließlich im Arbeitsspeicher mit synthetis
 
 Browser: lokale QA-Seite öffnen, Modern auswählen, „Gesamte Matrix prüfen“, dann „Weitere Formulare prüfen“. Klassisch wählen und „Schrift und Farbwelten prüfen“. Die Matrix prüft 320/375/390/430/768/1024/1440 Pixel, DE/TR, Hell/Dunkel und die passenden drei Rollen. Axe-Core prüft die ausgewählten Fälle bei 390 Pixeln auf WCAG A/AA; das ist keine umfassende manuelle Barrierefreiheitszertifizierung.
 
-- JavaScript-Suite: **167 bestanden, 0 fehlgeschlagen** (einschließlich 19 neuer V5-Tests).
+- JavaScript-Suite: **168 bestanden, 0 fehlgeschlagen** (einschließlich 20 neuer V5-Tests).
 - Bestehende SQL-Suite: **120 bestanden, 0 fehlgeschlagen**.
-- Neue SQL-Suite: **43 bestanden, 0 fehlgeschlagen**, darunter 1/10/20 Wohnungen, Anteilsschlüssel, Rollback/Idempotenz, Ausnahme/Vergütung, Teilzahlung/Guthaben, Stornohistorie, fremde Wohnung/Bankdaten, Zielgruppen/Versionen/Vertretermandate und anonymer Zugriff.
+- Neue SQL-Suite: **46 bestanden, 0 fehlgeschlagen**, darunter 1/10/20 Wohnungen, Anteilsschlüssel, Rollback/Idempotenz, Ausnahme/Vergütung, Teilzahlung/Guthaben, Stornohistorie, fremde Wohnung/Bankdaten, Zielgruppen/Versionen/Vertretermandate und anonymer Zugriff.
 - Browser-Hauptmatrix: **924 Ansichten**, kein horizontaler Überlauf; **56 Axe-Prüfungen**, keine gemeldeten Verstöße.
 - Zusätzliche Formulare/Pop-ups: **392 Ansichten**, kein horizontaler Überlauf; **56 Axe-Prüfungen**, keine gemeldeten Verstöße. Letzte Wiederholung nach den abschließenden Formularkorrekturen separat protokolliert.
 - Klassische Farbwelten, große Schrift und Kontrastvarianten: **144 Ansichten**, kein horizontaler Überlauf.
@@ -92,6 +92,7 @@ Die gezielten Mitteilungs-/Bestätigungsprüfungen und der Schutz roher Bankdate
 - Revisionsnachvollziehbare App-Historie, keine Zusicherung einer externen steuerrechtlichen oder GoBD-Zertifizierung. Die Datenbankadministration bleibt ein privilegierter Zugriff außerhalb normaler App-Rechte.
 - Budgetanzeige setzt gepflegte Zweckbindung/Planbeträge voraus. Sie ersetzt weder Wirtschaftsplanbeschluss noch Liquiditätsprüfung.
 - Browser können eine außerhalb des Browsers bereits installierte/entfernte App nicht auf allen Plattformen zuverlässig erkennen. Standalone-Modus und vorhandene Installationsereignisse werden berücksichtigt; iOS nutzt die Anleitung. Ausblenden gilt sieben Tage.
+- Zusätzlich geprüft: Die vorhandene Rollenconstraint verhindert eine reine Schuldner-/Quellenrolle in aktuellen Wohnungszuordnungen. Die Wohnungssicht nennt Eigentümer/Mieter/Vertreter zusätzlich ausdrücklich; zukünftig beginnende Zuordnungen mit gesetztem Aktiv-Flag erweitern die Sicht nicht. Eigene historische Forderungen bleiben erhalten.
 - Neue fachliche Beschlüsse nicht aus alten Dokumenten ableiten. Es wurde keine echte Beitragsbefreiung für eine benannte Person eingerichtet.
 
 ## Amtlicher Rechtsprüfstand

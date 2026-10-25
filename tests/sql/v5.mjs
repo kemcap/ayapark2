@@ -61,6 +61,11 @@ try{
  await as(tenant);check('tenant sees owner charge of same apartment',await value('select exists(select 1 from public.ay2_charges where unit_id=$1 and person_id=$2) v',[uid(1),pid(1)]));check('foreign apartment remains hidden',!(await value('select exists(select 1 from public.ay2_charges where unit_id=$1) v',[uid(2)])));check('raw bank rows inaccessible',(await value('select count(*)::int v from public.ay2_entries'))===0);await reject('resident cannot create batch',()=>command('batch_charge',batch()));
  const projection=await value('select ay2_private.ay5_payments($1) v',[site]);const payment=projection.find(e=>e.id===mixedEntry);check('shared payment exposes only allocated apartment amount',payment?.cents===500);check('projected payment excludes personal bank description and fields',payment?.description==='Ödeme'&&Object.keys(payment).sort().join(',')==='booked_on,category,cents,description,id');check('budget reserve details stay hidden from residents',(await value('select count(*)::int v from public.ay5_budget'))===0);
 
+ await reject('historical debtor role cannot become a current apartment assignment',()=>db.exec(`RESET ROLE;UPDATE public.ay3_links SET role='debtor' WHERE id='${lid(101)}';`));await as(tenant);
+ check('historical debtor retains own personal charge',await value('select exists(select 1 from public.ay2_charges where id=$1) v',[historical.id]));
+ await db.exec(`RESET ROLE;UPDATE public.ay3_links SET role='tenant',starts_on='2027-01-01' WHERE id='${lid(101)}';`);await as(tenant);
+ check('future cached-active assignment cannot grant shared apartment view',!(await value('select exists(select 1 from public.ay2_charges where unit_id=$1 and person_id=$2) v',[uid(1),pid(1)])));
+ await db.exec(`RESET ROLE;UPDATE public.ay3_links SET starts_on=NULL WHERE id='${lid(101)}';`);
  await as(admin);
  const notice={title:'QA notification',body:'QA synthetic test only',published:true,priority:'important',popup_on_login:true,target_kind:'owners',target_units:[],target_blocks:[]};const announcement=(await command('announcement',notice)).id;
  await as(tenant);check('owner-only notice hidden from tenant',!(await value('select exists(select 1 from public.ay2_announcements where id=$1) v',[announcement])));await reject('guessed receipt ID cannot bypass audience',()=>command('acknowledge',{id:announcement,revision:1}));

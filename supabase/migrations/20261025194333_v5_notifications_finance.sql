@@ -23,7 +23,7 @@ CREATE INDEX ay5_exception_period ON public.ay5_monthly_exceptions(site_id,unit_
 CREATE INDEX ay5_charge_group ON public.ay2_charges(site_id,unit_id,person_id,debt_group,due_on) WHERE void_reason IS NULL;
 
 CREATE FUNCTION ay2_private.ay5_unit(u uuid) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $$
- SELECT auth.uid() IS NOT NULL AND EXISTS(SELECT 1 FROM public.ay3_links l JOIN public.ay3_persons p ON p.id=l.person_id WHERE l.unit_id=u AND p.auth_user_id=auth.uid() AND l.active AND l.archived_at IS NULL AND (l.starts_on IS NULL OR l.starts_on<=current_date) AND (l.ends_on IS NULL OR l.ends_on>=current_date)); $$;
+ SELECT auth.uid() IS NOT NULL AND EXISTS(SELECT 1 FROM public.ay3_links l JOIN public.ay3_persons p ON p.id=l.person_id WHERE l.unit_id=u AND p.auth_user_id=auth.uid() AND l.role IN ('owner','tenant','representative') AND l.active AND l.archived_at IS NULL AND (l.starts_on IS NULL OR l.starts_on<=current_date) AND (l.ends_on IS NULL OR l.ends_on>=current_date)); $$;
 CREATE OR REPLACE FUNCTION ay2_private.view_charge(c uuid) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $$
  SELECT auth.uid() IS NOT NULL AND EXISTS(SELECT 1 FROM public.ay2_charges x WHERE x.id=c AND (ay2_private.can(x.site_id,'finance') OR ay2_private.own_person(x.person_id) OR (x.person_id IS NOT NULL AND ay2_private.ay5_unit(x.unit_id)))); $$;
 ALTER POLICY ay2_charges_read ON public.ay2_charges USING(ay2_private.can(site_id,'finance') OR ay2_private.own_person(person_id) OR (person_id IS NOT NULL AND ay2_private.ay5_unit(unit_id)));
@@ -33,7 +33,7 @@ ALTER POLICY ay3_credits_read ON public.ay3_credits USING(ay2_private.can(site_i
 CREATE FUNCTION ay2_private.ay5_receives(aid uuid) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $$
  SELECT auth.uid() IS NOT NULL AND EXISTS(SELECT 1 FROM public.ay2_announcements a WHERE a.id=aid AND ay2_private.view_site(a.site_id) AND (ay2_private.can(a.site_id,'announcements') OR (a.published AND (a.starts_at IS NULL OR a.starts_at<=now()) AND (a.ends_at IS NULL OR a.ends_at>now()) AND (a.target_kind='all' OR EXISTS(
  SELECT 1 FROM public.ay3_links l JOIN public.ay3_persons p ON p.id=l.person_id JOIN public.site_units u ON u.id=l.unit_id JOIN public.site_blocks b ON b.id=u.block_id
- WHERE l.site_id=a.site_id AND p.auth_user_id=auth.uid() AND l.active AND l.archived_at IS NULL AND (l.starts_on IS NULL OR l.starts_on<=current_date) AND (l.ends_on IS NULL OR l.ends_on>=current_date) AND (
+ WHERE l.site_id=a.site_id AND p.auth_user_id=auth.uid() AND l.role IN ('owner','tenant','representative') AND l.active AND l.archived_at IS NULL AND (l.starts_on IS NULL OR l.starts_on<=current_date) AND (l.ends_on IS NULL OR l.ends_on>=current_date) AND (
  (a.target_kind='owners' AND (l.role='owner' OR l.role='representative' AND 'owners'=ANY(l.mandates))) OR
  (a.target_kind='residents' AND (l.role='tenant' OR l.role='representative' AND 'residents'=ANY(l.mandates))) OR
  (a.target_kind='representatives' AND l.role='representative') OR

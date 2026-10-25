@@ -32,3 +32,5 @@ test('representative demo mandates retain before/after history',async()=>{
 test('shared apartment statements do not describe another debtor obligation as personal',async()=>{
  const {renderPage}=await import('../ui.mjs?v=5.0.0');setLanguage('de');const d=data();d.role='resident';d.capabilities={};const html=renderPage({data:d,mode:'demo',page:'dues',filter:{},period:'2026-10'});assert.match(html,/Wohnungsabrechnung/);assert.match(html,/Zahlungspflichtig: Mieter/);assert.doesNotMatch(html,/Eski Örnek/);assert.doesNotMatch(html,/Ihre offenen Forderungen/);setLanguage('tr');
 });
+
+test('historical debtor and source roles never expand apartment notification audiences',()=>{for(const role of ['debtor','source']){const d=data();d.role='resident';d.capabilities={};d.ownPersonIds=['qa-history'];d.links=[{id:'historical',person_id:'qa-history',unit_id:'A-4',role,active:true}];assert.equal(receives(d,{...notice(),target_kind:'units',target_units:['A-4']}),false);assert.equal(receives(d,{...notice(),target_kind:'blocks',target_blocks:['A']}),false);}});

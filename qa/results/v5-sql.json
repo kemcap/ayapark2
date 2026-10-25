@@ -1,5 +1,5 @@
 {
-  "passed": 43,
+  "passed": 46,
   "failed": 0,
   "scope": "isolated PGlite; synthetic identities; no production connection",
   "results": [
@@ -125,6 +125,18 @@
     },
     {
       "test": "budget reserve details stay hidden from residents",
+      "passed": true
+    },
+    {
+      "test": "historical debtor role cannot become a current apartment assignment",
+      "passed": true
+    },
+    {
+      "test": "historical debtor retains own personal charge",
+      "passed": true
+    },
+    {
+      "test": "future cached-active assignment cannot grant shared apartment view",
       "passed": true
     },
     {

@@ -3,7 +3,7 @@
   "productionWrites": false,
   "productionDeployment": false,
   "node": {
-    "passed": 167,
+    "passed": 168,
     "failed": 0
   },
   "sqlLegacy": {
@@ -11,7 +11,7 @@
     "failed": 0
   },
   "sqlV5": {
-    "passed": 43,
+    "passed": 46,
     "failed": 0
   },
   "browser": {

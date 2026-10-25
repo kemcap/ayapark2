@@ -1,3 +1,5 @@
+> Historischer Stand von PR #22. Im V5-Entwicklungsstand ist Modern der Standard; die Auswahl liegt ausschließlich in den Einstellungen. Aktuelle Prüfungen und Einführung: [V5-REVIEW.md](V5-REVIEW.md).
+
 # Modern – alternative Gestaltung für Ayapark 2
 
 Stand: 25. Oktober 2026. Grundlage: main `f124431e4229d595127daa9f72a010137be4e29d`.

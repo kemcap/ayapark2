@@ -8,7 +8,7 @@ export const hasRead=(d,a)=>!!d.acknowledgements?.some(r=>r.announcement_id===a.
 export function receives(d,a){
  if(a.local_test)return d.role==='super';if(d.role==='super'||d.role!=='resident'&&d.capabilities?.announcements)return true;
  const kind=a.target_kind||'all';if(kind==='all')return true;
- const ownLinks=(d.links||[]).filter(l=>financeLinkAt(l,new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}))&&(d.ownPersonIds||[]).includes(l.person_id));
+ const ownLinks=(d.links||[]).filter(l=>['owner','tenant','representative'].includes(l.role)&&financeLinkAt(l,new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}))&&(d.ownPersonIds||[]).includes(l.person_id));
  if(kind==='owners')return ownLinks.some(l=>l.role==='owner'||l.role==='representative'&&l.mandates?.includes('owners'));
  if(kind==='residents')return ownLinks.some(l=>l.role==='tenant'||l.role==='representative'&&l.mandates?.includes('residents'));
  if(kind==='representatives')return ownLinks.some(l=>l.role==='representative');
