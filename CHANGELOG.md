@@ -1,5 +1,7 @@
 ## V4.0 · 2026-10-25
 
+- Einheitliche Versions-URLs für den gesamten ES-Modulgraphen verhindern beim Update eine Mischung aus alten und neuen Dateien.
+
 - Freigegebene Produktionsfassung: echte Anmeldung, gespeicherte Sitzungen und Recovery wieder aktiv; Versionsnummer V4.0 ohne Vorschauzusatz.
 - Risikoarme UI/UX- und Frontend-Performance-Korrekturen aus der Vorschau übernommen; Details unten und in RELEASE-V4.md.
 - Zahlungszuordnung: Rechteprüfung vor Fachprüfung; identische Wiederholung vor aktuellem Guthabencheck, geänderte Wiederholung weiterhin abgewiesen.

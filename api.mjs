@@ -1,4 +1,4 @@
-import {t as tr} from './i18n.mjs';
+import {t as tr} from './i18n.mjs?v=4.0.1';
 // Existing site tables are read-only; V2 mutations use a checked transactional RPC.
 const URL='https://eisozwhhinqszfikemot.supabase.co';
 const KEY='sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc';

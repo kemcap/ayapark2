@@ -1,7 +1,7 @@
 const bundle=new URLSearchParams(location.search).get('bundle');
 if(!['baseline','current'].includes(bundle))throw Error('Invalid bundle');
 const base='./'+bundle+'/';
-const [{renderPage,labels},{fullDemo},{navigation,unitDetailV3},{buildForm},{updateAssignmentForm},i18n,prefs]=await Promise.all(['ui.mjs','ledger.mjs','v3-ui.mjs','forms.mjs','assignments.mjs','i18n.mjs','preferences.mjs'].map(f=>import(base+f)));
+const [{renderPage,labels},{fullDemo},{navigation,unitDetailV3},{buildForm},{updateAssignmentForm},i18n,prefs]=await Promise.all(['ui.mjs','ledger.mjs','v3-ui.mjs','forms.mjs','assignments.mjs','i18n.mjs','preferences.mjs'].map(f=>import(base+f+(bundle==='current'?'?v=4.0.1':''))));
 const template=new DOMParser().parseFromString(await (await fetch(base+'index.html')).text(),'text/html');
 for(const f of ['styles.css','recovery.css','install-tutorial.css','v4-ui.css']){const link=document.createElement('link');link.rel='stylesheet';link.href=base+f;document.head.append(link);}
 let enhance;try{enhance=(await import(base+'ui-accessibility.mjs')).enhanceTables;}catch{}
