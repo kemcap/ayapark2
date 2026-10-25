@@ -1,5 +1,5 @@
-import {t as tr,getLanguage,setLanguage} from './i18n.mjs';
-import {escapeHtml as e} from './core.mjs';
+import {t as tr,getLanguage,setLanguage} from './i18n.mjs?v=4.0.1';
+import {escapeHtml as e} from './core.mjs?v=4.0.1';
 export const preferenceOptions={palette:['classic','ocean','slate','plum','sand','ayapark'],loader:['ring','dots','bar','pulse','wave'],font:['normal','large','xlarge'],contrast:['normal','high'],density:['compact','comfortable'],motion:['system'],language:['tr','de'],theme:['system','light','dark']};
 export const preferenceDefaults={palette:'classic',loader:'ring',font:'normal',contrast:'normal',density:'comfortable',motion:'system',hideAmounts:false,language:'tr',theme:'system'};
 export function cleanPreferences(value={}){const out={...preferenceDefaults};for(const[k,options]of Object.entries(preferenceOptions))if(options.includes(value[k]))out[k]=value[k];out.hideAmounts=value.hideAmounts===true;return out;}

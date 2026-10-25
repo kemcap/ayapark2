@@ -1,5 +1,5 @@
-import {parseImport} from './v3-import.mjs';
-import {t as tr,locale} from './i18n.mjs';
+import {parseImport} from './v3-import.mjs?v=4.0.1';
+import {t as tr,locale} from './i18n.mjs?v=4.0.1';
 // Pure domain functions. Money is stored as integer kuruş.
 export const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const money = cents => cents == null ? '—' : new Intl.NumberFormat(locale(), {style:'currency', currency:'TRY', maximumFractionDigits:2}).format(cents / 100);

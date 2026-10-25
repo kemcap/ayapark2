@@ -1,6 +1,6 @@
-import {t as tr,locale} from './i18n.mjs';
-import {escapeHtml as e} from './core.mjs';
-import {appearanceSettings} from './preferences.mjs';
+import {t as tr,locale} from './i18n.mjs?v=4.0.1';
+import {escapeHtml as e} from './core.mjs?v=4.0.1';
+import {appearanceSettings} from './preferences.mjs?v=4.0.1';
 const capLabels={finance:'Mali kayıtlar ve ödeme eşleştirme',import:'Banka dosyası içe aktarma',people:'Kişi kayıtları',announcements:'Duyuru oluşturma ve yayımlama'};
 const btn=(label,action,attrs='')=>`<button type="button" class="button" data-action="${action}" ${attrs}>${tr(label)}</button>`;
 const date=v=>v?new Intl.DateTimeFormat(locale(),{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Istanbul'}).format(new Date(v)):'—';

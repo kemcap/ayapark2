@@ -1,5 +1,5 @@
-import {openInstallTutorial} from './install-tutorial.mjs';
-import {t as tr} from './i18n.mjs';
+import {openInstallTutorial} from './install-tutorial.mjs?v=4.0.1';
+import {t as tr} from './i18n.mjs?v=4.0.1';
 export function bindInstall(){
  let pending=null;const button=document.getElementById('installApp');
  const standalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
