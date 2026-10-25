@@ -17,5 +17,6 @@ for(const file of ['index.html','reset.html']){
   .replace('<script src="./design-boot.js">','<meta name="ayapark-design-default" content="modern">\n<script src="./design-boot.js">');
  await writeFile(path,html);
 }
+await cp(resolve(root,'qa/mobile-preview.html'),resolve(dist,'mobile-preview.html'));
 // Preserve an existing Site identity; initialization and audience are managed by Sites.
 console.log('Prepared Modern demo. Stage: preview; connect-src: none; synthetic demo data only.');

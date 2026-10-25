@@ -1,8 +1,8 @@
-import {getLanguage} from './i18n.mjs?v=4.1.0';
+import {getLanguage} from './i18n.mjs?v=5.0.0';
 export const designKey='ayapark2-design-v1';
 export const designOptions=['classic','modern'];
-let current='classic';
-export function readDesign(storage){try{const value=storage?.getItem(designKey);return designOptions.includes(value)?value:'classic';}catch{return 'classic';}}
+let current='modern';
+export function readDesign(storage){try{const value=storage?.getItem(designKey);return designOptions.includes(value)?value:'modern';}catch{return 'modern';}}
 export function getDesign(){return typeof document==='undefined'?current:document.documentElement.dataset.design||current;}
 export function setDesign(value,{storage,persist=true}={}){
  if(!designOptions.includes(value))return getDesign();current=value;

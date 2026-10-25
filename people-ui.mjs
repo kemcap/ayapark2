@@ -1,10 +1,10 @@
-import {t as tr} from './i18n.mjs?v=4.1.0';
-import {escapeHtml as e,money} from './core.mjs?v=4.1.0';
-import {activeAt,personName} from './v3-domain.mjs?v=4.1.0';
-import {can,heading,card,button,badge,date} from './ui.mjs?v=4.1.0';
-import {remaining} from './ledger.mjs?v=4.1.0';
-import {roleLabel} from './v3-ui.mjs?v=4.1.0';
-import {removalReasons} from './assignments.mjs?v=4.1.0';
+import {t as tr} from './i18n.mjs?v=5.0.0';
+import {escapeHtml as e,money} from './core.mjs?v=5.0.0';
+import {activeAt,personName} from './v3-domain.mjs?v=5.0.0';
+import {can,heading,card,button,badge,date} from './ui.mjs?v=5.0.0';
+import {remaining} from './ledger.mjs?v=5.0.0';
+import {roleLabel} from './v3-ui.mjs?v=5.0.0';
+import {removalReasons} from './assignments.mjs?v=5.0.0';
 export const historicalRoleLabel=r=>tr({owner:'Eski ev sahibi',tenant:'Eski kiracı',representative:'Eski yetkili kişi'}[r]||'Eski kişi');
 const role=l=>badge(activeAt(l)?roleLabel(l.role):historicalRoleLabel(l.role),'role-badge role-'+l.role);
 export function assignmentCard(s,l,showUnit=false){

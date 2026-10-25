@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#f4f5f0">
 <meta name="robots" content="noindex,nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https://eisozwhhinqszfikemot.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Ayapark 2 · Site Yönetimi V4.0</title>
+<title>Ayapark 2 · Site Yönetimi V5.0</title>
 <script src="./preferences-boot.js"></script>
 <script src="./theme.js"></script>
 <script src="./design-boot.js"></script>
@@ -18,26 +18,26 @@
 <link rel="stylesheet" href="./styles.css?v=4.0">
 <link rel="stylesheet" href="./recovery.css">
 <link rel="stylesheet" href="./install-tutorial.css">
-<script type="module" src="./app.mjs?v=4.1.0"></script>
+<script type="module" src="./app.mjs?v=5.0.0"></script>
 <link rel="stylesheet" href="./v4-ui.css?v=4.0">
-<link rel="stylesheet" href="./modern.css?v=4.1.0">
+<link rel="stylesheet" href="./modern.css?v=5.0.0"><link rel="stylesheet" href="./v5-ui.css?v=5.0.0">
 </head>
 <body>
 <a class="skip" href="#content">İçeriğe geç</a>
-<div id="previewBanner" class="preview-banner" role="note" hidden>V4.0 önizleme · Örnek veriler · Canlı kayıtlara erişim yok</div>
+<div id="previewBanner" class="preview-banner" role="note" hidden>V5.0 önizleme · Örnek veriler · Canlı kayıtlara erişim yok</div>
 <div class="shell">
 <aside class="sidebar">
  <a href="#overview" class="brand" aria-label="Ayapark 2 ana sayfa"><span class="modern-brand-mark" aria-hidden="true"><i></i><i></i></span><img class="brand-logo" src="./assets/ayapark2-header.webp" alt="Ayapark 2 bina fotoğrafı" width="46" height="46"><span>AYAPARK 2<small>Birlikte, daha düzenli.</small></span></a>
- <div class="site-label"><span class="site-dot"></span>Döşemealtı, Antalya <span class="version">v4.0</span></div>
+ <div class="site-label"><span class="site-dot"></span>Döşemealtı, Antalya <span class="version">v5.0</span></div>
  <p class="nav-label">YAŞAM & YÖNETİM</p>
  <nav id="nav" aria-label="Ana menü"></nav>
  <div class="sidebar-bottom"><div class="mini-building" aria-hidden="true"><i></i><i></i><i></i></div><strong>Her şey yerli yerinde.</strong><p>Daireniz, ödemeleriniz ve siteniz.<br>Tek bir yerde.</p><div class="side-meta">A + B Blok <span>20 daire</span></div></div>
 </aside>
 <div class="workspace">
- <header class="topbar"><span id="breadcrumb">Yönetim / Genel bakış</span><div class="header-actions"><details id="designMenu" class="design-menu"><summary class="button small"><span class="design-dot" aria-hidden="true"></span><span data-design-label>Klasik</span></summary><div class="design-options" role="group" aria-label="Design"><button type="button" data-design-choice="classic" aria-pressed="true">Klasik</button><button type="button" data-design-choice="modern" aria-pressed="false">Modern</button></div></details><button id="languageToggle" type="button" class="button small language-toggle" aria-label="Sprache wechseln / Dili değiştir" title="Deutsch" hidden>DE</button><button id="themeToggle" type="button" class="button header-icon" aria-label="Görünüm: Otomatik" title="Görünüm: Otomatik" hidden>◐</button><button type="button" id="installApp" class="button small">Uygulamayı ekle</button><span class="mode" id="modeBadge">Örnek veriler</span><button id="refreshButton" type="button" class="button header-icon" title="Kayıtları yenile" aria-label="Kayıtları yenile" hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17"/></svg></button><button id="connectionButton" class="button small">Hesabımla giriş</button></div></header>
+ <header class="topbar"><span id="breadcrumb">Yönetim / Genel bakış</span><div class="header-actions"><button id="languageToggle" type="button" class="button small language-toggle" aria-label="Sprache wechseln / Dili değiştir" title="Deutsch" hidden>DE</button><button id="themeToggle" type="button" class="button header-icon" aria-label="Görünüm: Otomatik" title="Görünüm: Otomatik" hidden>◐</button><button id="notificationBell" type="button" class="button header-icon" aria-label="Bildirimler" aria-haspopup="dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span id="notificationCount" class="notification-count" hidden></span></button><span class="mode" id="modeBadge">Örnek veriler</span><button id="refreshButton" type="button" class="button header-icon" title="Kayıtları yenile" aria-label="Kayıtları yenile" hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17"/></svg></button><button id="connectionButton" class="button small">Hesabımla giriş</button></div></header>
  <div class="context-bar"><p id="contextText">Tasarım önizlemesi · Tüm tutarlar örnektir.</p><label id="roleControl"><span id="roleLabel">Görünümü dene</span> <select id="roleSelect" aria-label="Örnek rol görünümü"><option value="super">Süper Admin</option><option value="staff">Yönetim</option><option value="resident">Site Sakini</option></select></label><label id="residentPreviewControl" hidden><span>Daire / Kişi</span> <select id="residentPreviewSelect" aria-label="Sakin önizlemesi için daire ve kişi"></select></label></div>
- <main id="content" tabindex="-1"></main>
- <footer>AYAPARK 2 <span>V4.0 · <span id="footerMode">Örnek veriler</span></span></footer>
+ <section id="installBanner" class="install-banner" hidden><span aria-hidden="true">▯</span><div><strong id="installBannerTitle">Uygulamayı telefonuna ekle</strong><small id="installBannerHelp"></small></div><button type="button" id="installApp" class="button small">Uygulamayı ekle</button><button id="dismissInstall" type="button" class="button header-icon" aria-label="Kapat">×</button></section><main id="content" tabindex="-1"></main>
+ <footer>AYAPARK 2 <span>V5.0 · <span id="footerMode">Örnek veriler</span></span></footer>
 </div>
 </div>
 <dialog id="detailDialog" aria-labelledby="detailTitle"><div id="detailContent"></div><form method="dialog" class="dialog-actions"><button class="button">Kapat</button></form></dialog>
@@ -52,7 +52,8 @@
  <p class="fine"><a href="./import-template.csv" download class="text-button">CSV şablonu indir</a> · <a href="./import-ai-instructions.txt" download class="text-button">KI / AI talimatı indir</a></p><details class="import-help"><summary>CSV dosyası nasıl hazırlanır?</summary><p class="fine">Güncel CSV şablonunu indirin. Gelir ve gideri ayrı sütunlara pozitif tutar olarak yazın (ör. 3.600,00). Her satırda yalnızca bir gelir veya gider bulunmalıdır.</p><p class="fine">Sütunlar: <code>date;reference;counterparty;description;income;expense;unit;iban;balance</code></p><p class="fine">Eski üç sütunlu biçim de desteklenir. PDF veya Excel dosyasını önce CSV dosyasına dönüştürün. Ödeme eşleştirmelerini ayrıca kontrol edin.</p></details>
  <div id="importPreview" role="status">Henüz dosya seçilmedi.</div><form method="dialog" class="dialog-actions"><button class="button">Kapat</button><button class="button primary" id="commitImport" type="button" disabled>İçe aktar</button></form>
 </dialog>
-<dialog id="urgentDialog" aria-labelledby="urgentTitle"><div class="dialog-kicker">Önemli duyuru</div><h2 id="urgentTitle"></h2><p id="urgentBody" class="pre-wrap"></p><div class="dialog-actions"><button id="ackUrgent" class="button primary">Okudum</button></div></dialog>
+<dialog id="notificationsDialog" aria-labelledby="notificationsTitle"><div class="notification-heading"><h2 id="notificationsTitle">Bildirimler</h2><button type="button" class="button" id="closeNotifications">Kapat</button></div><div id="notificationsList"></div></dialog>
+<dialog id="urgentDialog" aria-labelledby="urgentTitle"><div class="notification-symbol" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></div><h2 id="urgentTitle"></h2><p id="urgentBody" class="pre-wrap"></p><small id="urgentMeta"></small><div class="dialog-actions"><button id="ackUrgent" class="button primary">Okudum</button></div></dialog>
 <dialog id="actionDialog" aria-labelledby="actionTitle"><div class="dialog-kicker">AYAPARK 2</div><h2 id="actionTitle"></h2><form id="actionForm"><div id="actionFields"></div><p id="actionMessage" role="status"></p><div class="dialog-actions"><button class="button" type="button" id="cancelAction">Vazgeç</button><button class="button primary" type="submit" id="saveAction">Kaydet</button></div></form></dialog>
 <div id="toast" role="status" class="toast" hidden></div>
 <noscript><p>Bu uygulama için JavaScript'i etkinleştirin.</p></noscript>

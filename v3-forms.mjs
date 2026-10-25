@@ -1,11 +1,11 @@
-import {buildAssignmentForm,assignmentPayload} from './assignments.mjs?v=4.1.0';
-import {effectiveOccupancy} from './relationships.mjs?v=4.1.0';
-import {announcementTime,validateAnnouncement} from './announcement-validation.mjs?v=4.1.0';
-import {t as tr} from './i18n.mjs?v=4.1.0';
-import {escapeHtml as e,randomId,money} from './core.mjs?v=4.1.0';
-import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=4.1.0';
-import {today,personName,personLinks,activeAt,dateValid} from './v3-domain.mjs?v=4.1.0';
-import {roleLabel} from './v3-ui.mjs?v=4.1.0';
+import {buildAssignmentForm,assignmentPayload} from './assignments.mjs?v=5.0.0';
+import {effectiveOccupancy} from './relationships.mjs?v=5.0.0';
+import {announcementTime,validateAnnouncement} from './announcement-validation.mjs?v=5.0.0';
+import {t as tr} from './i18n.mjs?v=5.0.0';
+import {escapeHtml as e,randomId,money} from './core.mjs?v=5.0.0';
+import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.0.0';
+import {today,personName,personLinks,activeAt,dateValid} from './v3-domain.mjs?v=5.0.0';
+import {roleLabel} from './v3-ui.mjs?v=5.0.0';
 const sel=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}">${options.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(l)}</option>`).join('')}</select></label>`;
 const text=(name,label,value='')=>`<label class="field">${tr(label)}<textarea name="${name}" maxlength="5000" rows="3">${e(value)}</textarea></label>`;
 const check=(name,label,checked=false)=>`<label class="check-field"><input type="checkbox" name="${name}" ${checked?'checked':''}>${tr(label)}</label>`;
@@ -55,6 +55,8 @@ export function buildV3Form(s,action,args={}){
   const a=d.announcements.find(a=>a.id===args.id);title=tr(a?'Duyuruyu düzenle':'Duyuru oluştur');
   const local=v=>v?new Date(v).toLocaleString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,16).replace(' ','T'):'';
   body=field('title',tr('Başlık'),'text',a?.title||'','required maxlength="150"')+text('body','Duyuru metni',a?.body||'')+sel('priority','Önem',[['normal',tr('Normal')],['important',tr('Önemli')],['urgent',tr('Acil')]],a?.priority||'normal')+field('starts_at',tr('Yayın başlangıcı'),'datetime-local',local(a?.starts_at))+field('ends_at',tr('Yayın bitişi'),'datetime-local',local(a?.ends_at))+`<p class="fine">${tr('Saatler Türkiye saatidir. Başlangıç boşsa hemen yayımlanır. Bitiş boşsa süresiz kalır.')}</p><div class="publish-choice">${check('published','Yayımla',a?.published||false)}<span class="fine">${tr('Kapalıysa taslak olarak kaydedilir.')}</span></div>`;
+  body+=check('popup_on_login','Sonraki girişte pop-up göster',a?.popup_on_login||false)+sel('target_kind','Alıcılar',[['all',tr('Herkes')],['owners',tr('Yalnız malikler')],['residents',tr('Yalnız kiracı / sakinler')],['representatives',tr('Yalnız temsilciler')],['units',tr('Seçili daireler')],['blocks',tr('Seçili bloklar')]],a?.target_kind||'all')+`<div data-notification-target="units" hidden>${d.units.map(u=>`<label class="check-field"><input type="checkbox" name="target_units" value="${e(u.id)}" ${a?.target_units?.includes(u.id)?'checked':''}>${e(u.code)}</label>`).join('')}</div><div data-notification-target="blocks" hidden>${['A','B'].map(b=>`<label class="check-field"><input type="checkbox" name="target_blocks" value="${b}" ${a?.target_blocks?.includes(b)?'checked':''}>${b} ${tr('Blok')}</label>`).join('')}</div><details><summary>Deutsch</summary>${field('title_de','Titel (Deutsch)','text',a?.title_de||'','maxlength="150"')}${text('body_de','Text (Deutsch)',a?.body_de||'')}</details><p class="fine">${tr('Düzenleme yeni bir sürüm oluşturur. Önceki onaylar geçmişte kalır.')}</p>`;
+
  }
  else if(action==='provider'){
   const p=d.providers.find(p=>p.id===args.id);title=tr(p?'Hizmeti düzenle':'Hizmet ekle');body=field('name',tr('Firma / kişi'),'text',p?.name||'','required maxlength="150"')+sel('category','Alan',['Temizlik','Peyzaj','Elektrik','Asansör','Havuz','Tesisat','Diğer'].map(c=>[c,tr(c)]),p?.category||'Temizlik')+field('contact',tr('Yetkili'),'text',p?.contact||'','maxlength="150"')+field('phone',tr('Telefon'),'tel',p?.phone||'','maxlength="60"')+field('email',tr('E-posta'),'email',p?.email||'','maxlength="254"')+sel('status','Durum',[['preferred',tr('Tercih edilen')],['backup',tr('Alternatif')],['avoid',tr('Tekrar çalışılmasın')]],p?.status||'preferred');
@@ -67,6 +69,7 @@ export function buildV3Form(s,action,args={}){
    if(action==='monthly'){built.body=built.body.replace('placeholder="'+e(tr('Tutar girin'))+'"','placeholder="'+e(tr('Aidat tutarı'))+'"');}
    if(action==='monthly')built.body+=`<p class="fine">${tr('Dönemin sorumlu kişisi otomatik seçilir. Belirsiz kayıtlar kişi belirlenene kadar sakinlere gösterilmez.')}</p>`;
   }
+  if(action==='entry'&&args.kind==='expense'){built.title=tr('Gider ekle');built.body=built.body.replace('value="in"','value="in"').replace('value="out"','value="out" selected');}
   return built;
  }
  return {title,body,context};
@@ -92,6 +95,7 @@ export function payloadV3(action,form,ctx){
  if(action==='announcement'){
   if(!get('title')||!get('body'))throw Error(tr('Başlık ve metin gerekli.'));p.published=form.has('published');
   for(const k of ['starts_at','ends_at'])p[k]=announcementTime(get(k));
+  p.popup_on_login=form.has('popup_on_login');p.target_units=form.getAll('target_units');p.target_blocks=form.getAll('target_blocks');
   validateAnnouncement(p);
  }
  if(action==='provider_note'&&!get('body'))throw Error(tr('Not yazın.'));

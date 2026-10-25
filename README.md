@@ -1,4 +1,16 @@
-# Ayapark 2 · V4.0
+# Ayapark 2 · V5.0 – Entwicklungsstand
+
+Modern als Standard, kompakte mobile Bedienung, versionierte Benachrichtigungen und vereinfachte Finanzvorgänge. Noch nicht für Produktion freigegeben; die Live-Seite bleibt V4.0, bis Migration und Veröffentlichung ausdrücklich genehmigt werden.
+
+- [Umsetzung, Testnachweise, Grenzen und sichere Einführung](V5-REVIEW.md)
+- [Ausgangspunkt und Umsetzungsplan](IMPLEMENTATION-V5.md)
+- Tests: `npm ci`, `npm test`, `npm run test:sql`, `npm run test:v5:sql`.
+- Getrennte synthetische Vorschau: https://ayapark-v5-test.kemcap.chatgpt.site
+- Testmitteilung: Einstellungen → Benachrichtigungstest (nur Superadmin). Keine echte Zustellung und keine produktiven Lesebestätigungen.
+
+---
+
+## Vorheriger Produktionsstand V4.0
 
 Produktionsfassung nach ausdrücklicher Live-Freigabe am 25. Oktober 2026. GitHub ist die zentrale Codebasis. Der frühere, getrennte V4-Demostand bleibt eine Vorschau und wird nicht als identisch aktuell bezeichnet.
 

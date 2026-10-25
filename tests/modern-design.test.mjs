@@ -1,15 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readDesign,setDesign,getDesign,designKey,designSettings} from '../design.mjs?v=4.1.0';
-import {decorateModernPage} from '../modern-ui.mjs?v=4.1.0';
-import {renderPage} from '../ui.mjs?v=4.1.0';
-import {fullDemo} from '../ledger.mjs?v=4.1.0';
-import {setLanguage} from '../i18n.mjs?v=4.1.0';
-import {cleanPreferences,preferenceDefaults} from '../preferences.mjs?v=4.1.0';
+import {readDesign,setDesign,getDesign,designKey,designSettings} from '../design.mjs?v=5.0.0';
+import {decorateModernPage} from '../modern-ui.mjs?v=5.0.0';
+import {renderPage} from '../ui.mjs?v=5.0.0';
+import {fullDemo} from '../ledger.mjs?v=5.0.0';
+import {setLanguage} from '../i18n.mjs?v=5.0.0';
+import {cleanPreferences,preferenceDefaults} from '../preferences.mjs?v=5.0.0';
 
 test('design choice tolerates unavailable storage and rejects invalid persisted values',()=>{
- assert.equal(readDesign({getItem:()=>{throw Error('blocked');}}),'classic');
- for(const value of [null,'','<script>','unknown'])assert.equal(readDesign({getItem:()=>value}),'classic');
+ assert.equal(readDesign({getItem:()=>{throw Error('blocked');}}),'modern');
+ for(const value of [null,'','<script>','unknown'])assert.equal(readDesign({getItem:()=>value}),'modern');
  assert.equal(readDesign({getItem:key=>key===designKey?'modern':null}),'modern');
 });
 test('cosmetic design selection persists locally and does not enter account preferences',()=>{
@@ -47,11 +47,11 @@ test('design controls use translated labels and accessible pressed state',()=>{
  setLanguage('tr');assert.match(designSettings(),/Tasarım seçin/);setDesign('classic',{persist:false});
 });
 
-test('pre-paint bootstrap keeps classic default, validates storage, and supports disconnected Modern preview',async()=>{
+test('pre-paint bootstrap uses Modern default and preserves explicit Classic, validates storage, and supports disconnected Modern preview',async()=>{
  const {readFile}=await import('node:fs/promises');const {runInNewContext}=await import('node:vm');
  const source=await readFile(new URL('../design-boot.js',import.meta.url),'utf8');
- for(const [saved,preview,expected] of [[null,false,'classic'],['modern',false,'modern'],['invalid',false,'classic'],[null,true,'modern'],['classic',true,'classic']]){
+ for(const [saved,preview,expected] of [[null,false,'modern'],['modern',false,'modern'],['invalid',false,'modern'],[null,true,'modern'],['classic',true,'classic']]){
   const root={dataset:{}};runInNewContext(source,{document:{documentElement:root,querySelector:()=>preview?{content:'modern'}:null},localStorage:{getItem:()=>saved}});assert.equal(root.dataset.design,expected);
  }
- const root={dataset:{}};runInNewContext(source,{document:{documentElement:root,querySelector:()=>null},localStorage:{getItem:()=>{throw Error('denied');}}});assert.equal(root.dataset.design,'classic');
+ const root={dataset:{}};runInNewContext(source,{document:{documentElement:root,querySelector:()=>null},localStorage:{getItem:()=>{throw Error('denied');}}});assert.equal(root.dataset.design,'modern');
 });

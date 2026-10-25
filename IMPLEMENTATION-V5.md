@@ -18,3 +18,7 @@ Die Live-Datenbank wurde ausschließlich über Metadaten lesend geprüft. Finanz
 ## Sicherheitsprinzip
 
 Neue Tabellen mit RLS, keine direkten Schreibrechte für Browserrollen. Neue Buchungen ausschließlich über autorisierte, serialisierte RPCs. Bestehende Kategorien und Buchungen bleiben erhalten. Migration und Rückfallstrategie werden als Review-Artefakte geliefert; produktive Ausführung erfordert gesonderte Freigabe. Lokale Datenbank: PGlite mit synthetischen Konten und Fixtures, keine produktive URL.
+
+## Ergebnis
+
+Implementiert und lokal geprüft. Abschlussbericht, Testzahlen, amtliche Quellen und Einführung/Rückfall: [V5-REVIEW.md](V5-REVIEW.md). 167 JavaScript-, 120 bestehende und 43 neue SQL-Prüfungen erfolgreich. 924 Hauptansichten, 392 zusätzliche Formularansichten und 144 klassische Varianten ohne horizontalen Überlauf; 112 ausgewählte Axe-Prüfungen ohne gemeldete Verstöße. Getrennte private Vorschau ausschließlich mit synthetischen Daten. Keine produktive Migration oder Veröffentlichung auf GitHub Pages.

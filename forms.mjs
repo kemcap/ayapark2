@@ -1,9 +1,10 @@
-import {buildV3Form,payloadV3} from './v3-forms.mjs?v=4.1.0';
-import {t as tr} from './i18n.mjs?v=4.1.0';
-import {escapeHtml as e,money,randomId} from './core.mjs?v=4.1.0';
-import {remaining,unassigned} from './ledger.mjs?v=4.1.0';
-import {personName,creditAvailable} from './v3-domain.mjs?v=4.1.0';
-import {analyzeStage} from './reconcile.mjs?v=4.1.0';
+import {buildFinanceForm,financePayload} from './finance-forms.mjs?v=5.0.0';
+import {buildV3Form,payloadV3} from './v3-forms.mjs?v=5.0.0';
+import {t as tr} from './i18n.mjs?v=5.0.0';
+import {escapeHtml as e,money,randomId} from './core.mjs?v=5.0.0';
+import {remaining,unassigned} from './ledger.mjs?v=5.0.0';
+import {personName,creditAvailable} from './v3-domain.mjs?v=5.0.0';
+import {analyzeStage} from './reconcile.mjs?v=5.0.0';
 export const field=(name,label,type='text',value='',attrs='')=>`<label class="field">${tr(label)}<input name="${name}" type="${type}" value="${e(value)}" ${attrs}></label>`;
 const select=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}">${options.map(([v,l])=>`<option value="${e(v)}" ${String(v)===String(value)?'selected':''}>${e(tr(l))}</option>`).join('')}</select></label>`;
 const check=(name,label,checked=false)=>`<label class="check-field"><input type="checkbox" name="${name}" ${checked?'checked':''}>${tr(label)}</label>`;
@@ -60,5 +61,5 @@ export function payloadLegacy(action,form,context){
  return p;
 }
 
-export const buildForm=buildV3Form;
-export const payloadFor=payloadV3;
+export const buildForm=(s,action,args)=>buildFinanceForm(s,action,args)||buildV3Form(s,action,args);
+export function payloadFor(action,form,ctx){try{return ctx.v5?financePayload(action,form,ctx):payloadV3(action,form,ctx);}catch(error){error.message=tr(error.message);throw error;}}
