@@ -1,11 +1,12 @@
-# Ayapark 2 · V4.0 Entwicklungsvorschau
+# Ayapark 2 · V4.0
 
-Diese Branch ist **nicht zur Produktivveröffentlichung freigegeben**. Produktion bleibt V3.15. Die separate V4-Vorschau verwendet Beispieldaten; Live-API und Recovery sind gesperrt.
+Produktionsfassung nach ausdrücklicher Live-Freigabe am 25. Oktober 2026. GitHub ist die zentrale Codebasis. Der frühere, getrennte V4-Demostand bleibt eine Vorschau und wird nicht als identisch aktuell bezeichnet.
 
-- [UI/UX-Audit, Verbesserungen und Freigabevorschläge](UI-UX-AUDIT-V4.md)
-- [Release-Gates und Rollback](V4-RELEASE-PLAN.md)
+- [Release-Übersicht, Prüfungen und Grenzen](RELEASE-V4.md)
+- [UI/UX-Audit und größere Empfehlungen](UI-UX-AUDIT-V4.md)
+- [Release- und Rollback-Plan](V4-RELEASE-PLAN.md)
 - [Übernommener Datenbank-Audit](AUDIT-20261025.md)
-- Tests: `npm test`, `npm run test:sql`, `npm run qa:prepare`. Die drei dokumentierten SQL-Baselinefehler bleiben rot.
+- Tests: `npm test` (141), `npm run test:sql` (120, isoliert), `npm run qa:prepare`.
 
 ---
 

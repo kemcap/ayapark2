@@ -1,3 +1,9 @@
+# Aktueller Freigabestand
+
+Kemal hat am 25. Oktober 2026 mit „Okay, gerne live gehen.“ die Veröffentlichung freigegeben. Die drei SQL-Befunde sind isoliert behoben (120/120). RELEASE-V4.md beschreibt den konkreten Release-Umfang, verbleibende Testgrenzen und den kompatiblen Rückweg. Größere Navigations-/Dashboard-Vorschläge bleiben getrennt.
+
+Der folgende ursprüngliche Plan bleibt als Entscheidungshistorie erhalten.
+
 # V4 – Freigabe- und Rollback-Plan
 
 Produktionsbasis: deef766bbc22f2aa7b7bb4d6bf8b2ffc64e74c4c (V3.15).

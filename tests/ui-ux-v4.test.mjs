@@ -21,8 +21,8 @@ test('preview blocks recovery email and verification with no delivery attempt',a
  await assert.rejects(api.requestReset('fixture@example.invalid','https://preview.example.invalid/reset.html'),/önizleme|Vorschau/);
  await assert.rejects(api.beginWithEmailCode('fixture@example.invalid','123456'),/önizleme|Vorschau/);assert.equal(sent,0);
 });
-test('both preview entry points enforce a browser network boundary',()=>{
- for(const f of ['index.html','reset.html']){const html=readFileSync(new URL('../'+f,import.meta.url),'utf8');assert(html.includes('name="ayapark-stage" content="preview"'));assert(html.includes("connect-src 'none'"));}
+test('release entry points permit only the production backend and enable real sessions',()=>{
+ for(const f of ['index.html','reset.html']){const html=readFileSync(new URL('../'+f,import.meta.url),'utf8');assert(html.includes('name="ayapark-stage" content="production"'));assert(html.includes("connect-src https://eisozwhhinqszfikemot.supabase.co;"));assert(!html.includes("connect-src *"));}
 });
 test('role removal has one clear reason without losing the archive explanation',()=>{
  const d=fullDemo();for(const lang of ['de','tr']){setLanguage(lang);const built=buildAssignmentForm(d,'assignment_remove',{id:'demo-tenant-link'});assert.match(built.title,lang==='de'?/Rolle entfernen/:/Rolü kaldır/);assert.match(built.body,lang==='de'?/Person, andere Rollen und offene Forderungen bleiben erhalten/:/Kişi, diğer roller ve açık borçlar korunur/);assert(!built.body.includes('type="date"'));}setLanguage('tr');

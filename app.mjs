@@ -8,13 +8,13 @@ import {mayPreview,residentPreviewOptions,previewProjection} from './access-prev
 import {bindInstall} from './install.mjs';
 import {bindPasswordEyes} from './password-eye.mjs';
 import {sha256} from './hash.mjs';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs?v=4.0-preview';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs?v=4.0';
 import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs';
 import {template} from './v3-import.mjs';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs';
-import {AyaparkApi} from './api.mjs?v=4.0-preview';
+import {AyaparkApi} from './api.mjs?v=4.0';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs';
 import {buildForm,payloadFor} from './forms.mjs';
 import {analyzeStage} from './reconcile.mjs';
@@ -41,7 +41,7 @@ function render(focus=false){
  $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> '+getLanguage().toUpperCase();$('languageToggle').title=getLanguage()==='tr'?'Deutsch':'Türkçe';
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
- const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V4.0 · '+tr('Önizleme');
+ const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V4.0'+(IS_PREVIEW?' · '+tr('Önizleme'):'');
  renderNavigation();
  $('breadcrumb').textContent=roleName(d.role)+' / '+labels[state.page];
  const previewAllowed=state.mode==='connected'&&mayPreview(state.fullData);

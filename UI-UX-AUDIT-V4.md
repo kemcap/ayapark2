@@ -1,5 +1,5 @@
 # Ayapark 2 – gemeinsamer UI/UX-, Performance- und Logikaudit für V4
-Stand: 25. Oktober 2026 (Europe/Istanbul). Entwicklungsstand, keine Produktivfreigabe.
+Stand des ursprünglichen Audits: 25. Oktober 2026 (Europe/Istanbul). Die folgenden Entwicklungsbefunde sind historisch. Für die anschließend ausdrücklich freigegebene Produktionsfassung und die drei inzwischen behobenen SQL-Befunde siehe RELEASE-V4.md. D1/D2 bleiben größere offene Empfehlungen.
 
 ## Schutz des Ausgangsstands
 - Produktion: V3.15, Commit `deef766bbc22f2aa7b7bb4d6bf8b2ffc64e74c4c`.

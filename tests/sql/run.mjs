@@ -4,6 +4,7 @@ const db=new PGlite(); // In-memory PostgreSQL; no URL or production credentials
 let failed=0,passed=0;
 try{
  await db.exec(await readFile(new URL('./schema.sql',import.meta.url),'utf8'));
+ await db.exec(await readFile(new URL('../../supabase/migrations/20261025073340_v4_finance_release_safety.sql',import.meta.url),'utf8'));
  for(const file of ['assignments.sql','charge-period.sql','comfort.sql','appearance.sql','audit-finance.sql','audit-permissions.sql','audit-legacy-access.sql']){
   try{
    let sql=await readFile(new URL('../'+file,import.meta.url),'utf8');

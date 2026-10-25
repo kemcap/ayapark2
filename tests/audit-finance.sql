@@ -34,7 +34,9 @@ BEGIN
  INSERT INTO qa_finance_result VALUES('over-allocation rejected',rejected);
  r:=public.ay2_command(s,'credit',jsonb_build_object('request_id',gen_random_uuid(),'entry_id',entry,'unit_id',u,'person_id',person,'cents',5000));credit:=(r->>'id')::uuid;
  rejected:=false;BEGIN PERFORM public.ay2_command(s,'allocate',p);EXCEPTION WHEN raise_exception THEN rejected:=true;END;
- INSERT INTO qa_finance_result VALUES('KNOWN BUG: allocation retry remains idempotent after credit',NOT rejected);
+ INSERT INTO qa_finance_result VALUES('allocation retry remains idempotent after credit',NOT rejected);
+ rejected:=false;BEGIN PERFORM public.ay2_command(s,'allocate',p||'{"cents":3001}');EXCEPTION WHEN raise_exception THEN rejected:=true;END;
+ INSERT INTO qa_finance_result VALUES('changed retry after credit is rejected',rejected);
  rejected:=false;BEGIN PERFORM public.ay2_command(s,'credit',jsonb_build_object('request_id',gen_random_uuid(),'entry_id',entry,'unit_id',u,'person_id',person,'cents',1));EXCEPTION WHEN raise_exception THEN rejected:=true;END;
  INSERT INTO qa_finance_result VALUES('payment cannot be consumed twice',rejected);
  rejected:=false;BEGIN PERFORM public.ay2_command(s,'reverse',jsonb_build_object('id',entry,'reason','QA reversal'));EXCEPTION WHEN raise_exception THEN rejected:=true;END;
@@ -50,13 +52,38 @@ BEGIN
  SET LOCAL ROLE authenticated;
  PERFORM public.ay2_command(s,'publish_report','{"period":"2026-10-01"}');
  INSERT INTO qa_finance_result SELECT 'published closing balance equals live summary',closing_cents=(public.ay3_financial_summary(s)->>'balance_cents')::bigint FROM public.ay2_reports WHERE site_id=s;
- INSERT INTO qa_finance_result SELECT 'KNOWN BUG: published gross income agrees with live summary',income_cents=(SELECT sum((v->>'income_cents')::bigint) FROM jsonb_array_elements(public.ay3_financial_summary(s)->'days') v) FROM public.ay2_reports WHERE site_id=s;
+ INSERT INTO qa_finance_result SELECT 'published gross income agrees with live summary',income_cents=(SELECT sum((v->>'income_cents')::bigint) FROM jsonb_array_elements(public.ay3_financial_summary(s)->'days') v) FROM public.ay2_reports WHERE site_id=s;
+ -- Cross-month reversal and transfer: gross and actual cash are independent.
+ r:=public.ay2_command(s,'entry',jsonb_build_object('request_id',gen_random_uuid(),'date','2026-09-20','desc','QA prior month','category','Aidat','cents',4000));
+ PERFORM public.ay2_command(s,'reverse',jsonb_build_object('id',r->>'id','reason','QA cross-month reversal'));
+ RESET ROLE;
+ UPDATE public.ay2_entries SET booked_on='2026-10-12' WHERE site_id=s AND reversal_of=(r->>'id')::uuid;
+ SET LOCAL ROLE authenticated;
+ PERFORM public.ay2_command(s,'entry',jsonb_build_object('request_id',gen_random_uuid(),'date','2026-10-13','desc','QA transfer','category','Transfer','cents',6000));
+ PERFORM public.ay2_command(s,'publish_report','{"period":"2026-10-01"}');
+ INSERT INTO qa_finance_result SELECT 'cross-period reversal and transfer preserve actual cash closing',closing_cents=(public.ay3_financial_summary(s)->>'balance_cents')::bigint AND opening_cents=4000 AND closing_cents=21000 AND cash_adjustment_cents=2000 FROM public.ay2_reports WHERE site_id=s;
+ INSERT INTO qa_finance_result SELECT 'cross-period gross excludes reversal and transfer like live summary',income_cents=15000 AND expense_cents=0 FROM public.ay2_reports WHERE site_id=s;
+ PERFORM public.ay2_command(s,'publish_report','{"period":"2026-09-01"}');
+ INSERT INTO qa_finance_result SELECT 'prior-month cash remains 4000 while reversed gross is excluded',income_cents=0 AND expense_cents=0 AND closing_cents=4000 AND cash_adjustment_cents=4000 FROM public.ay2_reports WHERE site_id=s AND period='2026-09-01';
+ -- Revoked finance rights must also reject exact retries before payload parsing.
+ RESET ROLE;
+ INSERT INTO public.site_staff_memberships(site_id,user_id,role) VALUES(s,'10000000-0000-0000-0000-000000000002','deputy');
+ INSERT INTO public.ay2_permissions(site_id,user_id,capabilities) VALUES(s,'10000000-0000-0000-0000-000000000002',ARRAY['finance']);
+ SET LOCAL ROLE authenticated;
+ PERFORM set_config('request.jwt.claims','{"sub":"10000000-0000-0000-0000-000000000002","role":"authenticated"}',true);
+ r:=public.ay2_command(s,'allocate',p);
+ INSERT INTO qa_finance_result VALUES('authorized deputy exact retry works',(r->>'already_recorded')::boolean);
+ RESET ROLE;UPDATE public.ay2_permissions SET capabilities='{}' WHERE site_id=s AND user_id='10000000-0000-0000-0000-000000000002';SET LOCAL ROLE authenticated;
+ rejected:=false;BEGIN PERFORM public.ay2_command(s,'allocate',p);EXCEPTION WHEN insufficient_privilege THEN rejected:=true;END;
+ INSERT INTO qa_finance_result VALUES('revoked finance rights reject exact retry',rejected);
+ rejected:=false;BEGIN PERFORM public.ay2_command(s,'allocate','{"entry_id":"not-a-uuid"}');EXCEPTION WHEN insufficient_privilege THEN rejected:=true;END;
+ INSERT INTO qa_finance_result VALUES('authorization precedes malformed payload parsing',rejected);
  -- Switch to a genuinely distinct unrelated identity.
  PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',resident,'role','authenticated')::text,true);
  INSERT INTO qa_finance_result SELECT 'unrelated account sees no charges',count(*)=0 FROM public.ay2_charges;
  INSERT INTO qa_finance_result SELECT 'unrelated account gets no workspace',public.ay2_workspace(s) IS NULL;
  rejected:=false;BEGIN PERFORM public.ay2_command(s,'allocate',p);EXCEPTION WHEN insufficient_privilege THEN rejected:=true;WHEN raise_exception THEN rejected:=false;END;
- INSERT INTO qa_finance_result VALUES('KNOWN BUG: unrelated allocation rejected before finance details',rejected);
+ INSERT INTO qa_finance_result VALUES('unrelated allocation rejected before finance details',rejected);
 END;$qa$;
 RESET ROLE;
 SELECT jsonb_build_object('total',count(*),'passed',count(*) FILTER(WHERE passed IS TRUE),'results',jsonb_agg(to_jsonb(r))) FROM qa_finance_result r;

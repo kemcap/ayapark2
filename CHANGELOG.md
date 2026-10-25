@@ -1,3 +1,11 @@
+## V4.0 · 2026-10-25
+
+- Freigegebene Produktionsfassung: echte Anmeldung, gespeicherte Sitzungen und Recovery wieder aktiv; Versionsnummer V4.0 ohne Vorschauzusatz.
+- Risikoarme UI/UX- und Frontend-Performance-Korrekturen aus der Vorschau übernommen; Details unten und in RELEASE-V4.md.
+- Zahlungszuordnung: Rechteprüfung vor Fachprüfung; identische Wiederholung vor aktuellem Guthabencheck, geänderte Wiederholung weiterhin abgewiesen.
+- Neu veröffentlichte Berichte gleichen Bruttowerte an die Live-Auswertung an. Gesonderte Geldbestandskorrektur erhält bei Übertragungen und monatsübergreifenden Stornos die Gleichung zum tatsächlichen Kontostand. Frühere veröffentlichte Berichte bleiben unverändert.
+- 141 Anwendungstests, 120 isolierte SQL-Prüfungen und erneut 840 responsive Ansichten / 52 axe-Prüfungen erfolgreich.
+
 ## V4.0 Entwicklungsvorschau · 2026-10-25 · kein Produktivrelease
 
 - Gemeinsame Entwicklungsbranch auf Basis V3.15 plus separatem Datenbank-Audit; keine produktiven Datenbankänderungen durch diesen UI-Auftrag.
