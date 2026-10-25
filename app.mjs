@@ -1,3 +1,5 @@
+import {enhanceTables} from './ui-accessibility.mjs';
+import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs';
 import {apartmentInfo} from './apartment-info.mjs';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs';
 import {updateAssignmentForm} from './assignments.mjs';
@@ -6,23 +8,24 @@ import {mayPreview,residentPreviewOptions,previewProjection} from './access-prev
 import {bindInstall} from './install.mjs';
 import {bindPasswordEyes} from './password-eye.mjs';
 import {sha256} from './hash.mjs';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs?v=3.15';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs?v=4.0';
 import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs';
 import {template} from './v3-import.mjs';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs';
-import {AyaparkApi} from './api.mjs?v=3.15';
+import {AyaparkApi} from './api.mjs?v=4.0';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs';
 import {buildForm,payloadFor} from './forms.mjs';
 import {analyzeStage} from './reconcile.mjs';
-const $=id=>document.getElementById(id),api=new AyaparkApi();
+const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
+const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
 const applyStaticLanguage=bindStaticText(document.body);
 const hideLoginPassword=bindPasswordEyes();
 let detailView=null,loginMethod='password';
 bindInstall();
 initializePreferences();
-const state={data:fullDemo(),mode:new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},stale:false};
+const state={data:fullDemo(),mode:IS_PREVIEW||new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},stale:false};
 let peopleSearchTimer;
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
@@ -38,7 +41,7 @@ function render(focus=false){
  $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> '+getLanguage().toUpperCase();$('languageToggle').title=getLanguage()==='tr'?'Deutsch':'Türkçe';
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
- const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V3.15';
+ const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V4.0'+(IS_PREVIEW?' · '+tr('Önizleme'):'');
  renderNavigation();
  $('breadcrumb').textContent=roleName(d.role)+' / '+labels[state.page];
  const previewAllowed=state.mode==='connected'&&mayPreview(state.fullData);
@@ -55,8 +58,10 @@ function render(focus=false){
  if(isAccessPreview())$('contextText').textContent=tr('Görünüm önizlemesi · İşlemler kaydedilmez. Süper Admin görünümüne dönerek düzenleyin.');
  $('footerMode').textContent=state.mode==='demo'?tr("Örnek veriler"):tr("Hesabınız");$('connectionButton').textContent=state.mode==='demo'?tr("Hesabımla giriş"):tr("Çıkış yap");$('refreshButton').hidden=state.mode==='demo';
  document.body.classList.toggle('signed-out',state.mode==='signedout');
+ $('previewBanner').hidden=!IS_PREVIEW;
+ if(IS_PREVIEW){$('connectionButton').textContent=tr('Giriş ekranını incele');$('installApp').hidden=true;}
  $('modeBadge').hidden=state.mode!=='demo';$('refreshButton').hidden=state.mode!=='connected';
- $('connectionButton').textContent=state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
+ $('connectionButton').textContent=IS_PREVIEW?tr('Giriş ekranını incele'):state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/buildings.svg" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>`:renderPage(state);
  labelTables();applyAmountPrivacy();checkUrgent();
  if(state.page==='settings'&&can(state,'admin')&&!state.auditLoading&&state.auditData!==state.data){void loadAuditPage(0);}
@@ -96,8 +101,10 @@ function showForm(action,args={}){
  if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
  if(writeBusy)throw Error(tr("Önce devam eden işlemin tamamlanmasını bekleyin."));
  if(!can(state,permissionFor(action)))throw Error(tr("Bu işlem için yetkiniz yok."));
+ const origin=$('detailDialog').open?detailView:null;
+ const built=buildForm(state,action,{period:state.period,...args});
  if($('detailDialog').open)$('detailDialog').close();
- const built=buildForm(state,action,{period:state.period,...args});formAction={action,args,context:built.context};
+ formAction={action,args,context:built.context,origin};
  $('actionTitle').textContent=built.title;$('actionFields').innerHTML=built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');$('actionDialog').showModal();updateConditionalForm();
 }
 function showDetail(html){
@@ -201,6 +208,7 @@ $('roleSelect').addEventListener('change',event=>{
 });
 $('residentPreviewSelect').addEventListener('change',event=>{if(!mayPreview(state.fullData))return;closeDialogs();state.previewSelection=event.target.value;render();});
 document.addEventListener('input',event=>{
+ clearFieldError(event.target);
  if(formAction?.action.startsWith('assignment_')&&event.target.closest('#actionFields')){if(event.target.name==='person_search')updateConditionalForm('person_search');$('actionMessage').textContent='';}
  if(event.target.id==='unitSearch'){state.filter.q=event.target.value;$('unitResults').innerHTML=unitResults(state);$('resultCount').textContent=filteredUnits(state).length+tr(" daire");}
  if(event.target.id==='peopleSearch'){clearTimeout(peopleSearchTimer);const value=event.target.value,pos=event.target.selectionStart;peopleSearchTimer=setTimeout(()=>{state.peopleQuery=value;render();$('peopleSearch')?.focus();$('peopleSearch')?.setSelectionRange(pos,pos);},160);return;}
@@ -223,8 +231,9 @@ document.addEventListener('change',event=>{
  if(id==='providerCategory'){state.providerCategory=event.target.value;render();}
  if(id==='reportPeriod'&&/^\d{4}-\d{2}$/.test(event.target.value)){state.period=event.target.value;render();}
 });
-$('cancelAction').addEventListener('click',()=>{if(!writeBusy)$('actionDialog').close();});
-$('actionDialog').addEventListener('cancel',event=>{if(writeBusy)event.preventDefault();});
+function cancelActionForm(){if(writeBusy)return;$('actionDialog').close();const origin=formAction?.origin;if(origin?.action==='unit')showDetail(unitDetail(state,origin.id));else if(origin?.action==='person_manage')showDetail(personManager(state,origin.id));}
+$('cancelAction').addEventListener('click',cancelActionForm);
+$('actionDialog').addEventListener('cancel',event=>{event.preventDefault();cancelActionForm();});
 $('actionForm').addEventListener('submit',async event=>{
  event.preventDefault();if(writeBusy||!formAction)return;const attempt=epoch;let stopLoading=()=>{};
  try{
@@ -233,8 +242,8 @@ $('actionForm').addEventListener('submit',async event=>{
   const payload=payloadFor(action,new FormData($('actionForm')),context);
   writeBusy=true;$('saveAction').disabled=true;$('cancelAction').disabled=true;$('actionMessage').textContent='';stopLoading=beginLoading($('actionMessage'),tr('Kaydediliyor…'));
   await mutate(action==='ignore_staged'?'confirm_staged':action,payload);
-  if(attempt!==epoch)return;$('actionDialog').close();if(action.startsWith('assignment_')&&!state.stale&&detailView){if(detailView.action==='unit')showDetail(unitDetail(state,detailView.id));else if(detailView.action==='person_manage')showDetail(personManager(state,detailView.id));}toast(state.stale?tr("Kaydedildi; görünüm yenilenemedi. Yenile düğmesine basın."):state.mode==='demo'?tr("Örnek çalışma alanında kaydedildi."):tr("Kayıt tamamlandı."));
- }catch(error){if(attempt===epoch){$('actionMessage').textContent=error.message;$('actionMessage').classList.add('error');}}
+  if(attempt!==epoch)return;$('actionDialog').close();if(!state.stale&&formAction.origin){const origin=formAction.origin;if(origin.action==='unit')showDetail(unitDetail(state,origin.id));else if(origin.action==='person_manage')showDetail(personManager(state,origin.id));}toast(state.stale?tr("Kaydedildi; görünüm yenilenemedi. Yenile düğmesine basın."):state.mode==='demo'?tr("Örnek çalışma alanında kaydedildi."):tr("Kayıt tamamlandı."));
+ }catch(error){if(attempt===epoch)showFormError($('actionForm'),$('actionMessage'),error);}
  finally{stopLoading();writeBusy=false;$('saveAction').disabled=false;$('cancelAction').disabled=false;}
 });
 document.addEventListener('ay2:themechanged',event=>changePreference('theme',event.detail,state.mode==='connected'?api:null));
@@ -360,9 +369,7 @@ function updateConditionalForm(changed=''){
  if(formAction?.action!=='entry')return;const category=$('actionFields').querySelector('[name="category"]'),desc=$('actionFields').querySelector('[name="desc"]');if(desc){desc.placeholder=tr(category?.value==='Diğer'?'İşlem ne için yapıldı?':'Açıklama girin');desc.required=true;}
 }
 
-function labelTables(){
- for(const table of document.querySelectorAll('table')){const headers=Array.from(table.querySelectorAll('thead th')).map(x=>x.textContent);for(const row of table.querySelectorAll('tbody tr'))Array.from(row.children).forEach((cell,i)=>{if(headers[i])cell.dataset.label=headers[i];});}
-}
+function labelTables(){enhanceTables(document);}
 
 window.matchMedia('(max-width:1000px)').addEventListener('change',()=>{mobileNavGroup=null;renderNavigation();});
 
@@ -425,3 +432,5 @@ window.addEventListener('storage',event=>{
 setInterval(()=>{if(state.mode==='connected')void api.token().catch(error=>{if([400,401,403].includes(error.status)){epoch++;closeDialogs();state.mode='signedout';state.data=fullDemo();navigate('overview');toast(error.message);}});},30000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&state.mode==='signedout'&&api.saved())void resumeSession();});
 void resumeSession();
+
+$('actionForm').addEventListener('invalid',event=>{event.preventDefault();const input=event.target;const message=tr(input.validity.valueMissing?'Bu alanı doldurun.':input.type==='email'?'Geçerli bir e-posta adresi girin.':'Bu alanı kontrol edin.');showFormError($('actionForm'),$('actionMessage'),fieldError(message,input.name));const first=$('actionForm').querySelector(':invalid');first?.focus();},true);

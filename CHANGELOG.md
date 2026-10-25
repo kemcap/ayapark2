@@ -1,3 +1,21 @@
+## V4.0 · 2026-10-25
+
+- Freigegebene Produktionsfassung: echte Anmeldung, gespeicherte Sitzungen und Recovery wieder aktiv; Versionsnummer V4.0 ohne Vorschauzusatz.
+- Risikoarme UI/UX- und Frontend-Performance-Korrekturen aus der Vorschau übernommen; Details unten und in RELEASE-V4.md.
+- Zahlungszuordnung: Rechteprüfung vor Fachprüfung; identische Wiederholung vor aktuellem Guthabencheck, geänderte Wiederholung weiterhin abgewiesen.
+- Neu veröffentlichte Berichte gleichen Bruttowerte an die Live-Auswertung an. Gesonderte Geldbestandskorrektur erhält bei Übertragungen und monatsübergreifenden Stornos die Gleichung zum tatsächlichen Kontostand. Frühere veröffentlichte Berichte bleiben unverändert.
+- 141 Anwendungstests, 120 isolierte SQL-Prüfungen und erneut 840 responsive Ansichten / 52 axe-Prüfungen erfolgreich.
+
+## V4.0 Entwicklungsvorschau · 2026-10-25 · kein Produktivrelease
+
+- Gemeinsame Entwicklungsbranch auf Basis V3.15 plus separatem Datenbank-Audit; keine produktiven Datenbankänderungen durch diesen UI-Auftrag.
+- Entfernen statt technischer Archivierungsaktion; rollenabhängiger Grund und unveränderter Historien-/Finanzschutz.
+- Feldbezogene Fehlermeldungen, Datenerhalt und Fokus; nach Abbrechen oder Speichern zur geöffneten Wohnung/Person zurückkehren.
+- Konsistente Touchgrößen, Formular-/Fokus-/Dialog-Tokens und semantische Tabellenlabels.
+- CSV-Hilfe an die neunspaltige Vorlage angepasst; Strukturfehler in DE/TR.
+- Getrennte Beispieldaten-Vorschau mit Browser-/API-Netzwerksperre. Kein Merge und keine Änderung der bestehenden Pages-/GPT-Version.
+- Größere Navigations-, Dashboard- und Backendänderungen als Freigabevorschläge dokumentiert. Ergebnisse und Testgrenzen: UI-UX-AUDIT-V4.md.
+
 ## V3.15 · 2026-10-24
 
 - Cache allowed-site sets once per SQL statement in three existing read policies, preserving the same permission checks and grants.

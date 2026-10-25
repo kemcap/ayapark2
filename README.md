@@ -1,3 +1,15 @@
+# Ayapark 2 · V4.0
+
+Produktionsfassung nach ausdrücklicher Live-Freigabe am 25. Oktober 2026. GitHub ist die zentrale Codebasis. Der frühere, getrennte V4-Demostand bleibt eine Vorschau und wird nicht als identisch aktuell bezeichnet.
+
+- [Release-Übersicht, Prüfungen und Grenzen](RELEASE-V4.md)
+- [UI/UX-Audit und größere Empfehlungen](UI-UX-AUDIT-V4.md)
+- [Release- und Rollback-Plan](V4-RELEASE-PLAN.md)
+- [Übernommener Datenbank-Audit](AUDIT-20261025.md)
+- Tests: `npm test` (141), `npm run test:sql` (120, isoliert), `npm run qa:prepare`.
+
+---
+
 # Ayapark 2 · V3.15
 
 Browser app with Supabase Auth and row-level data access.

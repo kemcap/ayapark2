@@ -1,10 +1,10 @@
 import {enrichDemo,demoV3,bindDemoCharge} from './v3-ledger.mjs';
-import {creditAvailable,buildSummaryDays} from './v3-domain.mjs';
+import {creditAvailable,buildSummaryDays,withPaymentIndex} from './v3-domain.mjs';
 import {t as tr} from './i18n.mjs';
 import {demoData as base,summarize,randomId} from './core.mjs';
 let computation=null;
 // Cache only within one synchronous rendering pass. Mutations never share this cache.
-export function withLedgerIndex(d,fn){if(computation?.data===d)return fn();const previous=computation,byCharge=new Map(),byEntry=new Map();for(const a of d.allocations||[])if(!a.void_reason){byCharge.set(a.charge_id,(byCharge.get(a.charge_id)||0)+Number(a.cents));byEntry.set(a.entry_id,(byEntry.get(a.entry_id)||0)+Number(a.cents));}computation={data:d,byCharge,byEntry};try{return fn();}finally{computation=previous;}}
+export function withLedgerIndex(d,fn){if(computation?.data===d)return fn();const previous=computation,byCharge=new Map(),byEntry=new Map();for(const a of d.allocations||[])if(!a.void_reason){byCharge.set(a.charge_id,(byCharge.get(a.charge_id)||0)+Number(a.cents));byEntry.set(a.entry_id,(byEntry.get(a.entry_id)||0)+Number(a.cents));}computation={data:d,byCharge,byEntry};try{return withPaymentIndex(d,fn);}finally{computation=previous;}}
 export const paid=(d,id)=>computation?.data===d?(computation.byCharge.get(id)||0):d.allocations.filter(a=>a.charge_id===id&&!a.void_reason).reduce((n,a)=>n+a.cents,0);
 export const remaining=(d,c)=>c.void_reason?0:c.cents-paid(d,c.id);
 export const unassigned=(d,t)=>t.cents-(computation?.data===d?(computation.byEntry.get(t.id)||0):d.allocations.filter(a=>a.entry_id===t.id&&!a.void_reason).reduce((n,a)=>n+a.cents,0));

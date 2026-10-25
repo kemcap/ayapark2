@@ -1,0 +1,15 @@
+{
+  "name": "ayapark2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "test:sql": "node tests/sql/run.mjs",
+    "bench:audit": "node tests/benchmark-bank-filter.mjs",
+    "qa:prepare": "node qa/prepare.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.11",
+    "axe-core": "4.14.0"
+  }
+}

@@ -1051,3 +1051,29 @@ Object.assign(german,{
  'Geçmişe taşıma nedeni':'Grund für die Archivierung',
  'Bu işlem ilişkiyi eski rol olarak geçmişe taşır. Açık borçlar ilgili eski kişide kalır. Yanlışlıkla eklenen kayıtlar da geçmişte saklanır; tamamen silinmeleri ayrı bir düzeltmedir.':'Diese Zuordnung wird mit ihrer bisherigen Rolle archiviert. Offene Forderungen bleiben der früheren Person zugeordnet. Auch versehentliche Einträge bleiben zunächst in der Historie; die vollständige Löschung ist eine separate Korrektur.'
 });
+
+Object.assign(german,{
+ 'Bu önizleme yalnızca örnek veriler kullanır. Canlı hesaba bağlanılmaz.':'Diese Vorschau verwendet ausschließlich Beispieldaten. Eine Verbindung zum Live-Konto ist gesperrt.',
+ 'V4.0 önizleme · Örnek veriler · Canlı kayıtlara erişim yok':'V4.0 Vorschau · Beispieldaten · Kein Zugriff auf Live-Daten',
+ 'Giriş ekranını incele':'Anmeldung ansehen',
+ 'Rolü kaldır':'Rolle entfernen',
+ 'Kaldırma nedeni':'Grund für das Entfernen',
+ 'Yalnızca bu dairedeki rol kaldırılır. Kişi, diğer roller ve açık borçlar korunur. İşlem geçmişte saklanır.':'Nur diese Wohnungsrolle wird entfernt. Person, andere Rollen und offene Forderungen bleiben erhalten. Die Änderung bleibt im Verlauf nachvollziehbar.',
+ 'Bu alanı doldurun.':'Bitte dieses Feld ausfüllen.',
+ 'Bu alanı kontrol edin.':'Bitte dieses Feld prüfen.'
+});
+
+Object.assign(german,{
+ 'CSV dosyası nasıl hazırlanır?':'Wie bereite ich die CSV-Datei vor?',
+ 'Güncel CSV şablonunu indirin. Gelir ve gideri ayrı sütunlara pozitif tutar olarak yazın (ör. 3.600,00). Her satırda yalnızca bir gelir veya gider bulunmalıdır.':'Lade die aktuelle CSV-Vorlage herunter. Trage Einnahmen und Ausgaben in getrennten Spalten als positive Beträge ein (z. B. 3.600,00). Jede Zeile enthält entweder eine Einnahme oder eine Ausgabe.',
+ 'Sütunlar:':'Spalten:',
+ 'Eski üç sütunlu biçim de desteklenir. PDF veya Excel dosyasını önce CSV dosyasına dönüştürün. Ödeme eşleştirmelerini ayrıca kontrol edin.':'Das alte Format mit drei Spalten bleibt unterstützt. Wandle PDF- oder Excel-Dateien zunächst in CSV um und prüfe die Zahlungszuordnung anschließend separat.'
+});
+
+Object.assign(german,{
+ 'CSV dosyasındaki tırnak işaretlerini kontrol edin.':'Prüfe die Anführungszeichen in der CSV-Datei.',
+ 'CSV dosyası 1–2.000 veri satırı içermelidir.':'Die CSV-Datei muss 1 bis 2.000 Datenzeilen enthalten.',
+ 'Dokuz sütun gerekli. Güncel CSV şablonunu kullanın.':'Es sind neun Spalten erforderlich. Verwende die aktuelle CSV-Vorlage.',
+ 'Her satırda yalnızca gelir veya gider girin, ikisini birden girmeyin.':'Trage je Zeile entweder eine Einnahme oder eine Ausgabe ein, niemals beides.',
+ 'Referans, gönderen, daire veya IBAN alanını kontrol edin.':'Prüfe Referenz, Absender, Wohnung und IBAN.'
+});

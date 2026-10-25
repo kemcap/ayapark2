@@ -1,6 +1,17 @@
 // Domain rules shared by views and the local demonstration. Amounts are integer kuruş.
 import {summarize} from './core.mjs';
 import {t as tr} from './i18n.mjs';
+// Shared only during a synchronous render; always discard after the callback.
+let paymentComputation=null;
+export function withPaymentIndex(d,fn){
+ if(paymentComputation?.data===d)return fn();
+ const previous=paymentComputation,reversed=new Set(),credits=new Map();
+ for(const t of d.transactions||[])if(t.reversal_of)reversed.add(t.reversal_of);
+ for(const c of d.credits||[])if(!c.void_reason)credits.set(c.entry_id,(credits.get(c.entry_id)||0)+c.cents);
+ paymentComputation={data:d,reversed,credits,suggestions:new Map()};
+ try{return fn();}finally{paymentComputation=previous;}
+}
+export const isReversed=(d,t)=>paymentComputation?.data===d?paymentComputation.reversed.has(t.id):d.transactions.some(x=>x.reversal_of===t.id);
 export const norm=s=>String(s||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').replace(/[^a-z0-9]/g,'');
 export const today=()=>new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'});
 export const activeAt=(l,day=today())=>typeof l.active==='boolean'?l.active:(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day);
@@ -26,7 +37,17 @@ export function rangeError({from='',to=''}={}){
 }
 export function assertRange(range){const error=rangeError(range);if(error)throw Error(error);return range;}
 export function inRange(date,{from='',to=''}={}){return (!from||date>=from)&&(!to||date<=to);}
-export function filteredTransactions(s){const f=s.filter,r=assertRange(selectedRange(s));return s.data.transactions.filter(t=>inRange(t.date,r)&&(f.type==='all'||!f.type||(f.type==='in'?t.cents>0:f.type==='unmatched'?t.cents>0&&!t.reversal_of&&!s.data.transactions.some(x=>x.reversal_of===t.id)&&t.cents-s.data.allocations.filter(a=>a.entry_id===t.id&&!a.void_reason).reduce((n,a)=>n+a.cents,0)-creditAvailable(s.data,t)>0:t.cents<0))&&norm(t.desc+' '+t.category+' '+(t.bank_reference||'')).includes(norm(f.q)));}
+export function filteredTransactions(s){
+ const f=s.filter,r=assertRange(selectedRange(s)),d=s.data,q=norm(f.q);
+ // Build request-local indexes only when the unmatched filter needs them.
+ // No cached balances survive a data refresh or mutation.
+ const reversed=new Set(),used=new Map();
+ if(f.type==='unmatched'){
+  for(const t of d.transactions)if(t.reversal_of)reversed.add(t.reversal_of);
+  for(const row of [...d.allocations,...(d.credits||[])])if(!row.void_reason)used.set(row.entry_id,(used.get(row.entry_id)||0)+row.cents);
+ }
+ return d.transactions.filter(t=>inRange(t.date,r)&&(f.type==='all'||!f.type||(f.type==='in'?t.cents>0:f.type==='unmatched'?t.cents>0&&!t.reversal_of&&!reversed.has(t.id)&&t.cents-(used.get(t.id)||0)>0:t.cents<0))&&(!q||norm(t.desc+' '+t.category+' '+(t.bank_reference||'')).includes(q)));
+}
 export function financialSeries(d,range={},group='year'){
  assertRange(range);
  const buckets=new Map(),categories=new Map();
@@ -43,15 +64,16 @@ export function announcementStatus(a,now=Date.now()){
 export function announcementActive(a,now=Date.now()){return announcementStatus(a,now)==='Yayımlandı';}
 export const acknowledgementKey=a=>a.id+':'+(a.revision||1);
 export function suggestUnits(d,t){
+ const cached=paymentComputation?.data===d?paymentComputation.suggestions:null;if(cached?.has(t))return cached.get(t);
  const desc=norm(t.desc),codes=(t.desc||'').toUpperCase().match(/\b[AB][ -]?\d{1,2}\b/g)||[];const found=new Set();const reasons=[];
  if(t.unit_hint){const u=d.units.find(u=>norm(u.code)===norm(t.unit_hint));if(u){found.add(u.id);reasons.push('hint');}}
  for(const code of codes){const u=d.units.find(u=>norm(u.code)===norm(code));if(u){found.add(u.id);reasons.push('code');}}
  for(const p of d.persons||[]){if(norm(p.full_name).length>=5&&desc.includes(norm(p.full_name))){for(const l of d.links||[])if(l.person_id===p.id)found.add(l.unit_id);reasons.push('name');}}
  for(const rule of d.matchRules||[]){if((rule.iban&&norm(t.iban)===norm(rule.iban))||(rule.alias&&norm(rule.alias).length>=4&&desc.includes(norm(rule.alias)))){found.add(rule.unit_id);reasons.push('saved');}}
- return {unitIds:[...found],ambiguous:found.size!==1,reasons:[...new Set(reasons)]};
+ const result={unitIds:[...found],ambiguous:found.size!==1,reasons:[...new Set(reasons)]};cached?.set(t,result);return result;
 }
 export function effectivePayer(d,unit,payer,day){const roles=payer==='owner'?['owner']:payer==='tenant'?['tenant']:[];const l=personLinks(d,unit,day).filter(l=>l.starts_on&&roles.includes(l.role));return l.length===1?l[0]:null;}
-export function creditAvailable(d,t){return (d.credits||[]).filter(x=>x.entry_id===t.id&&!x.void_reason).reduce((n,x)=>n+x.cents,0);}
+export function creditAvailable(d,t){if(paymentComputation?.data===d)return paymentComputation.credits.get(t.id)||0;return (d.credits||[]).filter(x=>x.entry_id===t.id&&!x.void_reason).reduce((n,x)=>n+x.cents,0);}
 
 // Search only permitted apartment contents; a block letter is never a code match.
 export function unitSearchMatches(d,unit,query,peopleAccess=false,roles={}){
