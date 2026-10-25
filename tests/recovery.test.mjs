@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {RecoveryApi,takeRecoveryLocation} from '../recovery-api.mjs?v=4.0.1';
+import {RecoveryApi,takeRecoveryLocation} from '../recovery-api.mjs?v=4.1.0';
 
 test('default fetch keeps the browser Window receiver',async()=>{
  const original=globalThis.fetch;

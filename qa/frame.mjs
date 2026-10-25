@@ -1,11 +1,15 @@
 const bundle=new URLSearchParams(location.search).get('bundle');
 if(!['baseline','current'].includes(bundle))throw Error('Invalid bundle');
 const base='./'+bundle+'/';
-const [{renderPage,labels},{fullDemo},{navigation,unitDetailV3},{buildForm},{updateAssignmentForm},i18n,prefs]=await Promise.all(['ui.mjs','ledger.mjs','v3-ui.mjs','forms.mjs','assignments.mjs','i18n.mjs','preferences.mjs'].map(f=>import(base+f+(bundle==='current'?'?v=4.0.1':''))));
+const [{renderPage,labels},{fullDemo},{navigation,unitDetailV3},{buildForm},{updateAssignmentForm},i18n,prefs]=await Promise.all(['ui.mjs','ledger.mjs','v3-ui.mjs','forms.mjs','assignments.mjs','i18n.mjs','preferences.mjs'].map(f=>import(base+f+(bundle==='current'?'?v=4.1.0':''))));
+let design;try{design=await import(base+'design.mjs?v=4.1.0');}catch{}
 const template=new DOMParser().parseFromString(await (await fetch(base+'index.html')).text(),'text/html');
-for(const f of ['styles.css','recovery.css','install-tutorial.css','v4-ui.css']){const link=document.createElement('link');link.rel='stylesheet';link.href=base+f;document.head.append(link);}
+for(const f of ['styles.css','recovery.css','install-tutorial.css','v4-ui.css','modern.css']){const link=document.createElement('link');link.rel='stylesheet';link.href=base+f;document.head.append(link);}
 let enhance;try{enhance=(await import(base+'ui-accessibility.mjs')).enhanceTables;}catch{}
+// Measure settled presentation; entry opacity animations otherwise produce false contrast failures.
+const settledStyle=document.createElement('style');settledStyle.textContent='*,*::before,*::after{animation:none!important;transition:none!important}';document.head.append(settledStyle);
 window.runCase=async c=>{
+ if(design)design.setDesign(c.design||'modern',{persist:false});else document.documentElement.dataset.design='classic';
  document.body.innerHTML=template.body.innerHTML;
  document.body.querySelectorAll('script').forEach(n=>n.remove());
  document.querySelectorAll('img').forEach(n=>{const s=n.getAttribute('src');if(s?.startsWith('./'))n.src=base+s.slice(2);});
@@ -32,7 +36,7 @@ window.runCase=async c=>{
  const viewport=document.documentElement.clientWidth;
  const offenders=[...document.querySelectorAll('body *')].filter(n=>{const b=n.getBoundingClientRect();return b.width&&b.right>viewport+2&&!n.closest('[hidden]')&&getComputedStyle(n).position!=='fixed';}).slice(0,5).map(n=>({tag:n.tagName,class:n.className,right:Math.round(n.getBoundingClientRect().right)}));
  const result={...c,viewport,scrollWidth:document.documentElement.scrollWidth,overflow:document.documentElement.scrollWidth>viewport+2,offenders};
- if(c.axe){const a=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa','wcag22aa']}});result.violations=a.violations.map(v=>({id:v.id,impact:v.impact,count:v.nodes.length,examples:v.nodes.slice(0,2).map(n=>({target:n.target,summary:n.failureSummary}))}));result.incomplete=a.incomplete.length;result.incompleteRules=a.incomplete.map(x=>x.id);result.axePasses=a.passes.length;}
+ if(c.axe){const a=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa','wcag22aa']}});result.violations=a.violations.map(v=>({id:v.id,impact:v.impact,count:v.nodes.length,examples:v.nodes.slice(0,12).map(n=>({target:n.target,summary:n.failureSummary}))}));result.incomplete=a.incomplete.length;result.incompleteRules=a.incomplete.map(x=>x.id);result.axePasses=a.passes.length;}
  return result;
 };
 document.body.textContent='Testansicht bereit';window.ready=true;

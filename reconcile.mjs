@@ -1,4 +1,4 @@
-import {t as tr} from './i18n.mjs?v=4.0.1';
+import {t as tr} from './i18n.mjs?v=4.1.0';
 // Evidence-based suggestions only. No financial posting or automatic allocation.
 export function normalize(value){return String(value??'').replace(/[İı]/g,'i').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/ş/g,'s').replace(/ğ/g,'g').replace(/ç/g,'c').replace(/ö/g,'o').replace(/ü/g,'u').replace(/[^a-z0-9]+/g,' ').trim();}
 function matchesName(label,description){

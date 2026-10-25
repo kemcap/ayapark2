@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {fullDemo} from '../ledger.mjs?v=4.0.1';
-import {parseImport,templateHeader} from '../v3-import.mjs?v=4.0.1';
-import {announcementActive,announcementStatus,filteredTransactions,financialSeries} from '../v3-domain.mjs?v=4.0.1';
-import {overviewV3,duesV3,unitDetailV3,reportV3,bankV3,providersV3} from '../v3-ui.mjs?v=4.0.1';
-import {buildForm,payloadFor} from '../forms.mjs?v=4.0.1';
-import {setLanguage} from '../i18n.mjs?v=4.0.1';
+import {fullDemo} from '../ledger.mjs?v=4.1.0';
+import {parseImport,templateHeader} from '../v3-import.mjs?v=4.1.0';
+import {announcementActive,announcementStatus,filteredTransactions,financialSeries} from '../v3-domain.mjs?v=4.1.0';
+import {overviewV3,duesV3,unitDetailV3,reportV3,bankV3,providersV3} from '../v3-ui.mjs?v=4.1.0';
+import {buildForm,payloadFor} from '../forms.mjs?v=4.1.0';
+import {setLanguage} from '../i18n.mjs?v=4.1.0';
 const state=()=>({data:fullDemo(),mode:'demo',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',preset:'all'},reportFilter:{preset:'all'}});
 const csv=(income,expense,unit='A-1')=>templateHeader+'\n2026-10-23;ref;Sender;Payment;'+income+';'+expense+';'+unit+';;';
 

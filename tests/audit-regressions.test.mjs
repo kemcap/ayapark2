@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {AyaparkApi} from '../api.mjs?v=4.0.1';
-import {filteredTransactions,withPaymentIndex,suggestUnits,creditAvailable,isReversed} from '../v3-domain.mjs?v=4.0.1';
-import {fullDemo,withLedgerIndex} from '../ledger.mjs?v=4.0.1';
-import {overviewV3} from '../v3-ui.mjs?v=4.0.1';
+import {AyaparkApi} from '../api.mjs?v=4.1.0';
+import {filteredTransactions,withPaymentIndex,suggestUnits,creditAvailable,isReversed} from '../v3-domain.mjs?v=4.1.0';
+import {fullDemo,withLedgerIndex} from '../ledger.mjs?v=4.1.0';
+import {overviewV3} from '../v3-ui.mjs?v=4.1.0';
 
 test('pagination refuses to combine results from different login generations',async()=>{
  const api=new AyaparkApi(undefined,{persist:false});
