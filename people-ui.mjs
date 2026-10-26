@@ -6,7 +6,7 @@ import {can,heading,card,button,badge,date} from './ui.mjs?v=5.1.0';
 import {remaining} from './ledger.mjs?v=5.1.0';
 import {roleLabel} from './v3-ui.mjs?v=5.1.0';
 import {removalReasons} from './assignments.mjs?v=5.1.0';
-import {inviteEligible} from './invite-ui.mjs?v=5.1.0';
+import {inviteEligible} from './invite-ui.mjs?v=5.2.0';
 import {getLanguage} from './i18n.mjs?v=5.1.0';
 const invitationButton=(s,p)=>inviteEligible(s,p)?button(getLanguage()==='de'?(p.auth_user_id?'Link erneuern':'Einladen'):(p.auth_user_id?'Davet linki':'Davet et'),'invite_person',`data-id="${e(p.id)}"`):'';
 export const historicalRoleLabel=r=>tr({owner:'Eski ev sahibi',tenant:'Eski kiracı',representative:'Eski yetkili kişi'}[r]||'Eski kişi');
