@@ -55,3 +55,7 @@ Real OTP delivery, real password recovery after URL configuration, phone install
 - Real phone installation, real resident onboarding, OTP delivery and a full recovery/password change need the user or an authorized real device/account. Automated tests do not change a user's password or send mail.
 - Four historic balance items still require source clarification. They remain unposted rather than assigning financial liability from ambiguous evidence.
 - No original building photograph was available in the current attachments or identified by the file search.
+
+## Telefonzugang (vorbereitet)
+
+Passwortfreier WhatsApp-/SMS-Zugang, technische Aktivierungsvoraussetzungen, Kosten und Rückfallstrategie: [PHONE-AUTH.md](PHONE-AUTH.md). Der Versand bleibt bis zur Anbieter- und Konfigurationsprüfung deaktiviert.

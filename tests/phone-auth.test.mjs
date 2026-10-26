@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {normalizePhone,maskPhone,activationToken,PhoneAccess} from '../phone-auth.mjs';
+for(const input of ['0532 123 45 67','5321234567','+90 (532) 123-45-67','00905321234567','905321234567'])test('normalize '+input,()=>assert.equal(normalizePhone(input),'+905321234567'));
+for(const input of ['','abc','+0','+1234567890123456','5321234567<script>','1234567890'])test('reject '+input,()=>assert.throws(()=>normalizePhone(input)));
+test('mask hides middle digits',()=>assert.equal(maskPhone('+905321234567'),'+90 ••• ••• 4567'));
+test('invitation credentials removed from URL',()=>{let path;assert.equal(activationToken({hash:'#invite='+'a'.repeat(64),pathname:'/phone.html'},{replaceState:(_,__,p)=>path=p}),'a'.repeat(64));assert.equal(path,'/phone.html');});
+test('bad invitation rejected',()=>assert.equal(activationToken({hash:'#invite=x',pathname:'/phone.html'},{replaceState(){}}),''));
+test('no session accepted before verification completes',async()=>{const calls=[],api={generation:4,raw:async(...args)=>{calls.push(args);return {session:{user:{id:'approved'}}};},accept:(s,g)=>calls.push([s,g])};await new PhoneAccess(api).verify('a'.repeat(64),'123456');assert.equal(calls[0][2].action,'verify');assert.equal(calls[0][3],undefined);assert.equal(calls[1][1],4);});
+test('bad OTP makes no request',async()=>{let called=false;await assert.rejects(new PhoneAccess({raw(){called=true;}}).verify('a'.repeat(64),'x'));assert.equal(called,false);});
+test('failed verification never persists session',async()=>{let accepted=false;await assert.rejects(new PhoneAccess({raw(){throw Error('denied');},accept(){accepted=true;}}).verify('a'.repeat(64),'123456'));assert.equal(accepted,false);});
