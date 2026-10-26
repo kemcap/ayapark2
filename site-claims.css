@@ -1,0 +1,14 @@
+.resident-claims-panel { margin: 0 0 1.25rem; }
+.resident-claims-panel .summary-grid { margin-bottom: .7rem; }
+.claim-metric .large-amount { display: block; margin: .7rem 0 .3rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.claim-metric small { display:block; line-height: 1.5; }
+.claim-breakdown { margin: .65rem 0; }
+.claim-breakdown h2 { margin: 0 0 .6rem; font-size: 1rem; }
+.claims-unit-list { display: grid; gap: .3rem; }
+.claims-unit-list .contact-row { display: flex; justify-content: space-between; gap: 1rem; font-variant-numeric: tabular-nums; }
+.claims-notes { margin: .3rem .25rem .65rem; }
+.claims-notes .fine { margin: .45rem 0; }
+@media (max-width: 600px) {
+ .resident-claims-panel .summary-grid { display: grid; grid-template-columns: minmax(0,1fr); }
+ .claim-metric .large-amount { font-size: clamp(1.45rem,5vw,2rem); }
+}

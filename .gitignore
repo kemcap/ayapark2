@@ -1,5 +1,2 @@
-node_modules/
-.env
-.env.*
-.private/
+node_modules
 supabase/.temp/

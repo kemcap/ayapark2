@@ -1,0 +1,19 @@
+AYAPARK 2 — BANK IMPORT / V3.0
+
+Task: Convert the supplied bank statement to a UTF-8 semicolon-separated CSV using EXACTLY these columns:
+date;reference;counterparty;description;income;expense;unit;iban;balance
+
+Rules:
+- One row per bank transaction, including fees. Do not combine transactions.
+- Dates: YYYY-MM-DD. Amounts: Turkish format 1234,56. No currency symbol.
+- Fill only income OR expense on each row. Both must be positive amounts.
+- Preserve bank transaction reference. Preserve running balance (negative allowed), if stated.
+- counterparty = sender/recipient, description = transaction purpose in the original language.
+- unit = A-1 through A-10 / B-1 through B-10 ONLY when explicitly stated or supported by supplied confirmed mappings. Otherwise leave blank. It is a suggestion, never authority to post.
+- IBAN: only if present in the source. Do not include identity or tax numbers, card numbers, passwords, or account login details.
+- Missing fields remain empty. Never invent names, references, dates, amounts or apartment links.
+- Use double quotes around cells containing semicolons/newlines and escape double quotes as two double quotes.
+- Preserve all pages and transactions exactly once. Compare opening + income - expense with closing, and every running balance where available. Report discrepancies separately; never change amounts to force agreement.
+- Return only the CSV as the import file. List unreadable/uncertain source rows in a separate note for the administrator; do not silently omit them.
+- The administrator must review the preview and resolve ambiguous payments before posting to apartment debts.
+- App limit per file: 2 MB / 2,000 rows. Split larger statements into consecutive files without overlapping rows.

@@ -1,0 +1,191 @@
+{
+  "passed": 46,
+  "failed": 0,
+  "scope": "isolated PGlite; synthetic identities; no production connection",
+  "results": [
+    {
+      "test": "20 apartments, exact total and shared operation",
+      "passed": true
+    },
+    {
+      "test": "exact retry creates no duplicate",
+      "passed": true
+    },
+    {
+      "test": "changed retry is rejected atomically",
+      "passed": true
+    },
+    {
+      "test": "1 apartments, fixed amount",
+      "passed": true
+    },
+    {
+      "test": "10 apartments, fixed amount",
+      "passed": true
+    },
+    {
+      "test": "share distribution agrees in SQL and JavaScript",
+      "passed": true
+    },
+    {
+      "test": "foreign apartment debtor rejected",
+      "passed": true
+    },
+    {
+      "test": "late preview mismatch rolls back every charge",
+      "passed": true
+    },
+    {
+      "test": "no partial batch persisted",
+      "passed": true
+    },
+    {
+      "test": "true exemption skips one monthly charge",
+      "passed": true
+    },
+    {
+      "test": "remuneration does not silently reduce charge",
+      "passed": true
+    },
+    {
+      "test": "remuneration creates no bank transaction",
+      "passed": true
+    },
+    {
+      "test": "different request cannot duplicate monthly obligations",
+      "passed": true
+    },
+    {
+      "test": "expired exception no longer excludes apartment",
+      "passed": true
+    },
+    {
+      "test": "historical row remains exactly unchanged",
+      "passed": true
+    },
+    {
+      "test": "oldest first, separate debt group, overpayment credit",
+      "passed": true
+    },
+    {
+      "test": "stale payment preview rejected",
+      "passed": true
+    },
+    {
+      "test": "payment retry idempotent",
+      "passed": true
+    },
+    {
+      "test": "credit is retained against debtor and group",
+      "passed": true
+    },
+    {
+      "test": "capital group not allocated",
+      "passed": true
+    },
+    {
+      "test": "partial payment supported",
+      "passed": true
+    },
+    {
+      "test": "correction and reversal preserve original records",
+      "passed": true
+    },
+    {
+      "test": "budget changes audited",
+      "passed": true
+    },
+    {
+      "test": "staff without finance permission rejected before payload parsing",
+      "passed": true
+    },
+    {
+      "test": "tenant sees owner charge of same apartment",
+      "passed": true
+    },
+    {
+      "test": "foreign apartment remains hidden",
+      "passed": true
+    },
+    {
+      "test": "raw bank rows inaccessible",
+      "passed": true
+    },
+    {
+      "test": "resident cannot create batch",
+      "passed": true
+    },
+    {
+      "test": "shared payment exposes only allocated apartment amount",
+      "passed": true
+    },
+    {
+      "test": "projected payment excludes personal bank description and fields",
+      "passed": true
+    },
+    {
+      "test": "budget reserve details stay hidden from residents",
+      "passed": true
+    },
+    {
+      "test": "historical debtor role cannot become a current apartment assignment",
+      "passed": true
+    },
+    {
+      "test": "historical debtor retains own personal charge",
+      "passed": true
+    },
+    {
+      "test": "future cached-active assignment cannot grant shared apartment view",
+      "passed": true
+    },
+    {
+      "test": "owner-only notice hidden from tenant",
+      "passed": true
+    },
+    {
+      "test": "guessed receipt ID cannot bypass audience",
+      "passed": true
+    },
+    {
+      "test": "owner receives targeted notice",
+      "passed": true
+    },
+    {
+      "test": "receipt persists and is deduplicated",
+      "passed": true
+    },
+    {
+      "test": "representative without mandate not implicitly targeted",
+      "passed": true
+    },
+    {
+      "test": "authorized current representative can view apartment claims",
+      "passed": true
+    },
+    {
+      "test": "mandate history includes before and after",
+      "passed": true
+    },
+    {
+      "test": "explicit mandate adds representative recipient",
+      "passed": true
+    },
+    {
+      "test": "old version cannot acknowledge newly edited text",
+      "passed": true
+    },
+    {
+      "test": "previous and new revision receipts retained",
+      "passed": true
+    },
+    {
+      "test": "anonymous workspace RPC denied",
+      "passed": true
+    },
+    {
+      "test": "anonymous command RPC denied",
+      "passed": true
+    }
+  ]
+}

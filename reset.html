@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="tr">
+<head>
+ <meta charset="utf-8">
+<meta name="ayapark-stage" content="production"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+ <meta name="theme-color" content="#F5F2EC">
+ <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https://eisozwhhinqszfikemot.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'">
+ <title>Ayapark 2 · Şifre yenile</title>
+ <script src="./preferences-boot.js"></script>
+ <script src="./theme.js"></script>
+<script src="./design-boot.js"></script><link rel="icon" href="./assets/buildings.svg" type="image/svg+xml">
+ <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./recovery.css">
+ <script type="module" src="./recovery.mjs?v=5.3.1"></script>
+<link rel="stylesheet" href="./v4-ui.css?v=4.0">
+<link rel="stylesheet" href="./modern.css?v=5.1.0"><link rel="stylesheet" href="./v5-ui.css?v=5.1.0">
+</head>
+<body class="recovery-page">
+ <header class="recovery-header"><a href="./" class="brand"><img class="brand-logo" src="./assets/ayapark2-header.webp" alt="Ayapark 2 bina fotoğrafı" width="46" height="46"><strong>AYAPARK 2</strong></a><div class="header-actions"><button id="recoveryLanguage" class="button language-toggle" type="button"></button><button id="themeToggle" class="button" type="button">◐</button></div></header>
+ <main class="recovery-main"><section class="recovery-card" aria-labelledby="recoveryTitle">
+  <img class="recovery-logo" src="./assets/buildings.svg" alt="">
+  <div class="dialog-kicker">AYAPARK 2</div><h1 id="recoveryTitle">Şifre yenile</h1>
+  <p id="recoveryHelp" class="muted">Şifreni yenilemek için e-posta adresini yaz.</p>
+  <p id="recoveryStatus" role="status" aria-live="polite"></p>
+  <form id="requestResetForm">
+   <label class="field">E-posta<input id="recoveryEmail" type="email" required autocomplete="username"></label>
+   <button id="requestResetButton" class="button primary" type="submit">Yenileme bağlantısı gönder</button>
+  </form>
+  <form id="verifyRecoveryCodeForm" hidden>
+   <p class="fine">Bağlantı çalışmıyorsa e-postadaki doğrulama kodunu kullanın.</p>
+   <label class="field">E-posta<input id="recoveryCodeEmail" type="email" required autocomplete="username"></label>
+   <label class="field">Doğrulama kodu<input id="recoveryCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10" required></label>
+   <button id="verifyRecoveryCodeButton" class="button" type="submit">Kodu doğrula</button>
+  </form>
+  <form id="newPasswordForm" hidden>
+   <label class="field" for="newPassword">Yeni şifre</label>
+   <div class="password-control"><input id="newPassword" type="password" required minlength="8" maxlength="256" autocomplete="new-password" aria-describedby="passwordHelp"><button class="button password-eye" type="button" data-password-eye="newPassword" aria-label="Şifreyi göster" aria-pressed="false"></button></div>
+   <p class="fine" id="passwordHelp">En az 8 karakter kullan.</p>
+   <label class="field" for="confirmPassword">Yeni şifreyi tekrarla</label>
+   <div class="password-control"><input id="confirmPassword" type="password" required minlength="8" maxlength="256" autocomplete="new-password"><button class="button password-eye" type="button" data-password-eye="confirmPassword" aria-label="Şifreyi göster" aria-pressed="false"></button></div>
+   <button id="saveNewPassword" class="button primary" type="submit">Şifreyi kaydet</button>
+  </form>
+  <a href="./" class="text-button recovery-back">Girişe dön</a><p class="fine">Yeni kullanıcı mısınız? Giriş ekranında “İlk kez şifre oluştur” seçeneğiyle e-posta kodundan sonra şifre oluşturabilirsiniz.</p>
+ </section></main>
+</body></html>

@@ -1,0 +1,41 @@
+/* V4 refinement layer. Existing six palettes and light/dark tokens remain authoritative. */
+:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--control-size:44px;--radius-control:9px;--radius-card:14px;--shadow-dialog:0 18px 60px #0003}
+button,input,select,textarea{font:inherit}
+button,a,input,select,textarea,summary{scroll-margin-block:24px}
+.button,.header-actions .header-icon,.header-actions .button,.theme-options>button{min-height:var(--control-size);min-width:var(--control-size)}
+.button{border-radius:var(--radius-control);white-space:normal;line-height:1.4}
+.heading-actions{min-width:0;flex-wrap:wrap}
+.heading-actions .button{white-space:normal;overflow-wrap:anywhere;max-width:100%}
+.text-button,.unit-link{display:inline-flex;align-items:center;min-height:32px}
+summary{min-height:var(--control-size);align-content:center}
+.field{font-size:1rem;gap:var(--space-2)}
+.field input,.field select,.field textarea,dialog input,dialog select,dialog textarea{max-width:100%;min-width:0;background:var(--paper);color:var(--ink);border:1px solid var(--muted);border-radius:var(--radius-control)}
+.field input,.field select,dialog input:not([type=checkbox]):not([type=radio]),dialog select{min-height:var(--control-size)}
+.field textarea,dialog textarea{padding:var(--space-3);resize:vertical}
+textarea:focus-visible,summary:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.check-field,.person-choice label{min-height:var(--control-size);display:flex;align-items:center;gap:var(--space-3)}
+input[type=checkbox],input[type=radio]{accent-color:var(--primary);flex-shrink:0;width:20px;height:20px}
+dialog{background:var(--paper);box-shadow:var(--shadow-dialog);overscroll-behavior:contain;scroll-padding-block:var(--space-6)}
+.dialog-actions{flex-wrap:wrap;gap:var(--space-3)}
+.dialog-actions .button{flex:0 1 auto}
+.field-error{color:var(--red);font-size:14px;line-height:1.5;margin:var(--space-2) 0 0}
+[aria-invalid=true]{border:2px solid var(--red)!important}
+#actionMessage.error,#loginMessage.error{padding:var(--space-3);border:1px solid var(--red);border-radius:var(--radius-control);margin-top:var(--space-4)}
+.toast{background:var(--paper);color:var(--ink);border-color:var(--primary);box-shadow:var(--shadow-dialog);font-size:14px}
+.assignment-context{padding:var(--space-3);background:var(--soft);border-radius:var(--radius-control);overflow-wrap:anywhere}
+.card,.person-card,.apartment-card{min-width:0}
+.staff-name small,.assignment-card strong,.page-heading p{overflow-wrap:anywhere}
+.table-wrap th,.table-wrap td{font-variant-numeric:tabular-nums}
+.preview-banner{padding:12px 20px;background:var(--info-bg);color:var(--info-ink);border-bottom:1px solid var(--info-line);font-size:14px}
+@media(max-width:760px){
+ .heading-actions{display:flex;width:100%}
+ .heading-actions .button{flex:1 1 140px}
+ .field input,.field select,.field textarea,dialog input,dialog select,dialog textarea{font-size:max(16px,1rem)}
+ .dialog-actions .button{flex:1 1 110px}
+ .header-actions .header-icon{width:44px;padding:10px}
+ dialog{max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px)}
+ .table-wrap td[data-label]::before{font-weight:600}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important}}
+
+.import-help code{display:block;white-space:normal;overflow-wrap:anywhere;font-size:12px}

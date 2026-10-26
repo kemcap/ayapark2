@@ -1,0 +1,50 @@
+-- Isolated clone only. All identities are synthetic and distinct.
+BEGIN;
+CREATE TEMP TABLE qa_permissions(test text,passed boolean);
+GRANT SELECT,INSERT ON qa_permissions TO authenticated;
+INSERT INTO public.site_blocks(id,site_id,code) VALUES('30000000-0000-0000-0000-000000000001','20000000-0000-0000-0000-000000000001','A');
+INSERT INTO public.site_units(id,site_id,block_id,number,code) VALUES('40000000-0000-0000-0000-000000000001','20000000-0000-0000-0000-000000000001','30000000-0000-0000-0000-000000000001',1,'A-1');
+INSERT INTO public.site_staff_memberships(site_id,user_id,role) VALUES('20000000-0000-0000-0000-000000000001','10000000-0000-0000-0000-000000000002','deputy');
+INSERT INTO public.ay3_persons(id,site_id,first_name,last_name,full_name,auth_user_id) VALUES('50000000-0000-0000-0000-000000000001','20000000-0000-0000-0000-000000000001','QA','Resident','QA Resident','10000000-0000-0000-0000-000000000003'),('50000000-0000-0000-0000-000000000002','20000000-0000-0000-0000-000000000001','QA','Other','QA Other',NULL);
+INSERT INTO public.ay3_links(site_id,unit_id,person_id,role) SELECT site_id,'40000000-0000-0000-0000-000000000001',id,'owner' FROM public.ay3_persons;
+INSERT INTO public.site_resident_units(unit_id,user_id,role) VALUES('40000000-0000-0000-0000-000000000001','10000000-0000-0000-0000-000000000003','owner');
+INSERT INTO public.ay2_charges(site_id,unit_id,person_id,category,label,due_on,cents,payer,reference,created_by) SELECT site_id,'40000000-0000-0000-0000-000000000001',id,'Aidat','QA own debt','2026-10-01',1000,'owner',id::text,'10000000-0000-0000-0000-000000000001' FROM public.ay3_persons;
+SET LOCAL ROLE authenticated;
+DO $qa$
+DECLARE s uuid:='20000000-0000-0000-0000-000000000001';denied boolean;
+BEGIN
+ PERFORM set_config('request.jwt.claims','{"sub":"10000000-0000-0000-0000-000000000001","role":"authenticated"}',true);
+ INSERT INTO qa_permissions VALUES('manager has all five capabilities',ay2_private.can(s,'admin') AND ay2_private.can(s,'finance') AND ay2_private.can(s,'people') AND ay2_private.can(s,'import') AND ay2_private.can(s,'announcements'));
+ PERFORM set_config('request.jwt.claims','{"sub":"10000000-0000-0000-0000-000000000002","role":"authenticated"}',true);
+ INSERT INTO qa_permissions VALUES('deputy without grants has no finance or people rights',NOT ay2_private.can(s,'finance') AND NOT ay2_private.can(s,'people') AND NOT ay2_private.can(s,'admin'));
+ INSERT INTO qa_permissions SELECT 'deputy without grants cannot read charges',count(*)=0 FROM public.ay2_charges;
+ denied:=false;BEGIN PERFORM public.ay2_command(s,'assignment_add',jsonb_build_object('request_id',gen_random_uuid()));EXCEPTION WHEN insufficient_privilege THEN denied:=true;END;
+ INSERT INTO qa_permissions VALUES('deputy without people rights cannot assign',denied);
+ RESET ROLE;
+ INSERT INTO public.ay2_permissions(site_id,user_id,capabilities) VALUES(s,'10000000-0000-0000-0000-000000000002',ARRAY['people','finance']);
+ SET LOCAL ROLE authenticated;
+ INSERT INTO qa_permissions VALUES('deputy grants do not imply admin',ay2_private.can(s,'finance') AND ay2_private.can(s,'people') AND NOT ay2_private.can(s,'admin'));
+ INSERT INTO qa_permissions SELECT 'authorized deputy reads both charges',count(*)=2 FROM public.ay2_charges;
+ denied:=false;BEGIN PERFORM public.ay3_staff_directory(s);EXCEPTION WHEN insufficient_privilege THEN denied:=true;END;
+ INSERT INTO qa_permissions VALUES('deputy cannot read protected staff directory',denied);
+ PERFORM set_config('request.jwt.claims','{"sub":"10000000-0000-0000-0000-000000000003","role":"authenticated"}',true);
+ INSERT INTO qa_permissions SELECT 'resident sees exactly own charge in shared unit',count(*)=1 AND bool_and(person_id='50000000-0000-0000-0000-000000000001'::uuid) FROM public.ay2_charges;
+ INSERT INTO qa_permissions SELECT 'resident sees exactly own role in shared unit',count(*)=1 FROM public.ay3_links;
+ INSERT INTO qa_permissions SELECT 'resident cannot directly list person contact records',count(*)=0 FROM public.ay3_persons;
+ INSERT INTO qa_permissions VALUES('resident has no management capabilities',NOT ay2_private.can(s,'admin') AND NOT ay2_private.can(s,'people') AND NOT ay2_private.can(s,'finance'));
+ denied:=false;BEGIN PERFORM public.ay3_audit_page(s,10,0);EXCEPTION WHEN insufficient_privilege THEN denied:=true;END;
+ INSERT INTO qa_permissions VALUES('resident cannot read audit',denied);
+ PERFORM set_config('request.jwt.claims','{"sub":"90000000-0000-0000-0000-000000000009","role":"authenticated"}',true);
+ INSERT INTO qa_permissions VALUES('outsider gets null workspace',public.ay2_workspace(s) IS NULL);
+ INSERT INTO qa_permissions SELECT 'outsider gets zero apartments',count(*)=0 FROM public.site_units;
+END;$qa$;
+RESET ROLE;
+SET LOCAL ROLE anon;
+DO $qa$ DECLARE denied boolean:=false;BEGIN
+ BEGIN PERFORM public.ay2_workspace('20000000-0000-0000-0000-000000000001');EXCEPTION WHEN insufficient_privilege THEN denied:=true;END;
+ IF NOT denied THEN RAISE EXCEPTION 'anonymous workspace must be denied';END IF;
+END;$qa$;
+RESET ROLE;
+INSERT INTO qa_permissions VALUES('actual anon database role cannot invoke workspace',true);
+SELECT jsonb_build_object('total',count(*),'passed',count(*) FILTER(WHERE passed IS TRUE),'results',jsonb_agg(to_jsonb(r))) FROM qa_permissions r;
+ROLLBACK;

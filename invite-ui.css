@@ -1,0 +1,17 @@
+/* Invitation composer: bilingual, keyboard-accessible and phone-friendly. */
+.invitation-dialog{box-sizing:border-box;width:min(580px,calc(100vw - 24px));max-width:580px;max-height:min(90dvh,900px);overflow:auto;padding:clamp(16px,3vw,30px);border-radius:18px}
+.invitation-dialog::backdrop{background:rgba(10,21,28,.65)}
+.invitation-dialog .field{display:grid;gap:7px;margin:16px 0}
+.invitation-dialog textarea{display:block;box-sizing:border-box;width:100%;min-height:170px;resize:vertical;font:inherit;line-height:1.55}
+.invitation-dialog input{box-sizing:border-box;max-width:100%;width:100%}
+.invitation-dialog input[readonly]{font-size:.86rem}
+.invite-consent{display:flex;align-items:flex-start;gap:11px;line-height:1.5;margin:15px 0;cursor:pointer}
+.invite-consent input{width:18px;min-width:18px;height:18px;margin-top:3px}
+.invite-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.invite-actions .button{flex:1 1 165px}
+.invitation-dialog .dialog-actions{justify-content:flex-end;margin-top:12px}
+.invite-landing{width:min(100%,580px);margin:18px auto;padding:clamp(18px,3vw,32px)}
+.invite-landing .button{margin-top:10px}
+#inviteStatus{min-height:1.5em}
+#inviteStatus.error{color:#bd4545}
+@media(max-width:540px){.invitation-dialog{margin:auto;padding:17px;max-height:94dvh}.invite-actions{display:grid;grid-template-columns:1fr}.invite-actions .button{width:100%}.invitation-dialog textarea{min-height:150px}}

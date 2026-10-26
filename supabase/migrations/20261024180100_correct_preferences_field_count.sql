@@ -1,0 +1,1 @@
+DO $$DECLARE def text;BEGIN def:=pg_get_functiondef('public.ay3_preferences(jsonb)'::regprocedure);def:=replace(def,'jsonb_object_keys(p_settings))<>10','jsonb_object_keys(p_settings))<>9');EXECUTE def;END;$$;

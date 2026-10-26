@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-25",
+  "productionWrites": false,
+  "productionDeployment": false,
+  "node": {
+    "passed": 168,
+    "failed": 0
+  },
+  "sqlLegacy": {
+    "passed": 120,
+    "failed": 0
+  },
+  "sqlV5": {
+    "passed": 46,
+    "failed": 0
+  },
+  "browser": {
+    "mainViews": 924,
+    "formViews": 392,
+    "classicVariants": 144,
+    "horizontalOverflowCases": 0,
+    "axeCases": 112,
+    "reportedAxeViolations": 0,
+    "widths": [
+      320,
+      375,
+      390,
+      430,
+      768,
+      1024,
+      1440
+    ],
+    "languages": [
+      "tr",
+      "de"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "limits": [
+      "Desktop Chromium with responsive iframe widths, no physical iOS/Android",
+      "Axe runs selected 390px cases, not all views",
+      "Final labels and icons additionally checked interactively"
+    ]
+  },
+  "manualSynthetic": [
+    "show/ack/reset/reopen/disable test notification",
+    "100.01 TRY split across 20 apartments with confirmation",
+    "3600 TRY payment allocated, former debtor debt unchanged",
+    "monthly exception return retains input; 19 x 3600 TRY preview"
+  ]
+}
