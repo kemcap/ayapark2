@@ -110,6 +110,7 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
   const url=new URL(location.href);url.searchParams.delete('invite');history.replaceState(null,'',url.pathname+url.search+url.hash);token=null;preview=null;
  }
  const form=$('inviteActivateForm'),activationStatus=$('inviteActivateStatus'),activationDialog=$('inviteActivateDialog');
+ $('inviteActivationCancel').addEventListener('click',()=>activationDialog.close());
  form.addEventListener('submit',async(event)=>{
   event.preventDefault();
   if(!token||!preview?.valid)return;
