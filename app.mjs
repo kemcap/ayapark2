@@ -398,6 +398,21 @@ $('refreshButton').addEventListener('click',async()=>{
  catch(error){if(attempt!==epoch)return;if([400,401,403].includes(error.status)){epoch++;closeDialogs();void api.logout().catch(()=>{});state.mode='signedout';state.data=prepareV5Demo(fullDemo());navigate('overview');toast(tr("Erişim doğrulanamadı. Yeniden giriş yapın."));}else{state.stale=true;render();toast(tr("Veriler yenilenemedi. Ekranda önceki okuma var."));}}
  finally{$('refreshButton').disabled=false;$('refreshButton').setAttribute('aria-busy','false');}
 });
+// The language switch must not clear a half-completed sign-in form.
+function syncLoginLanguage(){
+ if(!$('loginDialog').open)return;
+ if(!$('loginEntryChoice').hidden){
+  $('loginTitle').textContent=tr('Sitenize hoş geldiniz.');
+  $('loginIntro').textContent=tr('Nasıl devam etmek istersiniz?');
+  return;
+ }
+ const setup=loginMethod==='setup',saving=loginMethod==='setup_password';
+ $('loginTitle').textContent=tr(setup||saving?'Şifre oluştur':'Sitenize hoş geldiniz.');
+ $('loginIntro').textContent=tr(setup||saving?'Yönetim tarafından tanımlanan erişiminizi e-posta koduyla doğrulayın.':'Mevcut hesabınızla giriş yapın.');
+ $('loginSubmit').textContent=tr(saving?'Şifreyi kaydet':setup?'Devam et':'Giriş yap');
+ $('codeHelp').textContent=tr(setup?'Şifre oluşturmak için e-postadaki kodu buraya gir. E-postadaki bağlantıyı açma.':'E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.');
+}
+document.addEventListener('ay2:languagechange',syncLoginLanguage);
 $('csvFile').addEventListener('change',async()=>{
  const generation=++fileGeneration,file=$('csvFile').files[0];importPayload=null;$('commitImport').disabled=true;if(!file)return;
  try{
