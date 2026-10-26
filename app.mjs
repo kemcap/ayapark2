@@ -287,7 +287,7 @@ function completeSignIn(loaded){
  // Closing a completed login must not trigger the pending-login cancellation handler.
  loginBusy=false;pendingSetupLoaded=null;$('loginSubmit').disabled=false;
  if($('loginDialog').open)$('loginDialog').close();
- invitationUi.clearUrl();$('loginForm').reset();navigate('overview');void syncPreferences(api,()=>{applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));});
+ if(typeof invitationUi!=='undefined')invitationUi.clearUrl();$('loginForm').reset();navigate('overview');void syncPreferences(api,()=>{applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));});
 }
 
 $('loginDialog').addEventListener('close',()=>{
