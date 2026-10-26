@@ -25,6 +25,7 @@ export class AyaparkApi {
   this.accept({access_token,refresh_token,expires_in:0,user},generation);await this.token();return user;
  }
  async provision(payload){return this.raw('/functions/v1/ay3-user-access','POST',payload,await this.token());}
+ async invitation(payload,authenticated=false){return this.raw('/functions/v1/ay3-whatsapp-invite','POST',payload,authenticated?await this.token():undefined);}
  async raw(path,method='GET',body,token) {
   if(this.previewOnly)throw Error(tr('Bu önizleme yalnızca örnek veriler kullanır. Canlı hesaba bağlanılmaz.'));
   const response=await this.fetcher(URL+path,{method,headers:{apikey:KEY,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',signal:AbortSignal.timeout(15000)});
