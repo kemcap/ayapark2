@@ -39,7 +39,7 @@ begin
  then raise exception 'No current apartment'; end if;
  if exists(select 1 from public.ay3_persons p where p.auth_user_id=p_user and p.id<>ticket.person_id)
  then raise exception 'Account already linked elsewhere'; end if;
- update public.ay3_persons set auth_user_id=p_user
+ update public.ay3_persons set auth_user_id=p_user, phone=ticket.phone_e164
  where id=ticket.person_id;
  insert into public.site_resident_units(unit_id,user_id,role,person_id,active)
  select distinct l.unit_id,p_user,l.role,null,true from public.ay3_links l
