@@ -1,7 +1,7 @@
 import {PGlite} from '@electric-sql/pglite';
 import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import {distribute} from '../../finance-v5.mjs?v=5.0.0';
+import {distribute} from '../../finance-v5.mjs?v=5.1.0';
 const db=new PGlite(),results=[];
 const site='50000000-0000-0000-0000-000000000001',admin='10000000-0000-0000-0000-000000000001',tenant='10000000-0000-0000-0000-000000000002',owner='10000000-0000-0000-0000-000000000003',rep='10000000-0000-0000-0000-000000000004',stranger='10000000-0000-0000-0000-000000000005',staff='10000000-0000-0000-0000-000000000006';
 const uid=i=>'a0000000-0000-0000-0000-'+String(i).padStart(12,'0'),pid=i=>'b0000000-0000-0000-0000-'+String(i).padStart(12,'0'),lid=i=>'c0000000-0000-0000-0000-'+String(i).padStart(12,'0');
@@ -16,7 +16,7 @@ const reject=async(name,fn)=>{await assert.rejects(fn);check(name);};
 const all=Array.from({length:20},(_,i)=>uid(i+1));
 function batch(ids=all,mode='total',cents=10001){return {request_id:request(),scope:'selected',unit_ids:ids,distribution:mode,cents,due_on:'2026-11-01',label:'QA synthetic charge',category:'Genel Gider / İşletme',debt_group:'general',basis_ref:'QA resolution',debtors:Object.fromEntries(ids.map(id=>[id,lid(Number(id.slice(-12)))])),expected:Object.fromEntries(distribute(cents,ids,mode).map(r=>[r.unit_id,r.cents])),confirmed:true};}
 try{
- for(const f of ['schema.sql','../../supabase/migrations/20261025073340_v4_finance_release_safety.sql','../../supabase/migrations/20261025194333_v5_notifications_finance.sql'])await db.exec(await readFile(new URL(f,import.meta.url),'utf8'));
+ for(const f of ['schema.sql','../../supabase/migrations/20261025073340_v4_finance_release_safety.sql','../../supabase/migrations/20261025194333_v5_notifications_finance.sql','../../supabase/migrations/20261026061016_visible_expired_announcements.sql'])await db.exec(await readFile(new URL(f,import.meta.url),'utf8'));
  await db.exec(`INSERT INTO auth.users(id,email) SELECT ('10000000-0000-0000-0000-'||lpad(i::text,12,'0'))::uuid,'qa'||i||'@example.invalid' FROM generate_series(1,6)i ON CONFLICT(id) DO NOTHING;
  INSERT INTO public.site_sites(id,slug,name) VALUES('${site}','qa-v5','QA synthetic site');
  INSERT INTO public.site_blocks(id,site_id,code) VALUES('60000000-0000-0000-0000-000000000001','${site}','A'),('60000000-0000-0000-0000-000000000002','${site}','B');
@@ -75,6 +75,11 @@ try{
  check('mandate history includes before and after',await value("select exists(select 1 from public.ay2_audit where site_id=$1 and action='notification_mandates' and details->'after'='[\"owners\"]'::jsonb) v",[site]));
  await as(rep);check('explicit mandate adds representative recipient',await value('select exists(select 1 from public.ay2_announcements where id=$1) v',[announcement]));
  await as(admin);await command('announcement',{...notice,id:announcement,body:'QA revised test'});await as(owner);await reject('old version cannot acknowledge newly edited text',()=>command('acknowledge',{id:announcement,revision:1}));await command('acknowledge',{id:announcement,revision:2});check('previous and new revision receipts retained',(await value('select count(*)::int v from public.ay3_acknowledgements where announcement_id=$1',[announcement]))===2);
+ await as(admin);const expired=(await command('announcement',{...notice,title:'QA expired',ends_at:'2026-01-01T00:00:00Z'})).id;
+ const draft=(await command('announcement',{...notice,title:'QA draft',published:false})).id;
+ const future=(await command('announcement',{...notice,title:'QA future',starts_at:'2027-01-01T00:00:00Z'})).id;
+ await as(owner);check('published expired notice remains visible to its authorized owner',await value('select exists(select 1 from public.ay2_announcements where id=$1) v',[expired]));await reject('expired notice cannot create a new acknowledgement',()=>command('acknowledge',{id:expired,revision:1}));check('draft and future notices remain hidden',!(await value('select exists(select 1 from public.ay2_announcements where id in ($1,$2)) v',[draft,future])));
+ await as(tenant);check('expired owner notice does not leak to tenant',!(await value('select exists(select 1 from public.ay2_announcements where id=$1) v',[expired])));
  await db.exec('RESET ROLE;SET ROLE anon;');await reject('anonymous workspace RPC denied',()=>value('select public.ay5_workspace($1) v',[site]));await reject('anonymous command RPC denied',()=>command('budget',{}));
  console.log(JSON.stringify({passed:results.length,failed:0,scope:'isolated PGlite; synthetic identities; no production connection',results},null,2));
 }catch(error){console.error(error);console.log(JSON.stringify({passed:results.length,failed:1,results},null,2));process.exitCode=1;}finally{await db.close();}

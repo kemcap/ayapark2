@@ -1217,6 +1217,11 @@ Object.assign(german,{
 
 Object.assign(german,{"Bilinmeyen işlem.":"Unbekannter Vorgang.","Borç grubunu seçin.":"Bitte die Forderungsgruppe wählen.","Geçerli tahsilat bulunamadı.":"Kein gültiger Zahlungseingang gefunden.","Giriş gerekli.":"Bitte anmelden.","Kategori seçin.":"Bitte eine Kategorie wählen."});
 
-Object.assign(german,{"İstisna türü":"Art der Ausnahme","V5.0 önizleme · Örnek veriler · Canlı kayıtlara erişim yok":"V5.0 Vorschau · Beispieldaten · Kein Zugriff auf produktive Daten"});
+Object.assign(german,{"İstisna türü":"Art der Ausnahme","V5.1 önizleme · Örnek veriler · Canlı kayıtlara erişim yok":"V5.1 Vorschau · Beispieldaten · Kein Zugriff auf produktive Daten"});
 
 Object.assign(german,{"Daire borçlarına işlenen ödemeler.":"Zahlungen auf Forderungen der Wohnung."});
+
+Object.assign(german,{"Kurulum rehberi":"Anleitung öffnen","Şimdi yükle":"Jetzt installieren","açık":"offen","Henüz kişiye atanmamış":"Noch zuzuordnen","Dairenin toplam açık borcu":"Gesamt offen · Wohnung","Ödemeler ve Geçmiş":"Zahlungen & Verlauf","Henüz ödeme kaydı yok.":"Noch keine Zahlungen vorhanden.","Eşleştirme kaldırıldı":"Zuordnung aufgehoben","Kayıtlar ve eşleştirmeler":"Buchungen und Zuordnungen","Sakin görünümü":"Bewohneransicht","Yönetim görünümü":"Verwaltungsansicht","Süper Admin görünümüne dön":"Zurück zu Superadmin","Önizlemede değişiklikler kaydedilmez.":"In der Vorschau werden keine Änderungen gespeichert.","Daire / Kişi":"Wohnung / Person","Süresi doldu":"Abgelaufen","Aktif":"Aktiv","Duyuruyu aç":"Mitteilung öffnen"});
+Object.assign(german,{"Duyuru":"Mitteilung"});
+
+Object.assign(german,{"Üç test duyurusu göster":"Drei Testmitteilungen anzeigen"});

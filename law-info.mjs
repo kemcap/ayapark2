@@ -1,5 +1,5 @@
-import {getLanguage} from './i18n.mjs?v=5.0.0';
-import {escapeHtml as e} from './core.mjs?v=5.0.0';
+import {getLanguage} from './i18n.mjs?v=5.1.0';
+import {escapeHtml as e} from './core.mjs?v=5.1.0';
 const kmk='https://mevzuat.adalet.gov.tr/mevzuat/103807';
 const kvkk='https://www.kvkk.gov.tr/Icerik/6649/Personal-Data-Protection-Law';
 const privacy='https://www.kvkk.gov.tr/Icerik/8719/toplu-yapilarda-apartman-site-sakinlerine-ait-borc-bilgilerinin-ortak-yerlere-asilmasi-hakkinda-kamuoyu-duyurusu';
