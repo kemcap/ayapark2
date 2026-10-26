@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
+    "test:invitations:sql": "node tests/sql/invitations.mjs",
     "test:sql": "node tests/sql/run.mjs",
     "bench:audit": "node tests/benchmark-bank-filter.mjs",
     "qa:prepare": "node qa/prepare.mjs",

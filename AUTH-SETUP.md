@@ -55,3 +55,7 @@ Real OTP delivery, real password recovery after URL configuration, phone install
 - Real phone installation, real resident onboarding, OTP delivery and a full recovery/password change need the user or an authorized real device/account. Automated tests do not change a user's password or send mail.
 - Four historic balance items still require source clarification. They remain unposted rather than assigning financial liability from ambiguous evidence.
 - No original building photograph was available in the current attachments or identified by the file search.
+
+## Persönliche Einladungen ohne WhatsApp-/SMS-Anbieter
+
+Vorbereiteter Ablauf: [RESIDENT-INVITATIONS.md](RESIDENT-INVITATIONS.md). Manuelle Identitätsprüfung mit Geräteanfrage, optional E-Mail-Code. Neue Provider und Nachrichtenkosten sind für die manuelle Freigabe nicht erforderlich. Noch nicht live aktiviert.
