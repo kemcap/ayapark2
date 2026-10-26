@@ -32,7 +32,7 @@ test('bilingual invite copy works without collecting resident email',()=>{
   const value=inviteText({name:'Test',units:'A-3',link:'https://example.invalid/?invite=abc',language});
   assert.match(value,/https:\/\/example\.invalid\/\?invite=abc/);
   assert.match(value,/A-3/);
-  assert.match(value,/ohne E-Mail|e-posta adresi girmeden/);
+  assert.match(value,/ohne E-Mail|E-posta gerekmez/);
   assert.match(value,/einmal|bir kez/);
  }
 });
