@@ -3,7 +3,7 @@ import {activeAt} from './v3-domain.mjs?v=5.1.0';
 import {getLanguage} from './i18n.mjs?v=5.1.0';
 
 export const inviteEligible=(state,person)=>state.mode==='connected' && state.data.role==='super'
- && Boolean(person?.id) && !person.auth_user_id
+ && Boolean(person?.id)
  && (state.data.links||[]).some(link=>link.person_id===person.id && ['owner','tenant'].includes(link.role) && activeAt(link));
 
 export function whatsappNumber(input) {
@@ -64,7 +64,8 @@ export function bindInvitations({api,getState,rerender,openSetup}) {
   button.disabled=true;setStatus(tx('Hesap hazırlanıyor ve güvenli bağlantı oluşturuluyor…','Konto wird vorbereitet und der geschützte Link erstellt…'));
   try{
    // Uses the existing manager-only provisioning endpoint. No email or WhatsApp is sent.
-   await api.provision({site_id:s.data.site.id,person_id:selected.id,access_role:'resident',confirmation:true});
+   const currentPerson=s.data.persons.find(p=>p.id===selected.id);
+   if(!currentPerson?.auth_user_id)await api.provision({site_id:s.data.site.id,person_id:selected.id,access_role:'resident',confirmation:true});
    const result=await api.invitation({action:'create',person_id:selected.id},true);
    if(typeof result?.url!=='string'||!result.url.startsWith('https://kemcap.github.io/ayapark2/?invite='))throw Error('Invalid invitation response');
    inviteUrl=result.url;
