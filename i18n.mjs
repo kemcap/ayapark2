@@ -2,6 +2,7 @@
 export const german = {
   "Nasıl devam etmek istersiniz?": "Wie möchtest du fortfahren?",
   "Giriş seçimi": "Anmeldeauswahl",
+  "E-posta doğrulandı. Şimdi şifrenizi oluşturun.": "Deine E-Mail-Adresse ist bestätigt. Lege jetzt dein Passwort fest.",
   "Zaten erişimim var": "Ich habe bereits einen Zugang",
   "Şimdi giriş yap": "Jetzt anmelden",
   "Erişimimi ilk kez etkinleştir": "Zugang erstmals aktivieren",
