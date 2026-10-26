@@ -86,6 +86,7 @@ Deno.serve(async req=>{
   const {data:permission,error:permissionError}=await admin.from('site_staff_memberships')
    .select('role').eq('site_id',person.site_id).eq('user_id',identity.user.id).eq('role','manager').maybeSingle();
   if(permissionError||!permission)return respond({error:'access_denied'},403);
+  await signingKey(); // Do not provision accounts if the invitation service is not configured.
   if(!person.auth_user_id)return respond({error:'provision_access_first'},409);
   const {data:links,error:linksError}=await admin.from('ay3_links')
    .select('unit_id,role,starts_on,ends_on').eq('site_id',person.site_id).eq('person_id',person.id);
