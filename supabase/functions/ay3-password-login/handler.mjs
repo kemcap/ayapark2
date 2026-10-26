@@ -16,10 +16,11 @@ export function passwordLoginHandler({enabled,origins,admin,signIn,hash,clientIp
    while(true){const {value,done}=await reader.read();if(done)break;size+=value.length;if(size>4096){await reader.cancel();return reply(413,{error:'invalid_request'});}parts.push(value);}
    const bytes=new Uint8Array(size);let offset=0;for(const p of parts){bytes.set(p,offset);offset+=p.length;}
    const input=JSON.parse(new TextDecoder().decode(bytes));
+   if(!input||typeof input!=='object'||Array.isArray(input)||input.action&&!['login','bind'].includes(input.action))return reply(400,{error:'invalid_request'});
    if(input.action==='bind'){
     const bearer=/^Bearer (.+)$/i.exec(req.headers.get('Authorization')||'')?.[1];
     const actor=bearer?await admin.user(bearer):null;if(!actor)return reply(401,{error:'access_denied'});
-    const phone=classifyIdentifier(input.phone);if(phone?.kind!=='phone'||typeof input.reason!=='string'||input.reason.trim().length<5||input.reason.length>500||input.confirmed!==true||typeof input.active!=='boolean')return reply(400,{error:'invalid_request'});
+    const phone=classifyIdentifier(input.phone);if(phone?.kind!=='phone'||typeof input.person_id!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input.person_id)||typeof input.reason!=='string'||input.reason.trim().length<5||input.reason.length>500||input.confirmed!==true||typeof input.active!=='boolean')return reply(400,{error:'invalid_request'});
     await admin.bind({actor:actor.id,person:input.person_id,phone:phone.value,reason:input.reason,active:input.active});return reply(200,{ok:true});
    }
    const contact=classifyIdentifier(input.identifier);

@@ -47,7 +47,7 @@ Kompromittierte Passwörter werden in dieser Phase nicht durch einen selbst erfu
 
 ## Tests und Grenzen
 
-- Vollständige JavaScript-Suite: 205/205 bestanden; neun zusätzliche Phase-3-Tests prüfen exakt sechs Zeichen, Normalisierung, bestehende Auth-ID, neutrale Fehler, Drosselung, ausgeschalteten Pfad, Größen-/Originprüfung, bestätigte Bindung, Infrastrukturfehler und fehlenden Konto-Fallback.
+- Vollständige JavaScript-Suite: 206/206 bestanden; zehn zusätzliche Phase-3-Tests prüfen exakt sechs Zeichen, Normalisierung, bestehende Auth-ID, neutrale Fehler, Drosselung, ausgeschalteten Pfad, Größen-/Originprüfung, bestätigte Bindung, Infrastrukturfehler und fehlenden Konto-Fallback.
 - `npm run test:auth:sql`: 18 Prüfungen in einer synthetischen PGlite-Instanz. Anonyme/gewöhnliche Benutzer gesperrt; fremder Manager/Benutzer abgewiesen; Nummernkonflikt erhält alte Zuordnung; Entzug/Reaktivierung, Audit, Drosselung und unveränderte Auth-/Wohnungszuordnungen geprüft.
 - `npm run test:sql` und `npm run test:v5:sql`: vorhandene Finanz-/Rechteregressionen mit 120/120 und 50/50 bestanden.
 - CI prüft auch die neue Edge Function mit Deno; kein Deno war lokal installiert. Syntaxprüfung mit Node ist kein Ersatz für diesen Typecheck.
