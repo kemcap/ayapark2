@@ -24,14 +24,15 @@ Deno.serve(async req=>{
   const {data:site,error:siteError}=await admin.from('site_sites').select('id')
    .eq('slug','aya-park-2').maybeSingle();
   if(siteError||!site)return reply({error:'site_unavailable'},503);
-  const fetchAll=async(table:string,columns:string)=>{
-   const result:Record<string,unknown>[]=[];
+  const fetchAll=async(table:string,columns:string):Promise<any[]>=>{
+   const result:any[]=[];
    for(let start=0;start<100000;start+=1000){
     const {data,error}=await admin.from(table).select(columns).eq('site_id',site.id)
-     .range(start,start+999);
+     .order('id',{ascending:true}).range(start,start+999);
     if(error)throw Error('Site accounting query failed');
-    result.push(...(data||[]));
-    if((data||[]).length<1000)return result;
+    const rows=Array.isArray(data)?data as any[]:[];
+    result.push(...rows);
+    if(rows.length<1000)return result;
    }
    throw Error('Site accounting rows limit exceeded');
   };
