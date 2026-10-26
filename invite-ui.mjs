@@ -3,7 +3,7 @@ import {activeAt} from './v3-domain.mjs?v=5.1.0';
 import {getLanguage} from './i18n.mjs?v=5.1.0';
 
 export const inviteEligible=(state,person)=>state.mode==='connected' && state.data.role==='super'
- && Boolean(person?.id)
+ && Boolean(person?.id) && !person?.auth_user_id
  && (state.data.links||[]).some(link=>link.person_id===person.id && ['owner','tenant'].includes(link.role) && activeAt(link));
 
 export function whatsappNumber(input) {
@@ -23,15 +23,16 @@ export function whatsappShareUrl(phone,message) {
 export function inviteText({name,units,link='',language='tr'}) {
  const label=String(units||'').trim();
  return language==='de'
- ? 'Hallo '+name+',\n\nwir laden dich zur AYAPARK 2 Hausverwaltungs-App ein'+(label?' ('+label+')':'')+'.\n\nÜber den persönlichen Einladungslink kannst du die Anmeldung beginnen. Bestätige anschließend deine hinterlegte E-Mail-Adresse mit dem dort angeforderten Code. Der Einladungslink gewährt allein noch keinen Zugang zu deinen Wohnungsdaten.\n\n'+(link||'[EINLADUNGSLINK]')+'\n\nViele Grüße\nAYAPARK 2 Verwaltung'
- : 'Merhaba '+name+',\n\nAYAPARK 2 site yönetimi uygulamasına davetlisiniz'+(label?' ('+label+')':'')+'.\n\nKişisel davet bağlantısını açıp kayıtlı e-posta adresinize gelen kodla hesabınızı etkinleştirebilirsiniz. Bağlantı tek başına daire bilgilerine erişim sağlamaz.\n\n'+(link||'[DAVET BAĞLANTISI]')+'\n\nSaygılarımızla\nAYAPARK 2 Yönetimi';
+  ? 'Hallo '+name+',\n\nwir laden dich zur AYAPARK 2 Hausverwaltungs-App ein'+(label?' ('+label+')':'')+'.\n\nÜber diesen persönlichen Link kannst du dein Konto ohne E-Mail-Adresse aktivieren und ein Passwort erstellen. Der Link ist 48 Stunden gültig und nur einmal einlösbar. Bitte nicht weiterleiten.\n\n'+(link||'[EINLADUNGSLINK]')+'\n\nViele Grüße\nAYAPARK 2 Verwaltung'
+  : 'Merhaba '+name+',\n\nAYAPARK 2 site yönetimi uygulamasına davetlisiniz'+(label?' ('+label+')':'')+'.\n\nKişisel bağlantıdan e-posta adresi girmeden hesabınızı etkinleştirip şifre oluşturabilirsiniz. Bağlantı 48 saat geçerlidir ve yalnızca bir kez kullanılabilir. Lütfen başkalarına iletmeyin.\n\n'+(link||'[DAVET BAĞLANTISI]')+'\n\nSaygılarımızla\nAYAPARK 2 Yönetimi';
 }
+
 const tx=(tr,de)=>getLanguage()==='de'?de:tr;
 const $=id=>document.getElementById(id);
 const replacePlaceholder=(message,link)=>/\[(?:EINLADUNGSLINK|DAVET BAĞLANTISI)\]/.test(message)
  ?message.replace(/\[(?:EINLADUNGSLINK|DAVET BAĞLANTISI)\]/g,link):message+'\n\n'+link;
 
-export function bindInvitations({api,getState,rerender,openSetup}) {
+export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogin}) {
  let selected=null,inviteUrl='',preview=null,token=null;
  const dialog=$('inviteDialog');
  const status=$('inviteStatus');
@@ -42,7 +43,6 @@ export function bindInvitations({api,getState,rerender,openSetup}) {
  function open(personId){
   const s=getState(),person=s.data.persons?.find(p=>p.id===personId);
   if(!inviteEligible(s,person))throw Error(tx('Bu kişi davet için uygun değil.','Für diese Person ist keine Einladung möglich.'));
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(person.email||'')))throw Error(tx('Önce kişinin geçerli e-posta adresini kaydedin.','Bitte zuerst eine gültige E-Mail-Adresse für diese Person eintragen.'));
   const units=[...new Set(s.data.links.filter(link=>link.person_id===person.id&&['owner','tenant'].includes(link.role)&&activeAt(link))
    .map(link=>s.data.units.find(unit=>unit.id===link.unit_id)?.code).filter(Boolean))].join(', ');
   selected={id:person.id,name:person.full_name||'',units,email:person.email||''};
@@ -64,15 +64,9 @@ export function bindInvitations({api,getState,rerender,openSetup}) {
   if(!inviteEligible(s,s.data.persons.find(p=>p.id===selected.id))){setStatus(tx('Kişi bilgileri değişti. Sayfayı yenileyin.','Der Personenstatus hat sich geändert. Bitte aktualisieren.'),true);return;}
   button.disabled=true;setStatus(tx('Hesap hazırlanıyor ve güvenli bağlantı oluşturuluyor…','Konto wird vorbereitet und der geschützte Link erstellt…'));
   try{
-   // Check server configuration and eligibility BEFORE provisioning an Auth account.
-   let result;
-   try{result=await api.invitation({action:'create',person_id:selected.id},true);}
-   catch(error){
-    if(error.code!=='provision_access_first')throw error;
-    // Uses the existing manager-only provisioning endpoint. No messages are sent.
-    await api.provision({site_id:s.data.site.id,person_id:selected.id,access_role:'resident',confirmation:true});
-    result=await api.invitation({action:'create',person_id:selected.id},true);
-   }
+   const phone=whatsappNumber($('invitePhone').value);
+   if(!phone)throw Error(tx('Geçerli bir WhatsApp numarası girin.','Bitte eine gültige WhatsApp-Nummer eintragen.'));
+   const result=await api.invitation({action:'create',person_id:selected.id,phone},true);
    if(typeof result?.url!=='string'||!result.url.startsWith('https://kemcap.github.io/ayapark2/?invite='))throw Error('Invalid invitation response');
    inviteUrl=result.url;
    $('inviteLink').value=inviteUrl;
@@ -100,7 +94,7 @@ export function bindInvitations({api,getState,rerender,openSetup}) {
   if(!token)return '';
   if(preview?.error)return '<section class="card invite-landing" role="alert"><h2>'+escape(tx('Davet bağlantısı geçersiz','Einladungslink ungültig'))+'</h2><p>'+escape(preview.error)+'</p></section>';
   const headline=preview?.first_name?tx('Hoş geldiniz, ','Willkommen, ')+preview.first_name:tx('Kişisel davet bağlantısı','Persönlicher Einladungslink');
-  return '<section class="card invite-landing"><h2>'+escape(headline)+'</h2><p>'+escape(preview?.unit_code||'AYAPARK 2')+'</p><p>'+escape(tx('Giriş için kayıtlı e-posta adresinizdeki doğrulama kodu gereklidir. Davet bağlantısı tek başına erişim vermez.','Zum Anmelden benötigst du den Code an deine hinterlegte E-Mail-Adresse. Der Link allein gewährt keinen Zugang.'))+'</p><button type="button" class="button primary" data-action="invite_activate" '+(!preview?.valid?'disabled':'')+'>'+escape(tx('Hesabımı etkinleştir','Konto aktivieren'))+'</button></section>';
+  return '<section class="card invite-landing"><h2>'+escape(headline)+'</h2><p>'+escape(preview?.unit_code||'AYAPARK 2')+' · '+escape(preview?.phone_hint||'')+'</p><p>'+escape(tx('Bu bağlantı ile e-posta kullanmadan şifre oluşturabilirsiniz. Bağlantı yalnızca bir kez kullanılır.','Du kannst hier ohne E-Mail ein Passwort erstellen. Der Link ist nur einmal einlösbar.'))+'</p><button type="button" class="button primary" data-action="invite_activate" '+(!preview?.valid?'disabled':'')+'>'+escape(tx('Hesabımı etkinleştir','Konto aktivieren'))+'</button></section>';
  }
  async function inspect(){
   const raw=new URLSearchParams(location.search).get('invite');
@@ -115,5 +109,24 @@ export function bindInvitations({api,getState,rerender,openSetup}) {
   if(!token)return;
   const url=new URL(location.href);url.searchParams.delete('invite');history.replaceState(null,'',url.pathname+url.search+url.hash);token=null;preview=null;
  }
- return {open,landing,inspect,clearUrl,activate(){if(preview?.valid)openSetup();}};
+ const form=$('inviteActivateForm'),activationStatus=$('inviteActivateStatus'),activationDialog=$('inviteActivateDialog');
+ form.addEventListener('submit',async(event)=>{
+  event.preventDefault();
+  if(!token||!preview?.valid)return;
+  const password=$('inviteActivationPassword').value,again=$('inviteActivationConfirm').value;
+  if(password.length<10||password!==again){activationStatus.textContent=tx('Şifre en az 10 karakter olmalı ve aynı girilmeli.','Das Passwort muss mindestens 10 Zeichen haben und zweimal übereinstimmen.');return;}
+  const submit=$('inviteActivationSubmit');submit.disabled=true;
+  activationStatus.textContent=tx('Hesabınız etkinleştiriliyor…','Dein Konto wird aktiviert…');
+  try{
+   const result=await api.invitation({action:'activate',token,password});
+   const phone=result.phone;
+   clearUrl();activationDialog.close();form.reset();
+   try{await onActivated({phone,password});}
+   catch{
+    openPhoneLogin(phone);
+   }
+  }catch(err){activationStatus.textContent=err.message||tx('Hesap etkinleştirilemedi.','Konto konnte nicht aktiviert werden.');}
+  finally{submit.disabled=false;}
+ });
+ return {open,landing,inspect,clearUrl,activate(){if(preview?.valid){activationStatus.textContent='';activationDialog.showModal();}}};
 }
