@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 // Safe production smoke checks. Never provisions an account, sends mail or reveals secrets.
 const endpoint='https://eisozwhhinqszfikemot.supabase.co/functions/v1/ay3-whatsapp-invite';
 const checks=[
- {name:'invalid signed token is rejected when signing key exists',payload:{action:'inspect',token:'a.b'},status:410,error:'expired_or_invalid'},
+ {name:'invalid opaque one-time token is rejected',payload:{action:'inspect',token:'a.b'},status:410,error:'expired_or_invalid'},
+ {name:'invalid one-time activation token is rejected',payload:{action:'activate',token:'a.b',password:'strongsecretpassword'},status:410,error:'expired_or_invalid'},
  {name:'unauthenticated invitation creation is rejected',payload:{action:'create',person_id:'00000000-0000-4000-8000-000000000000'},status:401,error:'sign_in_required'}
 ];
 for(const check of checks) {
