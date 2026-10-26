@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f4f5f0">
 <meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https://eisozwhhinqszfikemot.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Ayapark 2 · Site Yönetimi V5.1</title>
 <script src="./preferences-boot.js"></script>
@@ -18,8 +19,9 @@
 <link rel="stylesheet" href="./styles.css?v=4.0">
 <link rel="stylesheet" href="./recovery.css">
 <link rel="stylesheet" href="./install-tutorial.css">
-<script type="module" src="./app.mjs?v=5.1.0"></script>
+<script type="module" src="./app.mjs?v=5.1.1"></script>
 <link rel="stylesheet" href="./v4-ui.css?v=4.0">
+<link rel="stylesheet" href="./invite-ui.css?v=5.1.1">
 <link rel="stylesheet" href="./modern.css?v=5.1.0"><link rel="stylesheet" href="./v5-ui.css?v=5.1.0">
 </head>
 <body>
@@ -55,6 +57,19 @@
 <dialog id="notificationsDialog" aria-labelledby="notificationsTitle"><div class="notification-heading"><h2 id="notificationsTitle">Bildirimler</h2><button type="button" class="button" id="closeNotifications">Kapat</button></div><div id="notificationsList"></div></dialog>
 <dialog id="urgentDialog" aria-labelledby="urgentTitle"><div class="notification-symbol" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></div><small id="urgentProgress" hidden></small><h2 id="urgentTitle"></h2><p id="urgentBody" class="pre-wrap"></p><small id="urgentMeta"></small><div class="dialog-actions"><button id="ackUrgent" class="button primary">Okudum</button></div></dialog>
 <dialog id="actionDialog" aria-labelledby="actionTitle"><div class="dialog-kicker">AYAPARK 2</div><h2 id="actionTitle"></h2><form id="actionForm"><div id="actionFields"></div><p id="actionMessage" role="status"></p><div class="dialog-actions"><button class="button" type="button" id="cancelAction">Vazgeç</button><button class="button primary" type="submit" id="saveAction">Kaydet</button></div></form></dialog>
+<dialog id="inviteDialog" aria-labelledby="inviteTitle" class="invitation-dialog">
+ <div class="dialog-kicker">AYAPARK 2 · DAVET</div><h2 id="inviteTitle">Einladung / Davet</h2>
+ <p id="invitePersonLabel" class="muted"></p>
+ <label class="field">WhatsApp telefonu / Telefonnummer<input id="invitePhone" type="tel" autocomplete="tel"></label>
+ <label class="field">Davet metni / Einladungstext<textarea id="inviteMessage" rows="9"></textarea></label>
+ <label class="invite-consent"><input type="checkbox" id="inviteConfirm"><span>Ich bestätige die Freischaltung für diese Person / Bu kişi için erişim yetkisini onaylıyorum. Es wird nichts automatisch versendet / Otomatik gönderim yapılmaz.</span></label>
+ <button type="button" id="inviteGenerate" class="button primary">Link erstellen / Bağlantı oluştur</button>
+ <label class="field">Kişisel bağlantı / Persönlicher Link<input type="url" id="inviteLink" readonly aria-label="Einladungslink"></label>
+ <p class="fine">48 saat / 48 Stunden. Die Person muss ihre hinterlegte E-Mail-Adresse mit einem Code bestätigen. Der Link allein gewährt keinen Datenzugriff.</p>
+ <p id="inviteStatus" role="status" aria-live="polite"></p>
+ <div class="invite-actions"><button type="button" class="button" id="inviteCopyLink" disabled>Link kopieren / Bağlantıyı kopyala</button><button type="button" class="button" id="inviteCopyText" disabled>Text kopieren / Metni kopyala</button><button type="button" class="button primary" id="inviteWhatsApp" disabled>WhatsApp</button></div>
+ <form method="dialog" class="dialog-actions"><button type="submit" class="button">Schließen / Kapat</button></form>
+</dialog>
 <div id="toast" role="status" class="toast" hidden></div>
 <noscript><p>Bu uygulama için JavaScript'i etkinleştirin.</p></noscript>
 </body>

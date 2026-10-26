@@ -9,6 +9,7 @@ import {apartmentInfo} from './apartment-info.mjs?v=5.1.0';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.1.0';
 import {updateAssignmentForm} from './assignments.mjs?v=5.1.0';
 import {personManager} from './people-ui.mjs?v=5.1.0';
+import {bindInvitations} from './invite-ui.mjs?v=5.1.1';
 import {mayPreview,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.1.0';
 import {bindInstall} from './install.mjs?v=5.1.0';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.1.0';
@@ -19,8 +20,8 @@ import {template} from './v3-import.mjs?v=5.1.0';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.1.0';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.1.0';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.1.0';
-import {AyaparkApi} from './api.mjs?v=5.1.0';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.1.0';
+import {AyaparkApi} from './api.mjs?v=5.1.1';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.1.1';
 import {buildForm,payloadFor} from './forms.mjs?v=5.1.0';
 import {analyzeStage} from './reconcile.mjs?v=5.1.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
@@ -33,6 +34,7 @@ initializePreferences();
 const updateDesignControl=bindDesign(()=>render());
 const state={data:prepareV5Demo(fullDemo()),mode:IS_PREVIEW||new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},stale:false};
 let peopleSearchTimer;
+const invitationUi=bindInvitations({api,getState:()=>state,rerender:()=>render(),openSetup:()=>{selectLogin('setup');$('loginDialog').showModal();}});
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
@@ -70,7 +72,7 @@ function render(focus=false){
  if(IS_PREVIEW){$('connectionButton').textContent=tr('Giriş ekranını incele');$('installApp').hidden=true;}
  $('modeBadge').hidden=state.mode!=='demo';$('refreshButton').hidden=state.mode!=='connected';
  $('connectionButton').textContent=IS_PREVIEW?tr('Giriş ekranını incele'):state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
- $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/buildings.svg" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>`:renderPage(state);
+ $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/buildings.svg" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>${invitationUi.landing()}`:renderPage(state);
  if(appearanceWasOpen&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;
  const previewBar=$('accessPreviewBanner');previewBar.innerHTML=previewBanner(state);previewBar.hidden=!isAccessPreview();labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
  document.dispatchEvent(new CustomEvent('ay5:view',{detail:{resident:own,page:state.page,mode:state.mode}}));
@@ -81,7 +83,7 @@ function render(focus=false){
  if(focus)$('content').focus({preventScroll:true});
 }
 function navigate(page){mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
-function closeDialogs(){for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
+function closeDialogs(){for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
@@ -190,6 +192,8 @@ document.addEventListener('click',async event=>{
  try{
   if(action==='audit_page'){if(can(state,'admin'))await loadAuditPage(Number(b.dataset.page));return;}
   if(action==='review_selected'){await reviewSelected();return;}
+  if(action==='invite_person'){invitationUi.open(b.dataset.id);return;}
+  if(action==='invite_activate'){invitationUi.activate();return;}
   if(action==='person_manage'){detailView={action,id:b.dataset.id};return showDetail(personManager(state,b.dataset.id));}
   if(action==='unit'){detailView={action,id:b.dataset.id};return showDetail(unitDetail(state,b.dataset.id));}
   if(action==='transaction'){if(can(state,'finance')){detailView={action,id:b.dataset.id};showDetail(transactionDetail(state,b.dataset.id));}return;}
@@ -283,7 +287,7 @@ function completeSignIn(loaded){
  // Closing a completed login must not trigger the pending-login cancellation handler.
  loginBusy=false;pendingSetupLoaded=null;$('loginSubmit').disabled=false;
  if($('loginDialog').open)$('loginDialog').close();
- $('loginForm').reset();navigate('overview');void syncPreferences(api,()=>{applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));});
+ if(typeof invitationUi!=='undefined')invitationUi.clearUrl();$('loginForm').reset();navigate('overview');void syncPreferences(api,()=>{applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));});
 }
 
 $('loginDialog').addEventListener('close',()=>{
@@ -455,6 +459,7 @@ window.addEventListener('storage',event=>{
 setInterval(()=>{if(state.mode==='connected')void api.token().catch(error=>{if([400,401,403].includes(error.status)){epoch++;closeDialogs();state.mode='signedout';state.data=prepareV5Demo(fullDemo());navigate('overview');toast(error.message);}});},30000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&state.mode==='signedout'&&api.saved())void resumeSession();});
 void resumeSession();
+void invitationUi.inspect();
 
 $('actionForm').addEventListener('invalid',event=>{event.preventDefault();const input=event.target;const message=tr(input.validity.valueMissing?'Bu alanı doldurun.':input.type==='email'?'Geçerli bir e-posta adresi girin.':'Bu alanı kontrol edin.');showFormError($('actionForm'),$('actionMessage'),fieldError(message,input.name));const first=$('actionForm').querySelector(':invalid');first?.focus();},true);
 
