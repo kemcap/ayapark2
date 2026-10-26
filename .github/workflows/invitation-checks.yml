@@ -36,6 +36,6 @@ jobs:
         with:
           deno-version: v2.x
       - name: Typecheck Supabase Edge Function
-        run: deno check supabase/functions/ay3-whatsapp-invite/index.ts
+        run: deno check --node-modules-dir=auto supabase/functions/ay3-whatsapp-invite/index.ts
       - name: Safe Edge Function smoke checks (no resident data)
         run: node tests/invite-edge-smoke.mjs
