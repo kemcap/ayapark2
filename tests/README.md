@@ -19,7 +19,8 @@ suite applies the real restriction migration inside its rolled-back fixture tran
 not Supabase Auth accounts. No production rows are included. All fixture users
 use synthetic IDs and `example.invalid` addresses.
 
-The SQL runner deliberately exits **1** for three reproduced existing defects:
+Historical findings from the pre-V4 fixture (resolved by the V4 safety migration,
+which the runner now applies before the tests):
 
 1. Allocation retry after a credit fails before reaching the existing idempotency check.
 2. Published reports include reversal pairs in gross income/expense; the live
@@ -29,8 +30,11 @@ The SQL runner deliberately exits **1** for three reproduced existing defects:
    validation error before authorization. It does not perform a write, but
    authorization must precede these checks.
 
-Do not mark these tests passing or merge a database change until they are resolved
-and reviewed. Frontend unit tests are a separate passing suite.
+Current checks: `npm run test:sql` passes 120 assertions. `npm run test:v5:sql`
+passes 50 additional assertions for V5. Both run in isolated PGlite and have no
+production credentials. They do not prove mail delivery, concurrent PostgREST
+transactions, or a complete Supabase project restore. See AUDIT-20261026.md for
+the current UI audit, browser verification limits and separate release gate.
 
 The existing `read-performance.sql` and `read-performance-benchmark.sql` scripts
 temporarily replace policies/functions. They are **not production read-only

@@ -76,3 +76,9 @@ Run `node --test tests/*.test.mjs`. Application assets are in the repository roo
 ### Datenbank- und Ladeleistung (V3.15)
 
 Messwerte, sichere Migration, Regressionstests und Backup-Grenzen: [PERFORMANCE.md](PERFORMANCE.md). Die produktive Migration ändert ausschließlich Lese-Policies und eine interne Prüfsignatur-Abfrage, keine Anwendungsdaten.
+# Aktueller gemeinsamer Audit
+
+Der erneute UI/UX-, Datenbank- und Performance-Audit vom 26.10.2026 ist in
+[AUDIT-20261026.md](AUDIT-20261026.md) dokumentiert. Er baut auf dem bereits
+veröffentlichten V5.1-Stand auf. Die historische Branch `ayapark-v4` wird für
+diese Nachprüfung fortgeführt; das ist kein Downgrade und keine Live-Freigabe.

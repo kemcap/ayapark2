@@ -1,6 +1,6 @@
-import {escapeHtml as escape} from './core.mjs?v=5.1.0';
-import {activeAt} from './v3-domain.mjs?v=5.1.0';
-import {getLanguage} from './i18n.mjs?v=5.1.0';
+import {escapeHtml as escape} from './core.mjs?v=5.3.1';
+import {activeAt} from './v3-domain.mjs?v=5.3.1';
+import {getLanguage} from './i18n.mjs?v=5.3.1';
 
 export const inviteEligible=(state,person)=>state.mode==='connected' && state.data.role==='super'
  && Boolean(person?.id) && !person?.auth_user_id
@@ -59,7 +59,7 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
  $('invitePhone').addEventListener('input',toggleSend);
  $('inviteGenerate').addEventListener('click',async ()=>{
   if(!selected)return;
-  if(!$('inviteConfirm').checked){setStatus(tx('Önce yetki ve e-posta doğrulaması açıklamasını onaylayın.','Bitte zuerst die Bestätigung für die Kontofreischaltung aktivieren.'),true);return;}
+  if(!$('inviteConfirm').checked){setStatus(tx('Önce bu kişi için erişim yetkisini onaylayın.','Bitte zuerst die Bestätigung für die Kontofreischaltung aktivieren.'),true);return;}
   const s=getState(),button=$('inviteGenerate');
   if(!inviteEligible(s,s.data.persons.find(p=>p.id===selected.id))){setStatus(tx('Kişi bilgileri değişti. Sayfayı yenileyin.','Der Personenstatus hat sich geändert. Bitte aktualisieren.'),true);return;}
   button.disabled=true;setStatus(tx('Hesap hazırlanıyor ve güvenli bağlantı oluşturuluyor…','Konto wird vorbereitet und der geschützte Link erstellt…'));
@@ -67,7 +67,7 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
    const phone=whatsappNumber($('invitePhone').value);
    if(!phone)throw Error(tx('Geçerli bir WhatsApp numarası girin.','Bitte eine gültige WhatsApp-Nummer eintragen.'));
    const result=await api.invitation({action:'create',person_id:selected.id,phone},true);
-   if(typeof result?.url!=='string'||!result.url.startsWith('https://kemcap.github.io/ayapark2/?invite='))throw Error('Invalid invitation response');
+   if(typeof result?.url!=='string'||!result.url.startsWith('https://kemcap.github.io/ayapark2/?invite='))throw Error(tx('Sunucudan geçerli bir davet bağlantısı alınamadı. Lütfen tekrar deneyin.','Der Server hat keinen gültigen Einladungslink geliefert. Bitte erneut versuchen.'));
    inviteUrl=result.url;
    $('inviteLink').value=inviteUrl;
    message.value=replacePlaceholder(message.value,inviteUrl);
