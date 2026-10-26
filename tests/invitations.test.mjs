@@ -87,3 +87,11 @@ test('invite activation UI has no mandatory email and requires password twice',a
  assert.doesNotMatch(client,/Bitte zuerst eine gültige E-Mail-Adresse für diese Person eintragen/);
  assert.doesNotMatch(client,/api\.provision\(/);
 });
+
+test('phone invitation activation does not insert a text NULL into uuid person_id',async()=>{
+ const sql=await readFile(new URL('../supabase/migrations/20261026_fix_invite_activation_uuid.sql',import.meta.url),'utf8');
+ assert.match(sql,/insert into public\.site_resident_units\(unit_id,user_id,role,person_id,active\)/);
+ assert.match(sql,/select distinct l\.unit_id,p_user,l\.role,null::uuid,true/);
+ assert.doesNotMatch(sql,/select distinct l\.unit_id,p_user,l\.role,null,true/);
+ assert.match(sql,/revoke all on function public\.ay3_redeem_phone_invite\(text,uuid\) from PUBLIC,anon,authenticated/);
+});
