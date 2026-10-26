@@ -41,10 +41,32 @@
 </div>
 </div>
 <dialog id="detailDialog" aria-labelledby="detailTitle"><div id="detailContent"></div><form method="dialog" class="dialog-actions"><button class="button">Kapat</button></form></dialog>
-<dialog id="loginDialog" aria-labelledby="loginTitle">
- <div class="dialog-kicker">AYAPARK 2 HESABINIZ</div><h2 id="loginTitle">Sitenize hoş geldiniz.</h2><p class="muted">Mevcut hesabınızla daire bilgilerinizi görüntüleyin. İşlemler hesabınıza verilen yetkilerle yapılır.</p>
- <div id="loginMethodChooser" class="row-actions"><button type="button" id="useCode" class="button" aria-pressed="false">E-posta kodu</button><button type="button" id="usePassword" class="button" aria-pressed="true">Şifre</button></div>
- <form id="loginForm"><label id="loginEmailField" class="field">E-posta<input id="email" type="email" required autocomplete="username"></label><div id="passwordFields"><label class="field" for="password">Şifre</label><div class="password-control"><input id="password" type="password" autocomplete="current-password"><button class="button password-eye" type="button" data-password-eye="password" aria-label="Şifreyi göster" aria-pressed="false"></button></div></div><div id="codeFields" hidden><label class="field" for="loginCode">E-posta kodu</label><input id="loginCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10"><button type="button" id="requestCode" class="button">Kod gönder</button><p id="codeHelp" class="fine">E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.</p></div><div id="setupPasswordFields" hidden><p class="muted">E-posta adresin doğrulandı. Bundan sonra şifreyle giriş yapabilirsin.</p><label class="field" for="setupPassword">Şifre oluştur</label><div class="password-control"><input id="setupPassword" type="password" minlength="8" maxlength="256" autocomplete="new-password"><button class="button password-eye" type="button" data-password-eye="setupPassword" aria-label="Şifreyi göster" aria-pressed="false"></button></div><label class="field" for="setupPasswordConfirm">Şifreyi tekrarla</label><div class="password-control"><input id="setupPasswordConfirm" type="password" minlength="8" maxlength="256" autocomplete="new-password"><button class="button password-eye" type="button" data-password-eye="setupPasswordConfirm" aria-label="Şifreyi göster" aria-pressed="false"></button></div></div><p id="loginMessage" role="status"></p><div class="dialog-actions"><button type="button" id="cancelLogin" class="button">Vazgeç</button><button id="loginSubmit" class="button primary" type="submit">Giriş yap</button></div></form><p><button type="button" id="createPasswordEntry" class="text-button">İlk kez şifre oluştur</button> · <a class="text-button" href="./reset.html">Şifremi unuttum</a></p><p class="fine">Bu cihazda oturum açık kalır. Ortak cihazlarda işiniz bitince çıkış yapın.</p>
+<dialog id="loginDialog" aria-labelledby="loginTitle" class="auth-dialog">
+ <div class="dialog-kicker">AYAPARK 2 HESABINIZ</div>
+ <h2 id="loginTitle">Sitenize hoş geldiniz.</h2>
+ <p id="loginIntro" class="muted">Nasıl devam etmek istersiniz?</p>
+ <section id="loginEntryChoice" class="auth-entry-choice" aria-label="Giriş seçimi">
+  <div class="auth-entry-grid">
+   <button type="button" id="chooseExistingAccess" class="auth-entry-card"><span class="auth-entry-symbol" aria-hidden="true">↪</span><strong>Zaten erişimim var</strong><small>Şimdi giriş yap</small></button>
+   <button type="button" id="chooseFirstActivation" class="auth-entry-card"><span class="auth-entry-symbol" aria-hidden="true">✓</span><strong>Erişimimi ilk kez etkinleştir</strong><small>Hesabımı doğrula</small></button>
+  </div>
+  <p class="fine auth-entry-note">Erişiminiz site yönetimi tarafından önceden tanımlanmış olmalıdır.</p>
+ </section>
+ <div id="loginFlow" hidden>
+  <button id="loginBack" class="text-button auth-flow-back" type="button">← Geri dön</button>
+  <div id="loginOauthOptions" class="auth-oauth-options" hidden>
+   <p class="fine">Diğer giriş seçenekleri</p>
+   <div class="auth-oauth-buttons">
+    <button id="loginGoogle" type="button" class="button auth-provider" hidden>Google ile devam et</button>
+    <button id="loginApple" type="button" class="button auth-provider" hidden>Apple ile devam et</button>
+   </div>
+   <p class="fine">Yalnızca yönetimin önceden yetkilendirdiği hesaplar daire bilgilerine erişebilir.</p>
+  </div>
+  <div id="loginMethodChooser" class="row-actions"><button type="button" id="useCode" class="button" aria-pressed="false">E-posta kodu</button><button type="button" id="usePassword" class="button" aria-pressed="true">Şifre</button></div>
+  <form id="loginForm"><label id="loginEmailField" class="field">E-posta<input id="email" type="email" required autocomplete="username"></label><div id="passwordFields"><label class="field" for="password">Şifre</label><div class="password-control"><input id="password" type="password" autocomplete="current-password"><button class="button password-eye" type="button" data-password-eye="password" aria-label="Şifreyi göster" aria-pressed="false"></button></div></div><div id="codeFields" hidden><label class="field" for="loginCode">E-posta kodu</label><input id="loginCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10"><button type="button" id="requestCode" class="button">Kod gönder</button><p id="codeHelp" class="fine">E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.</p></div><div id="setupPasswordFields" hidden><p class="muted">E-posta adresin doğrulandı. Bundan sonra şifreyle giriş yapabilirsin.</p><label class="field" for="setupPassword">Şifre oluştur</label><div class="password-control"><input id="setupPassword" type="password" minlength="8" maxlength="256" autocomplete="new-password"><button class="button password-eye" type="button" data-password-eye="setupPassword" aria-label="Şifreyi göster" aria-pressed="false"></button></div><label class="field" for="setupPasswordConfirm">Şifreyi tekrarla</label><div class="password-control"><input id="setupPasswordConfirm" type="password" minlength="8" maxlength="256" autocomplete="new-password"><button class="button password-eye" type="button" data-password-eye="setupPasswordConfirm" aria-label="Şifreyi göster" aria-pressed="false"></button></div></div><p id="loginMessage" role="status" aria-live="polite"></p><div class="dialog-actions"><button type="button" id="cancelLogin" class="button">Vazgeç</button><button id="loginSubmit" class="button primary" type="submit">Giriş yap</button></div></form>
+  <p id="loginFooter"><button type="button" id="createPasswordEntry" class="text-button">İlk kez şifre oluştur</button> · <a class="text-button" href="./reset.html">Şifremi unuttum</a></p>
+  <p class="fine">Bu cihazda oturum açık kalır. Ortak cihazlarda işiniz bitince çıkış yapın.</p>
+ </div>
 </dialog>
 <dialog id="importDialog" aria-labelledby="importTitle">
  <div class="dialog-kicker">DOSYA ÖNİZLEMESİ</div><h2 id="importTitle">Önce kontrol, sonra aktarım.</h2><p class="muted">CSV dosyanızı burada inceleyin. Önizleme yereldir. Kayıt oluşturmak için ayrıca “İçe aktar” düğmesine basın.</p>
