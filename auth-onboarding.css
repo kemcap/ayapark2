@@ -11,3 +11,6 @@
 #loginDialog #loginStart > .fine { margin: 12px 0 0; line-height: 1.6; }
 @media (max-width: 420px) { #loginDialog .login-path-grid { grid-template-columns: 1fr; gap: 10px; } #loginDialog .login-path { min-height: auto; padding: 15px; gap: 5px; } #loginDialog .login-path-symbol { width: 30px; height: 30px; font-size: 18px; } }
 @media (prefers-reduced-motion: reduce) { #loginDialog .login-path { transition: none; } }
+
+/* Do not let component display rules override HTML's hidden state. */
+#loginDialog [hidden] { display: none !important; }
