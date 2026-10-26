@@ -1,3 +1,4 @@
+import {setupInvitations} from './invitation-ui.mjs';
 import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.1.0';
 import {prepareV5Demo} from './finance-demo.mjs?v=5.1.0';
 import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.1.0';
@@ -464,3 +465,5 @@ async function refreshWhenIdle(){if(autoRefreshBusy||state.mode!=='connected'||d
 setInterval(()=>void refreshWhenIdle(),90000);window.addEventListener('focus',()=>void refreshWhenIdle());document.addEventListener('visibilitychange',()=>void refreshWhenIdle());
 
 window.addEventListener('scroll',event=>{if(mobileNavGroup!==null&&closeMenuOnScroll(event,$('nav'))){mobileNavGroup=null;renderNavigation();}},{passive:true,capture:true});
+
+setupInvitations({state,api,showDetail,toast,reload,isAccessPreview});

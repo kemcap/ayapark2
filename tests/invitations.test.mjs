@@ -1,0 +1,12 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {readInvitation,invitationText,Invitations} from '../invitations.mjs';import {invitationControl} from '../invitation-ui.mjs';
+const person={id:'p',full_name:'Resident',auth_user_id:null};const state={mode:'connected',data:{role:'super',links:[{person_id:'p',role:'owner',active:true}]}};
+test('invitation is offered next to an assigned person to superadmin',()=>assert.match(invitationControl(state,person),/data-resident-invite="p"/));
+test('staff and residents cannot see invitation controls',()=>{for(const role of ['resident','staff'])assert.equal(invitationControl({...state,data:{...state.data,role}},person),'');});
+test('unassigned person receives assignment guidance, no invitation action',()=>assert.doesNotMatch(invitationControl({...state,data:{...state.data,links:[]}},person),/data-resident-invite/));
+test('historical assignments do not enable invitation',()=>assert.doesNotMatch(invitationControl({...state,data:{...state.data,links:[{person_id:'p',role:'owner',active:false}]}},person),/data-resident-invite/));
+test('representative alone does not silently create a resident obligation or owner role',()=>assert.doesNotMatch(invitationControl({...state,data:{...state.data,links:[{person_id:'p',role:'representative',active:true}]}},person),/data-resident-invite/));
+test('URL fragment is validated and immediately removed',()=>{let path;assert.equal(readInvitation({hash:'#invite='+'a'.repeat(64),pathname:'/invite.html'},{replaceState:(_,__,p)=>path=p}),'a'.repeat(64));assert.equal(path,'/invite.html');});
+test('malformed invitation rejected',()=>assert.equal(readInvitation({hash:'#invite=bad',pathname:'/invite.html'},{replaceState(){}}),''));
+test('invitation text includes personal link for manual sharing',()=>assert.ok(invitationText('Resident','https://example.invalid/#invite=synthetic').includes('https://example.invalid/#invite=synthetic')));
+test('session persisted only after server approves completion',async()=>{let accepted;const api={generation:9,raw:async()=>({session:{user:{id:'resident'}}}),accept:(s,g)=>accepted={s,g}};await new Invitations(api).finish('manual_finish',{});assert.equal(accepted.g,9);assert.equal(accepted.s.user.id,'resident');});
+test('rejected completion never accepts a session',async()=>{let accepted=false;await assert.rejects(new Invitations({raw:async()=>{throw Error('denied');},accept:()=>accepted=true}).finish('manual_finish',{}));assert.equal(accepted,false);});
