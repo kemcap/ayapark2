@@ -1,57 +1,61 @@
--- Email-free resident onboarding by one-time, expiring WhatsApp invitation.
--- This RPC is never exposed to browser roles, only to the service_role backend.
-create or replace function public.ay3_activate_phone_invite(
-  p_actor uuid,
-  p_person uuid,
-  p_site uuid,
-  p_unit uuid,
-  p_user uuid,
-  p_phone text
-) returns jsonb
-language plpgsql security invoker
-set search_path = ''
+-- WhatsApp invitations: no email address required. Service-role-only token store.
+create table if not exists public.ay3_invite_tokens (
+  id uuid primary key default gen_random_uuid(),
+  site_id uuid not null references public.site_sites(id),
+  person_id uuid not null references public.ay3_persons(id),
+  unit_id uuid not null references public.site_units(id),
+  issued_by uuid not null,
+  phone_e164 text not null check (phone_e164 ~ '^\+[1-9][0-9]{9,14}$'),
+  token_hash text not null unique check (token_hash ~ '^[0-9a-f]{64}$'),
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null,
+  consumed_at timestamptz,
+  revoked_at timestamptz
+);
+create index if not exists ay3_invite_tokens_person on public.ay3_invite_tokens(person_id,created_at desc);
+alter table public.ay3_invite_tokens enable row level security;
+revoke all on public.ay3_invite_tokens from PUBLIC, anon, authenticated;
+grant select,insert,update on public.ay3_invite_tokens to service_role;
+
+create or replace function public.ay3_redeem_phone_invite(p_token_hash text,p_user uuid)
+returns jsonb language plpgsql security invoker set search_path = ''
 as $$
-declare target public.ay3_persons;
+declare ticket public.ay3_invite_tokens; resident public.ay3_persons;
 begin
-  if p_phone !~ '^\+[1-9][0-9]{9,14}$' then
-    raise exception 'Invalid phone';
-  end if;
-  if not exists (
-    select 1 from public.site_staff_memberships m
-    where m.site_id=p_site and m.user_id=p_actor and m.role='manager'
-  ) then raise exception 'Management authorization required'; end if;
-  if not exists (
-    select 1 from auth.users u
-    where u.id=p_user and u.phone=p_phone and u.phone_confirmed_at is not null
-  ) then raise exception 'Authenticated account mismatch'; end if;
-  select * into target from public.ay3_persons
-    where id=p_person and site_id=p_site for update;
-  if not found or target.auth_user_id is not null then
-    raise exception 'Person account unavailable';
-  end if;
-  if not exists (
-    select 1 from public.ay3_links l
-    where l.person_id=p_person and l.site_id=p_site and l.unit_id=p_unit
-      and l.role in ('owner','tenant') and l.active
-      and (l.starts_on is null or l.starts_on<=current_date)
-      and (l.ends_on is null or l.ends_on>=current_date)
-  ) then raise exception 'Active apartment relationship required'; end if;
-  if exists (
-    select 1 from public.ay3_persons other
-    where other.auth_user_id=p_user and other.id<>p_person
-  ) then raise exception 'Account already bound'; end if;
-  update public.ay3_persons
-  set auth_user_id=p_user, phone=case when trim(phone)='' then p_phone else phone end
-  where id=p_person;
-  insert into public.site_resident_units(unit_id,user_id,role,person_id,active)
-  select distinct l.unit_id,p_user,l.role,null,true from public.ay3_links l
-  where l.person_id=p_person and l.site_id=p_site and l.role in ('owner','tenant') and l.active
-    and (l.starts_on is null or l.starts_on<=current_date)
-    and (l.ends_on is null or l.ends_on>=current_date)
-  on conflict(unit_id,user_id,role) do update set active=true;
-  insert into public.ay2_audit(site_id,actor,action,entity_id,details)
-    values(p_site,p_actor,'resident_whatsapp_activation',p_person,jsonb_build_object('unit',p_unit));
-  return jsonb_build_object('ok',true);
-end; $$;
-revoke all on function public.ay3_activate_phone_invite(uuid,uuid,uuid,uuid,uuid,text) from public, anon, authenticated;
-grant execute on function public.ay3_activate_phone_invite(uuid,uuid,uuid,uuid,uuid,text) to service_role;
+ select * into ticket from public.ay3_invite_tokens where token_hash=p_token_hash for update;
+ if not found or ticket.consumed_at is not null or ticket.revoked_at is not null or ticket.expires_at<=now()
+ then raise exception 'Invite expired or already used'; end if;
+ if not exists(select 1 from public.site_staff_memberships s
+   where s.site_id=ticket.site_id and s.user_id=ticket.issued_by and s.role='manager')
+ then raise exception 'Issuer no longer authorized'; end if;
+ select * into resident from public.ay3_persons
+   where id=ticket.person_id and site_id=ticket.site_id for update;
+ if not found or resident.auth_user_id is not null
+ then raise exception 'Resident already linked'; end if;
+ if not exists(select 1 from public.ay3_links l where l.person_id=ticket.person_id
+   and l.site_id=ticket.site_id and l.unit_id=ticket.unit_id and l.role in ('owner','tenant')
+   and l.active and (l.starts_on is null or l.starts_on<=current_date)
+   and (l.ends_on is null or l.ends_on>=current_date))
+ then raise exception 'No current apartment'; end if;
+ if exists(select 1 from public.ay3_persons p where p.auth_user_id=p_user and p.id<>ticket.person_id)
+ then raise exception 'Account already linked elsewhere'; end if;
+ update public.ay3_persons set auth_user_id=p_user
+ where id=ticket.person_id;
+ insert into public.site_resident_units(unit_id,user_id,role,person_id,active)
+ select distinct l.unit_id,p_user,l.role,null,true from public.ay3_links l
+ where l.person_id=ticket.person_id and l.site_id=ticket.site_id
+   and l.role in ('owner','tenant') and l.active
+   and (l.starts_on is null or l.starts_on<=current_date)
+   and (l.ends_on is null or l.ends_on>=current_date)
+ on conflict(unit_id,user_id,role) do update set active=true;
+ update public.ay3_invite_tokens set consumed_at=now() where id=ticket.id;
+ update public.ay3_invite_tokens set revoked_at=now()
+ where person_id=ticket.person_id and id<>ticket.id and consumed_at is null and revoked_at is null;
+ insert into public.ay2_audit(site_id,actor,action,entity_id,details)
+ values(ticket.site_id,ticket.issued_by,'whatsapp_invite_activated',ticket.person_id,
+ jsonb_build_object('unit_id',ticket.unit_id));
+ return jsonb_build_object('ok',true,'person_id',ticket.person_id);
+end;
+$$;
+revoke all on function public.ay3_redeem_phone_invite(text,uuid) from PUBLIC,anon,authenticated;
+grant execute on function public.ay3_redeem_phone_invite(text,uuid) to service_role;
