@@ -13,7 +13,7 @@ jobs:
         run: |
           node --input-type=module - <<'JS'
           const url='https://eisozwhhinqszfikemot.supabase.co/auth/v1/settings';
-          const res=await fetch(url);
+          const res=await fetch(url,{headers:{apikey:'sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc'}});
           console.log('HTTP',res.status);
           if(!res.ok)process.exit(1);
           const data=await res.json();
