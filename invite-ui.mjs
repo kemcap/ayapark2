@@ -42,11 +42,12 @@ export function bindInvitations({api,getState,rerender,openSetup}) {
  function open(personId){
   const s=getState(),person=s.data.persons?.find(p=>p.id===personId);
   if(!inviteEligible(s,person))throw Error(tx('Bu kişi davet için uygun değil.','Für diese Person ist keine Einladung möglich.'));
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(person.email||'')))throw Error(tx('Önce kişinin geçerli e-posta adresini kaydedin.','Bitte zuerst eine gültige E-Mail-Adresse für diese Person eintragen.'));
   const units=[...new Set(s.data.links.filter(link=>link.person_id===person.id&&['owner','tenant'].includes(link.role)&&activeAt(link))
    .map(link=>s.data.units.find(unit=>unit.id===link.unit_id)?.code).filter(Boolean))].join(', ');
   selected={id:person.id,name:person.full_name||'',units,email:person.email||''};
   inviteUrl='';
-  $('invitePersonLabel').textContent=selected.name+' · '+(units||'—');
+  $('invitePersonLabel').textContent=selected.name+' · '+(units||'—')+' · '+selected.email;
   $('invitePhone').value=person.phone||'';
   message.value=inviteText({name:selected.name,units,language:getLanguage()});
   $('inviteConfirm').checked=false;
