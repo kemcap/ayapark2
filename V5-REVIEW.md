@@ -1,3 +1,5 @@
+> Historischer Entwicklungsbericht vor der Freigabe. V5 ist inzwischen nach ausdrücklicher Anweisung produktiv veröffentlicht; aktueller Status, Sicherungsnachweis und Grenzen: [RELEASE-V5.md](RELEASE-V5.md).
+
 # Ayapark 2 V5 – Implementierung, Prüfung und Freigabe
 
 Prüfdatum: 25.10.2026. Entwicklungsbranch: `feature/v5-finance-notifications`.

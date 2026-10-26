@@ -1,6 +1,6 @@
-# Ayapark 2 · V5.0 – Entwicklungsstand
+# Ayapark 2 · V5.0
 
-Modern als Standard, kompakte mobile Bedienung, versionierte Benachrichtigungen und vereinfachte Finanzvorgänge. Noch nicht für Produktion freigegeben; die Live-Seite bleibt V4.0, bis Migration und Veröffentlichung ausdrücklich genehmigt werden.
+Modern als Standard, kompakte mobile Bedienung, versionierte Benachrichtigungen und vereinfachte Finanzvorgänge. Nach ausdrücklicher Freigabe produktiv veröffentlicht. Migration eingespielt, GitHub-Pages-Version V5.0 geprüft. [Release-Nachweis](RELEASE-V5.md).
 
 - [Umsetzung, Testnachweise, Grenzen und sichere Einführung](V5-REVIEW.md)
 - [Ausgangspunkt und Umsetzungsplan](IMPLEMENTATION-V5.md)
