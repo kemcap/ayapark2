@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="./styles.css?v=4.0">
 <link rel="stylesheet" href="./recovery.css">
 <link rel="stylesheet" href="./install-tutorial.css">
-<script type="module" src="./app.mjs?v=5.4.0"></script>
+<script type="module" src="./app.mjs?v=5.5.0"></script>
 <link rel="stylesheet" href="./v4-ui.css?v=4.0">
 <link rel="stylesheet" href="./invite-ui.css?v=5.2.0">
 <link rel="stylesheet" href="./site-claims.css?v=5.3.0">
@@ -64,9 +64,10 @@
  <label class="field">WhatsApp telefonu<input id="invitePhone" type="tel" autocomplete="tel"></label>
  <label class="field">Davet metni<textarea id="inviteMessage" rows="9"></textarea></label>
  <label class="invite-consent"><input type="checkbox" id="inviteConfirm"><span>Bu kişi için erişim yetkisini onaylıyorum. Otomatik gönderim yapılmaz.</span></label>
+ <button type="button" id="inviteRevoke" class="button">Bekleyen davetleri iptal et</button>
  <button type="button" id="inviteGenerate" class="button primary">Bağlantı oluştur</button>
  <label class="field">Kişisel bağlantı<input type="url" id="inviteLink" readonly aria-label="Davet bağlantısı"></label>
- <p class="fine">Bağlantı 48 saat geçerlidir ve yalnızca bir kez kullanılabilir. Etkinleştirme için e-posta gerekmez.</p>
+ <p class="fine">Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir. Etkinleştirme için e-posta gerekmez.</p>
  <p id="inviteStatus" role="status" aria-live="polite"></p>
  <div class="invite-actions"><button type="button" class="button" id="inviteCopyLink" disabled>Bağlantıyı kopyala</button><button type="button" class="button" id="inviteCopyText" disabled>Metni kopyala</button><button type="button" class="button primary" id="inviteWhatsApp" disabled>WhatsApp</button></div>
  <form method="dialog" class="dialog-actions"><button type="submit" class="button">Kapat</button></form>
@@ -75,10 +76,10 @@
  <h2 id="inviteActivationTitle">Hesabımı etkinleştir</h2>
  <p class="muted">E-posta gerekmez. Lütfen kendi şifrenizi oluşturun.</p>
  <form id="inviteActivateForm">
-  <label class="field">Yeni şifre (en az 10 karakter)
-   <input id="inviteActivationPassword" type="password" autocomplete="new-password" minlength="10" maxlength="128" required></label>
+  <label class="field">Yeni şifre (en az 6 karakter)
+   <input id="inviteActivationPassword" type="password" autocomplete="new-password" minlength="6" maxlength="256" required></label>
   <label class="field">Şifreyi tekrar gir
-   <input id="inviteActivationConfirm" type="password" autocomplete="new-password" minlength="10" maxlength="128" required></label>
+   <input id="inviteActivationConfirm" type="password" autocomplete="new-password" minlength="6" maxlength="256" required></label>
   <p class="fine">Davet bağlantısı yalnızca bir kez kullanılır.</p>
   <p id="inviteActivateStatus" role="status" aria-live="polite"></p>
   <div class="dialog-actions"><button type="button" class="button" id="inviteActivationCancel">Vazgeç</button><button id="inviteActivationSubmit" type="submit" class="button primary">Etkinleştir</button></div>

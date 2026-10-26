@@ -44,7 +44,9 @@ jobs:
       - name: Typecheck verified phone login (development only)
         run: deno check --node-modules-dir=auto supabase/functions/ay3-password-login/index.ts
       - name: Isolated auth database checks
-        run: npm run test:auth:sql
+        run: |
+          npm run test:auth:sql
+          npm run test:invite:sql
       - name: Safe Edge Function smoke checks (no resident data)
         run: node tests/invite-edge-smoke.mjs
       - name: Safe site receivables smoke checks (no resident data)

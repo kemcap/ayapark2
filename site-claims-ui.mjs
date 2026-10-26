@@ -1,5 +1,5 @@
-import {getLanguage} from './i18n.mjs?v=5.4.0';
-import {escapeHtml as escape,money} from './core.mjs?v=5.4.0';
+import {getLanguage} from './i18n.mjs?v=5.5.0';
+import {escapeHtml as escape,money} from './core.mjs?v=5.5.0';
 
 const labels={
  own:['Dairelerimin açık borçları','Meine offenen Forderungen'],

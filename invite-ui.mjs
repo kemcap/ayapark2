@@ -1,6 +1,6 @@
-import {escapeHtml as escape} from './core.mjs?v=5.4.0';
-import {activeAt} from './v3-domain.mjs?v=5.4.0';
-import {getLanguage} from './i18n.mjs?v=5.4.0';
+import {escapeHtml as escape} from './core.mjs?v=5.5.0';
+import {activeAt} from './v3-domain.mjs?v=5.5.0';
+import {getLanguage} from './i18n.mjs?v=5.5.0';
 
 export const inviteEligible=(state,person)=>state.mode==='connected' && state.data.role==='super'
  && Boolean(person?.id) && !person?.auth_user_id
@@ -24,8 +24,8 @@ export function inviteText({name,units,link='',language='tr'}) {
  const unit=String(units||'').trim();
  const salutation=String(name||'')+(unit?' ('+unit+')':'');
  return language==='de'
- ? '🏡 Willkommen bei AYAPARK 2!\n\nHallo '+salutation+' 👋\n\nUnsere App bietet dir Informationen zu Hausgeld, Mitteilungen und deiner Wohnung.\n\n📲 Konto erstellen:\n'+(link||'[EINLADUNGSLINK]')+'\n\n🔐 Anmeldung ohne E-Mail. 48 Stunden gültig und nur einmal verwendbar.\n\nAYAPARK 2 Verwaltung 🌿'
- : '🏡 AYAPARK 2’ye Hoş Geldiniz!\n\nMerhaba '+salutation+' 👋\n\nSite yönetim uygulamamızla aidat, duyuru ve daire bilgilerinize kolayca ulaşabilirsiniz.\n\n📲 Hesabınızı oluşturmak için:\n'+(link||'[DAVET BAĞLANTISI]')+'\n\n🔐 E-posta gerekmez. Bağlantı 48 saat geçerlidir ve yalnızca bir kez kullanılabilir.\n\nAYAPARK 2 Site Yönetimi 🌿';
+ ? '🏡 Willkommen bei AYAPARK 2!\n\nHallo '+salutation+' 👋\n\nUnsere App bietet dir Informationen zu Hausgeld, Mitteilungen und deiner Wohnung.\n\n📲 Konto erstellen:\n'+(link||'[EINLADUNGSLINK]')+'\n\n🔐 Anmeldung ohne E-Mail. 7 Tage gültig und nur einmal verwendbar.\n\nAYAPARK 2 Verwaltung 🌿'
+ : '🏡 AYAPARK 2’ye Hoş Geldiniz!\n\nMerhaba '+salutation+' 👋\n\nSite yönetim uygulamamızla aidat, duyuru ve daire bilgilerinize kolayca ulaşabilirsiniz.\n\n📲 Hesabınızı oluşturmak için:\n'+(link||'[DAVET BAĞLANTISI]')+'\n\n🔐 E-posta gerekmez. Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir.\n\nAYAPARK 2 Site Yönetimi 🌿';
 }
 const tx=(tr,de)=>getLanguage()==='de'?de:tr;
 const $=id=>document.getElementById(id);
@@ -33,7 +33,7 @@ const replacePlaceholder=(message,link)=>/\[(?:EINLADUNGSLINK|DAVET BAĞLANTISI)
  ?message.replace(/\[(?:EINLADUNGSLINK|DAVET BAĞLANTISI)\]/g,link):message+'\n\n'+link;
 
 export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogin}) {
- let selected=null,inviteUrl='',preview=null,token=null;
+ let selected=null,inviteUrl='',preview=null,token=null,inviteBusy=false;
  const dialog=$('inviteDialog');
  const status=$('inviteStatus');
  const message=$('inviteMessage');
@@ -56,25 +56,32 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
   setStatus(tx('Bağlantı henüz oluşturulmadı.','Noch kein Einladungslink erzeugt.'));
   toggleSend();dialog.showModal();
  }
+ $('inviteRevoke').addEventListener('click',async()=>{
+  if(inviteBusy)return;
+  if(!selected||!$('inviteConfirm').checked){setStatus(tx('Önce erişim onayını işaretleyin.','Bitte zuerst die Bestätigung aktivieren.'),true);return;}
+  const b=$('inviteRevoke');inviteBusy=true;b.disabled=true;$('inviteGenerate').disabled=true;
+  try{await api.invitation({action:'revoke',person_id:selected.id,confirmed:true},true);inviteUrl='';$('inviteLink').value='';message.value=inviteText({name:selected.name,units:selected.units,language:getLanguage()});toggleSend();setStatus(tx('Bekleyen davetler iptal edildi.','Ausstehende Einladungen widerrufen.'));}
+  catch(e){setStatus(e.message,true);}finally{inviteBusy=false;b.disabled=false;$('inviteGenerate').disabled=false;}
+ });
  $('invitePhone').addEventListener('input',toggleSend);
  $('inviteGenerate').addEventListener('click',async ()=>{
-  if(!selected)return;
+  if(!selected||inviteBusy)return;
   if(!$('inviteConfirm').checked){setStatus(tx('Önce bu kişi için erişim yetkisini onaylayın.','Bitte zuerst die Bestätigung für die Kontofreischaltung aktivieren.'),true);return;}
   const s=getState(),button=$('inviteGenerate');
   if(!inviteEligible(s,s.data.persons.find(p=>p.id===selected.id))){setStatus(tx('Kişi bilgileri değişti. Sayfayı yenileyin.','Der Personenstatus hat sich geändert. Bitte aktualisieren.'),true);return;}
-  button.disabled=true;setStatus(tx('Hesap hazırlanıyor ve güvenli bağlantı oluşturuluyor…','Konto wird vorbereitet und der geschützte Link erstellt…'));
+  inviteBusy=true;button.disabled=true;$('inviteRevoke').disabled=true;setStatus(tx('Hesap hazırlanıyor ve güvenli bağlantı oluşturuluyor…','Konto wird vorbereitet und der geschützte Link erstellt…'));
   try{
    const phone=whatsappNumber($('invitePhone').value);
    if(!phone)throw Error(tx('Geçerli bir WhatsApp numarası girin.','Bitte eine gültige WhatsApp-Nummer eintragen.'));
-   const result=await api.invitation({action:'create',person_id:selected.id,phone},true);
-   if(typeof result?.url!=='string'||!result.url.startsWith('https://kemcap.github.io/ayapark2/?invite='))throw Error(tx('Sunucudan geçerli bir davet bağlantısı alınamadı. Lütfen tekrar deneyin.','Der Server hat keinen gültigen Einladungslink geliefert. Bitte erneut versuchen.'));
+   const result=await api.invitation({action:'create',person_id:selected.id,phone,confirmed:true},true);
+   if(typeof result?.url!=='string'||!result.url.startsWith(new URL('./',location.href).href+'?invite='))throw Error(tx('Sunucudan geçerli bir davet bağlantısı alınamadı. Lütfen tekrar deneyin.','Der Server hat keinen gültigen Einladungslink geliefert. Bitte erneut versuchen.'));
    inviteUrl=result.url;
    $('inviteLink').value=inviteUrl;
-   message.value=replacePlaceholder(message.value,inviteUrl);
+   message.value=inviteText({name:selected.name,units:selected.units,link:inviteUrl,language:getLanguage()});
    toggleSend();
-   setStatus(tx('Bağlantı hazır. 48 saat geçerlidir. Gönderim sadece sizin onayınızla yapılır.','Link erstellt, 48 Stunden gültig. Es wird nichts automatisch verschickt.'));
+   setStatus(tx('Bağlantı hazır. 7 gün geçerlidir. Gönderim sadece sizin onayınızla yapılır.','Link erstellt, 7 Tage gültig. Es wird nichts automatisch verschickt.'));
   }catch(error){setStatus(error.message||tx('Bağlantı oluşturulamadı.','Der Link konnte nicht erzeugt werden.'),true);}
-  finally{button.disabled=false;}
+  finally{inviteBusy=false;button.disabled=false;$('inviteRevoke').disabled=false;}
  });
  async function copy(value){
   if(!inviteUrl)return;
@@ -115,7 +122,7 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
   event.preventDefault();
   if(!token||!preview?.valid)return;
   const password=$('inviteActivationPassword').value,again=$('inviteActivationConfirm').value;
-  if(password.length<10||password!==again){activationStatus.textContent=tx('Şifre en az 10 karakter olmalı ve aynı girilmeli.','Das Passwort muss mindestens 10 Zeichen haben und zweimal übereinstimmen.');return;}
+  if([...password].length<6||password!==again){activationStatus.textContent=tx('Şifre en az 6 karakter olmalı ve aynı girilmeli.','Das Passwort muss mindestens 6 Zeichen haben und zweimal übereinstimmen.');return;}
   const submit=$('inviteActivationSubmit');submit.disabled=true;
   activationStatus.textContent=tx('Hesabınız etkinleştiriliyor…','Dein Konto wird aktiviert…');
   try{

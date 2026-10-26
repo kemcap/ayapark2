@@ -1258,3 +1258,7 @@ Object.assign(german,{
 });
 
 Object.assign(german,{'Telefon veya e-posta':'Telefonnummer oder E-Mail-Adresse'});
+
+Object.assign(german,{'Bekleyen davetleri iptal et':'Ausstehende Einladungen widerrufen','Yeni şifre (en az 6 karakter)':'Neues Passwort (mindestens 6 Zeichen)','Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir. Etkinleştirme için e-posta gerekmez.':'Der Link ist 7 Tage gültig und nur einmal verwendbar. Für die Aktivierung ist keine E-Mail erforderlich.'});
+
+Object.assign(german,{'En az 6 karakterli bir şifre kullanın.':'Verwende ein Passwort mit mindestens 6 Zeichen.'});

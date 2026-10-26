@@ -1,8 +1,8 @@
 // AYAPARK 2: manual WhatsApp onboarding, no resident email required.
 // Deploy verify_jwt=false. create validates manager bearer; inspect/activate validate a single-use secret.
 import {createClient} from 'npm:@supabase/supabase-js@2.57.4';
-const origins=new Set(['https://kemcap.github.io','https://ayapark2-v2-private.kemcap.chatgpt.site']);
-const appUrl='https://kemcap.github.io/ayapark2/';
+const origins=new Set((Deno.env.get('AY_INVITE_ALLOWED_ORIGINS')||'https://kemcap.github.io,https://ayapark2-v2-private.kemcap.chatgpt.site').split(',').filter(Boolean));
+const appUrl=Deno.env.get('AY_INVITE_APP_URL')||'https://kemcap.github.io/ayapark2/';
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const day=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const normalizedPhone=(input:unknown)=>{
@@ -35,11 +35,13 @@ Deno.serve(async req=>{
  if(req.method==='OPTIONS')return new Response(null,{headers});
  if(req.method!=='POST')return reply({error:'method_not_allowed'},405);
  try{
+  if(Deno.env.get('ENABLE_INVITATIONS_V2')!=='true')return reply({error:'not_configured'},503);
+  if(!origins.has(new URL(appUrl).origin)||new URL(appUrl).protocol!=='https:')return reply({error:'not_configured'},503);
   const raw=await req.text();
   if(raw.length>8192)return reply({error:'request_too_large'},413);
   const input=JSON.parse(raw);
   const action=String(input?.action||'');
-  if(!['create','inspect','activate'].includes(action))return reply({error:'invalid_request'},400);
+  if(!['create','inspect','activate','revoke'].includes(action))return reply({error:'invalid_request'},400);
   const url=Deno.env.get('SUPABASE_URL'),service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
   if(!url||!service)return reply({error:'server_unavailable'},503);
   const admin=createClient(url,service,{auth:{persistSession:false,autoRefreshToken:false}});
@@ -47,6 +49,7 @@ Deno.serve(async req=>{
    const token=String(input.token||'');
    if(!/^[A-Za-z0-9_-]{40,90}$/.test(token))return reply({error:'expired_or_invalid'},410);
    const token_hash=await sha256(token);
+   for(const [bucket,limit] of [['global:'+await sha256('invite-global'),300],['phone:'+await sha256('invite:'+token),20]] as const){const {data:allowed,error}=await admin.rpc('ay_auth_login_limit',{p_bucket:bucket,p_limit:limit});if(error)return reply({error:'invitation_failed'},503);if(!allowed)return reply({error:'try_later'},429);}
    const {data:ticket,error:tokenError}=await admin.from('ay3_invite_tokens')
     .select('site_id,person_id,unit_id,issued_by,phone_e164,expires_at,consumed_at,revoked_at')
     .eq('token_hash',token_hash).maybeSingle();
@@ -63,14 +66,12 @@ Deno.serve(async req=>{
     .eq('site_id',ticket.site_id).eq('user_id',ticket.issued_by).eq('role','manager').maybeSingle();
    if(!staff)return reply({error:'invite_unavailable'},410);
    if(action==='inspect'){
-    const {data:unit}=await admin.from('site_units').select('code')
-     .eq('id',ticket.unit_id).eq('site_id',ticket.site_id).maybeSingle();
-    return reply({valid:true,first_name:String(person.first_name||'').slice(0,70),
-      unit_code:String(unit?.code||'AYAPARK 2'),phone_hint:'••'+ticket.phone_e164.slice(-3),
+     return reply({valid:true,first_name:String(person.first_name||'').slice(0,70),
+      phone_hint:'••'+ticket.phone_e164.slice(-3),
       expires_at:ticket.expires_at});
    }
    const password=String(input.password||'');
-   if(password.length<10||password.length>128)return reply({error:'weak_password'},400);
+   if([...password].length<6||[...password].length>256)return reply({error:'weak_password'},400);
    // A dummy internal email identifier is used for password auth; residents never supply an email.
    // The manual WhatsApp invitation is NOT independent proof of ownership of this phone number.
    const {data:created,error:createError}=await admin.auth.admin.createUser({
@@ -94,13 +95,15 @@ Deno.serve(async req=>{
   const personId=String(input.person_id||'');
   const phone=normalizedPhone(input.phone);
   if(!uuid.test(personId))return reply({error:'invalid_person'},400);
-  if(!phone)return reply({error:'invalid_phone'},400);
+  if(action==='create'&&!phone)return reply({error:'invalid_phone'},400);
+  if(input.confirmed!==true)return reply({error:'confirmation_required'},400);
   const {data:person}=await admin.from('ay3_persons')
    .select('id,site_id,auth_user_id').eq('id',personId).maybeSingle();
   if(!person)return reply({error:'invalid_person'},404);
   const {data:staff}=await admin.from('site_staff_memberships').select('role')
    .eq('site_id',person.site_id).eq('user_id',identity.user.id).eq('role','manager').maybeSingle();
   if(!staff)return reply({error:'access_denied'},403);
+  if(action==='revoke'){const {error}=await admin.rpc('ay_auth_revoke_invites',{p_actor:identity.user.id,p_person:personId});return error?reply({error:'invitation_failed'},409):reply({ok:true});}
   if(person.auth_user_id)return reply({error:'already_activated'},409);
   const {data:roles,error:rolesError}=await admin.from('ay3_links')
    .select('unit_id,role,active,starts_on,ends_on')
@@ -110,15 +113,8 @@ Deno.serve(async req=>{
   if(!role)return reply({error:'active_apartment_required'},409);
   const token=b64url(crypto.getRandomValues(new Uint8Array(32)));
   const token_hash=await sha256(token);
-  const expires_at=new Date(Date.now()+48*60*60*1000).toISOString();
-  const {error:revocationError}=await admin.from('ay3_invite_tokens')
-   .update({revoked_at:new Date().toISOString()}).eq('person_id',personId).is('revoked_at',null).is('consumed_at',null);
-  if(revocationError)return reply({error:'invitation_failed'},500);
-  const {error:insertError}=await admin.from('ay3_invite_tokens').insert({
-   site_id:person.site_id,person_id:personId,unit_id:role.unit_id,issued_by:identity.user.id,
-   phone_e164:phone,token_hash,expires_at
-  });
-  if(insertError)return reply({error:'invitation_failed'},500);
+  const {data:expires_at,error:insertError}=await admin.rpc('ay_auth_issue_invite',{p_actor:identity.user.id,p_person:personId,p_phone:phone,p_hash:token_hash});
+  if(insertError)return reply({error:'invitation_failed'},409);
   return reply({url:appUrl+'?invite='+encodeURIComponent(token),expires_at});
  }catch{
   return reply({error:'invitation_failed'},500);
