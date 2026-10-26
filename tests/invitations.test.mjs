@@ -36,7 +36,7 @@ test('bilingual invite copy works without collecting resident email',()=>{
   assert.match(value,/einmal|bir kez/);
  }
 });
-test('password sign-in maps phone to internal alias while retaining real email accounts',()=>{
+test('password sign-in maps phone to internal alias while retaining real email accounts',async()=>{
  assert.equal(loginIdentifier('0542 111 22 33'),'resident-905421112233@ayapark2.invalid');
  assert.equal(loginIdentifier('+49 170 1234567'),'resident-491701234567@ayapark2.invalid');
  assert.equal(loginIdentifier('Person@Example.com'),'Person@Example.com');
