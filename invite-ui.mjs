@@ -21,12 +21,12 @@ export function whatsappShareUrl(phone,message) {
  return number?'https://wa.me/'+number+'?text='+encodeURIComponent(message):'';
 }
 export function inviteText({name,units,link='',language='tr'}) {
- const label=String(units||'').trim();
+ const unit=String(units||'').trim();
+ const salutation=String(name||'')+(unit?' ('+unit+')':'');
  return language==='de'
-  ? 'Hallo '+name+',\n\nwir laden dich zur AYAPARK 2 Hausverwaltungs-App ein'+(label?' ('+label+')':'')+'.\n\nÜber diesen persönlichen Link kannst du dein Konto ohne E-Mail-Adresse aktivieren und ein Passwort erstellen. Der Link ist 48 Stunden gültig und nur einmal einlösbar. Bitte nicht weiterleiten.\n\n'+(link||'[EINLADUNGSLINK]')+'\n\nViele Grüße\nAYAPARK 2 Verwaltung'
-  : 'Merhaba '+name+',\n\nAYAPARK 2 site yönetimi uygulamasına davetlisiniz'+(label?' ('+label+')':'')+'.\n\nKişisel bağlantıdan e-posta adresi girmeden hesabınızı etkinleştirip şifre oluşturabilirsiniz. Bağlantı 48 saat geçerlidir ve yalnızca bir kez kullanılabilir. Lütfen başkalarına iletmeyin.\n\n'+(link||'[DAVET BAĞLANTISI]')+'\n\nSaygılarımızla\nAYAPARK 2 Yönetimi';
+ ? '🏡 Willkommen bei AYAPARK 2!\n\nHallo '+salutation+' 👋\n\nUnsere App bietet dir Informationen zu Hausgeld, Mitteilungen und deiner Wohnung.\n\n📲 Konto erstellen:\n'+(link||'[EINLADUNGSLINK]')+'\n\n🔐 Anmeldung ohne E-Mail. 48 Stunden gültig und nur einmal verwendbar.\n\nAYAPARK 2 Verwaltung 🌿'
+ : '🏡 AYAPARK 2’ye Hoş Geldiniz!\n\nMerhaba '+salutation+' 👋\n\nSite yönetim uygulamamızla aidat, duyuru ve daire bilgilerinize kolayca ulaşabilirsiniz.\n\n📲 Hesabınızı oluşturmak için:\n'+(link||'[DAVET BAĞLANTISI]')+'\n\n🔐 E-posta gerekmez. Bağlantı 48 saat geçerlidir ve yalnızca bir kez kullanılabilir.\n\nAYAPARK 2 Site Yönetimi 🌿';
 }
-
 const tx=(tr,de)=>getLanguage()==='de'?de:tr;
 const $=id=>document.getElementById(id);
 const replacePlaceholder=(message,link)=>/\[(?:EINLADUNGSLINK|DAVET BAĞLANTISI)\]/.test(message)
