@@ -275,6 +275,7 @@ $('connectionButton').addEventListener('click',async()=>{
  endPreferenceSession();urgentShown.clear();popupSession='';importantLoginKeys.clear();localTest=null;localTestRead=false;localTestQueue=[];localTestReceipts.clear();popupBatch=[];epoch++;closeDialogs();state.mode='signedout';state.data=prepareV5Demo(fullDemo());state.stale=false;navigate('overview');
  try{await api.logout();toast(tr("Oturum kapatıldı."));}catch{toast(tr("Bu sekmedeki oturum temizlendi; sunucu çıkışı doğrulanamadı."));}
 });
+$('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 let pendingSetupLoaded=null;
 function showLoginStart(){
  $('loginStart').hidden=false;$('loginCredentials').hidden=true;
@@ -293,7 +294,6 @@ function openLoginRoute(route){
 $('loginExistingPath').addEventListener('click',()=>openLoginRoute('existing'));
 $('loginActivatePath').addEventListener('click',()=>openLoginRoute('activate'));
 $('loginBackToStart').addEventListener('click',()=>{if(loginBusy||pendingSetupLoaded)return;selectLogin('password');showLoginStart();$('loginExistingPath').focus();});
-$('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 function completeSignIn(loaded){
  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;
  state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
