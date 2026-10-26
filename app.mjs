@@ -302,7 +302,7 @@ $('loginDialog').addEventListener('close',()=>{
 
 function selectLogin(method){
  loginMethod=method;const code=method==='code'||method==='setup';
- $('loginMethodChooser').hidden=method==='setup';$('loginEmailField').hidden=false;$('email').required=true;
+ $('loginMethodChooser').hidden=method==='setup';$('loginEmailField').hidden=false;$('email').required=true;$('email').type=code?'email':'text';
  $('passwordFields').hidden=method!=='password';$('codeFields').hidden=!code;$('setupPasswordFields').hidden=true;
  $('password').required=method==='password';$('loginCode').required=code;
  $('setupPassword').required=false;$('setupPasswordConfirm').required=false;
