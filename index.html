@@ -19,9 +19,9 @@
 <link rel="stylesheet" href="./styles.css?v=4.0">
 <link rel="stylesheet" href="./recovery.css">
 <link rel="stylesheet" href="./install-tutorial.css">
-<script type="module" src="./app.mjs?v=5.1.2"></script>
+<script type="module" src="./app.mjs?v=5.2.0"></script>
 <link rel="stylesheet" href="./v4-ui.css?v=4.0">
-<link rel="stylesheet" href="./invite-ui.css?v=5.1.1">
+<link rel="stylesheet" href="./invite-ui.css?v=5.2.0">
 <link rel="stylesheet" href="./modern.css?v=5.1.0"><link rel="stylesheet" href="./v5-ui.css?v=5.1.0">
 </head>
 <body>
@@ -46,7 +46,7 @@
 <dialog id="loginDialog" aria-labelledby="loginTitle">
  <div class="dialog-kicker">AYAPARK 2 HESABINIZ</div><h2 id="loginTitle">Sitenize hoş geldiniz.</h2><p class="muted">Mevcut hesabınızla daire bilgilerinizi görüntüleyin. İşlemler hesabınıza verilen yetkilerle yapılır.</p>
  <div id="loginMethodChooser" class="row-actions"><button type="button" id="useCode" class="button" aria-pressed="false">E-posta kodu</button><button type="button" id="usePassword" class="button" aria-pressed="true">Şifre</button></div>
- <form id="loginForm"><label id="loginEmailField" class="field">E-posta<input id="email" type="email" required autocomplete="username"></label><div id="passwordFields"><label class="field" for="password">Şifre</label><div class="password-control"><input id="password" type="password" autocomplete="current-password"><button class="button password-eye" type="button" data-password-eye="password" aria-label="Şifreyi göster" aria-pressed="false"></button></div></div><div id="codeFields" hidden><label class="field" for="loginCode">E-posta kodu</label><input id="loginCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10"><button type="button" id="requestCode" class="button">Kod gönder</button><p id="codeHelp" class="fine">E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.</p></div><div id="setupPasswordFields" hidden><p class="muted">E-posta adresin doğrulandı. Bundan sonra şifreyle giriş yapabilirsin.</p><label class="field" for="setupPassword">Şifre oluştur</label><div class="password-control"><input id="setupPassword" type="password" minlength="8" maxlength="256" autocomplete="new-password"><button class="button password-eye" type="button" data-password-eye="setupPassword" aria-label="Şifreyi göster" aria-pressed="false"></button></div><label class="field" for="setupPasswordConfirm">Şifreyi tekrarla</label><div class="password-control"><input id="setupPasswordConfirm" type="password" minlength="8" maxlength="256" autocomplete="new-password"><button class="button password-eye" type="button" data-password-eye="setupPasswordConfirm" aria-label="Şifreyi göster" aria-pressed="false"></button></div></div><p id="loginMessage" role="status"></p><div class="dialog-actions"><button type="button" id="cancelLogin" class="button">Vazgeç</button><button id="loginSubmit" class="button primary" type="submit">Giriş yap</button></div></form><p><button type="button" id="createPasswordEntry" class="text-button">İlk kez şifre oluştur</button> · <a class="text-button" href="./reset.html">Şifremi unuttum</a></p><p class="fine">Bu cihazda oturum açık kalır. Ortak cihazlarda işiniz bitince çıkış yapın.</p>
+ <form id="loginForm"><label id="loginEmailField" class="field">E-posta veya telefon / E-Mail oder Telefonnummer<input id="email" type="text" required autocomplete="username"></label><div id="passwordFields"><label class="field" for="password">Şifre</label><div class="password-control"><input id="password" type="password" autocomplete="current-password"><button class="button password-eye" type="button" data-password-eye="password" aria-label="Şifreyi göster" aria-pressed="false"></button></div></div><div id="codeFields" hidden><label class="field" for="loginCode">E-posta kodu</label><input id="loginCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10"><button type="button" id="requestCode" class="button">Kod gönder</button><p id="codeHelp" class="fine">E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.</p></div><div id="setupPasswordFields" hidden><p class="muted">E-posta adresin doğrulandı. Bundan sonra şifreyle giriş yapabilirsin.</p><label class="field" for="setupPassword">Şifre oluştur</label><div class="password-control"><input id="setupPassword" type="password" minlength="8" maxlength="256" autocomplete="new-password"><button class="button password-eye" type="button" data-password-eye="setupPassword" aria-label="Şifreyi göster" aria-pressed="false"></button></div><label class="field" for="setupPasswordConfirm">Şifreyi tekrarla</label><div class="password-control"><input id="setupPasswordConfirm" type="password" minlength="8" maxlength="256" autocomplete="new-password"><button class="button password-eye" type="button" data-password-eye="setupPasswordConfirm" aria-label="Şifreyi göster" aria-pressed="false"></button></div></div><p id="loginMessage" role="status"></p><div class="dialog-actions"><button type="button" id="cancelLogin" class="button">Vazgeç</button><button id="loginSubmit" class="button primary" type="submit">Giriş yap</button></div></form><p><button type="button" id="createPasswordEntry" class="text-button">İlk kez şifre oluştur</button> · <a class="text-button" href="./reset.html">Şifremi unuttum</a></p><p class="fine">Bu cihazda oturum açık kalır. Ortak cihazlarda işiniz bitince çıkış yapın.</p>
 </dialog>
 <dialog id="importDialog" aria-labelledby="importTitle">
  <div class="dialog-kicker">DOSYA ÖNİZLEMESİ</div><h2 id="importTitle">Önce kontrol, sonra aktarım.</h2><p class="muted">CSV dosyanızı burada inceleyin. Önizleme yereldir. Kayıt oluşturmak için ayrıca “İçe aktar” düğmesine basın.</p>
@@ -65,10 +65,23 @@
  <label class="invite-consent"><input type="checkbox" id="inviteConfirm"><span>Ich bestätige die Freischaltung für diese Person / Bu kişi için erişim yetkisini onaylıyorum. Es wird nichts automatisch versendet / Otomatik gönderim yapılmaz.</span></label>
  <button type="button" id="inviteGenerate" class="button primary">Link erstellen / Bağlantı oluştur</button>
  <label class="field">Kişisel bağlantı / Persönlicher Link<input type="url" id="inviteLink" readonly aria-label="Einladungslink"></label>
- <p class="fine">48 saat / 48 Stunden. Die Person muss ihre hinterlegte E-Mail-Adresse mit einem Code bestätigen. Der Link allein gewährt keinen Datenzugriff.</p>
+ <p class="fine">48 saat / 48 Stunden. Für die Aktivierung ist keine E-Mail erforderlich. Der Link kann nur einmal verwendet werden.</p>
  <p id="inviteStatus" role="status" aria-live="polite"></p>
  <div class="invite-actions"><button type="button" class="button" id="inviteCopyLink" disabled>Link kopieren / Bağlantıyı kopyala</button><button type="button" class="button" id="inviteCopyText" disabled>Text kopieren / Metni kopyala</button><button type="button" class="button primary" id="inviteWhatsApp" disabled>WhatsApp</button></div>
  <form method="dialog" class="dialog-actions"><button type="submit" class="button">Schließen / Kapat</button></form>
+</dialog>
+<dialog id="inviteActivateDialog" class="invitation-dialog" aria-labelledby="inviteActivationTitle">
+ <h2 id="inviteActivationTitle">Hesabımı etkinleştir / Konto aktivieren</h2>
+ <p class="muted">E-posta gerekmez. Lütfen kendi şifrenizi oluşturun. / Keine E-Mail nötig. Bitte lege dein Passwort fest.</p>
+ <form id="inviteActivateForm">
+  <label class="field">Yeni şifre / Neues Passwort (en az / mindestens 10 karakter)
+   <input id="inviteActivationPassword" type="password" autocomplete="new-password" minlength="10" maxlength="128" required></label>
+  <label class="field">Şifreyi tekrar gir / Passwort wiederholen
+   <input id="inviteActivationConfirm" type="password" autocomplete="new-password" minlength="10" maxlength="128" required></label>
+  <p class="fine">Davet bağlantısı yalnızca bir kez kullanılır. / Der Einladungslink ist nur einmal nutzbar.</p>
+  <p id="inviteActivateStatus" role="status" aria-live="polite"></p>
+  <div class="dialog-actions"><button type="button" class="button" id="inviteActivationCancel">Vazgeç / Abbrechen</button><button id="inviteActivationSubmit" type="submit" class="button primary">Etkinleştir / Aktivieren</button></div>
+ </form>
 </dialog>
 <div id="toast" role="status" class="toast" hidden></div>
 <noscript><p>Bu uygulama için JavaScript'i etkinleştirin.</p></noscript>

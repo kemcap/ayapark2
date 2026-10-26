@@ -2,6 +2,16 @@ import {t as tr} from './i18n.mjs?v=5.1.0';
 // Existing site tables are read-only; V2 mutations use a checked transactional RPC.
 const URL='https://eisozwhhinqszfikemot.supabase.co';
 const KEY='sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc';
+export function loginIdentifier(input){
+ const raw=String(input||'').trim();
+ if(raw.includes('@'))return raw;
+ if(!/^[+()\d\s./-]+$/.test(raw))return raw;
+ let digits=raw.replace(/\D/g,'');
+ if(digits.startsWith('00'))digits=digits.slice(2);
+ if(digits.length===10&&digits.startsWith('5'))digits='90'+digits;
+ else if(digits.length===11&&digits.startsWith('05'))digits='90'+digits.slice(1);
+ return /^[1-9]\d{9,14}$/.test(digits)?'resident-'+digits+'@ayapark2.invalid':raw;
+}
 const TABLES=new Set(['site_sites','site_units','site_blocks','site_staff_memberships','site_resident_units','ay2_settings','ay2_permissions','ay2_entries','ay2_charges','ay2_allocations','ay2_people','ay2_announcements','ay2_reports','ay2_audit','ay2_staged_charges']);
 export class AyaparkApi {
  constructor(fetcher=(...args)=>globalThis.fetch(...args),{persist=true,storage,previewOnly=false}={}) {
@@ -32,7 +42,7 @@ export class AyaparkApi {
   const data=await response.json().catch(()=>null);
   if(!response.ok){const announcementErrors={ay2_announcements_title_check:tr('Duyuru başlığı en fazla 150 karakter olabilir.'),ay2_announcements_body_check:tr('Duyuru metni en fazla 5000 karakter olabilir.'),ay2_announcements_check:tr('Yayın bitişi başlangıçtan sonra olmalıdır.')};const knownAnnouncement=Object.entries(announcementErrors).find(([constraint])=>String(data?.message).includes('\"'+constraint+'\"'))?.[1];
   const accessMessages={access_denied:'Yalnızca Süper Admin kullanıcı erişimi verebilir.',invalid_email:'Geçerli bir e-posta adresi girin.',apartment_required:'Sakin erişimi için önce güncel bir daire ilişkisi ekleyin.',account_mismatch:'Bu kişi başka bir hesaba bağlı. Hesap bağlantısını kontrol edin.',role_conflict:'Bu hesabın farklı bir yönetim rolü var. Mevcut rolü önce kontrol edin.',invalid_person:'Ad, soyad ve geçerli e-posta gerekli.',account_failed:'Hesap hazırlanamadı. Lütfen tekrar deneyin.',assignment_failed:'Erişim kaydedilemedi. Lütfen yöneticiye bildirin.',invalid_request:'Kişi, rol ve onay alanlarını kontrol edin.'};
-  const inviteMessages={not_configured:'Davet bağlantısı hizmeti henüz sunucuda ayarlanmadı.',expired_or_invalid:'Davet bağlantısının süresi doldu veya bağlantı geçersiz.',invite_unavailable:'Bu davet artık geçerli değil.',active_apartment_required:'Bu kişi için güncel bir daire ilişkisi bulunamadı.',invitation_failed:'Davet bağlantısı oluşturulamadı.'};
+  const inviteMessages={weak_password:'En az 10 karakterli bir şifre kullanın.',invalid_phone:'Geçerli bir WhatsApp telefon numarası girin.',already_activated:'Bu kişinin hesabı zaten etkinleştirildi.',account_exists_or_unavailable:'Bu telefon numarası için zaten bir hesap var veya hesap oluşturulamadı.',activation_failed:'Hesap etkinleştirilemedi. Yönetimden yeni bağlantı isteyin.',not_configured:'Davet bağlantısı hizmeti henüz sunucuda ayarlanmadı.',expired_or_invalid:'Davet bağlantısının süresi doldu veya bağlantı geçersiz.',invite_unavailable:'Bu davet artık geçerli değil.',active_apartment_required:'Bu kişi için güncel bir daire ilişkisi bulunamadı.',invitation_failed:'Davet bağlantısı oluşturulamadı.'};
   const error=Error((path.startsWith('/functions/v1/ay3-whatsapp-invite')&&inviteMessages[data?.error]?tr(inviteMessages[data.error]):null)||(path.startsWith('/functions/v1/ay3-user-access')&&accessMessages[data?.error]?tr(accessMessages[data.error]):null)||knownAnnouncement||(data?.code==='23514'&&String(data.message).includes('ay3_links_check')?tr('Çıkış tarihi başlangıç tarihinden önce olamaz.'):response.status===403?tr('Bu işlem için yetkiniz yok.'):path.startsWith('/auth/v1/')&&response.status===400?tr('Kod, e-posta veya şifre geçersiz olabilir. Tekrar kontrol edin.'):response.status===401?tr("Oturum sona erdi. Yeniden giriş yapın."):response.status===429?tr("Çok fazla deneme yapıldı. Biraz sonra tekrar deneyin."):(['P0001','42501'].includes(data?.code)?tr(data.message):tr("İşlem tamamlanamadı. Bağlantıyı, erişimi ve zorunlu alanları kontrol edin."))));error.status=response.status;error.code=data?.error;throw error;}
   return data;
  }
@@ -50,7 +60,7 @@ export class AyaparkApi {
  }
  async login(email,password){
   this.clear();const generation=this.generation;
-  this.accept(await this.raw('/auth/v1/token?grant_type=password','POST',{email,password}),generation);
+  this.accept(await this.raw('/auth/v1/token?grant_type=password','POST',{email:loginIdentifier(email),password}),generation);
   const user=await this.raw('/auth/v1/user','GET',undefined,this.session.access_token);
   if(generation!==this.generation)throw Error(tr("Oturum değişti."));
   if(!user?.id||user.id!==this.session.user.id)throw Error(tr("Kimlik doğrulanamadı."));
