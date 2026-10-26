@@ -349,6 +349,7 @@ function showFirstPasswordForm(loaded){
  $('password').required=false;$('loginCode').required=false;
  $('setupPassword').required=true;$('setupPasswordConfirm').required=true;
  $('loginTitle').textContent=tr('Şifre oluştur');
+ $('loginIntro').textContent=tr('E-posta doğrulandı. Şimdi şifrenizi oluşturun.');
  $('loginOauthOptions').hidden=true;$('loginFooter').hidden=true;
  $('loginSubmit').textContent=tr('Şifreyi kaydet');
  $('setupPassword').focus();
@@ -408,7 +409,7 @@ function syncLoginLanguage(){
  }
  const setup=loginMethod==='setup',saving=loginMethod==='setup_password';
  $('loginTitle').textContent=tr(setup||saving?'Şifre oluştur':'Sitenize hoş geldiniz.');
- $('loginIntro').textContent=tr(setup||saving?'Yönetim tarafından tanımlanan erişiminizi e-posta koduyla doğrulayın.':'Mevcut hesabınızla giriş yapın.');
+ $('loginIntro').textContent=tr(saving?'E-posta doğrulandı. Şimdi şifrenizi oluşturun.':setup?'Yönetim tarafından tanımlanan erişiminizi e-posta koduyla doğrulayın.':'Mevcut hesabınızla giriş yapın.');
  $('loginSubmit').textContent=tr(saving?'Şifreyi kaydet':setup?'Devam et':'Giriş yap');
  $('codeHelp').textContent=tr(setup?'Şifre oluşturmak için e-postadaki kodu buraya gir. E-postadaki bağlantıyı açma.':'E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.');
 }
