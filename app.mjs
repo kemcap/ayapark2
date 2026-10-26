@@ -20,6 +20,7 @@ import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.1.0
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.1.0';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.1.0';
 import {AyaparkApi} from './api.mjs?v=5.1.0';
+import {enabledOAuthProviders,oauthAuthorizeUrl} from './oauth-entry.mjs';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.1.0';
 import {buildForm,payloadFor} from './forms.mjs?v=5.1.0';
 import {analyzeStage} from './reconcile.mjs?v=5.1.0';
@@ -271,12 +272,44 @@ $('actionForm').addEventListener('submit',async event=>{
 });
 document.addEventListener('ay2:themechanged',event=>changePreference('theme',event.detail,state.mode==='connected'?api:null));
 $('connectionButton').addEventListener('click',async()=>{
- if(state.mode!=='connected'){$('loginMessage').textContent='';$('loginDialog').showModal();return;}
+ if(state.mode!=='connected'){$('loginMessage').textContent='';showLoginEntry();$('loginDialog').showModal();void checkOAuthProviders();return;}
  endPreferenceSession();urgentShown.clear();popupSession='';importantLoginKeys.clear();localTest=null;localTestRead=false;localTestQueue=[];localTestReceipts.clear();popupBatch=[];epoch++;closeDialogs();state.mode='signedout';state.data=prepareV5Demo(fullDemo());state.stale=false;navigate('overview');
  try{await api.logout();toast(tr("Oturum kapatıldı."));}catch{toast(tr("Bu sekmedeki oturum temizlendi; sunucu çıkışı doğrulanamadı."));}
 });
 let pendingSetupLoaded=null;
+let oauthProviders={google:false,apple:false},oauthStatusChecked=false;
+function updateOAuthOptions(){
+ $('loginGoogle').hidden=!oauthProviders.google;
+ $('loginApple').hidden=!oauthProviders.apple;
+ $('loginOauthOptions').hidden=!(oauthProviders.google||oauthProviders.apple)||loginMethod==='setup_password';
+}
+async function checkOAuthProviders(){
+ if(IS_PREVIEW||oauthStatusChecked)return;
+ oauthStatusChecked=true;
+ try{oauthProviders=enabledOAuthProviders(await api.raw('/auth/v1/settings'));}catch{oauthProviders={google:false,apple:false};oauthStatusChecked=false;}
+ updateOAuthOptions();
+}
+function showLoginEntry(){
+ $('loginEntryChoice').hidden=false;$('loginFlow').hidden=true;
+ $('loginTitle').textContent=tr('Sitenize hoş geldiniz.');
+ $('loginIntro').textContent=tr('Nasıl devam etmek istersiniz?');
+ $('loginMessage').textContent='';
+}
 $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
+$('chooseExistingAccess').addEventListener('click',()=>selectLogin('password'));
+$('chooseFirstActivation').addEventListener('click',()=>selectLogin('setup'));
+$('loginBack').addEventListener('click',()=>{
+ if(loginBusy)return;
+ if(pendingSetupLoaded){epoch++;pendingSetupLoaded=null;void api.logout().catch(()=>api.clear());}
+ selectLogin('password');showLoginEntry();
+});
+for(const provider of ['google','apple']){
+ $(provider==='google'?'loginGoogle':'loginApple').addEventListener('click',()=>{
+  if(IS_PREVIEW||!oauthProviders[provider]||loginBusy)return;
+  try{location.assign(oauthAuthorizeUrl(provider,new URL('./',location.href).href,oauthProviders));}
+  catch{$('loginMessage').textContent=tr('Bu giriş yöntemi şu anda kullanılamıyor.');}
+ });
+}
 function completeSignIn(loaded){
  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;
  state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
@@ -289,11 +322,14 @@ function completeSignIn(loaded){
 $('loginDialog').addEventListener('close',()=>{
  hideLoginPassword();$('password').value='';$('setupPassword').value='';$('setupPasswordConfirm').value='';
  if(loginBusy||pendingSetupLoaded){epoch++;pendingSetupLoaded=null;void api.logout().catch(()=>{});loginBusy=false;$('loginSubmit').disabled=false;}
- selectLogin('password');
+ selectLogin('password');showLoginEntry();
 });
 
 function selectLogin(method){
  loginMethod=method;const code=method==='code'||method==='setup';
+ $('loginEntryChoice').hidden=true;$('loginFlow').hidden=false;
+ $('loginIntro').textContent=tr(method==='setup'?'Yönetim tarafından tanımlanan erişiminizi e-posta koduyla doğrulayın.':'Mevcut hesabınızla giriş yapın.');
+ $('loginFooter').hidden=method==='setup';updateOAuthOptions();
  $('loginMethodChooser').hidden=method==='setup';$('loginEmailField').hidden=false;$('email').required=true;
  $('passwordFields').hidden=method!=='password';$('codeFields').hidden=!code;$('setupPasswordFields').hidden=true;
  $('password').required=method==='password';$('loginCode').required=code;
@@ -313,6 +349,7 @@ function showFirstPasswordForm(loaded){
  $('password').required=false;$('loginCode').required=false;
  $('setupPassword').required=true;$('setupPasswordConfirm').required=true;
  $('loginTitle').textContent=tr('Şifre oluştur');
+ $('loginOauthOptions').hidden=true;$('loginFooter').hidden=true;
  $('loginSubmit').textContent=tr('Şifreyi kaydet');
  $('setupPassword').focus();
 }
@@ -327,7 +364,7 @@ $('requestCode').addEventListener('click',async()=>{
  catch(error){$('loginMessage').textContent=error.message;}
  finally{stopLoading();setTimeout(()=>{b.disabled=false;},Math.max(0,nextCodeAt-Date.now()));}
 });
-selectLogin('password');
+selectLogin('password');showLoginEntry();
 
 $('loginForm').addEventListener('submit',async event=>{
  event.preventDefault();if(loginBusy)return;const stopLoading=beginLoading($('loginMessage'),tr('Hesap ve erişim yetkileri doğrulanıyor…'));loginBusy=true;const attempt=++epoch;$('loginSubmit').disabled=true;$('loginMessage').textContent='';$('loginMessage').classList.remove('error');
@@ -443,7 +480,7 @@ async function resumeSession(){
   if(!restored||attempt!==epoch)return;
   const loaded=await api.load();if(attempt!==epoch)return;
   completeSignIn(loaded);
- }catch(error){if(attempt===epoch)toast(error.message);}
+ }catch(error){if(attempt===epoch){if([401,403].includes(error.status)&&api.session)void api.logout().catch(()=>api.clear());toast(error.message);}}
  finally{stopLoading();}
 }
 window.addEventListener('storage',event=>{
