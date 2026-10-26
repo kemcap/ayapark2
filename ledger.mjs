@@ -1,8 +1,8 @@
-import {isFinanceV5,demoFinanceCommand} from './finance-demo.mjs?v=5.3.1';
-import {enrichDemo,demoV3,bindDemoCharge} from './v3-ledger.mjs?v=5.3.1';
-import {creditAvailable,buildSummaryDays,withPaymentIndex} from './v3-domain.mjs?v=5.3.1';
-import {t as tr} from './i18n.mjs?v=5.3.1';
-import {demoData as base,summarize,randomId} from './core.mjs?v=5.3.1';
+import {isFinanceV5,demoFinanceCommand} from './finance-demo.mjs?v=5.4.0';
+import {enrichDemo,demoV3,bindDemoCharge} from './v3-ledger.mjs?v=5.4.0';
+import {creditAvailable,buildSummaryDays,withPaymentIndex} from './v3-domain.mjs?v=5.4.0';
+import {t as tr} from './i18n.mjs?v=5.4.0';
+import {demoData as base,summarize,randomId} from './core.mjs?v=5.4.0';
 let computation=null;
 // Cache only within one synchronous rendering pass. Mutations never share this cache.
 export function withLedgerIndex(d,fn){if(computation?.data===d)return fn();const previous=computation,byCharge=new Map(),byEntry=new Map();for(const a of d.allocations||[])if(!a.void_reason){byCharge.set(a.charge_id,(byCharge.get(a.charge_id)||0)+Number(a.cents));byEntry.set(a.entry_id,(byEntry.get(a.entry_id)||0)+Number(a.cents));}computation={data:d,byCharge,byEntry};try{return withPaymentIndex(d,fn);}finally{computation=previous;}}

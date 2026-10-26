@@ -1,4 +1,4 @@
-import {AyaparkApi} from './api.mjs?v=5.3.1';
+import {AyaparkApi} from './api.mjs?v=5.4.0';
 
 // Recovery sessions stay in memory. This client never reads apartment or finance data.
 export class RecoveryApi extends AyaparkApi {
@@ -33,7 +33,7 @@ export class RecoveryApi extends AyaparkApi {
  async savePassword(password){
   if(!this.recovery)throw Error('No verified recovery session');
   const generation=this.generation,token=await this.token();
-  await this.raw('/auth/v1/user','PUT',{password},token);
+  await this.setPassword(password);
   if(this.generation!==generation)throw Error('Session changed');
   this.recovery=false;
   await this.logout().catch(()=>this.clear());

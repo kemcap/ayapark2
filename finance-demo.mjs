@@ -1,6 +1,6 @@
-import {demoCommand} from './ledger.mjs?v=5.3.1';
-import {randomId} from './core.mjs?v=5.3.1';
-import {batchPreview,paymentPlan} from './finance-v5.mjs?v=5.3.1';
+import {demoCommand} from './ledger.mjs?v=5.4.0';
+import {randomId} from './core.mjs?v=5.4.0';
+import {batchPreview,paymentPlan} from './finance-v5.mjs?v=5.4.0';
 export const isFinanceV5=act=>['batch_charge','monthly_v5','auto_allocate','monthly_exception','disable_exception','budget'].includes(act);
 export function demoFinanceCommand(data,action,p){
  const d=structuredClone(data);d.operations??=[];d.exceptions??=[];const payload={...p,_action:action},old=d.operations.find(x=>x.request_id===p.request_id);

@@ -1248,3 +1248,13 @@ Object.assign(german,{
  'Etkinleştir':'Aktivieren',
  'Hesabın etkinleştirildi. Telefon numaran ve yeni şifrenle giriş yap.':'Ihr Konto ist aktiviert. Melden Sie sich mit Ihrer Telefonnummer und Ihrem neuen Passwort an.'
 });
+
+Object.assign(german,{
+ 'En az 6 karakter kullan.':'Verwende mindestens 6 Zeichen.',
+ 'Şifre en fazla 256 karakter olabilir.':'Das Passwort darf höchstens 256 Zeichen enthalten.',
+ 'Telefon veya şifre geçersiz. Bilgilerinizi kontrol edin.':'Telefonnummer oder Passwort ungültig. Bitte prüfen Sie Ihre Angaben.',
+ 'Telefonla giriş henüz kullanıma hazır değil. E-posta ile giriş yapın veya yönetime başvurun.':'Telefonanmeldung ist noch nicht verfügbar. Melden Sie sich per E-Mail an oder kontaktieren Sie die Verwaltung.',
+ 'Giriş hizmetine şu anda ulaşılamıyor. Lütfen tekrar deneyin.':'Der Anmeldedienst ist derzeit nicht erreichbar. Bitte erneut versuchen.'
+});
+
+Object.assign(german,{'Telefon veya e-posta':'Telefonnummer oder E-Mail-Adresse'});
