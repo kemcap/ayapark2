@@ -1,15 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {AyaparkApi} from '../api.mjs?v=5.1.0';
-import {RecoveryApi} from '../recovery-api.mjs?v=5.1.0';
-import {buildAssignmentForm,assignmentPayload} from '../assignments.mjs?v=5.1.0';
-import {fullDemo} from '../ledger.mjs?v=5.1.0';
-import {setLanguage} from '../i18n.mjs?v=5.1.0';
-import {parseImport,templateHeader} from '../v3-import.mjs?v=5.1.0';
-import {enhanceTables} from '../ui-accessibility.mjs?v=5.1.0';
-import {unitMapV3} from '../v3-ui.mjs?v=5.1.0';
-import {apartmentInfo,unitDebtCategory} from '../apartment-info.mjs?v=5.1.0';
+import {AyaparkApi} from '../api.mjs?v=5.3.1';
+import {RecoveryApi} from '../recovery-api.mjs?v=5.3.1';
+import {buildAssignmentForm,assignmentPayload} from '../assignments.mjs?v=5.3.1';
+import {fullDemo} from '../ledger.mjs?v=5.3.1';
+import {setLanguage} from '../i18n.mjs?v=5.3.1';
+import {parseImport,templateHeader} from '../v3-import.mjs?v=5.3.1';
+import {enhanceTables} from '../ui-accessibility.mjs?v=5.3.1';
+import {unitMapV3} from '../v3-ui.mjs?v=5.3.1';
+import {apartmentInfo,unitDebtCategory} from '../apartment-info.mjs?v=5.3.1';
 
 test('preview rejects every network verb before invoking the fetcher',async()=>{
  let sent=0;const api=new AyaparkApi(()=>{sent++;throw Error('network');},{previewOnly:true,persist:false});

@@ -1225,3 +1225,26 @@ Object.assign(german,{"Kurulum rehberi":"Anleitung öffnen","Şimdi yükle":"Jet
 Object.assign(german,{"Duyuru":"Mitteilung"});
 
 Object.assign(german,{"Üç test duyurusu göster":"Drei Testmitteilungen anzeigen"});
+
+
+// Invitation shell: one language at a time; backend limits remain unchanged.
+Object.assign(german,{
+ 'E-posta veya telefon':'E-Mail oder Telefonnummer',
+ 'Davet':'Einladung',
+ 'WhatsApp telefonu':'WhatsApp-Telefonnummer',
+ 'Davet metni':'Einladungstext',
+ 'Bu kişi için erişim yetkisini onaylıyorum. Otomatik gönderim yapılmaz.':'Ich bestätige die Freischaltung für diese Person. Es wird nichts automatisch versendet.',
+ 'Bağlantı oluştur':'Link erstellen',
+ 'Kişisel bağlantı':'Persönlicher Link',
+ 'Davet bağlantısı':'Einladungslink',
+ 'Bağlantı 48 saat geçerlidir ve yalnızca bir kez kullanılabilir. Etkinleştirme için e-posta gerekmez.':'Der Link ist 48 Stunden gültig und nur einmal verwendbar. Für die Aktivierung ist keine E-Mail erforderlich.',
+ 'Bağlantıyı kopyala':'Link kopieren',
+ 'Metni kopyala':'Text kopieren',
+ 'Hesabımı etkinleştir':'Konto aktivieren',
+ 'E-posta gerekmez. Lütfen kendi şifrenizi oluşturun.':'Keine E-Mail nötig. Bitte legen Sie Ihr Passwort fest.',
+ 'Yeni şifre (en az 10 karakter)':'Neues Passwort (mindestens 10 Zeichen)',
+ 'Şifreyi tekrar gir':'Passwort wiederholen',
+ 'Davet bağlantısı yalnızca bir kez kullanılır.':'Der Einladungslink ist nur einmal verwendbar.',
+ 'Etkinleştir':'Aktivieren',
+ 'Hesabın etkinleştirildi. Telefon numaran ve yeni şifrenle giriş yap.':'Ihr Konto ist aktiviert. Melden Sie sich mit Ihrer Telefonnummer und Ihrem neuen Passwort an.'
+});

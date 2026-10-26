@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-import {AyaparkApi} from '../api.mjs?v=5.1.0';
+import {AyaparkApi} from '../api.mjs?v=5.3.1';
+import {t,setLanguage} from '../i18n.mjs?v=5.3.1';
 
 test('recovery callback at root goes to reset page with credentials preserved',()=>{
  const script=readFileSync(new URL('../recovery-redirect.js',import.meta.url),'utf8');
@@ -58,7 +59,7 @@ function harness(){
   async logout(){calls.logout++;},saved(){return null;}
  };
  const context=vm.createContext({$,api,state:{mode:'signedout'},epoch:0,loginBusy:false,loginMethod:'password',
-  tr:x=>x,beginLoading:()=>()=>{},syncPreferences:async()=>{},hideLoginPassword(){},
+  tr:t,beginLoading:()=>()=>{},syncPreferences:async()=>{},hideLoginPassword(){},
   navigate(){},toast(){},URLSearchParams,Date,setTimeout(){},location:{hash:'',pathname:'/',search:''},
   history:{replaceState(){}},applyStaticLanguage(){},render(){},document:{dispatchEvent(){}},Event});
  vm.runInContext(handlers,context);
@@ -83,4 +84,14 @@ test('mismatched first passwords cannot be saved',async()=>{
  h.$('email').value='first@example.invalid';h.$('loginCode').value='123456';await h.submit();
  h.$('setupPassword').value='one';h.$('setupPasswordConfirm').value='two';
  await h.submit();assert.equal(h.calls.password,0);assert.equal(h.context.loginMethod,'setup_password');
+});
+test('language refresh preserves the verified password setup without requesting another code',async()=>{
+ setLanguage('tr');const h=harness();h.$('createPasswordEntry').listeners.click();
+ h.$('email').value='first@example.invalid';h.$('loginCode').value='123456';await h.submit();
+ h.$('setupPassword').value='synthetic-unsubmitted';h.$('setupPasswordConfirm').value='synthetic-unsubmitted';
+ setLanguage('de');vm.runInContext('updateLoginLanguage()',h.context);
+ assert.equal(h.context.loginMethod,'setup_password');assert.equal(h.$('setupPasswordFields').hidden,false);
+ assert.equal(h.$('setupPassword').value,'synthetic-unsubmitted');assert.equal(h.calls.verify,1);assert.equal(h.calls.password,0);
+ assert.equal(h.$('loginTitle').textContent,'Passwort erstellen');assert.equal(h.$('loginSubmit').textContent,'Passwort speichern');
+ setLanguage('tr');vm.runInContext('updateLoginLanguage()',h.context);assert.equal(h.$('loginTitle').textContent,'Şifre oluştur');
 });
