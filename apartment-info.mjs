@@ -1,9 +1,9 @@
-import {t as tr} from './i18n.mjs?v=5.0.0';
-import {money} from './core.mjs?v=5.0.0';
-import {can} from './ui.mjs?v=5.0.0';
-import {remaining,unassigned} from './ledger.mjs?v=5.0.0';
-import {scopedCharges,personLinks,personName,suggestUnits,creditAvailable,isReversed} from './v3-domain.mjs?v=5.0.0';
-import {analyzeStage} from './reconcile.mjs?v=5.0.0';
+import {t as tr} from './i18n.mjs?v=5.1.0';
+import {money} from './core.mjs?v=5.1.0';
+import {can} from './ui.mjs?v=5.1.0';
+import {remaining,unassigned} from './ledger.mjs?v=5.1.0';
+import {scopedCharges,personLinks,personName,suggestUnits,creditAvailable,isReversed} from './v3-domain.mjs?v=5.1.0';
+import {analyzeStage} from './reconcile.mjs?v=5.1.0';
 export const openUnitCharges=(s,u)=>scopedCharges(s.data).filter(c=>c.unit_id===u.id&&!c.void_reason&&remaining(s.data,c)>0);
 export function unitDebtCategory(s,u){const kinds=[...new Set(openUnitCharges(s,u).map(c=>c.category||'Tür belirtilmedi'))];return kinds.length>1?tr('Birden fazla kalem'):kinds.length?tr(kinds[0]):'';}
 export function apartmentInfo(s,u){

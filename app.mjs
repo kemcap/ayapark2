@@ -1,27 +1,28 @@
-import {prepareV5Demo} from './finance-demo.mjs?v=5.0.0';
-import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.0.0';
-import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement} from './notifications.mjs?v=5.0.0';
-import {bindDesign} from './design.mjs?v=5.0.0';
-import {enhanceTables} from './ui-accessibility.mjs?v=5.0.0';
-import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.0.0';
-import {apartmentInfo} from './apartment-info.mjs?v=5.0.0';
-import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.0.0';
-import {updateAssignmentForm} from './assignments.mjs?v=5.0.0';
-import {personManager} from './people-ui.mjs?v=5.0.0';
-import {mayPreview,residentPreviewOptions,previewProjection} from './access-preview.mjs?v=5.0.0';
-import {bindInstall} from './install.mjs?v=5.0.0';
-import {bindPasswordEyes} from './password-eye.mjs?v=5.0.0';
-import {sha256} from './hash.mjs?v=5.0.0';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs?v=5.0.0';
-import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.0.0';
-import {template} from './v3-import.mjs?v=5.0.0';
-import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.0.0';
-import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.0.0';
-import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.0.0';
-import {AyaparkApi} from './api.mjs?v=5.0.0';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.0.0';
-import {buildForm,payloadFor} from './forms.mjs?v=5.0.0';
-import {analyzeStage} from './reconcile.mjs?v=5.0.0';
+import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.1.0';
+import {prepareV5Demo} from './finance-demo.mjs?v=5.1.0';
+import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.1.0';
+import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.1.0';
+import {bindDesign} from './design.mjs?v=5.1.0';
+import {enhanceTables} from './ui-accessibility.mjs?v=5.1.0';
+import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.1.0';
+import {apartmentInfo} from './apartment-info.mjs?v=5.1.0';
+import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.1.0';
+import {updateAssignmentForm} from './assignments.mjs?v=5.1.0';
+import {personManager} from './people-ui.mjs?v=5.1.0';
+import {mayPreview,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.1.0';
+import {bindInstall} from './install.mjs?v=5.1.0';
+import {bindPasswordEyes} from './password-eye.mjs?v=5.1.0';
+import {sha256} from './hash.mjs?v=5.1.0';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs?v=5.1.0';
+import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.1.0';
+import {template} from './v3-import.mjs?v=5.1.0';
+import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.1.0';
+import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.1.0';
+import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.1.0';
+import {AyaparkApi} from './api.mjs?v=5.1.0';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.1.0';
+import {buildForm,payloadFor} from './forms.mjs?v=5.1.0';
+import {analyzeStage} from './reconcile.mjs?v=5.1.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
 const applyStaticLanguage=bindStaticText(document.body);
@@ -35,23 +36,23 @@ let peopleSearchTimer;
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
-function isAccessPreview(){return state.mode==='connected'&&mayPreview(state.fullData)&&['staff','resident'].includes(state.viewRole);}
+function isAccessPreview(){return ['connected','demo'].includes(state.mode)&&mayPreview(state.fullData)&&['staff','resident'].includes(state.viewRole);}
 function render(focus=false){
  const appearanceWasOpen=document.querySelector('.appearance-settings')?.open;
  if(state.mode==='connected'){
   if(mayPreview(state.data)&&state.data!==state.fullData)state.fullData=state.data;
   if(mayPreview(state.fullData))state.data=previewProjection(state.fullData,state.viewRole||'super',state.previewSelection||'');
- }else{state.fullData=null;state.viewRole='super';state.previewSelection='';}
+ }else if(state.mode==='demo'){if(!state.demoFullData||state.data.role==='super'){state.demoFullData=state.data;state.demoFullData.serverRole='manager';}state.fullData=state.demoFullData;state.data=previewProjection(state.fullData,state.viewRole||'super',state.previewSelection||'');}else{state.fullData=null;state.demoFullData=null;state.viewRole='super';state.previewSelection='';}
 
  document.documentElement.lang=getLanguage();
  $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> '+getLanguage().toUpperCase();$('languageToggle').title=getLanguage()==='tr'?'Deutsch':'Türkçe';
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
- const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V5.0'+(IS_PREVIEW?' · '+tr('Önizleme'):'');
+ const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V5.1'+(IS_PREVIEW?' · '+tr('Önizleme'):'');
  renderNavigation();
  updateDesignControl();
  $('breadcrumb').textContent=labels[state.page];
- const previewAllowed=state.mode==='connected'&&mayPreview(state.fullData);
+ const previewAllowed=['connected','demo'].includes(state.mode)&&mayPreview(state.fullData);if(previewAllowed&&state.viewRole==='resident'){const opts=residentPreviewOptions(state.fullData);if(!opts.some(o=>o.id===state.previewSelection))state.previewSelection=opts[0]?.id||'';}
  $('roleControl').hidden=state.mode!=='demo'&&!previewAllowed;$('roleSelect').value=d.role;
  $('roleLabel').textContent=tr(previewAllowed?'Görünüm':'Görünümü dene');
  $('residentPreviewControl').hidden=!previewAllowed||d.role!=='resident';
@@ -65,13 +66,13 @@ function render(focus=false){
  if(isAccessPreview())$('contextText').textContent=tr('Görünüm önizlemesi · İşlemler kaydedilmez. Süper Admin görünümüne dönerek düzenleyin.');
  $('footerMode').textContent=state.mode==='demo'?tr("Örnek veriler"):tr("Hesabınız");$('connectionButton').textContent=state.mode==='demo'?tr("Hesabımla giriş"):tr("Çıkış yap");$('refreshButton').hidden=state.mode==='demo';
  document.body.classList.toggle('signed-out',state.mode==='signedout');
- $('previewBanner').hidden=!IS_PREVIEW;$('previewBanner').textContent=tr('V5.0 önizleme · Örnek veriler · Canlı kayıtlara erişim yok');
+ $('previewBanner').hidden=!IS_PREVIEW;$('previewBanner').textContent=tr('V5.1 önizleme · Örnek veriler · Canlı kayıtlara erişim yok');
  if(IS_PREVIEW){$('connectionButton').textContent=tr('Giriş ekranını incele');$('installApp').hidden=true;}
  $('modeBadge').hidden=state.mode!=='demo';$('refreshButton').hidden=state.mode!=='connected';
  $('connectionButton').textContent=IS_PREVIEW?tr('Giriş ekranını incele'):state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/buildings.svg" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>`:renderPage(state);
  if(appearanceWasOpen&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;
- labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
+ const previewBar=$('accessPreviewBanner');previewBar.innerHTML=previewBanner(state);previewBar.hidden=!isAccessPreview();labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
  document.dispatchEvent(new CustomEvent('ay5:view',{detail:{resident:own,page:state.page,mode:state.mode}}));
  for(const card of document.querySelectorAll('.summary-grid .card')){const links=card.querySelectorAll('a[href]');if(links.length===1&&!card.querySelector('button,input,select')){card.classList.add('stretched-card');links[0].setAttribute('aria-label',(card.querySelector('h2')?.textContent||'')+': '+links[0].textContent);}}
  $('refreshButton').hidden=true;const powerLabel=tr(state.mode==='connected'?'Çıkış yap':'Giriş yap');$('connectionButton').innerHTML=icon('power');$('connectionButton').setAttribute('aria-label',powerLabel);$('connectionButton').title=powerLabel;
@@ -135,18 +136,20 @@ function downloadCsv(filename,rows){const cell=v=>'"'+String(v??'').replaceAll('
 function exportReport(){
  const r=financialSeries(state.data,selectedRange(state,'report'),state.reportGroup||'year');downloadCsv('ayapark2-mali-rapor.csv',[[tr('Dönem'),tr('Gelir'),tr('Gider'),tr('Dönem farkı')],...r.buckets.map(b=>[b.period,b.income/100,b.expense/100,(b.income-b.expense)/100])]);
 }
-const urgentShown=new Set();let localTest=null,localTestRead=false,popupSession='',importantLoginKeys=new Set();
-function notificationData(){const d=state.data;return {...d,userId:d.userId||'demo-user',announcements:[...(d.announcements||[]),...(localTest&&d.role==='super'?[localTest]:[])],acknowledgements:[...(d.acknowledgements||[]),...(localTestRead&&localTest?[{announcement_id:localTest.id,revision:localTest.revision,user_id:d.userId||'demo-user'}]:[])]};}
+const urgentShown=new Set();let localTest=null,localTestRead=false,popupSession='',importantLoginKeys=new Set(),popupBatch=[],localTestQueue=[],localTestReceipts=new Set();
+function notificationData(){const d=state.data;return {...d,userId:d.userId||'demo-user',announcements:[...(d.announcements||[]),...(localTest&&d.role==='super'?[localTest]:[]),...(d.role==='super'?localTestQueue:[])],acknowledgements:[...(d.acknowledgements||[]),...(localTestRead&&localTest?[{announcement_id:localTest.id,revision:localTest.revision,user_id:d.userId||'demo-user'}]:[]),...localTestQueue.filter(a=>localTestReceipts.has(a.id)).map(a=>({announcement_id:a.id,revision:a.revision,user_id:d.userId||'demo-user'}))]};}
 function updateNotifications(){const d=notificationData(),unread=unreadNotifications(d);$('notificationBell').hidden=state.mode==='signedout';$('notificationCount').hidden=!unread.length;$('notificationCount').textContent=unread.length>99?'99+':unread.length;$('notificationBell').setAttribute('aria-label',tr('Bildirimler')+' · '+unread.length);$('notificationsTitle').textContent=tr('Bildirimler');$('closeNotifications').textContent=tr('Kapat');if($('notificationsDialog').open)$('notificationsList').innerHTML=notificationList(d);}
-function openNotification(a){if(!a)return;if($('notificationsDialog').open)$('notificationsDialog').close();$('urgentTitle').textContent=notificationTitle(a);$('urgentBody').textContent=notificationBody(a);$('urgentMeta').textContent=a.local_test?tr('Yalnızca Süper Admin testi'):new Date(a.created_at).toLocaleDateString(getLanguage()==='de'?'de-DE':'tr-TR')+(a.author_label?' · '+a.author_label:'');$('ackUrgent').dataset.id=a.id;$('ackUrgent').dataset.revision=a.revision||1;$('ackUrgent').dataset.key=acknowledgementKey(a);$('ackUrgent').textContent=tr('Okudum');$('urgentDialog').dataset.required=a.priority==='urgent'?'true':'false';if(a.priority!=='urgent')urgentShown.add(acknowledgementKey(a));if(!$('urgentDialog').open)$('urgentDialog').showModal();}
-function checkUrgent(){const key=state.mode+':'+(state.data.userId||'demo-user')+':'+epoch;if(key!==popupSession){popupSession=key;importantLoginKeys=new Set(unreadNotifications(notificationData()).filter(a=>a.priority==='important'&&a.popup_on_login).map(acknowledgementKey));}if(isAccessPreview()||state.mode==='signedout'||document.querySelector('dialog[open]'))return;const a=unreadNotifications(notificationData()).find(a=>(a.priority==='urgent'||a.priority==='important'&&a.popup_on_login&&importantLoginKeys.has(acknowledgementKey(a)))&&!urgentShown.has(acknowledgementKey(a)));openNotification(a);}
+function openNotification(a,{progress=''}={}){if(!a)return;if($('notificationsDialog').open)$('notificationsDialog').close();$('urgentTitle').textContent=notificationTitle(a);$('urgentBody').textContent=notificationBody(a);$('urgentMeta').textContent=a.local_test?tr('Yalnızca Süper Admin testi'):new Date(a.created_at).toLocaleDateString(getLanguage()==='de'?'de-DE':'tr-TR')+(a.author_label?' · '+a.author_label:'');$('ackUrgent').dataset.id=a.id;$('ackUrgent').dataset.revision=a.revision||1;$('ackUrgent').dataset.key=acknowledgementKey(a);$('ackUrgent').textContent=tr(!announcementActive(a)||isAccessPreview()?'Kapat':'Okudum');$('urgentProgress').textContent=progress;$('urgentProgress').hidden=!progress;$('urgentDialog').dataset.required=a.priority==='urgent'&&announcementActive(a)&&!isAccessPreview()?'true':'false';$('ackUrgent').dataset.expired=String(!announcementActive(a)||isAccessPreview());if(a.priority!=='urgent')urgentShown.add(acknowledgementKey(a));if(!$('urgentDialog').open)$('urgentDialog').showModal();}
+function checkUrgent(){const key=state.mode+':'+(state.data.userId||'demo-user')+':'+epoch;if(key!==popupSession){popupSession=key;popupBatch=[];importantLoginKeys=new Set(unreadNotifications(notificationData()).filter(a=>a.priority==='important'&&a.popup_on_login).map(acknowledgementKey));}if(isAccessPreview()||state.mode==='signedout'||document.querySelector('dialog[open]'))return;const pending=unreadNotifications(notificationData()).filter(a=>(a.priority==='urgent'||a.priority==='important'&&a.popup_on_login&&importantLoginKeys.has(acknowledgementKey(a)))&&!urgentShown.has(acknowledgementKey(a)));if(!pending.length){popupBatch=[];return;}if(!popupBatch.length)popupBatch=pending.map(acknowledgementKey);else for(const a of pending)if(!popupBatch.includes(acknowledgementKey(a)))popupBatch.push(acknowledgementKey(a));const a=pending[0];openNotification(a,{progress:popupBatch.length>1?popupProgress(popupBatch,acknowledgementKey(a)):''});}
 $('notificationBell').addEventListener('click',()=>{$('notificationsList').innerHTML=notificationList(notificationData());$('notificationsDialog').showModal();});
 $('closeNotifications').addEventListener('click',()=>$('notificationsDialog').close());
-$('ackUrgent').addEventListener('click',async()=>{const b=$('ackUrgent');b.disabled=true;try{if(b.dataset.id==='local-test-notification'){if(state.data.role!=='super')throw Error(tr('Yetkiniz yok.'));localTestRead=true;updateNotifications();}else await mutate('acknowledge',{id:b.dataset.id,revision:Number(b.dataset.revision)});urgentShown.add(b.dataset.key);$('urgentDialog').close();checkUrgent();}catch(error){toast(error.message);}finally{b.disabled=false;}});
+$('ackUrgent').addEventListener('click',async()=>{const b=$('ackUrgent');b.disabled=true;try{if(b.dataset.expired==='true'){$('urgentDialog').close();return;}if(b.dataset.id.startsWith('local-test-notification')){if(state.data.role!=='super')throw Error(tr('Yetkiniz yok.'));if(b.dataset.id==='local-test-notification')localTestRead=true;else localTestReceipts.add(b.dataset.id);updateNotifications();}else await mutate('acknowledge',{id:b.dataset.id,revision:Number(b.dataset.revision)});urgentShown.add(b.dataset.key);$('urgentDialog').close();checkUrgent();}catch(error){toast(error.message);}finally{b.disabled=false;}});
 $('urgentDialog').addEventListener('cancel',event=>{if($('urgentDialog').dataset.required==='true')event.preventDefault();});
 function updateAnnouncementTargets(){const root=$('actionFields'),kind=root.querySelector('[name="target_kind"]')?.value;for(const section of root.querySelectorAll('[data-notification-target]'))section.hidden=section.dataset.notificationTarget!==kind;}
 
 document.addEventListener('click',async event=>{
+ if(event.target.closest('.unit-history-link')){event.preventDefault();$('unitPaymentHistory')?.scrollIntoView({block:'start'});$('unitPaymentHistory')?.focus({preventScroll:true});return;}
+ if(event.target.closest('[data-preview-return]')){changePreviewRole('super');return;}
  if(event.target.closest('[data-reset-appearance]')){resetPreferences(state.mode==='connected'?api:null,message=>{const el=$('preferenceStatus');if(el)el.textContent=message;});applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));const panel=document.querySelector('.appearance-settings');if(panel)panel.open=true;document.querySelector('[data-reset-appearance]')?.focus();return;}
  const navToggle=event.target.closest('#nav [data-nav-group]');
  if(navToggle){
@@ -175,11 +178,12 @@ document.addEventListener('click',async event=>{
  const hiddenAmount=event.target.closest('.amount-private');if(hiddenAmount){hiddenAmount.classList.remove('amount-private');hiddenAmount.removeAttribute('aria-label');return;}
  const testButton=event.target.closest('[data-notification-test]');
  if(testButton){if(state.data.role!=='super'||isAccessPreview())return;const action=testButton.dataset.notificationTest;
-  if(action==='disable'){localTest=null;localTestRead=false;if($('urgentDialog').open&&$('ackUrgent').dataset.id==='local-test-notification')$('urgentDialog').close();}
-  else{localTest??=testAnnouncement();if(action==='reset')localTestRead=false;if(action==='show'||action==='reopen')openNotification(localTest);if(action==='reset')urgentShown.delete(acknowledgementKey(localTest));}
+  if(action==='disable'){localTest=null;localTestRead=false;localTestQueue=[];localTestReceipts.clear();popupBatch=[];if($('urgentDialog').open&&$('ackUrgent').dataset.id.startsWith('local-test-notification'))$('urgentDialog').close();}
+  else if(action==='show_many'){localTest=null;localTestRead=false;localTestReceipts.clear();popupBatch=[];localTestQueue=[1,2,3].map(n=>({...testAnnouncement(),id:'local-test-notification-'+n,title:'AYAPARK 2 – Test '+n,title_de:'AYAPARK 2 – Test '+n}));for(const a of localTestQueue){importantLoginKeys.add(acknowledgementKey(a));urgentShown.delete(acknowledgementKey(a));}checkUrgent();}
+  else{localTestQueue=[];localTestReceipts.clear();localTest??=testAnnouncement();if(action==='reset')localTestRead=false;if(action==='show'||action==='reopen')openNotification(localTest);if(action==='reset')urgentShown.delete(acknowledgementKey(localTest));}
   updateNotifications();if($('notificationTestStatus'))$('notificationTestStatus').textContent=tr(action==='disable'?'Test devre dışı.':'Test hazır. Gerçek bildirim gönderilmedi.');return;
  }
- const notice=event.target.closest('[data-notification]');if(notice){openNotification(notifications(notificationData()).find(a=>a.id===notice.dataset.notification));return;}
+ const notice=event.target.closest('[data-notification]');if(notice){openNotification(notificationCenter(notificationData()).find(a=>a.id===notice.dataset.notification));return;}
  const previewButton=event.target.closest('[data-finance-preview]');
  if(previewButton&&formAction){try{previewButton.disabled=true;const {action,context}=formAction,payload=financePayload(action,new FormData($('actionForm')),context,{previewing:true});const value=action==='auto_allocate'&&state.mode==='connected'?await api.rpc('ay5_payment_plan',{p_site:state.data.site.id,p_payload:payload}):localFinancePreview(state.data,action,payload);context.preview=value;context.previewSignature=JSON.stringify(payload);$('financePreview').innerHTML=financePreviewMarkup(state.data,action,value);labelTables();$('actionMessage').textContent='';}catch(error){$('actionMessage').textContent=tr(error.message);}finally{previewButton.disabled=false;}return;}
  const b=event.target.closest('[data-action]');if(!b)return;const action=b.dataset.action;
@@ -221,14 +225,9 @@ $('languageToggle').addEventListener('click',()=>{
  updateConditionalForm();document.dispatchEvent(new Event('ay2:languagechange'));
 });
 window.addEventListener('hashchange',()=>navigate(location.hash.slice(1)));
-$('roleSelect').addEventListener('change',event=>{
- if(writeBusy||loginBusy){event.target.value=state.data.role;return;}
- closeDialogs();
- if(state.mode==='demo')state.data.role=event.target.value;
- else if(mayPreview(state.fullData))state.viewRole=event.target.value;else return;
- state.page='overview';state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.reportFilter={preset:'all'};render(true);
-});
-$('residentPreviewSelect').addEventListener('change',event=>{if(!mayPreview(state.fullData))return;closeDialogs();state.previewSelection=event.target.value;render();});
+function changePreviewRole(role,selection){if(writeBusy||loginBusy||!mayPreview(state.fullData)||!['super','staff','resident'].includes(role))return;closeDialogs();state.viewRole=role;if(selection!==undefined)state.previewSelection=selection;else if(role==='resident')state.previewSelection=residentPreviewOptions(state.fullData)[0]?.id||'';state.page='overview';state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.reportFilter={preset:'all'};render(true);}
+$('roleSelect').addEventListener('change',event=>changePreviewRole(event.target.value));
+$('residentPreviewSelect').addEventListener('change',event=>changePreviewRole('resident',event.target.value));
 document.addEventListener('input',event=>{
  clearFieldError(event.target);
  if(formAction?.action.startsWith('assignment_')&&event.target.closest('#actionFields')){if(event.target.name==='person_search')updateConditionalForm('person_search');$('actionMessage').textContent='';}
@@ -239,7 +238,7 @@ document.addEventListener('input',event=>{
  if(event.target.id==='txnSearch'){state.filter.q=event.target.value;$('transactionResults').innerHTML=transactionTable(state);}
 });
 document.addEventListener('change',event=>{
- const id=event.target.id;
+ const id=event.target.id;if(id==='previewRoleSelect'){changePreviewRole(event.target.value);return;}if(id==='previewPersonSelect'){changePreviewRole('resident',event.target.value);return;}
  if(event.target.closest('#actionFields')){if(financeActions.includes(formAction?.action)){if(event.target.name!=='confirmed'){delete formAction.context.previewSignature;if($('financePreview'))$('financePreview').textContent='';const confirm=$('actionFields').querySelector('[name=confirmed]');if(confirm)confirm.checked=false;}updateFinanceForm($('actionFields'),state.data,event.target.name);}updateAnnouncementTargets();}
  if((formAction?.action.startsWith('assignment_')||formAction?.action==='user_access')&&event.target.closest('#actionFields'))updateConditionalForm(event.target.name);
  if(event.target.name==='category'||event.target.name==='relation'||event.target.name==='person_id'||event.target.name==='start_unknown')updateConditionalForm();
@@ -273,7 +272,7 @@ $('actionForm').addEventListener('submit',async event=>{
 document.addEventListener('ay2:themechanged',event=>changePreference('theme',event.detail,state.mode==='connected'?api:null));
 $('connectionButton').addEventListener('click',async()=>{
  if(state.mode!=='connected'){$('loginMessage').textContent='';$('loginDialog').showModal();return;}
- endPreferenceSession();urgentShown.clear();popupSession='';importantLoginKeys.clear();localTest=null;localTestRead=false;epoch++;closeDialogs();state.mode='signedout';state.data=prepareV5Demo(fullDemo());state.stale=false;navigate('overview');
+ endPreferenceSession();urgentShown.clear();popupSession='';importantLoginKeys.clear();localTest=null;localTestRead=false;localTestQueue=[];localTestReceipts.clear();popupBatch=[];epoch++;closeDialogs();state.mode='signedout';state.data=prepareV5Demo(fullDemo());state.stale=false;navigate('overview');
  try{await api.logout();toast(tr("Oturum kapatıldı."));}catch{toast(tr("Bu sekmedeki oturum temizlendi; sunucu çıkışı doğrulanamadı."));}
 });
 let pendingSetupLoaded=null;
@@ -463,3 +462,5 @@ document.addEventListener('input',event=>{if(event.target.closest('#actionFields
 let autoRefreshBusy=false,lastAutoRefresh=Date.now();
 async function refreshWhenIdle(){if(autoRefreshBusy||state.mode!=='connected'||document.visibilityState!=='visible'||writeBusy||loginBusy||document.querySelector('dialog[open]')||Date.now()-lastAutoRefresh<30000||document.activeElement?.matches('input,textarea,select'))return;autoRefreshBusy=true;lastAutoRefresh=Date.now();try{await reload();}catch{state.stale=true;}finally{autoRefreshBusy=false;}}
 setInterval(()=>void refreshWhenIdle(),90000);window.addEventListener('focus',()=>void refreshWhenIdle());document.addEventListener('visibilitychange',()=>void refreshWhenIdle());
+
+window.addEventListener('scroll',event=>{if(mobileNavGroup!==null&&closeMenuOnScroll(event,$('nav'))){mobileNavGroup=null;renderNavigation();}},{passive:true,capture:true});

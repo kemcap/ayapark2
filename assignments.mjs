@@ -1,7 +1,7 @@
-import {fieldError} from './ui-feedback.mjs?v=5.0.0';
-import {t as tr} from './i18n.mjs?v=5.0.0';
-import {escapeHtml as e,randomId} from './core.mjs?v=5.0.0';
-import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=5.0.0';
+import {fieldError} from './ui-feedback.mjs?v=5.1.0';
+import {t as tr} from './i18n.mjs?v=5.1.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=5.1.0';
+import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=5.1.0';
 export const assignmentRoles=[['owner','Ev sahibi'],['tenant','Kiracı'],['representative','Temsilci']];
 export const removalReasons=role=>[['mistake','Yanlışlıkla eklendi'],['ended',role==='owner'?'Mülkiyet ilişkisi sona erdi':role==='tenant'?'Kiracılık sona erdi':'Temsilcilik sona erdi'],['other','Diğer neden']];
 const select=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}" aria-label="${e(tr(label))}">${options.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(tr(l))}</option>`).join('')}</select></label>`;
