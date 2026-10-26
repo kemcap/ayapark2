@@ -1,0 +1,13 @@
+/* Isolated onboarding UI: only the sign-in dialog. */
+#loginDialog { width: min(560px, calc(100% - 24px)); max-height: calc(100dvh - 24px); overflow-y: auto; }
+#loginDialog .login-path-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0 14px; }
+#loginDialog .login-path { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; min-width: 0; min-height: 155px; padding: 18px; text-align: left; font: inherit; color: inherit; background: var(--paper, #fff); border: 1px solid var(--line, #d6d6d6); border-radius: 15px; cursor: pointer; transition: border-color .15s ease, background-color .15s ease; }
+#loginDialog .login-path:hover { background: var(--soft, #f2f5f2); border-color: var(--accent, #437b63); }
+#loginDialog .login-path:focus-visible { outline: 3px solid var(--focus, #227eac); outline-offset: 3px; }
+#loginDialog .login-path strong { font-size: 15px; line-height: 1.35; }
+#loginDialog .login-path small { line-height: 1.5; font-size: 12px; color: var(--muted, #636363); }
+#loginDialog .login-path-symbol { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 10px; background: var(--soft, #edf4ef); font-size: 21px; font-weight: 700; }
+#loginDialog .login-back { display: inline-block; margin: 0 0 8px; min-height: 40px; }
+#loginDialog #loginStart > .fine { margin: 12px 0 0; line-height: 1.6; }
+@media (max-width: 420px) { #loginDialog .login-path-grid { grid-template-columns: 1fr; gap: 10px; } #loginDialog .login-path { min-height: auto; padding: 15px; gap: 5px; } #loginDialog .login-path-symbol { width: 30px; height: 30px; font-size: 18px; } }
+@media (prefers-reduced-motion: reduce) { #loginDialog .login-path { transition: none; } }
