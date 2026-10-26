@@ -30,6 +30,8 @@ jobs:
           node --check api.mjs
           node --check people-ui.mjs
           node --check invite-ui.mjs
+          node --check site-claims-ui.mjs
+          node --check supabase/functions/ay3-site-open-claims/math.mjs
       - name: Full JavaScript regression suite
         run: npm test
       - uses: denoland/setup-deno@v2
@@ -37,5 +39,7 @@ jobs:
           deno-version: v2.x
       - name: Typecheck Supabase Edge Function
         run: deno check --node-modules-dir=auto supabase/functions/ay3-whatsapp-invite/index.ts
+      - name: Typecheck site claims Edge Function
+        run: deno check --node-modules-dir=auto supabase/functions/ay3-site-open-claims/index.ts
       - name: Safe Edge Function smoke checks (no resident data)
         run: node tests/invite-edge-smoke.mjs
