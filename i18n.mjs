@@ -1225,3 +1225,17 @@ Object.assign(german,{"Kurulum rehberi":"Anleitung öffnen","Şimdi yükle":"Jet
 Object.assign(german,{"Duyuru":"Mitteilung"});
 
 Object.assign(german,{"Üç test duyurusu göster":"Drei Testmitteilungen anzeigen"});
+
+
+Object.assign(german,{
+ "Nasıl devam etmek istersiniz?":"Wie möchtest du fortfahren?",
+ "Giriş türünü seç":"Anmeldeweg wählen",
+ "Zaten hesabım var":"Ich habe bereits einen Zugang",
+ "Mevcut hesabınızla giriş yapın":"Mit deinem bestehenden Zugang anmelden",
+ "İlk kez erişimi etkinleştir":"Zugang erstmals aktivieren",
+ "Yönetim tarafından tanımlanan hesabınızı etkinleştirin":"Deinen von der Verwaltung eingerichteten Zugang aktivieren",
+ "Yönetim hesabınızı önceden tanımlar. Yeni kullanıcı kaydı burada yapılmaz.":"Die Verwaltung richtet deinen Zugang vorher ein. Eine öffentliche Registrierung ist nicht möglich.",
+ "Giriş bilgileri":"Anmeldedaten",
+ "← Geri":"← Zurück",
+ "Hesaba giriş yap":"Mit bestehendem Zugang anmelden"
+});
