@@ -1,8 +1,8 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {accessRequestPayload} from '../access-request-policy.mjs?v=5.6.0';
-import {accessRequestsPanel} from '../access-requests.mjs?v=5.6.0';
+import {accessRequestPayload} from '../access-request-policy.mjs?v=5.8.0';
+import {accessRequestsPanel} from '../access-requests.mjs?v=5.8.0';
 import {accessRequestHandler} from '../supabase/functions/ay3-access-requests/handler.mjs';
-import {setLanguage} from '../i18n.mjs?v=5.6.0';
+import {setLanguage} from '../i18n.mjs?v=5.8.0';
 const input={first_name:'Synthetic',last_name:'Applicant',contact_kind:'phone',contact:'05321234567',unit_hint:'a-7'};
 const request=(body,headers={})=>new Request('https://backend.invalid',{method:'POST',headers:{Origin:'https://app.invalid',...headers},body:JSON.stringify(body)});
 function setup(extra={}){const calls=[];const admin={limit:async()=>true,submit:async(s,p)=>calls.push({site:s,p}),user:async()=>({id:'manager'}),list:async()=>({requests:[],open:0,unread:0}),update:async(...args)=>calls.push(args)};return {calls,handler:accessRequestHandler({enabled:true,origins:new Set(['https://app.invalid']),site:'fixed-site',admin,hash:async s=>s,ip:()=> 'trusted-ip',...extra})};}

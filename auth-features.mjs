@@ -3,3 +3,6 @@
 export const ENABLE_VERIFIED_PHONE_LOGIN=false;
 
 export const ENABLE_ACCESS_REQUESTS=false;
+
+export const ENABLE_ADMIN_RECOVERY=false;
+export const ENABLE_PASSKEY_LOGIN=false;

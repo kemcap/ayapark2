@@ -37,8 +37,9 @@ Deno.serve(async req=>{
  try{
   if(Deno.env.get('ENABLE_INVITATIONS_V2')!=='true')return reply({error:'not_configured'},503);
   if(!origins.has(new URL(appUrl).origin)||new URL(appUrl).protocol!=='https:')return reply({error:'not_configured'},503);
-  const raw=await req.text();
-  if(raw.length>8192)return reply({error:'request_too_large'},413);
+  const reader=req.body?.getReader();if(!reader)return reply({error:'invalid_request'},400);
+  const chunks:Uint8Array[]=[];let size=0;while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>8192){await reader.cancel();return reply({error:'request_too_large'},413);}chunks.push(value);}
+  const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}const raw=new TextDecoder().decode(bytes);
   const input=JSON.parse(raw);
   const action=String(input?.action||'');
   if(!['create','inspect','activate','revoke'].includes(action))return reply({error:'invalid_request'},400);
@@ -51,7 +52,7 @@ Deno.serve(async req=>{
    const token_hash=await sha256(token);
    for(const [bucket,limit] of [['global:'+await sha256('invite-global'),300],['phone:'+await sha256('invite:'+token),20]] as const){const {data:allowed,error}=await admin.rpc('ay_auth_login_limit',{p_bucket:bucket,p_limit:limit});if(error)return reply({error:'invitation_failed'},503);if(!allowed)return reply({error:'try_later'},429);}
    const {data:ticket,error:tokenError}=await admin.from('ay3_invite_tokens')
-    .select('site_id,person_id,unit_id,issued_by,phone_e164,expires_at,consumed_at,revoked_at')
+    .select('site_id,person_id,unit_id,issued_by,phone_e164,email,expires_at,consumed_at,revoked_at')
     .eq('token_hash',token_hash).maybeSingle();
    if(tokenError)return reply({error:'invitation_failed'},500);
    if(!ticket||ticket.consumed_at||ticket.revoked_at||new Date(ticket.expires_at).getTime()<=Date.now())
@@ -67,7 +68,7 @@ Deno.serve(async req=>{
    if(!staff)return reply({error:'invite_unavailable'},410);
    if(action==='inspect'){
      return reply({valid:true,first_name:String(person.first_name||'').slice(0,70),
-      phone_hint:'••'+ticket.phone_e164.slice(-3),
+      phone_hint:ticket.phone_e164?'••'+ticket.phone_e164.slice(-3):'••@'+String(ticket.email).split('@')[1],
       expires_at:ticket.expires_at});
    }
    const password=String(input.password||'');
@@ -75,18 +76,21 @@ Deno.serve(async req=>{
    // A dummy internal email identifier is used for password auth; residents never supply an email.
    // The manual WhatsApp invitation is NOT independent proof of ownership of this phone number.
    const {data:created,error:createError}=await admin.auth.admin.createUser({
-    email:emailAlias(ticket.phone_e164),email_confirm:true,password
+    email:ticket.email||emailAlias(ticket.phone_e164),email_confirm:true,password
    });
    if(createError||!created.user)return reply({error:'account_exists_or_unavailable'},409);
    const userId=created.user.id;
+   if(created.user.email?.toLowerCase()!==(ticket.email||emailAlias(ticket.phone_e164)).toLowerCase())return reply({error:'activation_reconciliation_required'},409);
    try{
     const {data:bound,error:bindError}=await admin.rpc('ay3_redeem_phone_invite',{p_token_hash:token_hash,p_user:userId});
     if(bindError||!bound?.ok)throw Error('bind_failed');
    }catch{
-    await admin.auth.admin.deleteUser(userId).catch(()=>{});
-    return reply({error:'activation_failed'},409);
+    // A failed RPC response can hide a COMMITTED binding. Never delete the new Auth user here.
+    // Quarantine for operator reconciliation; no blind retry that could overwrite another account.
+    const {data:linked}=await admin.from('ay3_persons').select('auth_user_id').eq('id',ticket.person_id).eq('site_id',ticket.site_id).maybeSingle();
+    if(linked?.auth_user_id!==userId)return reply({error:'activation_reconciliation_required'},409);
    }
-   return reply({ok:true,phone:ticket.phone_e164});
+   return reply({ok:true,phone:ticket.phone_e164,identifier:ticket.email||ticket.phone_e164});
   }
   const bearer=/^Bearer\s+(.+)$/i.exec(req.headers.get('Authorization')||'')?.[1];
   if(!bearer)return reply({error:'sign_in_required'},401);
@@ -94,8 +98,11 @@ Deno.serve(async req=>{
   if(authError||!identity.user)return reply({error:'invalid_session'},401);
   const personId=String(input.person_id||'');
   const phone=normalizedPhone(input.phone);
+  const email=input.contact_kind==='email'?String(input.email||'').trim().toLowerCase():'';
+  const emailMode=input.contact_kind==='email';
   if(!uuid.test(personId))return reply({error:'invalid_person'},400);
-  if(action==='create'&&!phone)return reply({error:'invalid_phone'},400);
+  if(action==='create'&&emailMode&&(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254))return reply({error:'invalid_email'},400);
+  if(action==='create'&&!emailMode&&!phone)return reply({error:'invalid_phone'},400);
   if(input.confirmed!==true)return reply({error:'confirmation_required'},400);
   const {data:person}=await admin.from('ay3_persons')
    .select('id,site_id,auth_user_id').eq('id',personId).maybeSingle();
@@ -113,7 +120,7 @@ Deno.serve(async req=>{
   if(!role)return reply({error:'active_apartment_required'},409);
   const token=b64url(crypto.getRandomValues(new Uint8Array(32)));
   const token_hash=await sha256(token);
-  const {data:expires_at,error:insertError}=await admin.rpc('ay_auth_issue_invite',{p_actor:identity.user.id,p_person:personId,p_phone:phone,p_hash:token_hash});
+  const {data:expires_at,error:insertError}=await admin.rpc(emailMode?'ay_auth_issue_email_invite':'ay_auth_issue_invite',{p_actor:identity.user.id,p_person:personId,...(emailMode?{p_email:email}:{p_phone:phone}),p_hash:token_hash});
   if(insertError)return reply({error:'invitation_failed'},409);
   return reply({url:appUrl+'?invite='+encodeURIComponent(token),expires_at});
  }catch{

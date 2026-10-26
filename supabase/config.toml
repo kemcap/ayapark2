@@ -7,3 +7,6 @@ verify_jwt = false
 
 [functions.ay3-access-requests]
 verify_jwt = false
+
+[functions.ay3-admin-recovery]
+verify_jwt = false

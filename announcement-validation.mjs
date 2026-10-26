@@ -1,4 +1,4 @@
-import {t as tr} from './i18n.mjs?v=5.6.0';
+import {t as tr} from './i18n.mjs?v=5.8.0';
 export function announcementTime(value){
  if(!value)return null;
  if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(value))throw Error(tr('Duyuru tarihini ve saatini kontrol edin.'));

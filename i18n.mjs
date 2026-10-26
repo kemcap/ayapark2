@@ -1,5 +1,21 @@
 // Only authored interface text is translated. Stored content is never sent to a service.
 export const german = {
+ "Giriş yöntemi": "Anmeldemethode",
+ "Davet e-postası": "E-Mail für die Einladung",
+ "Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir. Giriş için telefon veya e-posta seçin.": "Der Link gilt 7 Tage und ist einmal verwendbar. Wähle Telefon oder E-Mail für die Anmeldung.",
+ "Lütfen kendi şifrenizi oluşturun.": "Bitte erstelle dein eigenes Passwort.",
+ "Hesabın etkinleştirildi. Giriş bilgin ve yeni şifrenle giriş yap.": "Dein Konto wurde aktiviert. Melde dich mit deinen Zugangsdaten und dem neuen Passwort an.",
+ "Hesabın durumu yönetim tarafından kontrol edilmelidir. Yeni bir hesap oluşturmayın.": "Die Verwaltung muss den Kontostatus prüfen. Bitte kein weiteres Konto erstellen.",
+
+ "Erişimi yenile": "Zugang wiederherstellen",
+ "Bu bağlantı mevcut hesabın şifresini yeniler. Yeni hesap veya daire yetkisi oluşturmaz.": "Dieser Link setzt das Passwort des bestehenden Kontos zurück. Er erstellt kein Konto und keine Wohnungsberechtigung.",
+ "Kimlik kontrolü notu": "Notiz zur Identitätsprüfung",
+ "Kişinin kimliğini güvenilir bir yöntemle kontrol ettim.": "Ich habe die Identität der Person mit einem zuverlässigen Verfahren geprüft.",
+ "Yenileme bağlantısı oluştur": "Wiederherstellungslink erstellen",
+ "Kişisel yenileme bağlantısı": "Persönlicher Wiederherstellungslink",
+ "E-posta kullanmıyorsanız kimliğinizi doğrulamak ve kişisel yenileme bağlantısı almak için yönetime başvurun.": "Ohne E-Mail: Wende dich für eine Identitätsprüfung und einen persönlichen Wiederherstellungslink an die Verwaltung.",
+ "Şifre kaydedilemedi. En az 6 karakter kullanın ve tekrar deneyin.": "Das Passwort konnte nicht gespeichert werden. Verwende mindestens 6 Zeichen und versuche es erneut.",
+
  "Bağlantı geçersiz veya süresi dolmuş. Yeni bir bağlantı iste veya e-postadaki kodu kullan.": "Der Link ist ungültig oder abgelaufen. Fordere einen neuen Link an oder verwende den Code aus der E-Mail.",
  "Kod doğrulanıyor…": "Code wird überprüft …",
  "Kod geçersiz veya süresi dolmuş. Yeni bir kod iste.": "Der Code ist ungültig oder abgelaufen. Fordere einen neuen an.",
