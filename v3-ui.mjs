@@ -11,7 +11,7 @@ import {analyzeStage} from './reconcile.mjs?v=5.1.0';
 import {remaining,paid,unassigned} from './ledger.mjs?v=5.1.0';
 import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs?v=5.1.0';
 import {residentClaimsPanel} from './site-claims-ui.mjs?v=5.3.0';
-import {norm,today,activeAt,personLinks,personName,scopedCharges,filteredTransactions,selectedRange,rangeError,financialSeries,buildSummaryDays,announcementActive,announcementStatus,suggestUnits,creditAvailable,isReversed,acknowledgementKey,unitSearchMatches} from './v3-domain.mjs?v=5.1.0';
+import {norm,today,activeAt,personLinks,personName,scopedCharges,filteredTransactions,selectedRange,rangeError,financialSeries,buildSummaryDays,announcementActive,announcementStatus,suggestUnits,creditAvailable,isReversed,acknowledgementKey,unitSearchMatches} from './v3-domain.mjs?v=5.3.0';
 export const roleLabel=r=>tr({owner:'Ev sahibi',tenant:'Kiracı',representative:'Temsilci',debtor:'Borçlu',source:'Kaynak kaydı'}[r]||'Kişi');
 export const info=(short,detail)=>`<details class="help-line info-help help-disclosure"><summary><span>${e(tr(short))}</span><span aria-hidden="true">ⓘ</span></summary><p>${e(tr(detail))}</p></details>`;
 const chargeName=c=>c.reference?.startsWith('demo-')?tr('Açık borç'):c.category==='Aidat'&&/^\d{4}-\d{2}$/.test(c.label)?tr('Aidat')+' · '+c.label:e(c.label);
