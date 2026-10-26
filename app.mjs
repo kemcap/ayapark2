@@ -271,11 +271,28 @@ $('actionForm').addEventListener('submit',async event=>{
 });
 document.addEventListener('ay2:themechanged',event=>changePreference('theme',event.detail,state.mode==='connected'?api:null));
 $('connectionButton').addEventListener('click',async()=>{
- if(state.mode!=='connected'){$('loginMessage').textContent='';$('loginDialog').showModal();return;}
+ if(state.mode!=='connected'){showLoginStart();$('loginDialog').showModal();return;}
  endPreferenceSession();urgentShown.clear();popupSession='';importantLoginKeys.clear();localTest=null;localTestRead=false;localTestQueue=[];localTestReceipts.clear();popupBatch=[];epoch++;closeDialogs();state.mode='signedout';state.data=prepareV5Demo(fullDemo());state.stale=false;navigate('overview');
  try{await api.logout();toast(tr("Oturum kapatıldı."));}catch{toast(tr("Bu sekmedeki oturum temizlendi; sunucu çıkışı doğrulanamadı."));}
 });
 let pendingSetupLoaded=null;
+function showLoginStart(){
+ $('loginStart').hidden=false;$('loginCredentials').hidden=true;
+ $('loginBackToStart').hidden=false;
+ $('loginTitle').textContent=tr('Sitenize hoş geldiniz.');
+ $('loginMessage').textContent='';
+}
+function openLoginRoute(route){
+ if(loginBusy||pendingSetupLoaded)return;
+ $('loginStart').hidden=true;$('loginCredentials').hidden=false;
+ $('loginBackToStart').hidden=false;
+ selectLogin(route==='activate'?'setup':'password');
+ $('loginTitle').textContent=tr(route==='activate'?'İlk kez erişimi etkinleştir':'Hesaba giriş yap');
+ $('email').focus();
+}
+$('loginExistingPath').addEventListener('click',()=>openLoginRoute('existing'));
+$('loginActivatePath').addEventListener('click',()=>openLoginRoute('activate'));
+$('loginBackToStart').addEventListener('click',()=>{if(loginBusy||pendingSetupLoaded)return;selectLogin('password');showLoginStart();$('loginExistingPath').focus();});
 $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 function completeSignIn(loaded){
  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;
@@ -289,7 +306,7 @@ function completeSignIn(loaded){
 $('loginDialog').addEventListener('close',()=>{
  hideLoginPassword();$('password').value='';$('setupPassword').value='';$('setupPasswordConfirm').value='';
  if(loginBusy||pendingSetupLoaded){epoch++;pendingSetupLoaded=null;void api.logout().catch(()=>{});loginBusy=false;$('loginSubmit').disabled=false;}
- selectLogin('password');
+ selectLogin('password');showLoginStart();
 });
 
 function selectLogin(method){
@@ -300,7 +317,7 @@ function selectLogin(method){
  $('setupPassword').required=false;$('setupPasswordConfirm').required=false;
  $('usePassword').setAttribute('aria-pressed',String(method==='password'));
  $('useCode').setAttribute('aria-pressed',String(code));
- $('loginTitle').textContent=tr(method==='setup'?'Şifre oluştur':'Sitenize hoş geldiniz.');
+ $('loginTitle').textContent=tr(method==='setup'?'İlk kez erişimi etkinleştir':'Hesaba giriş yap');
  $('codeHelp').textContent=tr(method==='setup'?'Şifre oluşturmak için e-postadaki kodu buraya gir. E-postadaki bağlantıyı açma.':'E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.');
  $('loginSubmit').textContent=tr(method==='setup'?'Devam et':'Giriş yap');
  hideLoginPassword();$('password').value='';$('loginCode').value='';
@@ -312,13 +329,14 @@ function showFirstPasswordForm(loaded){
  $('passwordFields').hidden=true;$('codeFields').hidden=true;$('setupPasswordFields').hidden=false;
  $('password').required=false;$('loginCode').required=false;
  $('setupPassword').required=true;$('setupPasswordConfirm').required=true;
+ $('loginBackToStart').hidden=true;
  $('loginTitle').textContent=tr('Şifre oluştur');
  $('loginSubmit').textContent=tr('Şifreyi kaydet');
  $('setupPassword').focus();
 }
 $('useCode').addEventListener('click',()=>selectLogin('code'));
 $('usePassword').addEventListener('click',()=>selectLogin('password'));
-$('createPasswordEntry').addEventListener('click',()=>selectLogin('setup'));
+$('createPasswordEntry').addEventListener('click',()=>openLoginRoute('activate'));
 let nextCodeAt=0;
 $('requestCode').addEventListener('click',async()=>{
  if(loginBusy||Date.now()<nextCodeAt||!$('email').reportValidity())return;
