@@ -32,3 +32,5 @@ jobs:
           node --check invite-ui.mjs
       - name: Full JavaScript regression suite
         run: npm test
+      - name: Safe Edge Function smoke checks (no resident data)
+        run: node tests/invite-edge-smoke.mjs
