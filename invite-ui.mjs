@@ -63,10 +63,15 @@ export function bindInvitations({api,getState,rerender,openSetup}) {
   if(!inviteEligible(s,s.data.persons.find(p=>p.id===selected.id))){setStatus(tx('Kişi bilgileri değişti. Sayfayı yenileyin.','Der Personenstatus hat sich geändert. Bitte aktualisieren.'),true);return;}
   button.disabled=true;setStatus(tx('Hesap hazırlanıyor ve güvenli bağlantı oluşturuluyor…','Konto wird vorbereitet und der geschützte Link erstellt…'));
   try{
-   // Uses the existing manager-only provisioning endpoint. No email or WhatsApp is sent.
-   const currentPerson=s.data.persons.find(p=>p.id===selected.id);
-   if(!currentPerson?.auth_user_id)await api.provision({site_id:s.data.site.id,person_id:selected.id,access_role:'resident',confirmation:true});
-   const result=await api.invitation({action:'create',person_id:selected.id},true);
+   // Check server configuration and eligibility BEFORE provisioning an Auth account.
+   let result;
+   try{result=await api.invitation({action:'create',person_id:selected.id},true);}
+   catch(error){
+    if(error.code!=='provision_access_first')throw error;
+    // Uses the existing manager-only provisioning endpoint. No messages are sent.
+    await api.provision({site_id:s.data.site.id,person_id:selected.id,access_role:'resident',confirmation:true});
+    result=await api.invitation({action:'create',person_id:selected.id},true);
+   }
    if(typeof result?.url!=='string'||!result.url.startsWith('https://kemcap.github.io/ayapark2/?invite='))throw Error('Invalid invitation response');
    inviteUrl=result.url;
    $('inviteLink').value=inviteUrl;
