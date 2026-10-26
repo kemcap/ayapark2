@@ -4,6 +4,7 @@ const amount=value=>{
  if(!Number.isSafeInteger(n))throw Error('Invalid accounting amount');
  return n;
 };
+/** @param {{units?: Array<any>,charges?: Array<any>,allocations?: Array<any>,entries?: Array<any>,credits?: Array<any>,staged?: Array<any>,ownUnitIds?: Array<string>}} input */
 export function calculateClaims({units=[],charges=[],allocations=[],entries=[],credits=[],staged=[],ownUnitIds=[]}) {
  const available=new Map(units.map(u=>[u.id,{unit_id:u.id,code:u.code,open_cents:0}]));
  const owned=new Set(ownUnitIds.filter(id=>available.has(id)));
