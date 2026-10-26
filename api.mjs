@@ -121,7 +121,7 @@ export class AyaparkApi {
   const serverRole=memberships[0]?.role||'resident';
   const role=serverRole==='manager'?'super':['deputy','auditor'].includes(serverRole)?'staff':'resident';
   const ownIds=links.map(l=>l.unit_id);
-  const [byName,summary,reviewState,staff,residentAccounts,siteClaims]=await Promise.all([this.rpc('ay5_workspace',{p_site:site.id}),this.rpc('ay3_financial_summary',{p_site:site.id}),this.rpc('ay3_review_state',{p_site:site.id}),role==='super'?this.rpc('ay3_staff_directory',{p_site:site.id}):Promise.resolve([]),role==='super'?this.readAll('site_resident_units',`select=user_id,unit_id&active=eq.true&unit_id=in.(${units.map(u=>u.id).join(',')})`):Promise.resolve([]),role==='resident'?this.siteClaims().catch(()=>null):Promise.resolve(null)]);
+  const [byName,summary,reviewState,staff,residentAccounts,siteClaims]=await Promise.all([this.rpc('ay5_workspace',{p_site:site.id}),this.rpc('ay3_financial_summary',{p_site:site.id}),this.rpc('ay3_review_state',{p_site:site.id}),role==='super'?this.rpc('ay3_staff_directory',{p_site:site.id}):Promise.resolve([]),role==='super'?this.readAll('site_resident_units',`select=user_id,unit_id&active=eq.true&unit_id=in.(${units.map(u=>u.id).join(',')})`):Promise.resolve([]),role==='resident'&&this.session?.access_token?this.siteClaims().catch(()=>null):Promise.resolve(null)]);
   assertSession();
   if(!byName)throw Error(tr("Çalışma alanı erişimi doğrulanamadı."));
   const capabilities=byName.capabilities;
