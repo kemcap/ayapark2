@@ -43,7 +43,7 @@ test('setting a first password uses only the authenticated Supabase user endpoin
  assert.equal(api.session.user.id,'sample-user');
 });
 const source=readFileSync(new URL('../app.mjs',import.meta.url),'utf8');
-const handlers=source.slice(source.indexOf("$('cancelLogin').addEventListener"),source.indexOf("$('refreshButton').addEventListener"));
+const handlers=source.slice(source.indexOf('let pendingSetupLoaded=null;'),source.indexOf("$('refreshButton').addEventListener"));
 function harness(){
  const elements=new Map(),calls={verify:0,login:0,password:0,load:0,logout:0};
  const $=id=>{

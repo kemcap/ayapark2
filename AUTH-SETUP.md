@@ -32,6 +32,23 @@ For arbitrary residents, a working custom SMTP provider is required if the defau
 ## Reset loop and OTP fallback (V3.13.4)
 The reset email template in `supabase/templates/recovery.html` contains both `{{ .ConfirmationURL }}` and `{{ .Token }}`. **Copy this template into Supabase Authentication → Email Templates → Reset Password**; a GitHub code change alone does not modify the Supabase email template. A recovery link is one-use and expires. If a link fails, request a fresh reset email and enter its numeric code into `/reset.html` without clicking the link. The new form verifies the recovery code with `type: recovery` and only then permits setting a password. Check Authentication → URL Configuration for the GitHub Pages reset URL and set the current site URL. Never send recovery links or OTPs to support.
 
+## Block 3 – Getrennter Login und Erstaktivierung (Entwicklungsbranch)
+
+Das Anmeldedialog zeigt zuerst **„Zaten erişimim var / Ich habe bereits einen Zugang“** und **„Erişimimi ilk kez etkinleştir / Zugang erstmals aktivieren“**. Die Erstaktivierung führt wie bisher über einen E-Mail-Einmalcode zu einer einmaligen Passwortvergabe. Bereits eingerichtete Konten können weiterhin Passwort oder E-Mail-Code verwenden. Beim Zurückgehen aus einer bereits verifizierten Passwort-Erstvergabe wird die temporäre Sitzung widerrufen. Beide Wege bleiben durch die bisherigen RLS-/Serverberechtigungen geschützt.
+
+### Google und Apple (nur nach tatsächlicher Provider-Einrichtung)
+
+Die Client-App liest `GET /auth/v1/settings` von Supabase Auth. Google- bzw. Apple-Anmeldebuttons erscheinen nur, wenn `external.google === true` oder `external.apple === true` gemeldet wird. Danach startet die App ausschließlich für den autorisierten GitHub-Pages-Ursprung `/auth/v1/authorize?provider=…&redirect_to=…`; der Callback wird durch das bestehende Session-Handling verarbeitet. Unbekannte oder unberechtigte Auth-Sitzungen erhalten **keinen automatisch erteilten Wohnungszugang**. Der Client lädt die Site-Daten erst nach bestehender RLS-/Rollenprüfung und verwirft verweigerte Sitzungen.
+
+**Vor einer Aktivierung in Supabase:**
+1. Für Google ein Web-OAuth-Projekt samt Client ID/Secret konfigurieren, die Supabase-Callback-URL im Google-Konto hinterlegen, `https://kemcap.github.io/ayapark2/` als erlaubte Auth-Weiterleitung aufnehmen und mit bereits freigeschaltetem Testbenutzer prüfen.
+2. Für Apple Services ID, Apple-Key und zeitlich begrenztes Client Secret korrekt einrichten und den Ablauf einschließlich „E-Mail-Adresse verbergen“ durchspielen. Apple-Schlüsselwartung planen.
+3. OAuth-Kontoidentitäten vor produktiver Freigabe mit bestehenden `auth.users` und Wohnungszuordnungen prüfen. Bei anderer Provider-E-Mail **niemals anhand eines bloßen Namens oder einer behaupteten Adresse** automatisch einer vorhandenen Person zuordnen.
+4. Unerwünschte neue Auth-Identitäten können von Supabase OAuth erzeugt werden, wenn freie OAuth-Signups nicht serverseitig eingeschränkt sind. Sie dürfen durch RLS keine Bewohnerdaten sehen; für strikte Kontrolle auch auf Auth-Ebene eine geeignete serverseitige Vorabprüfung beziehungsweise einen sicheren Identitätsverknüpfungsprozess planen. Diese zusätzliche serverseitige Beschränkung ist **nicht** Bestandteil dieser rein clientseitigen Änderung.
+5. OAuth-Credentials und Service-Role-Schlüssel ausschließlich im Anbieter-/Supabase-Dashboard speichern, niemals in GitHub Pages, JavaScript oder GitHub-Commits eintragen.
+
+Die tatsächliche Provider-Konfiguration, reale E-Mail-Zustellung, Passwort-Reset-End-to-End und Google-/Apple-Konto-Verknüpfung können nicht allein durch einen Repository-Commit verifiziert werden. Die bestehende Wiederherstellungsmaske samt numerischem Code als Fallback bleibt erhalten. Die separate WhatsApp-Anmeldung und Telefonnummer-Verifizierung gehören ausdrücklich **nicht** zu diesem Arbeitspaket.
+
 ## User onboarding
 
 A manager records the person's email and current apartment relationship, then selects Benutzerzugang / Kullanıcı erişimi in settings. This prepares an unconfirmed Auth account and grants the selected role through a server-only transaction. It does not send an email. The user requests an OTP on the login screen; verification proves mailbox ownership. All account creation and role assignment is authorized server-side against the manager membership. Existing management roles are not silently downgraded.

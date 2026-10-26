@@ -1598,3 +1598,31 @@ dialog #detailTitle:focus{outline:none}
 /* V3.14.3: Keep former-person balances visible in relationship history. */
 .former-person-debt{margin:9px 0;padding:9px 11px;border-left:3px solid var(--primary);background:var(--info-bg);color:var(--info-ink);border-radius:5px;font-size:.88rem;overflow-wrap:anywhere}
 .former-person-debt strong{font-weight:700}
+
+
+/* Block 3: deliberate first-activation entry and accessible sign-in choices. */
+#loginDialog.auth-dialog{width:min(570px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow-y:auto}
+.auth-entry-choice{margin:18px 0 4px}
+.auth-entry-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.auth-entry-card{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:9px;min-height:168px;width:100%;padding:18px;border:1.5px solid var(--tile-line);border-radius:16px;background:var(--tile-bg);color:var(--ink);text-align:left;white-space:normal}
+.auth-entry-card:hover{border-color:var(--primary);background:var(--soft)}
+.auth-entry-card strong{font-size:16px;line-height:1.32}
+.auth-entry-card small{font-size:12px;color:var(--muted)}
+.auth-entry-symbol{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--paper);border:1px solid var(--line);color:var(--primary);font-size:22px}
+.auth-entry-note{margin-top:14px;color:var(--muted)}
+.auth-flow-back{margin:12px 0 18px;padding:7px 0;min-height:40px}
+.auth-oauth-options{border-bottom:1px solid var(--line);margin:0 0 16px;padding:0 0 15px}
+.auth-oauth-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:9px 0}
+.auth-provider{min-height:46px;width:100%;font-weight:650;white-space:normal}
+#loginDialog #loginMethodChooser{margin-bottom:15px}
+#loginDialog #loginIntro{line-height:1.5}
+#loginDialog #loginMessage.error{color:var(--red)}
+@media(max-width:480px){
+ #loginDialog.auth-dialog{width:calc(100vw - 16px);padding:18px;max-height:calc(100dvh - 16px)}
+ .auth-entry-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .auth-entry-card{padding:13px 10px;min-height:157px}
+ .auth-entry-card strong{font-size:14px}
+ .auth-entry-card small{font-size:11px}
+ .auth-oauth-buttons{grid-template-columns:1fr}
+}
+@media(max-width:350px){.auth-entry-grid{grid-template-columns:1fr}.auth-entry-card{min-height:100px}}
