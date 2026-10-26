@@ -34,8 +34,8 @@ begin
  then raise exception 'Resident already linked'; end if;
  if not exists(select 1 from public.ay3_links l where l.person_id=ticket.person_id
    and l.site_id=ticket.site_id and l.unit_id=ticket.unit_id and l.role in ('owner','tenant')
-   and l.active and (l.starts_on is null or l.starts_on<=current_date)
-   and (l.ends_on is null or l.ends_on>=current_date))
+   and l.active and (l.starts_on is null or l.starts_on<=(now() at time zone 'Europe/Istanbul')::date)
+   and (l.ends_on is null or l.ends_on>=(now() at time zone 'Europe/Istanbul')::date))
  then raise exception 'No current apartment'; end if;
  if exists(select 1 from public.ay3_persons p where p.auth_user_id=p_user and p.id<>ticket.person_id)
  then raise exception 'Account already linked elsewhere'; end if;
@@ -45,8 +45,8 @@ begin
  select distinct l.unit_id,p_user,l.role,null,true from public.ay3_links l
  where l.person_id=ticket.person_id and l.site_id=ticket.site_id
    and l.role in ('owner','tenant') and l.active
-   and (l.starts_on is null or l.starts_on<=current_date)
-   and (l.ends_on is null or l.ends_on>=current_date)
+   and (l.starts_on is null or l.starts_on<=(now() at time zone 'Europe/Istanbul')::date)
+   and (l.ends_on is null or l.ends_on>=(now() at time zone 'Europe/Istanbul')::date)
  on conflict(unit_id,user_id,role) do update set active=true;
  update public.ay3_invite_tokens set consumed_at=now() where id=ticket.id;
  update public.ay3_invite_tokens set revoked_at=now()
