@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {AyaparkApi} from '../api.mjs?v=5.5.0';
+import {AyaparkApi} from '../api.mjs?v=5.6.0';
 
 const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};};
 function fixture(role='manager',count=6){

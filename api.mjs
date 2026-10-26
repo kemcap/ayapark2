@@ -1,6 +1,6 @@
-import {classifyIdentifier,newPasswordError} from './auth-policy.mjs?v=5.5.0';
-import {ENABLE_VERIFIED_PHONE_LOGIN} from './auth-features.mjs?v=5.5.0';
-import {t as tr} from './i18n.mjs?v=5.5.0';
+import {classifyIdentifier,newPasswordError} from './auth-policy.mjs?v=5.6.0';
+import {ENABLE_VERIFIED_PHONE_LOGIN} from './auth-features.mjs?v=5.6.0';
+import {t as tr} from './i18n.mjs?v=5.6.0';
 // Existing site tables are read-only; V2 mutations use a checked transactional RPC.
 const URL='https://eisozwhhinqszfikemot.supabase.co';
 const KEY='sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc';
@@ -37,6 +37,7 @@ export class AyaparkApi {
   this.accept({access_token,refresh_token,expires_in:0,user},generation);await this.token();return user;
  }
  async siteClaims(){return this.raw('/functions/v1/ay3-site-open-claims','POST',{},await this.token());}
+ async accessRequests(payload,authenticated=false){return this.raw('/functions/v1/ay3-access-requests','POST',payload,authenticated?await this.token():undefined);}
  async provision(payload){return this.raw('/functions/v1/ay3-user-access','POST',payload,await this.token());}
  async invitation(payload,authenticated=false){return this.raw('/functions/v1/ay3-whatsapp-invite','POST',payload,authenticated?await this.token():undefined);}
  async raw(path,method='GET',body,token) {

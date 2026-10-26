@@ -1262,3 +1262,14 @@ Object.assign(german,{'Telefon veya e-posta':'Telefonnummer oder E-Mail-Adresse'
 Object.assign(german,{'Bekleyen davetleri iptal et':'Ausstehende Einladungen widerrufen','Yeni şifre (en az 6 karakter)':'Neues Passwort (mindestens 6 Zeichen)','Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir. Etkinleştirme için e-posta gerekmez.':'Der Link ist 7 Tage gültig und nur einmal verwendbar. Für die Aktivierung ist keine E-Mail erforderlich.'});
 
 Object.assign(german,{'En az 6 karakterli bir şifre kullanın.':'Verwende ein Passwort mit mindestens 6 Zeichen.'});
+
+Object.assign(german,{
+ 'Erişim Talepleri':'Zugangsanfragen','Yeni':'Neu','İnceleniyor':'In Prüfung','Onaylandı':'Freigegeben','Davet gönderildi':'Einladung versendet','Etkinleştirildi':'Aktiviert','Reddedildi':'Abgelehnt',
+ 'Yeni / okunmadı':'Neu / ungelesen','Yenile':'Aktualisieren','Son 200 talep gösterilir.':'Angezeigt werden die letzten 200 Anfragen.','Okundu olarak işaretle':'Als gelesen markieren','İncelemeye al':'In Prüfung nehmen','Kişiyi eşleştir':'Person zuordnen','Davet oluştur':'Einladung erstellen','Gönderimi onayla':'Versand bestätigen','Reddet':'Ablehnen','Henüz erişim talebi yok.':'Keine Zugangsanfragen vorhanden.',
+ 'İlk kez erişim iste':'Zugang erstmals aktivieren','Yönetimden kişisel davet bağlantısı isteyin. Bu form hesap oluşturmaz.':'Fordern Sie einen persönlichen Einladungslink von der Verwaltung an. Dieses Formular erstellt kein Konto.',
+ 'İletişim yöntemi':'Kontaktmethode','Daire (isteğe bağlı, ör. A-7)':'Wohnung (optional, z. B. A-7)','Talep gönder':'Anfrage senden','Erişim talebini incele':'Zugangsanfrage prüfen','Kişi ara':'Person suchen','Kimliği ve güncel daire rolünü kontrol ettim.':'Ich habe die Identität und die aktuelle Wohnungsrolle geprüft.','Onayla':'Bestätigen','Talebi reddet':'Anfrage ablehnen',
+ 'Kişiyi, iletişim bilgisini ve güncel daire rolünü kontrol edin.':'Prüfen Sie Person, Kontaktdaten und aktuelle Wohnungsrolle.','Önce kontrolü onaylayın.':'Bestätigen Sie zuerst die Prüfung.','İşlem tamamlanamadı. Kaydı yenileyip tekrar kontrol edin.':'Die Aktion konnte nicht abgeschlossen werden. Aktualisieren und prüfen Sie den Eintrag erneut.',
+ 'Talebiniz alındı. Yönetim incelemeden sonra sizinle iletişime geçecektir.':'Ihre Anfrage wurde entgegengenommen. Die Verwaltung meldet sich nach der Prüfung.','Talep gönderilemedi. Bilgilerinizi kontrol edip daha sonra tekrar deneyin.':'Die Anfrage konnte nicht gesendet werden. Prüfen Sie Ihre Angaben und versuchen Sie es später erneut.','Talepler yüklenemedi. Yenileyin.':'Anfragen konnten nicht geladen werden. Bitte aktualisieren.'
+});
+
+Object.assign(german,{'Sayfa başına en fazla 200 talep.':'Bis zu 200 Anfragen pro Seite.','Önceki talepler':'Vorherige Anfragen','Sonraki talepler':'Weitere Anfragen'});

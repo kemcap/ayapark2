@@ -1,5 +1,5 @@
-import {parseLegacyCsv} from './core.mjs?v=5.5.0';
-import {t as tr} from './i18n.mjs?v=5.5.0';
+import {parseLegacyCsv} from './core.mjs?v=5.6.0';
+import {t as tr} from './i18n.mjs?v=5.6.0';
 export const templateHeader='date;reference;counterparty;description;income;expense;unit;iban;balance';
 export const template=templateHeader+'\r\n';
 export function csvRows(raw){const rows=[];let row=[],cell='',quoted=false,closed=false;const delimiter=raw.split(/\r?\n/)[0].includes(';')?';':',';

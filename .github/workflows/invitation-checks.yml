@@ -47,6 +47,10 @@ jobs:
         run: |
           npm run test:auth:sql
           npm run test:invite:sql
+      - name: Typecheck access requests
+        run: deno check --node-modules-dir=auto supabase/functions/ay3-access-requests/index.ts
+      - name: Access request SQL checks
+        run: npm run test:requests:sql
       - name: Safe Edge Function smoke checks (no resident data)
         run: node tests/invite-edge-smoke.mjs
       - name: Safe site receivables smoke checks (no resident data)

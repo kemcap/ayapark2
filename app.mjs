@@ -1,29 +1,30 @@
-import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.5.0';
-import {prepareV5Demo} from './finance-demo.mjs?v=5.5.0';
-import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.5.0';
-import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.5.0';
-import {bindDesign} from './design.mjs?v=5.5.0';
-import {enhanceTables} from './ui-accessibility.mjs?v=5.5.0';
-import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.5.0';
-import {apartmentInfo} from './apartment-info.mjs?v=5.5.0';
-import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.5.0';
-import {updateAssignmentForm} from './assignments.mjs?v=5.5.0';
-import {personManager} from './people-ui.mjs?v=5.5.0';
-import {bindInvitations} from './invite-ui.mjs?v=5.5.0';
-import {mayPreview,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.5.0';
-import {bindInstall} from './install.mjs?v=5.5.0';
-import {bindPasswordEyes} from './password-eye.mjs?v=5.5.0';
-import {sha256} from './hash.mjs?v=5.5.0';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs?v=5.5.0';
-import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.5.0';
-import {template} from './v3-import.mjs?v=5.5.0';
-import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.5.0';
-import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.5.0';
-import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.5.0';
-import {AyaparkApi} from './api.mjs?v=5.5.0';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.5.0';
-import {buildForm,payloadFor} from './forms.mjs?v=5.5.0';
-import {analyzeStage} from './reconcile.mjs?v=5.5.0';
+import {bindAccessRequests} from './access-request-ui.mjs?v=5.6.0';
+import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.6.0';
+import {prepareV5Demo} from './finance-demo.mjs?v=5.6.0';
+import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.6.0';
+import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.6.0';
+import {bindDesign} from './design.mjs?v=5.6.0';
+import {enhanceTables} from './ui-accessibility.mjs?v=5.6.0';
+import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.6.0';
+import {apartmentInfo} from './apartment-info.mjs?v=5.6.0';
+import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.6.0';
+import {updateAssignmentForm} from './assignments.mjs?v=5.6.0';
+import {personManager} from './people-ui.mjs?v=5.6.0';
+import {bindInvitations} from './invite-ui.mjs?v=5.6.0';
+import {mayPreview,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.6.0';
+import {bindInstall} from './install.mjs?v=5.6.0';
+import {bindPasswordEyes} from './password-eye.mjs?v=5.6.0';
+import {sha256} from './hash.mjs?v=5.6.0';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs?v=5.6.0';
+import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.6.0';
+import {template} from './v3-import.mjs?v=5.6.0';
+import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.6.0';
+import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.6.0';
+import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.6.0';
+import {AyaparkApi} from './api.mjs?v=5.6.0';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.6.0';
+import {buildForm,payloadFor} from './forms.mjs?v=5.6.0';
+import {analyzeStage} from './reconcile.mjs?v=5.6.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
 const applyStaticLanguage=bindStaticText(document.body);
@@ -39,6 +40,7 @@ const invitationUi=bindInvitations({
  onActivated:async({phone,password})=>{await api.login(phone,password);completeSignIn(await api.load());},
  openPhoneLogin:(phone)=>{selectLogin('password');$('email').value=phone;$('loginDialog').showModal();$('loginMessage').textContent=tr('Hesabın etkinleştirildi. Telefon numaran ve yeni şifrenle giriş yap.');}
 });
+const accessRequestUi=bindAccessRequests({api,getState:()=>state,invite:id=>invitationUi.open(id)});
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
@@ -291,7 +293,7 @@ function completeSignIn(loaded){
  // Closing a completed login must not trigger the pending-login cancellation handler.
  loginBusy=false;pendingSetupLoaded=null;$('loginSubmit').disabled=false;
  if($('loginDialog').open)$('loginDialog').close();
- if(typeof invitationUi!=='undefined')invitationUi.clearUrl();$('loginForm').reset();navigate('overview');void syncPreferences(api,()=>{applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));});
+ if(typeof invitationUi!=='undefined')invitationUi.clearUrl();$('loginForm').reset();navigate('overview');if(typeof accessRequestUi!=='undefined')void accessRequestUi.load();void syncPreferences(api,()=>{applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));});
 }
 
 $('loginDialog').addEventListener('close',()=>{

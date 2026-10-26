@@ -1,6 +1,6 @@
 // Domain rules shared by views and the local demonstration. Amounts are integer kuruş.
-import {summarize} from './core.mjs?v=5.5.0';
-import {t as tr} from './i18n.mjs?v=5.5.0';
+import {summarize} from './core.mjs?v=5.6.0';
+import {t as tr} from './i18n.mjs?v=5.6.0';
 // Shared only during a synchronous render; always discard after the callback.
 let paymentComputation=null;
 export function withPaymentIndex(d,fn){
