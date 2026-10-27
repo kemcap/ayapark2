@@ -14,16 +14,23 @@ export function adminRecoveryHandler({enabled,origins,resetUrl,admin,hash}){retu
   const chunks=[];let size=0;while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>4096){await reader.cancel();return reply(413,{error:'invalid_request'});}chunks.push(value);}
   const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
   const p=JSON.parse(new TextDecoder().decode(bytes));
-  if(!p||Array.isArray(p)||p.action!=='create'||!/^[-a-f0-9]{36}$/i.test(p.person_id)||p.confirmed!==true||typeof p.reason!=='string'||p.reason.trim().length<10||p.reason.length>300)return reply(400,{error:'invalid_request'});
+  if(!p||Array.isArray(p)||p.action!=='create'||!/^[-a-f0-9]{36}$/i.test(p.person_id)||p.confirmed!==true||typeof p.reason!=='string'||p.reason.trim().length<10||p.reason.length>300||(p.staff_confirmed!==undefined&&typeof p.staff_confirmed!=='boolean'))return reply(400,{error:'invalid_request'});
   for(const [bucket,limit] of [['global:'+await hash('recovery-all'),100],['phone:'+await hash('recovery-actor:'+actor.id),5]])if(!await admin.limit(bucket,limit))return reply(429,{error:'try_later'});
   // SQL checks site-scoped manager privileges before looking up the Auth account.
-  const uid=await admin.authorize(actor.id,p.person_id,p.reason.trim(),true);
+  const staffConfirmed=p.staff_confirmed===true;
+  const uid=await admin.authorize(actor.id,p.person_id,p.reason.trim(),true,staffConfirmed);
   const user=await admin.account(uid);if(!user||user.id!==uid||!user.email)return reply(409,{error:'recovery_unavailable'});
   const link=await admin.generate(user.email);
   if(link?.user?.id!==uid||typeof link?.properties?.hashed_token!=='string'||!/^[a-f0-9]{32,256}$/i.test(link.properties.hashed_token))return reply(409,{error:'recovery_unavailable'});
   // Recheck linkage/manager and persist audit BEFORE disclosing any credential.
-  await admin.issued(actor.id,p.person_id,uid);
+  await admin.issued(actor.id,p.person_id,uid,staffConfirmed);
   target.hash=new URLSearchParams({type:'recovery',token_hash:link.properties.hashed_token}).toString();
   return reply(200,{url:target.href});
- }catch(error){return reply(error instanceof SyntaxError?400:409,{error:'recovery_unavailable'});}
+ }catch(error){
+  const reason=String(error?.message||'');
+  if(reason.includes('staff_verification_required'))return reply(409,{error:'staff_verification_required'});
+  if(reason.includes('manager_recovery_requires_operator'))return reply(403,{error:'manager_recovery_requires_operator'});
+  if(reason.includes('self_recovery_forbidden'))return reply(403,{error:'self_recovery_forbidden'});
+  return reply(error instanceof SyntaxError?400:409,{error:'recovery_unavailable'});
+ }
 };}
