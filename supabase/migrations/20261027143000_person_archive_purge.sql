@@ -24,7 +24,7 @@ BEGIN
   IF (SELECT auth.uid()) IS NULL OR NOT ay2_private.can(p_site,'admin') THEN
     RAISE EXCEPTION 'Nur Superadmins duerfen Personen archivieren oder loeschen.' USING ERRCODE='42501';
   END IF;
-  IF p_confirm IS DISTINCT FROM true OR p_person IS NULL OR p_mode NOT IN ('archive','restore','delete') THEN
+  IF p_confirm IS DISTINCT FROM true OR p_person IS NULL OR p_mode IS NULL OR p_mode NOT IN ('archive','restore','delete') THEN
     RAISE EXCEPTION 'Bestaetigung und gueltige Aktion erforderlich.';
   END IF;
   PERFORM pg_advisory_xact_lock(hashtextextended(p_site::text,0));
