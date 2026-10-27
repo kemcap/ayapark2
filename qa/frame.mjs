@@ -28,8 +28,8 @@ window.runCase=async c=>{
   document.querySelector('#actionTitle').textContent=built.title;document.querySelector('#actionFields').innerHTML=built.body;updateAssignmentForm(document.querySelector('#actionFields'),data);document.querySelector('#actionDialog').showModal();
  }
  if(['batch_charge','monthly_v5','auto_allocate','monthly_exception','budget'].includes(c.page)){const built=buildForm(s,c.page,{period:s.period});document.querySelector('#actionTitle').textContent=built.title;const root=document.querySelector('#actionFields');root.innerHTML=built.body;root.dataset.financeAction=c.page;const f=await import(base+'finance-forms.mjs?v=5.8.0');f.updateFinanceForm(root,data);root.querySelectorAll("details").forEach(n=>n.open=true);document.querySelector('#actionDialog').showModal();}
- if(c.page==='notifications'){const n=await import(base+'notifications.mjs?v=5.8.0');document.querySelector('#notificationsList').innerHTML=n.notificationList(data);document.querySelector('#notificationsDialog').showModal();}
- if(c.page==='urgent'){const n=await import(base+'notifications.mjs?v=5.8.0'),a=n.testAnnouncement();document.querySelector('#urgentTitle').textContent=n.notificationTitle(a);document.querySelector('#urgentBody').textContent=n.notificationBody(a);document.querySelector('#urgentDialog').showModal();}
+ if(c.page==='notifications'){const n=await import(base+'notifications.mjs?v=5.9.0');document.querySelector('#notificationsList').innerHTML=n.notificationList(data);document.querySelector('#notificationsDialog').showModal();}
+ if(c.page==='urgent'){const n=await import(base+'notifications.mjs?v=5.9.0'),a=n.testAnnouncement();document.querySelector('#urgentTitle').textContent=n.notificationTitle(a);document.querySelector('#urgentBody').textContent=n.notificationBody(a);document.querySelector('#urgentDialog').showModal();}
  if(c.page==='invite')document.querySelector('#inviteDialog').showModal();
  if(c.page==='invite_activate')document.querySelector('#inviteActivateDialog').showModal();
  if(c.page==='login')document.querySelector('#loginDialog').showModal();

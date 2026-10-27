@@ -1,10 +1,13 @@
 import {escapeHtml as escape} from './core.mjs?v=5.8.1';
-import {activeAt} from './v3-domain.mjs?v=5.8.1';
+import {today} from './v3-domain.mjs?v=5.9.0';
 import {getLanguage} from './i18n.mjs?v=5.8.1';
 
+export const invitableRelationship=link=>['owner','tenant','representative'].includes(link.role)
+ && (!link.starts_on||link.starts_on<=today()) && link.archive_reason!=='mistake';
+
 export const inviteEligible=(state,person)=>state.mode==='connected' && state.data.role==='super'
- && Boolean(person?.id) && !person?.auth_user_id
- && (state.data.links||[]).some(link=>link.person_id===person.id && ['owner','tenant'].includes(link.role) && activeAt(link));
+ && Boolean(person?.id) && person?.registered!==true && (!person?.auth_user_id||person?.provisional===true)
+ && (state.data.links||[]).some(link=>link.person_id===person.id && invitableRelationship(link));
 
 export function whatsappNumber(input) {
  const raw=String(input||'').trim();
@@ -43,7 +46,7 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
  function open(personId){
   const s=getState(),person=s.data.persons?.find(p=>p.id===personId);
   if(!inviteEligible(s,person))throw Error(tx('Bu kişi davet için uygun değil.','Für diese Person ist keine Einladung möglich.'));
-  const units=[...new Set(s.data.links.filter(link=>link.person_id===person.id&&['owner','tenant'].includes(link.role)&&activeAt(link))
+  const units=[...new Set(s.data.links.filter(link=>link.person_id===person.id&&invitableRelationship(link))
    .map(link=>s.data.units.find(unit=>unit.id===link.unit_id)?.code).filter(Boolean))].join(', ');
   selected={id:person.id,name:person.full_name||'',units,email:person.email||''};
   inviteUrl='';
@@ -54,7 +57,7 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
   $('inviteConfirm').checked=false;
   $('inviteGenerate').disabled=false;
   $('inviteLink').value='';
-  setStatus(tx('Bağlantı henüz oluşturulmadı.','Noch kein Einladungslink erzeugt.'));
+  setStatus(person.invite_expires_at&&Date.parse(person.invite_expires_at)>Date.now()?tx('Geçerli bir davet var. Yeni bağlantı oluşturmak önceki bağlantıyı iptal eder.','Eine gültige Einladung liegt vor. Ein neuer Link macht den bisherigen ungültig.'):tx('Bağlantı henüz oluşturulmadı.','Noch kein Einladungslink erzeugt.'));
   toggleSend();dialog.showModal();
  }
  $('inviteRevoke').addEventListener('click',async()=>{
@@ -78,6 +81,7 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
    if($('inviteContactKind').value!=='email'&&!phone)throw Error(tx('Geçerli bir WhatsApp numarası girin.','Bitte eine gültige WhatsApp-Nummer eintragen.'));
    const result=await api.invitation({action:'create',person_id:selected.id,phone,contact_kind:$('inviteContactKind').value,email:$('inviteEmail').value,confirmed:true},true);
    if(typeof result?.url!=='string'||!result.url.startsWith(new URL('./',location.href).href+'?invite='))throw Error(tx('Sunucudan geçerli bir davet bağlantısı alınamadı. Lütfen tekrar deneyin.','Der Server hat keinen gültigen Einladungslink geliefert. Bitte erneut versuchen.'));
+   const person=s.data.persons.find(p=>p.id===selected.id);if(person)person.invite_expires_at=result.expires_at;
    inviteUrl=result.url;
    $('inviteLink').value=inviteUrl;
    message.value=inviteText({name:selected.name,units:selected.units,link:inviteUrl,language:getLanguage(),contactKind:$('inviteContactKind').value});

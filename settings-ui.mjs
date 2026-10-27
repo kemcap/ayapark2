@@ -1,5 +1,5 @@
-import {previewControls} from './access-preview.mjs?v=5.8.1';
-import {testControls} from './notifications.mjs?v=5.8.1';
+import {previewControls} from './access-preview.mjs?v=5.9.0';
+import {testControls} from './notifications.mjs?v=5.9.0';
 import {t as tr,locale} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e} from './core.mjs?v=5.8.1';
 import {appearanceSettings} from './preferences.mjs?v=5.8.1';

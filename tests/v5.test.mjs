@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {fullDemo,demoCommand} from '../ledger.mjs?v=5.8.1';
 import {prepareV5Demo} from '../finance-demo.mjs?v=5.8.1';
 import {distribute,batchPreview,paymentPlan,amountCents,availableBudget,financeLinkAt} from '../finance-v5.mjs?v=5.8.1';
-import {unreadNotifications,nextPopup,hasRead,receives,testAnnouncement} from '../notifications.mjs?v=5.8.1';
+import {unreadNotifications,nextPopup,hasRead,receives,testAnnouncement} from '../notifications.mjs?v=5.9.0';
 import {setLanguage} from '../i18n.mjs?v=5.8.1';import {money,randomId} from '../core.mjs?v=5.8.1';
 import {financePayload,localFinancePreview} from '../finance-forms.mjs?v=5.8.1';
 const data=()=>prepareV5Demo(fullDemo());
@@ -24,13 +24,13 @@ test('targeted apartments and blocks use current assignments, not foreign apartm
 test('an unpreviewed finance payload cannot be submitted even with a checked confirmation',()=>{const f=new FormData();for(const[k,v]of Object.entries({entry_id:'e',unit_id:'u',person_id:'p',group:'general',confirmed:'on'}))f.set(k,v);assert.throws(()=>financePayload('auto_allocate',f,{request_id:'r',v5:true}));});
 
 test('bulk finance uses one command RPC and keeps notification compatibility',async()=>{
- const {AyaparkApi}=await import('../api.mjs?v=5.8.1');const calls=[],api=new AyaparkApi();api.rpc=async(name,body)=>{calls.push({name,body});return {ok:true};};await api.command('s','batch_charge',{unit_ids:Array(20).fill('synthetic')});assert.equal(calls.length,1);assert.equal(calls[0].name,'ay5_command');await api.command('s','acknowledge',{id:'n',revision:2});assert.equal(calls[1].name,'ay2_command');
+ const {AyaparkApi}=await import('../api.mjs?v=5.9.0');const calls=[],api=new AyaparkApi();api.rpc=async(name,body)=>{calls.push({name,body});return {ok:true};};await api.command('s','batch_charge',{unit_ids:Array(20).fill('synthetic')});assert.equal(calls.length,1);assert.equal(calls[0].name,'ay5_command');await api.command('s','acknowledge',{id:'n',revision:2});assert.equal(calls[1].name,'ay2_command');
 });
 test('representative demo mandates retain before/after history',async()=>{
- const {applyAssignmentDemo}=await import('../assignments.mjs?v=5.8.1');const d=data();d.links.push({id:'rep',unit_id:'A-4',person_id:'demo-owner',role:'representative',active:true,revision:1,mandates:[]});applyAssignmentDemo(d,'assignment_edit',{request_id:randomId(),id:'rep',revision:1,role:'representative',first_name:'Deniz',last_name:'Örnek',mandates:['owners']});assert.deepEqual(d.links.find(l=>l.id==='rep').mandates,['owners']);assert.deepEqual(d.audit[0].details.before.mandates,[]);assert.deepEqual(d.audit[0].details.after.mandates,['owners']);
+ const {applyAssignmentDemo}=await import('../assignments.mjs?v=5.9.0');const d=data();d.links.push({id:'rep',unit_id:'A-4',person_id:'demo-owner',role:'representative',active:true,revision:1,mandates:[]});applyAssignmentDemo(d,'assignment_edit',{request_id:randomId(),id:'rep',revision:1,role:'representative',first_name:'Deniz',last_name:'Örnek',mandates:['owners']});assert.deepEqual(d.links.find(l=>l.id==='rep').mandates,['owners']);assert.deepEqual(d.audit[0].details.before.mandates,[]);assert.deepEqual(d.audit[0].details.after.mandates,['owners']);
 });
 test('shared apartment statements do not describe another debtor obligation as personal',async()=>{
- const {renderPage}=await import('../ui.mjs?v=5.8.1');setLanguage('de');const d=data();d.role='resident';d.capabilities={};const html=renderPage({data:d,mode:'demo',page:'dues',filter:{},period:'2026-10'});assert.match(html,/Wohnungsabrechnung/);assert.match(html,/Zahlungspflichtig: Mieter/);assert.doesNotMatch(html,/Eski Örnek/);assert.doesNotMatch(html,/Ihre offenen Forderungen/);setLanguage('tr');
+ const {renderPage}=await import('../ui.mjs?v=5.9.0');setLanguage('de');const d=data();d.role='resident';d.capabilities={};const html=renderPage({data:d,mode:'demo',page:'dues',filter:{},period:'2026-10'});assert.match(html,/Wohnungsabrechnung/);assert.match(html,/Zahlungspflichtig: Mieter/);assert.doesNotMatch(html,/Eski Örnek/);assert.doesNotMatch(html,/Ihre offenen Forderungen/);setLanguage('tr');
 });
 
 test('historical debtor and source roles never expand apartment notification audiences',()=>{for(const role of ['debtor','source']){const d=data();d.role='resident';d.capabilities={};d.ownPersonIds=['qa-history'];d.links=[{id:'historical',person_id:'qa-history',unit_id:'A-4',role,active:true}];assert.equal(receives(d,{...notice(),target_kind:'units',target_units:['A-4']}),false);assert.equal(receives(d,{...notice(),target_kind:'blocks',target_blocks:['A']}),false);}});

@@ -1,0 +1,245 @@
+{
+  "passed": 37,
+  "errors": [],
+  "results": [
+    {
+      "peopleAccessibility": []
+    },
+    {
+      "pickerAccessibility": []
+    },
+    {
+      "lang": "tr",
+      "width": 320,
+      "overflow": false,
+      "pairs": [
+        {
+          "sameRow": true,
+          "widths": [
+            155.78125,
+            129.8125
+          ],
+          "height": 145.984375
+        },
+        {
+          "sameRow": true,
+          "widths": [
+            155.78125,
+            129.8125
+          ],
+          "height": 108.625
+        }
+      ]
+    },
+    {
+      "lang": "tr",
+      "width": 375,
+      "overflow": false,
+      "pairs": [
+        {
+          "sameRow": true,
+          "widths": [
+            180.328125,
+            150.28125
+          ],
+          "height": 134.078125
+        },
+        {
+          "sameRow": true,
+          "widths": [
+            180.328125,
+            150.28125
+          ],
+          "height": 107.453125
+        }
+      ]
+    },
+    {
+      "lang": "tr",
+      "width": 430,
+      "overflow": false,
+      "pairs": [
+        {
+          "sameRow": true,
+          "widths": [
+            210.328125,
+            175.265625
+          ],
+          "height": 121.375
+        },
+        {
+          "sameRow": true,
+          "widths": [
+            210.328125,
+            175.265625
+          ],
+          "height": 110.578125
+        }
+      ]
+    },
+    {
+      "lang": "tr",
+      "width": 768,
+      "overflow": false,
+      "pairs": [
+        {
+          "sameRow": true,
+          "widths": [
+            228.65625,
+            228.671875
+          ],
+          "height": 177.5625
+        },
+        {
+          "sameRow": true,
+          "widths": [
+            228.65625,
+            228.671875
+          ],
+          "height": 165
+        }
+      ]
+    },
+    {
+      "lang": "tr",
+      "width": 1440,
+      "overflow": false,
+      "pairs": [
+        {
+          "sameRow": true,
+          "widths": [
+            371.328125,
+            371.328125
+          ],
+          "height": 179.46875
+        },
+        {
+          "sameRow": true,
+          "widths": [
+            371.328125,
+            371.328125
+          ],
+          "height": 178.875
+        }
+      ]
+    },
+    {
+      "lang": "de",
+      "width": 320,
+      "overflow": false,
+      "pairs": [
+        {
+          "sameRow": true,
+          "widths": [
+            155.78125,
+            129.8125
+          ],
+          "height": 176.078125
+        },
+        {
+          "sameRow": true,
+          "widths": [
+            155.78125,
+            129.8125
+          ],
+          "height": 108.625
+        }
+      ]
+    },
+    {
+      "lang": "de",
+      "width": 375,
+      "overflow": false,
+      "pairs": [
+        {
+          "sameRow": true,
+          "widths": [
+            180.328125,
+            150.28125
+          ],
+          "height": 162.609375
+        },
+        {
+          "sameRow": true,
+          "widths": [
+            180.328125,
+            150.28125
+          ],
+          "height": 107.453125
+        }
+      ]
+    },
+    {
+      "lang": "de",
+      "width": 430,
+      "overflow": false,
+      "pairs": [
+        {
+          "sameRow": true,
+          "widths": [
+            210.328125,
+            175.265625
+          ],
+          "height": 151.46875
+        },
+        {
+          "sameRow": true,
+          "widths": [
+            210.328125,
+            175.265625
+          ],
+          "height": 110.578125
+        }
+      ]
+    },
+    {
+      "lang": "de",
+      "width": 768,
+      "overflow": false,
+      "pairs": [
+        {
+          "sameRow": true,
+          "widths": [
+            228.65625,
+            228.671875
+          ],
+          "height": 214.75
+        },
+        {
+          "sameRow": true,
+          "widths": [
+            228.65625,
+            228.671875
+          ],
+          "height": 165
+        }
+      ]
+    },
+    {
+      "lang": "de",
+      "width": 1440,
+      "overflow": false,
+      "pairs": [
+        {
+          "sameRow": true,
+          "widths": [
+            371.328125,
+            371.328125
+          ],
+          "height": 179.46875
+        },
+        {
+          "sameRow": true,
+          "widths": [
+            371.328125,
+            371.328125
+          ],
+          "height": 178.875
+        }
+      ]
+    },
+    {
+      "accessibility": []
+    }
+  ]
+}

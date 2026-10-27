@@ -24,6 +24,9 @@ Deno.serve(async req=>{
   const {data:site,error:siteError}=await admin.from('site_sites').select('id')
    .eq('slug','aya-park-2').maybeSingle();
   if(siteError||!site)return reply({error:'site_unavailable'},503);
+  const caller=createClient(base,Deno.env.get('SUPABASE_ANON_KEY')!,{global:{headers:{Authorization:'Bearer '+bearer}},auth:{persistSession:false,autoRefreshToken:false}});
+  const {data:allowed,error:accessError}=await caller.rpc('ay3_community_access',{p_site:site.id});
+  if(accessError||allowed!==true)return reply({error:'access_denied'},403);
   const fetchAll=async(table:string,columns:string):Promise<any[]>=>{
    const result:any[]=[];
    for(let start=0;start<100000;start+=1000){
@@ -51,13 +54,18 @@ Deno.serve(async req=>{
     ['owner','tenant'].includes(r.role)).map(r=>r.unit_id))];
   if(!staff&&!ownUnitIds.length)return reply({error:'access_denied'},403);
   const [charges,allocations,entries,credits,staged]=await Promise.all([
-   fetchAll('ay2_charges','id,unit_id,cents,void_reason'),
+   fetchAll('ay2_charges','id,unit_id,person_id,cents,void_reason'),
    fetchAll('ay2_allocations','charge_id,entry_id,cents,void_reason'),
    fetchAll('ay2_entries','id,cents,reversal_of'),
    fetchAll('ay3_credits','entry_id,cents,void_reason'),
    fetchAll('ay2_staged_charges','id,confirmed_charge,ignored_reason')
   ]);
-  const result=calculateClaims({units,charges,allocations,entries,credits,staged,ownUnitIds});
+  const {data:people,error:peopleError}=await admin.from('ay3_persons').select('id').eq('site_id',site.id).eq('auth_user_id',identity.user.id);
+  if(peopleError)return reply({error:'accounting_unavailable'},503);
+  const ids=new Set((people||[]).map(p=>p.id));
+  const result=calculateClaims({units,charges,allocations,entries,credits,staged,ownUnitIds:[]});
+  const personal=calculateClaims({units,charges:charges.filter(c=>ids.has(c.person_id)),allocations,entries:[],credits:[],staged:[],ownUnitIds});
+  result.own_total_cents=personal.own_total_cents;result.own_units=personal.own_units;
   // Staff may see site aggregate but not their own-units breakdown unless explicitly linked.
   return reply(result);
  }catch{return reply({error:'accounting_unavailable'},503);}

@@ -1,4 +1,4 @@
-import {activeAt,creditAvailable} from './v3-domain.mjs?v=5.8.1';
+import {activeAt,creditAvailable} from './v3-domain.mjs?v=5.9.0';
 import {remaining,unassigned} from './ledger.mjs?v=5.8.1';
 export const financeLinkAt=(l,day)=>l.active!==false&&!l.archived_at&&(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day);
 export const chargeCategories=['Genel Gider / İşletme','Bakım ve Onarım','Demirbaş'];

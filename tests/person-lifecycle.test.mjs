@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fullDemo} from '../ledger.mjs?v=5.8.1';
 import {buildForm,payloadFor} from '../forms.mjs?v=5.8.1';
-import {peoplePage,personManager} from '../people-ui.mjs?v=5.8.1';
+import {peoplePage,personManager} from '../people-ui.mjs?v=5.9.0';
 import {setLanguage} from '../i18n.mjs?v=5.8.1';
 
 const testState=()=>({mode:'demo',data:fullDemo(),peopleFilter:'all',peopleQuery:''});

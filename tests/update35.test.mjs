@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fullDemo,demoCommand} from '../ledger.mjs?v=5.8.1';
 import {buildForm,payloadFor} from '../forms.mjs?v=5.8.1';
-import {announcementsV3,providersV3} from '../v3-ui.mjs?v=5.8.1';
-import {peoplePage,personManager} from '../people-ui.mjs?v=5.8.1';
-import {mayPreview,previewProjection,residentPreviewOptions} from '../access-preview.mjs?v=5.8.1';
+import {announcementsV3,providersV3} from '../v3-ui.mjs?v=5.9.0';
+import {peoplePage,personManager} from '../people-ui.mjs?v=5.9.0';
+import {mayPreview,previewProjection,residentPreviewOptions} from '../access-preview.mjs?v=5.9.0';
 import {announcementTime} from '../announcement-validation.mjs?v=5.8.1';
 const state=()=>({data:fullDemo(),mode:'demo'});
 function announce(s,overrides={}){const f=new FormData();for(const [k,v] of Object.entries({title:'Test announcement',body:'Test body',priority:'normal',...overrides}))f.set(k,v);return payloadFor('announcement',f,buildForm(s,'announcement').context);}

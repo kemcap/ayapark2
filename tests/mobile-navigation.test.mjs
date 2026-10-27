@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup} from '../v3-ui.mjs?v=5.8.1';
+import {navigation,nextMobileNavGroup} from '../v3-ui.mjs?v=5.9.0';
 
 const view=(role='super')=>({data:{...fullDemo(),role},mode:'demo',page:'units'});
 const expandedCount=html=>(html.match(/aria-expanded="true"/g)||[]).length;

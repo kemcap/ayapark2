@@ -1,7 +1,8 @@
-import {fieldError} from './ui-feedback.mjs?v=5.8.1';
+import {personPicker,bindPersonPicker} from './person-picker.mjs?v=5.9.0';
+import {fieldError} from './ui-feedback.mjs?v=5.9.0';
 import {t as tr} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,randomId} from './core.mjs?v=5.8.1';
-import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=5.8.1';
+import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=5.9.0';
 export const assignmentRoles=[['owner','Ev sahibi'],['tenant','Kiracı'],['representative','Temsilci']];
 export const removalReasons=role=>[['mistake','Yanlışlıkla eklendi'],['ended',role==='owner'?'Mülkiyet ilişkisi sona erdi':role==='tenant'?'Kiracılık sona erdi':'Temsilcilik sona erdi'],['other','Diğer neden']];
 const select=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}" aria-label="${e(tr(label))}">${options.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(tr(l))}</option>`).join('')}</select></label>`;
@@ -26,7 +27,7 @@ export function buildAssignmentForm(d,action,args={}){
   title=tr('Kişi ekle');
   body=(args.unit?`<p class="assignment-context"><strong>${e(unitName)}</strong></p>`:select('unit_id','Daire',d.units.map(u=>[u.id,u.code]),unit))+
    `<fieldset class="person-choice"><legend>${tr('Kişi seçimi')}</legend><label><input type="radio" name="person_mode" value="existing" ${args.person==='__new__'?'':'checked'}>${tr('Kayıtlı kişi seç')}</label><label><input type="radio" name="person_mode" value="new" ${args.person==='__new__'?'checked':''}>${tr('Yeni kişi oluştur')}</label></fieldset>`+
-   `<div id="existingPersonFields">${field('person_search','Kişi ara','search','','placeholder="'+e(tr('Ad, telefon veya e-posta ara'))+'"')}${select('person_id','Kişi',[['','Kişi seçin.'],...d.persons.map(p=>[p.id,p.full_name])],p?.id||'')}</div><div id="newPersonFields" hidden>${personFields(null)}</div>`+
+   `<div id="existingPersonFields">${personPicker(d.persons,p?.id||'')}</div><div id="newPersonFields" hidden>${personFields(null)}</div>`+
    select('role','Dairedeki rol',assignmentRoles,'tenant')+dates(null);
  }
  if(['assignment_add','assignment_edit','assignment_restore'].includes(action))body+=`<details><summary>${tr('Temsilci bildirim yetkisi')}</summary><p>${tr('Yalnızca temsilci rolü için. Ek borç oluşturmaz.')}</p><label class="check-field"><input type="checkbox" name="mandate_owners" ${l?.mandates?.includes('owners')?'checked':''}>${tr('Malik duyurularını alabilir')}</label><label class="check-field"><input type="checkbox" name="mandate_residents" ${l?.mandates?.includes('residents')?'checked':''}>${tr('Sakin duyurularını alabilir')}</label></details>`;
@@ -38,9 +39,7 @@ export function updateAssignmentForm(container,d,changed=''){
   const fresh=mode==='new',old=container.querySelector('#existingPersonFields'),newFields=container.querySelector('#newPersonFields');old.hidden=fresh;newFields.hidden=!fresh;
   for(const node of old.querySelectorAll('input,select'))node.disabled=fresh;
   for(const node of newFields.querySelectorAll('input,textarea')){node.disabled=!fresh;node.required=fresh&&['first_name','last_name'].includes(node.name);}
-  const list=old.querySelector('[name="person_id"]'),q=norm(old.querySelector('[name="person_search"]').value),value=list.value;
-  const matches=d.persons.filter(p=>!q||norm([p.full_name,p.phone,p.email].join(' ')).includes(q));
-  list.innerHTML=`<option value="">${e(tr(matches.length?'Kişi seçin.':'Kişi bulunamadı.'))}</option>`+matches.map(p=>`<option value="${e(p.id)}" ${p.id===value?'selected':''}>${e(p.full_name)}</option>`).join('');
+  bindPersonPicker(container,d.persons);
  }
  const reason=container.querySelector('[name="reason"]'),note=container.querySelector('#removalNote');if(reason&&note){note.hidden=reason.value!=='other';note.querySelector('input').disabled=note.hidden;}
 }

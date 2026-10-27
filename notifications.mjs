@@ -1,5 +1,5 @@
 import {financeLinkAt} from './finance-v5.mjs?v=5.8.1';
-import {announcementActive,announcementStatus,acknowledgementKey,activeAt} from './v3-domain.mjs?v=5.8.1';
+import {announcementActive,announcementStatus,acknowledgementKey,activeAt} from './v3-domain.mjs?v=5.9.0';
 import {getLanguage,t as tr} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e} from './core.mjs?v=5.8.1';
 export const notificationTitle=a=>getLanguage()==='de'&&a.title_de?a.title_de:a.title;
@@ -7,6 +7,7 @@ export const notificationBody=a=>getLanguage()==='de'&&a.body_de?a.body_de:a.bod
 export const hasRead=(d,a)=>!!d.acknowledgements?.some(r=>r.announcement_id===a.id&&r.revision===(a.revision||1)&&r.user_id===d.userId);
 export function receives(d,a){
  if(a.local_test)return d.role==='super';if(d.role==='super'||d.role!=='resident'&&d.capabilities?.announcements)return true;
+ if(d.role==='resident'&&d.currentMember===false)return false;
  const kind=a.target_kind||'all';if(kind==='all')return true;
  const ownLinks=(d.links||[]).filter(l=>['owner','tenant','representative'].includes(l.role)&&financeLinkAt(l,new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}))&&(d.ownPersonIds||[]).includes(l.person_id));
  if(kind==='owners')return ownLinks.some(l=>l.role==='owner'||l.role==='representative'&&l.mandates?.includes('owners'));
