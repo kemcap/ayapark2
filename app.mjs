@@ -22,9 +22,9 @@ import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.8.1';
-import {AyaparkApi} from './api.mjs?v=5.8.5';
+import {AyaparkApi} from './api.mjs?v=5.8.6';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.8.1';
-import {buildForm,payloadFor} from './forms.mjs?v=5.8.5';
+import {buildForm,payloadFor} from './forms.mjs?v=5.8.6';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -133,7 +133,13 @@ async function mutateInner(action,payload){
   if(state.mode==='demo'){
    const d=state.data,person=d.persons.find(x=>x.id===payload.person_id);
    if(!person)throw Error('Person nicht gefunden.');
-   if(person.auth_user_id)throw Error('Verknüpften Anmeldezugang vorher entfernen.');
+   if(person.auth_user_id&&mode==='delete'&&!payload.revoke_access)throw Error('Site-Zugang zuerst ausdrücklich entziehen.');
+   if(person.auth_user_id&&payload.revoke_access){
+    if(person.auth_user_id===d.userId||(d.staff||[]).some(m=>m.user_id===person.auth_user_id))
+     throw Error('Yönetim hesabı: Önce yönetim üyeliğini kaldırın.');
+    if(d.persons.some(p=>p.id!==person.id&&p.auth_user_id===person.auth_user_id))
+     throw Error('Giriş hesabı birden fazla kişiye bağlı.');
+   }
    if(mode==='archive'){
     if(person.archived_at)throw Error('Bereits archiviert.');
     person.archived_at=new Date().toISOString();person.archive_note=payload.note;
@@ -153,7 +159,7 @@ async function mutateInner(action,payload){
    }else throw Error('Ungültige Aktion.');
    render();return {ok:true,mode};
   }
-  const attempt=epoch,result=await api.rpc('ay3_manage_person',{p_site:state.data.site.id,p_person:payload.person_id,p_mode:mode,p_note:payload.note||'',p_confirm:payload.confirmation===true});
+  const attempt=epoch,result=await api.rpc('ay3_manage_person_v2',{p_site:state.data.site.id,p_person:payload.person_id,p_mode:mode,p_note:payload.note||'',p_confirm:payload.confirmation===true,p_revoke_access:payload.revoke_access===true});
   if(attempt!==epoch)throw Error(tr('Oturum değişti.'));
   try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
   return result;

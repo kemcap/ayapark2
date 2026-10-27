@@ -3,7 +3,7 @@ import {effectiveOccupancy} from './relationships.mjs?v=5.8.1';
 import {announcementTime,validateAnnouncement} from './announcement-validation.mjs?v=5.8.1';
 import {t as tr,getLanguage} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,randomId,money} from './core.mjs?v=5.8.1';
-import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.8.5';
+import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.8.6';
 import {today,personName,personLinks,activeAt,dateValid} from './v3-domain.mjs?v=5.8.1';
 import {roleLabel} from './v3-ui.mjs?v=5.8.1';
 const loc=(de,trText)=>getLanguage()==='de'?de:trText;
@@ -37,12 +37,16 @@ export function buildV3Form(s,action,args={}){
  else if(action==='person_lifecycle'){
   const person=d.persons.find(x=>x.id===args.id);if(!person)throw Error(loc('Person nicht gefunden.','Kişi bulunamadı.'));
   context.person_id=person.id;context.expected_name=person.full_name;
+  context.linked_login=!!person.auth_user_id;
   title=loc('Person löschen oder archivieren','Kişiyi sil veya arşivle');
-  body=`<div class="info-strip"><strong>${e(person.full_name)}</strong><p>${loc('Archivieren erhält die Stammdaten mit Hinweis und verschiebt aktuelle Wohnungszuordnungen ins Archiv. Endgültig löschen entfernt den Personendatensatz und ungeschützte Verknüpfungen. Bei Finanzdaten oder verknüpftem Login ist das Löschen gesperrt.','Arşivleme kişi bilgilerini not ile saklar ve güncel daire bağlantılarını geçmişe taşır. Kalıcı silme kişi kaydını ve korunmayan ilişkilerini siler. Mali kayıt veya giriş hesabı varsa silme engellenir.')}</p></div>`
+  body=`<div class="info-strip"><strong>${e(person.full_name)}</strong><p>${loc('Archivieren erhält die Stammdaten mit Hinweis und verschiebt aktuelle Wohnungszuordnungen ins Archiv. Endgültig löschen entfernt den Personendatensatz und ungeschützte Verknüpfungen. Bei Finanzdaten ist endgültiges Löschen gesperrt. Ein verknüpfter Standortzugang kann nur mit zusätzlicher Bestätigung entzogen werden. Ein Supabase-Benutzerkonto wird niemals gelöscht.','Arşivleme kişi bilgilerini not ile saklar ve güncel daire bağlantılarını geçmişe taşır. Kalıcı silme kişi kaydını ve korunmayan ilişkilerini siler. Mali kayıt varsa kalıcı silme engellenir. Bağlı giriş için site erişimini kaldırmak ayrıca onaylanmalıdır. Kullanıcı hesabı silinmez.')}</p></div>`
    +`<fieldset><legend>${loc('Aktion auswählen','İşlem seç')}</legend><label class="check-field"><input type="radio" name="mode" value="archive" ${person.archived_at?'disabled':''}>${loc('Archivieren (mit Hinweis)','Arşivle (not ile)')}</label><label class="check-field"><input type="radio" name="mode" value="delete" checked>${loc('Endgültig löschen (unwiderruflich)','Kalıcı sil (geri alınamaz)')}</label></fieldset>`
    +`<label class="field">${loc('Archivierungshinweis (beim Archivieren erforderlich)','Arşiv notu (arşivleme için zorunlu)')}<textarea name="note" maxlength="500" rows="3"></textarea></label>`
    +field('verify_name',loc('Zur endgültigen Löschung Namen exakt eingeben','Kalıcı silmek için tam adı yazın'),'text','','autocomplete="off" maxlength="180"')
    +`<p class="fine">${loc('Zur endgültigen Löschung den Namen exakt wie oben eingeben. Buchungen und Anmeldekonten bleiben geschützt.','Kalıcı silmek için yukarıdaki tam adı birebir yazın. Mali kayıtlar ve giriş hesapları korunur.')}</p>`
+   +(person.auth_user_id?
+     `<div class="info-strip">${loc('Ein App-Konto ist verknüpft. Bei Archivierung bleibt der App-Zugang ohne gesonderte Auswahl bestehen. Vor endgültigem Löschen muss der Zugang zu dieser Anlage entzogen werden. Verwaltungsmitglieder müssen zuerst unter Einstellungen → Yönetim yetkileri entfernt werden. Das Auth-Konto bleibt in anderen Anlagen bestehen.','Uygulama hesabı bağlıdır. Arşivlerken ayrı seçim yapılmazsa giriş erişimi devam eder. Kalıcı silme için bu siteye erişim kaldırılmalıdır. Yönetim üyelikleri önce Ayarlar → Yönetim yetkileri bölümünde kaldırılmalıdır. Diğer sitelerdeki hesap korunur.')}</div>`
+     +check('revoke_access',loc('App-Zugang zu Ayapark 2 entziehen (bei endgültigem Löschen erforderlich)','Ayapark 2 site erişimini kaldır (kalıcı silmek için zorunlu)')):'')
    +check('confirmation',loc('Ich bestätige die ausgewählte Aktion.','Seçilen işlemi onaylıyorum.'));
  }
  else if(action==='person_restore'){
@@ -100,12 +104,14 @@ export function payloadV3(action,form,ctx){
  if(!special.includes(action)){const p=payloadLegacy(action,form,ctx);if(action==='charge'&&(p.period_from||p.period_to)&&(!dateValid(p.period_from)||!dateValid(p.period_to)||p.period_to<p.period_from))throw Error(tr('Borç döneminin başlangıç ve bitiş tarihlerini kontrol edin.'));if(action==='entry'&&p.category==='Diğer'&&!p.desc)throw Error(tr('Açıklama gerekli.'));return p;}
  if(['person_lifecycle','person_restore'].includes(action)){
   if(!form.has('confirmation')||!ctx.person_id)throw Error(loc('Bestätigung erforderlich.','Onay gerekli.'));
-  if(action==='person_restore')return {person_id:ctx.person_id,mode:'restore',note:'',confirmation:true};
+  if(action==='person_restore')return {person_id:ctx.person_id,mode:'restore',note:'',confirmation:true,revoke_access:false};
   const mode=String(form.get('mode')||''),note=String(form.get('note')||'').trim();
   if(!['archive','delete'].includes(mode))throw Error(loc('Aktion auswählen.','İşlem seç.'));
   if(mode==='archive'&&(note.length<3||note.length>500))throw Error(loc('Archivierungshinweis mit 3 bis 500 Zeichen angeben.','Arşiv notu 3 ila 500 karakter olmalıdır.'));
   if(mode==='delete'&&String(form.get('verify_name')||'')!==ctx.expected_name)throw Error(loc('Den vollständigen Namen exakt eingeben.','Tam adı birebir yazın.'));
-  return {person_id:ctx.person_id,mode,note,confirmation:true};
+  const revoke_access=form.has('revoke_access')&&ctx.linked_login===true;
+  if(mode==='delete'&&ctx.linked_login===true&&!revoke_access)throw Error(loc('Vor dem endgültigen Löschen den Entzug des Standortzugangs bestätigen.','Kalıcı silmeden önce site erişimini kaldırmayı onaylayın.'));
+  return {person_id:ctx.person_id,mode,note,confirmation:true,revoke_access};
  }
  if(action==='staff_remove'&&(!form.has('confirmation')||!ctx.user_id))throw Error(tr('Devam etmek için onay kutusunu işaretleyin.'));
  if(action==='staff_remove'&&String(form.get('reason')||'').trim().length<3)throw Error(tr('En az üç karakterlik gerekçe yazın.'));
