@@ -310,7 +310,7 @@ $('loginDialog').addEventListener('close',()=>{
 function updateLoginLanguage(){
  const setup=loginMethod==='setup',verified=loginMethod==='setup_password';
  $('loginTitle').textContent=tr(setup||verified?'Şifre oluştur':'Sitenize hoş geldiniz.');
- $('loginIdentifierLabel').textContent=tr(loginMethod==='password'?'Telefon veya e-posta':'E-posta');
+ $('loginIdentifierLabel').textContent=tr(loginMethod==='password'?'Telefon, e-posta veya kullanıcı kodu':'E-posta');
  $('codeHelp').textContent=tr(setup?'Şifre oluşturmak için e-postadaki kodu buraya gir. E-postadaki bağlantıyı açma.':'E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.');
  $('loginSubmit').textContent=tr(verified?'Şifreyi kaydet':setup?'Devam et':'Giriş yap');
 }
