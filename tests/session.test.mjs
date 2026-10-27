@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {AyaparkApi} from '../api.mjs?v=5.8.0';
-import {RecoveryApi} from '../recovery-api.mjs?v=5.8.0';
-import {buildForm,payloadFor} from '../forms.mjs?v=5.8.0';
-import {fullDemo} from '../ledger.mjs?v=5.8.0';
+import {AyaparkApi} from '../api.mjs?v=5.8.1';
+import {RecoveryApi} from '../recovery-api.mjs?v=5.8.1';
+import {buildForm,payloadFor} from '../forms.mjs?v=5.8.1';
+import {fullDemo} from '../ledger.mjs?v=5.8.1';
 const session=(a='test-access',r='test-refresh',expires_in=3600)=>({access_token:a,refresh_token:r,expires_in,user:{id:'test-user'}});
 const storage=()=>{const values=new Map();return {getItem:k=>values.get(k)||null,setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};};
 function client(replies,store=storage()){

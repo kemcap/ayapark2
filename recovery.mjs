@@ -1,6 +1,6 @@
-import {RecoveryApi,takeRecoveryLocation} from './recovery-api.mjs?v=5.8.0';
-import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.8.0';
-import {bindPasswordEyes} from './password-eye.mjs?v=5.8.0';
+import {RecoveryApi,takeRecoveryLocation} from './recovery-api.mjs?v=5.8.1';
+import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.8.1';
+import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 const incoming=takeRecoveryLocation(location,history),api=new RecoveryApi(undefined,{previewOnly:document.querySelector('meta[name="ayapark-stage"]')?.content==='preview'}),$=id=>document.getElementById(id);
 const translate=bindStaticText(document.body),hidePasswords=bindPasswordEyes();
 let busy=false,completed=false,phase='request',statusText='';

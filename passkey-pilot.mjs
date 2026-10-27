@@ -1,4 +1,4 @@
-import {ENABLE_PASSKEY_LOGIN} from './auth-features.mjs?v=5.8.0';
+import {ENABLE_PASSKEY_LOGIN} from './auth-features.mjs?v=5.8.1';
 // Isolated pilot adapter, deliberately not wired into the production login.
 // Supply the pinned official SDK factory from the isolated test host only.
 export function createPasskeyPilot({enabled=ENABLE_PASSKEY_LOGIN,stage,origin,allowedOrigins=new Set(),platform=globalThis,createClient,url,key,api,approvedUser}){

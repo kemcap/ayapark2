@@ -42,3 +42,11 @@ Der zweite privilegierte Prüfendpunkt wurde nach Abschluss durch einen 503-Hand
 ### Verbleibende technische Rollout-Grenze
 
 Die vorhandene Supabase-Verbindung bietet SQL/Edge-Deployment, aber keine Operation zum Setzen von Edge-Secrets oder zum Lesen/Ändern der Auth-Konfiguration. Für eine produktive Aktivierung werden unter anderem das private Rate-Secret, die Feature-Schalter, erlaubte Origins/Reset-URL und der verifizierte Ingress benötigt. Die Handler verweigern ohne diese Konfiguration korrekt die Funktion. Daher wurde kein Frontend ausgerollt, das eine aktivierte Backend-Funktion vortäuschen würde. Browser/PWA, SMTP, vollständiger Restore und Reconciliation sind weiterhin nicht abgenommen.
+
+## Bereitgestellte Dienste – 27.10.2026
+
+Private Testvorschau: https://ayapark-auth-staging.kemcap.chatgpt.site/ (Sites-ID appgprj_6ae05c74371081918fc3cc20fe38d300). Frontend ausschließlich mit Testprojekt verbunden; neue Frontendflags noch aus. Browser erreicht ohne ChatGPT-Sitzung nur den privaten Sites-Zugangsschutz, daher keine bestandene Browser-QA behauptet.
+
+Vier eigentliche Edge-Dienste im Testprojekt bereitgestellt. CORS akzeptiert die tatsächliche Test-Origin. Nach manueller Konfiguration: Einladungen liefern für ungültige Tokens 410, administrative Recovery verlangt Bearer (401), Zugangsanfragen bleiben abgeschaltet (503).
+
+19 Integrationsergebnisse erneut bestanden, davon Einladung und Recovery diesmal über die tatsächlich bereitgestellten HTTP-Endpunkte mit den vom Benutzer konfigurierten Secrets und Origins. Anfragehandler weiterhin mit injiziertem Test-Ingress; kein Nachweis des öffentlichen Anfrageendpunkts. Nachweis: tests/evidence/auth-staging-deployed.json. Temporärer Prüfendpunkt anschließend durch JWT-geschützten 503-Handler ersetzt. Synthetische Konten und Fall-Daten entfernt; dauerhafte synthetische Testanlage bleibt ohne Bewohner-/Finanzdaten bestehen. Produktivprojekt und GitHub Pages unverändert.

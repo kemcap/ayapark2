@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {unitSearchMatches} from '../v3-domain.mjs?v=5.8.0';
+import {unitSearchMatches} from '../v3-domain.mjs?v=5.8.1';
 const unit={id:'a1',code:'A-1'},other={id:'b1',code:'B-1'};
 const data={role:'super',persons:[{id:'p',full_name:'Özdemir Yılmaz',email:'oz@example.invalid',phone:'+90 555 123 45 67',notes:'havuz anahtarı'}],links:[{unit_id:'a1',person_id:'p',role:'owner'},{unit_id:'b1',person_id:'p',role:'representative'}]};
 test('apartment code and block letter do not create search hits',()=>{
@@ -26,7 +26,7 @@ test('source-only debt label is searchable without inventing a resident',()=>{
  assert.equal(unitSearchMatches(d,unit,'Günebir',false).length,0);
 });
 
-const {unitClarifications,unitBalance,unitMapV3,unitCardResidents}=await import('../v3-ui.mjs?v=5.8.0');
+const {unitClarifications,unitBalance,unitMapV3,unitCardResidents}=await import('../v3-ui.mjs?v=5.8.1');
 function sample(){return {mode:'demo',data:{role:'super',units:[{id:'x',code:'A-4',number:4,block:'A',occupancy_status:'unknown',debt:0}],persons:[],links:[],charges:[],allocations:[],transactions:[],staged:[]}};}
 test('card computes posted current and former debt instead of stale unit cache',()=>{
  const s=sample(),u=s.data.units[0];s.data.links=[{id:'former',unit_id:'x',ends_on:'2020-01-01'}];s.data.charges=[{id:'old',unit_id:'x',link_id:'former',cents:720000},{id:'current',unit_id:'x',cents:360000},{id:'void',unit_id:'x',cents:100000,void_reason:'correction'}];

@@ -1,6 +1,6 @@
-import {installationVisible} from './seven-ux.mjs?v=5.8.0';
-import {openInstallTutorial} from './install-tutorial.mjs?v=5.8.0';
-import {t as tr} from './i18n.mjs?v=5.8.0';
+import {installationVisible} from './seven-ux.mjs?v=5.8.1';
+import {openInstallTutorial} from './install-tutorial.mjs?v=5.8.1';
+import {t as tr} from './i18n.mjs?v=5.8.1';
 export function bindInstall(){
  let pending=null,view={},dismissedUntil=0,installed=false;try{installed=localStorage.getItem('ayapark-app-installed')==='1';}catch{}const button=document.getElementById('installApp'),banner=document.getElementById('installBanner');
  const standalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;

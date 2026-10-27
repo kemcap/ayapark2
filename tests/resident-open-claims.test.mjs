@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {calculateClaims} from '../supabase/functions/ay3-site-open-claims/math.mjs';
 import {residentClaimsCards,residentClaimsPanel} from '../site-claims-ui.mjs';
-import {scopedCharges} from '../v3-domain.mjs?v=5.8.0';
-import {AyaparkApi} from '../api.mjs?v=5.8.0';
+import {scopedCharges} from '../v3-domain.mjs?v=5.8.1';
+import {AyaparkApi} from '../api.mjs?v=5.8.1';
 
 const units=Array.from({length:20},(_,i)=>({id:'u'+i,code:(i<10?'A-':'B-')+(i%10+1)}));
 const fixture={

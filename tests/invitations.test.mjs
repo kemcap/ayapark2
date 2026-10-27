@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {inviteEligible,inviteText,whatsappNumber,whatsappShareUrl} from '../invite-ui.mjs?v=5.8.0';
-import {AyaparkApi,loginIdentifier} from '../api.mjs?v=5.8.0';
+import {inviteEligible,inviteText,whatsappNumber,whatsappShareUrl} from '../invite-ui.mjs?v=5.8.1';
+import {AyaparkApi,loginIdentifier} from '../api.mjs?v=5.8.1';
 
 const person={id:'p1',full_name:'Test Resident',phone:'0542 111 22 33',email:''};
 const base={mode:'connected',data:{role:'super',persons:[person],links:[{person_id:'p1',role:'tenant',starts_on:'2024-01-01',ends_on:null}],units:[]}};

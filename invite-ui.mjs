@@ -1,6 +1,6 @@
-import {escapeHtml as escape} from './core.mjs?v=5.8.0';
-import {activeAt} from './v3-domain.mjs?v=5.8.0';
-import {getLanguage} from './i18n.mjs?v=5.8.0';
+import {escapeHtml as escape} from './core.mjs?v=5.8.1';
+import {activeAt} from './v3-domain.mjs?v=5.8.1';
+import {getLanguage} from './i18n.mjs?v=5.8.1';
 
 export const inviteEligible=(state,person)=>state.mode==='connected' && state.data.role==='super'
  && Boolean(person?.id) && !person?.auth_user_id
