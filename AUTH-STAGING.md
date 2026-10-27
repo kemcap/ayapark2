@@ -30,3 +30,15 @@ Danach Prüfendpunkt vollständig durch inaktiven 503-Handler ersetzt, JWT-Prüf
 Die Prüfung nutzt native Admin-/Auth-APIs, nicht die vollständigen neuen produktnahen Edge-Handler mit ihren Featureflags und Konfigurationswerten. Echte Einladungskette, Zugangsanfragen mit realen Rollen, administrativer Recovery-Handler, Smartphone/Browser/PWA, SMTP-Zustellung, vollständige produktive RLS-Parität, Wiederherstellung und Unterbrechungs-/Reconciliation-Fälle bleiben offen. Produktive Passwortregeln wurden nicht angepasst. Passkeys weiterhin ausgeschaltet. Keine Veröffentlichung oder Produktionsfreigabe aus dem Testergebnis ableiten.
 
 Dies aktualisiert die Aussage in AUTH-ABSCHLUSS.md, dass noch keine isolierte Auth-Umgebung vorhanden war: Sie besteht nun, und die oben aufgelisteten nativen Prüfungen sind ausgeführt.
+
+## Erweiterte Integration – 27.10.2026
+
+Zusätzlich 19 Prüfungen mit realem GoTrue/PostgREST und den Anwendungs-Handlern bestanden (`tests/evidence/auth-staging-integration.json`): öffentliche E-Mail-Zugangsanfrage, neutrales Duplikat, Managerliste, Zuordnung/Freigabe, keine Wohnungsrechte vor Aktivierung, Erstellung/Prüfung/Aktivierung des E-Mail-Einladungslinks mit sechs Zeichen, Anmeldung, identische Person/Auth-Verknüpfung, Replay-Ablehnung, automatischer Aktivierungsstatus, Bewohner-Ausschluss und ausschließlich die vorgesehene Tenant-Wohnung. Auch der administrative Recovery-Handler erzeugte einen gültigen Link für dieselbe Konto-ID; Verifizierung, Passwortwechsel und erneute Anmeldung bestanden.
+
+Testadapter: Einladungs-Handler mit ausschließlich auf die Test-Origin und Testprojekt gesetzter Konfiguration; unveränderte Anfrage-/Recovery-Handler mit tatsächlichen RPC-/Auth-Adaptern. Eine synthetische Ingress-Adresse wurde injiziert. Damit ist die produktive Ingress-Vertrauensgrenze ausdrücklich **nicht** nachgewiesen. Kein SMTP-Versand und kein Browserdurchlauf. Die früher aufgelisteten fehlenden Handler-Prüfungen für E-Mail sind damit teilweise erledigt; Telefon-/Abbruch-/Device-Fälle bleiben offen.
+
+Der zweite privilegierte Prüfendpunkt wurde nach Abschluss durch einen 503-Handler mit JWT-Prüfung ersetzt. Separate SQL-Kontrolle: null verbliebene Integrationskonten und null Testanlagen. Produktivprojekt und Pages unverändert.
+
+### Verbleibende technische Rollout-Grenze
+
+Die vorhandene Supabase-Verbindung bietet SQL/Edge-Deployment, aber keine Operation zum Setzen von Edge-Secrets oder zum Lesen/Ändern der Auth-Konfiguration. Für eine produktive Aktivierung werden unter anderem das private Rate-Secret, die Feature-Schalter, erlaubte Origins/Reset-URL und der verifizierte Ingress benötigt. Die Handler verweigern ohne diese Konfiguration korrekt die Funktion. Daher wurde kein Frontend ausgerollt, das eine aktivierte Backend-Funktion vortäuschen würde. Browser/PWA, SMTP, vollständiger Restore und Reconciliation sind weiterhin nicht abgenommen.
