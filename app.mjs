@@ -12,7 +12,7 @@ import {initializePreferences,syncPreferences,endPreferenceSession,changePrefere
 import {updateAssignmentForm} from './assignments.mjs?v=5.9.0';
 import {personManager} from './people-ui.mjs?v=5.9.0';
 import {bindInvitations} from './invite-ui.mjs?v=5.9.0';
-import {mayPreview,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.0';
+import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.3';
 import {bindInstall} from './install.mjs?v=5.8.1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
@@ -46,12 +46,12 @@ const accessRequestUi=bindAccessRequests({api,getState:()=>state,invite:id=>invi
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
-function isAccessPreview(){return ['connected','demo'].includes(state.mode)&&mayPreview(state.fullData)&&['staff','resident'].includes(state.viewRole);}
+function isAccessPreview(){return ['connected','demo'].includes(state.mode)&&mayPreview(state.fullData)&&allowedPreviewRoles(state.fullData).includes(state.viewRole)&&state.viewRole!==nativePreviewRole(state.fullData);}
 function render(focus=false){
  const appearanceWasOpen=document.querySelector('.appearance-settings')?.open;
  if(state.mode==='connected'){
   if(mayPreview(state.data)&&state.data!==state.fullData)state.fullData=state.data;
-  if(mayPreview(state.fullData))state.data=previewProjection(state.fullData,state.viewRole||'super',state.previewSelection||'');
+  if(mayPreview(state.fullData)){if(!allowedPreviewRoles(state.fullData).includes(state.viewRole))state.viewRole=nativePreviewRole(state.fullData);state.data=previewProjection(state.fullData,state.viewRole,state.previewSelection||'');}
  }else if(state.mode==='demo'){if(!state.demoFullData||state.data.role==='super'){state.demoFullData=state.data;state.demoFullData.serverRole='manager';}state.fullData=state.demoFullData;state.data=previewProjection(state.fullData,state.viewRole||'super',state.previewSelection||'');}else{state.fullData=null;state.demoFullData=null;state.viewRole='super';state.previewSelection='';}
 
  document.documentElement.lang=getLanguage();
@@ -63,7 +63,9 @@ function render(focus=false){
  updateDesignControl();
  $('breadcrumb').textContent=labels[state.page];
  const previewAllowed=['connected','demo'].includes(state.mode)&&mayPreview(state.fullData);if(previewAllowed&&state.viewRole==='resident'){const opts=residentPreviewOptions(state.fullData);if(!opts.some(o=>o.id===state.previewSelection))state.previewSelection=opts[0]?.id||'';}
- $('roleControl').hidden=!previewAllowed;$('roleSelect').value=d.role;
+ $('roleControl').hidden=!previewAllowed;
+  for(const option of $('roleSelect').options){const allowed=previewAllowed&&allowedPreviewRoles(state.fullData).includes(option.value);option.hidden=!allowed;option.disabled=!allowed;}
+  $('roleSelect').value=d.role;
  $('roleLabel').textContent=tr('Görünüm');
  const narrowRoleLabels=window.matchMedia('(max-width:440px)').matches;
  const deutsch=getLanguage()==='de';
@@ -87,7 +89,7 @@ function render(focus=false){
  }
  $('modeBadge').textContent=tr("Örnek veriler");
  $('contextText').textContent=state.mode==='demo'?tr("Örnek çalışma alanı · Değişiklikler bu sayfayla sınırlıdır."):state.stale?tr("Kayıt kaydedildi; görünüm yenilenemedi. Sayfayı yeniden açın."):tr("Son okuma ")+(d.loadedAt||'')+tr(" · Kayıtlar hesabınızın yetkileriyle gösterilir.");
- if(isAccessPreview())$('contextText').textContent=tr('Görünüm önizlemesi · İşlemler kaydedilmez. Süper Admin görünümüne dönerek düzenleyin.');
+ if(isAccessPreview())$('contextText').textContent=tr(nativePreviewRole(state.fullData)==='super'?'Görünüm önizlemesi · İşlemler kaydedilmez. Süper Admin görünümüne dönerek düzenleyin.':'Görünüm önizlemesi · İşlemler kaydedilmez. Yönetim görünümüne dönerek düzenleyin.');
  $('footerMode').textContent=state.mode==='demo'?tr("Örnek veriler"):tr("Hesabınız");$('connectionButton').textContent=state.mode==='demo'?tr("Hesabımla giriş"):tr("Çıkış yap");$('refreshButton').hidden=state.mode==='demo';
  document.body.classList.toggle('signed-out',state.mode==='signedout');
  $('previewBanner').hidden=!IS_PREVIEW;$('previewBanner').textContent=tr('V5.1 önizleme · Örnek veriler · Canlı kayıtlara erişim yok');
@@ -106,11 +108,11 @@ function render(focus=false){
 }
 function navigate(page){mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
 function closeDialogs(){for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
-async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
+async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
  if(action==='person_link')action='link';
- if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
+ if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
  if(state.mode==='demo'&&action==='user_access')return {ok:true};
  if(action==='user_access'){const result=await api.provision({...payload,site_id:state.data.site.id});await reload();return result;}
  if(action==='staff_remove'){
@@ -171,7 +173,7 @@ async function mutateInner(action,payload){
 }
 function permissionFor(action){return ['user_access','staff_remove','person_lifecycle','person_restore','settings','permissions','publish_report'].includes(action)?'admin':['assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
 function showForm(action,args={}){
- if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
+ if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
  if(writeBusy)throw Error(tr("Önce devam eden işlemin tamamlanmasını bekleyin."));
  if(!can(state,permissionFor(action)))throw Error(tr("Bu işlem için yetkiniz yok."));
  const origin=$('detailDialog').open?detailView:null;
@@ -210,7 +212,7 @@ function updateAnnouncementTargets(){const root=$('actionFields'),kind=root.quer
 
 document.addEventListener('click',async event=>{
  if(event.target.closest('.unit-history-link')){event.preventDefault();$('unitPaymentHistory')?.scrollIntoView({block:'start'});$('unitPaymentHistory')?.focus({preventScroll:true});return;}
- if(event.target.closest('[data-preview-return]')){changePreviewRole('super');return;}
+ if(event.target.closest('[data-preview-return]')){changePreviewRole(nativePreviewRole(state.fullData));return;}
  if(event.target.closest('[data-reset-appearance]')){resetPreferences(state.mode==='connected'?api:null,message=>{const el=$('preferenceStatus');if(el)el.textContent=message;});applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));const panel=document.querySelector('.appearance-settings');if(panel)panel.open=true;document.querySelector('[data-reset-appearance]')?.focus();return;}
  const navToggle=event.target.closest('#nav [data-nav-group]');
  if(navToggle){
@@ -266,7 +268,7 @@ document.addEventListener('click',async event=>{
   if(action==='export_report')return exportReport();
   if(action==='export_bank'){if(!can(state,'finance'))return;downloadCsv('ayapark2-banka-'+(state.mode==='demo'?'ornek':'kayitlar')+'.csv',[[tr("Tarih"),tr("Açıklama"),tr("Kategori"),tr("Tutar TL"),tr("Referans")],...filteredTransactions(state).map(t=>[t.date,t.desc,t.category,t.cents/100,t.bank_reference||t.reference||''])]);return;}
   if(action==='import'){
-   if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
+   if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
    if(!can(state,'import'))return;importPayload=null;$('csvFile').value='';$('importPreview').textContent=tr("Henüz dosya seçilmedi.");$('commitImport').disabled=true;$('importDialog').showModal();return;
   }
   const back=b.closest('#actionFields')&&formAction?{...formAction,values:[...new FormData($('actionForm'))]}:null;
@@ -289,7 +291,7 @@ $('languageToggle').addEventListener('click',()=>{
  updateConditionalForm();document.dispatchEvent(new Event('ay2:languagechange'));
 });
 window.addEventListener('hashchange',()=>navigate(location.hash.slice(1)));
-function changePreviewRole(role,selection){if(writeBusy||loginBusy||!mayPreview(state.fullData)||!['super','staff','resident'].includes(role))return;closeDialogs();state.viewRole=role;if(selection!==undefined)state.previewSelection=selection;else if(role==='resident')state.previewSelection=residentPreviewOptions(state.fullData)[0]?.id||'';state.page='overview';state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.reportFilter={preset:'all'};render(true);}
+function changePreviewRole(role,selection){if(writeBusy||loginBusy||!mayPreview(state.fullData)||!allowedPreviewRoles(state.fullData).includes(role))return;closeDialogs();state.viewRole=role;if(selection!==undefined)state.previewSelection=selection;else if(role==='resident')state.previewSelection=residentPreviewOptions(state.fullData)[0]?.id||'';state.page='overview';state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.reportFilter={preset:'all'};render(true);}
 $('roleSelect').addEventListener('change',event=>changePreviewRole(event.target.value));
 $('residentPreviewSelect').addEventListener('change',event=>changePreviewRole('resident',event.target.value));
 document.addEventListener('input',event=>{
@@ -342,7 +344,8 @@ $('connectionButton').addEventListener('click',async()=>{
 let pendingSetupLoaded=null;
 $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 function completeSignIn(loaded){
- state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;
+ state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';state.fullData=null;
+  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;
  state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
  // Closing a completed login must not trigger the pending-login cancellation handler.
  loginBusy=false;pendingSetupLoaded=null;$('loginSubmit').disabled=false;
