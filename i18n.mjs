@@ -1288,4 +1288,4 @@ Object.assign(german,{
  'Talebiniz alındı. Yönetim incelemeden sonra sizinle iletişime geçecektir.':'Ihre Anfrage wurde entgegengenommen. Die Verwaltung meldet sich nach der Prüfung.','Talep gönderilemedi. Bilgilerinizi kontrol edip daha sonra tekrar deneyin.':'Die Anfrage konnte nicht gesendet werden. Prüfen Sie Ihre Angaben und versuchen Sie es später erneut.','Talepler yüklenemedi. Yenileyin.':'Anfragen konnten nicht geladen werden. Bitte aktualisieren.'
 });
 
-Object.assign(german,{'Sayfa başına en fazla 200 talep.':'Bis zu 200 Anfragen pro Seite.','Önceki talepler':'Vorherige Anfragen','Sonraki talepler':'Weitere Anfragen'});
+Object.assign(german,{'Sayfa başına en fazla 200 talep.':'Bis zu 200 Anfragen pro Seite.','Önceki talepler':'Vorherige Anfragen','Sonraki talepler':'Weitere Anfragen','Telefon, e-posta veya kullanıcı kodu':'Telefon, E-Mail oder Benutzerkennung'});
