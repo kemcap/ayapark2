@@ -10,7 +10,12 @@ $$;
 CREATE OR REPLACE FUNCTION ay2_private.guard_person_identity()
 RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path='' AS $$
 BEGIN
- PERFORM pg_advisory_xact_lock(hashtextextended(new.site_id::text,0));
+ -- Inserts share the management site lock. Account updates lock only the account,
+ -- avoiding a person -> site lock inversion during invitation redemption.
+ IF TG_OP='INSERT' THEN PERFORM pg_advisory_xact_lock(hashtextextended(new.site_id::text,0));END IF;
+ IF new.auth_user_id IS NOT NULL AND (TG_OP='INSERT' OR new.auth_user_id IS DISTINCT FROM old.auth_user_id) THEN
+  PERFORM pg_advisory_xact_lock(hashtextextended(new.auth_user_id::text,20261027));
+ END IF;
  IF new.auth_user_id IS NOT NULL AND (TG_OP='INSERT' OR new.auth_user_id IS DISTINCT FROM old.auth_user_id)
  AND EXISTS(SELECT 1 FROM public.ay3_persons p WHERE p.site_id=new.site_id AND p.id<>new.id AND p.auth_user_id=new.auth_user_id)
  THEN RAISE EXCEPTION 'Dieses Konto ist bereits einer anderen Person zugeordnet. / Bu hesap başka bir kişiye bağlı.';END IF;
