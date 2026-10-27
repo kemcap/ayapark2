@@ -1289,3 +1289,12 @@ Object.assign(german,{
 });
 
 Object.assign(german,{'Sayfa başına en fazla 200 talep.':'Bis zu 200 Anfragen pro Seite.','Önceki talepler':'Vorherige Anfragen','Sonraki talepler':'Weitere Anfragen'});
+
+// Restored Superadmin header preview and single-step person role assignment.
+Object.assign(german,{
+ 'Görünüm':'Ansicht',
+ 'Rol seçin.':'Rolle auswählen.',
+ 'Yeni kişi için daire seçin.':'Bitte eine Wohnung für die neue Person auswählen.',
+ 'Yeni kişi için rol seçin.':'Bitte eine Rolle für die neue Person auswählen.',
+ 'Kişi kaydedildiğinde daire ve rolü de aynı anda atanır.':'Beim Speichern werden die Person und ihre Wohnungsrolle gemeinsam angelegt.'
+});
