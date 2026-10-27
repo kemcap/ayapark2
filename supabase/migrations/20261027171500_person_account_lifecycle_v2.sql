@@ -23,6 +23,9 @@ BEGIN
   SELECT * INTO target FROM public.ay3_persons
    WHERE site_id=p_site AND id=p_person FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'Person nicht gefunden.'; END IF;
+  IF p_mode='restore' AND p_revoke_access IS TRUE THEN
+    RAISE EXCEPTION 'Wiederherstellung kann keine Zugangsrechte entziehen.';
+  END IF;
   -- Explicit site-access revocation for both archive and delete; auth.users remains intact.
   -- Staff access requires the separate management-membership workflow.
   IF target.auth_user_id IS NOT NULL AND p_revoke_access IS TRUE THEN
