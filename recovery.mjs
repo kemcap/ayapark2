@@ -1,6 +1,6 @@
-import {RecoveryApi,takeRecoveryLocation} from './recovery-api.mjs?v=5.3.1';
-import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.3.1';
-import {bindPasswordEyes} from './password-eye.mjs?v=5.3.1';
+import {RecoveryApi,takeRecoveryLocation} from './recovery-api.mjs?v=5.8.1';
+import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.8.1';
+import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 const incoming=takeRecoveryLocation(location,history),api=new RecoveryApi(undefined,{previewOnly:document.querySelector('meta[name="ayapark-stage"]')?.content==='preview'}),$=id=>document.getElementById(id);
 const translate=bindStaticText(document.body),hidePasswords=bindPasswordEyes();
 let busy=false,completed=false,phase='request',statusText='';
@@ -30,8 +30,8 @@ $('newPasswordForm').addEventListener('submit',async event=>{
  if($('newPassword').value!==$('confirmPassword').value){message('Şifreler aynı değil.',true);$('confirmPassword').focus();return;}
  busy=true;$('saveNewPassword').disabled=true;message('Şifre kaydediliyor…');
  try{await api.savePassword($('newPassword').value);completed=true;phase='complete';$('newPasswordForm').hidden=true;$('recoveryHelp').textContent=tr('Yeni şifrenle uygulamaya giriş yapabilirsin.');message('Şifren yenilendi.');}
- catch(error){message(error.status===401||error.status===403?'Bağlantının süresi dolmuş olabilir. Yeni bir bağlantı iste.':'Şifre kaydedilemedi. Güçlü bir şifre seçip tekrar dene.',true);if(error.status===401||error.status===403){api.clear();phase='request';$('recoveryHelp').textContent=tr('Şifreni yenilemek için e-posta adresini yaz.');$('newPasswordForm').hidden=true;$('requestResetForm').hidden=false;}}
- finally{busy=false;$('saveNewPassword').disabled=false;$('newPasswordForm').reset();hidePasswords();}
+ catch(error){message(error.status===401||error.status===403?'Bağlantının süresi dolmuş olabilir. Yeni bir bağlantı iste.':'Şifre kaydedilemedi. En az 6 karakter kullanın ve tekrar deneyin.',true);if(error.status===401||error.status===403){api.clear();phase='request';$('recoveryHelp').textContent=tr('Şifreni yenilemek için e-posta adresini yaz.');$('newPasswordForm').hidden=true;$('requestResetForm').hidden=false;}}
+ finally{busy=false;$('saveNewPassword').disabled=false;if(completed)$('newPasswordForm').reset();hidePasswords();}
 });
 window.addEventListener('pagehide',()=>{api.clear();$('newPasswordForm').reset();hidePasswords();});
 language();

@@ -1,4 +1,4 @@
-import {getLanguage} from './i18n.mjs?v=5.3.1';
+import {getLanguage} from './i18n.mjs?v=5.8.1';
 export const designKey='ayapark2-design-v1';
 export const designOptions=['classic','modern'];
 let current='modern';

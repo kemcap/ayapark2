@@ -1,0 +1,34 @@
+import {PGlite} from '@electric-sql/pglite';import {readFile} from 'node:fs/promises';import assert from 'node:assert/strict';
+const db=new PGlite();let passed=0;const id=n=>'6f000000-0000-0000-0000-'+String(n).padStart(12,'0');const hash=n=>String(n).repeat(64);
+const scalar=async(sql,args=[])=>Object.values((await db.query(sql,args)).rows[0])[0];const check=(label,v)=>{assert(v,label);passed++;};const denied=async(sql,args)=>{let fail=false;try{await db.query(sql,args);}catch{fail=true;}check('denied',fail);};
+try{
+ for(const path of ['./schema.sql','../../supabase/migrations/20261026_email_free_whatsapp_activation.sql','../../supabase/auth-phase3.sql','../../supabase/auth-phase4.sql','../../supabase/auth-phase5.sql','../../supabase/auth-phase6.sql','../../supabase/auth-phase8.sql'])await db.exec(await readFile(new URL(path,import.meta.url),'utf8'));
+ await db.exec(`insert into auth.users(id,email) values('${id(1)}','manager@example.invalid'),('${id(2)}','emailonly@example.invalid'),('${id(3)}','alien@example.invalid'),('${id(4)}','resident-905321234567@ayapark2.invalid');
+ insert into public.site_sites(id,slug,name) values('${id(10)}','integration-qa','Synthetic');
+ insert into public.site_blocks(id,site_id,code) values('${id(11)}','${id(10)}','A');
+ insert into public.site_units(id,site_id,block_id,number,code) values('${id(12)}','${id(10)}','${id(11)}',7,'A-7');
+ insert into public.site_staff_memberships(site_id,user_id,role) values('${id(10)}','${id(1)}','manager');
+ insert into public.ay3_persons(id,site_id,full_name) values('${id(20)}','${id(10)}','Email only'),('${id(21)}','${id(10)}','Phone');
+ insert into public.ay3_links(site_id,unit_id,person_id,role,active) values('${id(10)}','${id(12)}','${id(20)}','tenant',true),('${id(10)}','${id(12)}','${id(21)}','owner',true);
+ grant select,insert,update on all tables in schema public to service_role;`);
+ const issue='select public.ay_auth_issue_email_invite($1,$2,$3,$4)',redeem='select public.ay3_redeem_phone_invite($1,$2)';
+ await db.exec('set role anon');await denied(issue,[id(1),id(20),'emailonly@example.invalid',hash(1)]);await db.exec('reset role;set role service_role');
+ await denied(issue,[id(3),id(20),'emailonly@example.invalid',hash(1)]);await denied(issue,[id(1),id(20),'not an email',hash(1)]);
+ await db.query('select public.ay_access_submit($1,$2,$3,$4,$5,$6)',[id(10),'Email','Only','email','emailonly@example.invalid','A-7']);
+ const request=(await scalar('select public.ay_access_list($1,$2)',[id(10),id(1)])).requests[0];
+ await db.query('select public.ay_access_update($1,$2,$3,$4,$5,$6,$7)',[id(10),id(1),request.id,1,'approve',id(20),true]);
+ await db.query(issue,[id(1),id(20),'EmailOnly@Example.invalid',hash(1)]);
+ await db.exec('reset role');check('email normalized, no phone required',await scalar('select email from public.ay3_invite_tokens where token_hash=$1',[hash(1)])==='emailonly@example.invalid');
+ check('seven days',await scalar("select expires_at-created_at=interval '7 days' from public.ay3_invite_tokens where token_hash=$1",[hash(1)]));
+ check('no access before consumption',await scalar('select count(*)::int from public.site_resident_units where user_id=$1',[id(2)])===0);
+ await db.exec('set role service_role');await db.query(issue,[id(1),id(20),'emailonly@example.invalid',hash(2)]);await denied(redeem,[hash(1),id(2)]);
+ await db.query(redeem,[hash(2),id(2)]);await denied(redeem,[hash(2),id(2)]);await denied(issue,[id(1),id(20),'emailonly@example.invalid',hash(3)]);
+ await db.query('select public.ay_auth_issue_invite($1,$2,$3,$4)',[id(1),id(21),'+905321234567',hash(4)]);await db.query(redeem,[hash(4),id(4)]);
+ await db.exec('reset role');check('email account attached unchanged',await scalar('select auth_user_id from public.ay3_persons where id=$1',[id(20)])===id(2));
+ check('no invented phone',await scalar("select coalesce(phone,'')='' from public.ay3_persons where id=$1",[id(20)]));
+ check('request activates after consumption',await scalar('select status from public.ay_access_requests where id=$1',[request.id])==='activated');
+ check('only authorized unit assigned',await scalar('select count(*)::int from public.site_resident_units where user_id=$1 and unit_id=$2 and role=$3',[id(2),id(12),'tenant'])===1);
+ check('existing phone flow remains compatible',await scalar('select auth_user_id from public.ay3_persons where id=$1',[id(21)])===id(4));
+ check('no phone binding for email-only',await scalar('select count(*)::int from ay_auth_private.phone_contacts where user_id=$1',[id(2)])===0);
+ console.log(JSON.stringify({passed,failed:0,scope:'combined drafts, synthetic SQL, no GoTrue'}));
+}finally{await db.close();}

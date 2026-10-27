@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.3.1';
-import {settingsPage} from '../settings-ui.mjs?v=5.3.1';
+import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.8.1';
+import {settingsPage} from '../settings-ui.mjs?v=5.8.1';
 
 const staff=[
  {user_id:'actor',role:'manager',name:'Primary administrator',email:'primary@example.invalid'},

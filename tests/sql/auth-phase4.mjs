@@ -1,0 +1,36 @@
+import {PGlite} from '@electric-sql/pglite';import {readFile} from 'node:fs/promises';import assert from 'node:assert/strict';
+const db=new PGlite();let passed=0;const id=n=>'8f000000-0000-0000-0000-'+String(n).padStart(12,'0');const hash=n=>String(n).repeat(64);
+const value=async(sql,args=[])=>Object.values((await db.query(sql,args)).rows[0])[0];const check=(name,v)=>{assert(v,name);passed++;};const denied=async(sql,args=[])=>{let no=false;try{await db.query(sql,args);}catch{no=true;}check('rejected',no);};
+const issue='select public.ay_auth_issue_invite($1,$2,$3,$4)',redeem='select public.ay3_redeem_phone_invite($1,$2)',revoke='select public.ay_auth_revoke_invites($1,$2)';
+try{
+ for(const path of ['./schema.sql','../../supabase/migrations/20261026_email_free_whatsapp_activation.sql','../../supabase/auth-phase3.sql','../../supabase/auth-phase4.sql'])await db.exec(await readFile(new URL(path,import.meta.url),'utf8'));
+ await db.exec(`insert into auth.users(id,email) values('${id(1)}','admin4@example.invalid'),('${id(2)}','resident4@example.invalid'),('${id(3)}','alien4@example.invalid');
+ insert into public.site_sites(id,slug,name) values('${id(10)}','qa-phase4','Synthetic');
+ insert into public.site_blocks(id,site_id,code) values('${id(11)}','${id(10)}','A');
+ insert into public.site_units(id,site_id,block_id,number,code) values('${id(12)}','${id(10)}','${id(11)}',7,'A-7');
+ insert into public.site_staff_memberships(site_id,user_id,role) values('${id(10)}','${id(1)}','manager');
+ insert into public.ay3_persons(id,site_id,full_name) values('${id(20)}','${id(10)}','Synthetic invitee');
+ insert into public.ay3_links(site_id,unit_id,person_id,role,active) values('${id(10)}','${id(12)}','${id(20)}','tenant',true);`);
+ await db.exec('grant select,insert,update on all tables in schema public to service_role');
+ await db.exec('set role anon');await denied(issue,[id(1),id(20),'+905321234567',hash(1)]);await denied(revoke,[id(1),id(20)]);
+ await db.exec('reset role;set role authenticated');await denied(redeem,[hash(1),id(2)]);
+ await db.exec('reset role;set role service_role');await denied(issue,[id(3),id(20),'+905321234567',hash(1)]);
+ await db.query(issue,[id(1),id(20),'+905321234567',hash(1)]);
+ await db.exec('reset role');check('exactly seven days stored',await value("select expires_at-created_at=interval '7 days' from public.ay3_invite_tokens where token_hash=$1",[hash(1)]));
+ check('no apartment permission before activation',await value('select count(*)::int from public.site_resident_units where user_id=$1',[id(2)])===0);
+ await db.exec('set role service_role');await denied(issue,[id(1),id(20),'invalid-phone',hash(2)]);
+ await db.exec('reset role');check('failed replacement retains old invitation',await value('select revoked_at is null from public.ay3_invite_tokens where token_hash=$1',[hash(1)]));
+ await db.exec('set role service_role');await db.query(issue,[id(1),id(20),'+905321234567',hash(2)]);await denied(redeem,[hash(1),id(2)]);
+ await denied(revoke,[id(3),id(20)]);await db.query(revoke,[id(1),id(20)]);await denied(redeem,[hash(2),id(2)]);
+ await db.query(issue,[id(1),id(20),'+905321234567',hash(3)]);
+ await db.exec("reset role;update public.ay3_invite_tokens set expires_at=now()-interval '1 second' where token_hash='"+hash(3)+"';set role service_role");await denied(redeem,[hash(3),id(2)]);
+ await db.query(issue,[id(1),id(20),'+905321234567',hash(4)]);
+ await db.exec("reset role;update public.site_staff_memberships set role='deputy' where user_id='"+id(1)+"' and site_id='"+id(10)+"';set role service_role");await denied(redeem,[hash(4),id(2)]);
+ await db.exec("reset role;update public.site_staff_memberships set role='manager' where user_id='"+id(1)+"' and site_id='"+id(10)+"';set role service_role");
+ check('valid activation',!!(await value(redeem,[hash(4),id(2)])).ok);await denied(redeem,[hash(4),id(2)]);await denied(issue,[id(1),id(20),'+905321234567',hash(5)]);
+ check('same phone account mapping',await value('select public.ay_auth_phone_lookup($1)',['+905321234567'])===id(2));
+ await db.exec('reset role');check('only intended apartment permission',await value('select count(*)::int from public.site_resident_units where user_id=$1 and unit_id=$2',[id(2),id(12)])===1);
+ check('no admin rights granted',await value('select count(*)::int from public.site_staff_memberships where user_id=$1',[id(2)])===0);
+ check('activation audited',await value("select count(*)::int from public.ay2_audit where action='whatsapp_invite_activated' and entity_id=$1",[id(20)])===1);
+ console.log(JSON.stringify({passed,failed:0,scope:'isolated synthetic PostgreSQL; no real Auth creation or concurrency'}));
+}finally{await db.close();}

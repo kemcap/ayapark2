@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {RecoveryApi,takeRecoveryLocation} from '../recovery-api.mjs?v=5.3.1';
+import {RecoveryApi,takeRecoveryLocation} from '../recovery-api.mjs?v=5.8.1';
 
 test('default fetch keeps the browser Window receiver',async()=>{
  const original=globalThis.fetch;
@@ -74,4 +74,15 @@ test('a response arriving after the session is cleared cannot restore recovery a
  const pending=api.begin({accessToken:'a',refreshToken:'r',type:'recovery'});api.clear();
  resolve({ok:true,status:200,json:async()=>({id:'u'})});
  await assert.rejects(pending);assert.equal(api.recovery,false);assert.equal(api.session,null);
+});
+
+test('fragment recovery hashes are read and immediately removed from the address',()=>{
+ let clean=false;const result=takeRecoveryLocation({hash:'#type=recovery&token_hash=secret-hash',search:'',pathname:'/reset.html'},{replaceState(){clean=true;}});
+ assert.equal(clean,true);assert.equal(result.payload.tokenHash,'secret-hash');
+});
+test('temporary password save failure preserves the verified session for retry with six plain characters',async()=>{
+ const {api,calls}=client([{id:'u'},{status:503,body:{}},{id:'u'},{}]);
+ await api.begin({accessToken:'a',refreshToken:'r',type:'recovery'});
+ await assert.rejects(api.savePassword('abcdef'));assert.equal(api.recovery,true);assert.equal(api.session.user.id,'u');
+ await api.savePassword('abcdef');assert.equal(api.session,null);assert.equal(calls.filter(c=>c.method==='PUT').length,2);
 });

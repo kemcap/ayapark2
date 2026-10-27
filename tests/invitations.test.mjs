@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {inviteEligible,inviteText,whatsappNumber,whatsappShareUrl} from '../invite-ui.mjs?v=5.3.1';
-import {AyaparkApi,loginIdentifier} from '../api.mjs?v=5.3.1';
+import {inviteEligible,inviteText,whatsappNumber,whatsappShareUrl} from '../invite-ui.mjs?v=5.8.1';
+import {AyaparkApi,loginIdentifier} from '../api.mjs?v=5.8.1';
 
 const person={id:'p1',full_name:'Test Resident',phone:'0542 111 22 33',email:''};
 const base={mode:'connected',data:{role:'super',persons:[person],links:[{person_id:'p1',role:'tenant',starts_on:'2024-01-01',ends_on:null}],units:[]}};
@@ -72,7 +72,7 @@ test('backend stores hash-only one-time tokens and atomically claims access',asy
  assert.match(edge,/SHA-256/);
  assert.match(edge,/getUser\(bearer\)/);
  assert.match(edge,/phone_e164/);
- assert.match(edge,/48\*60\*60\*1000/);
+ assert.match(edge,/ay_auth_issue_invite/);
  assert.doesNotMatch(edge,/sendSms|sendEmail|inviteUserByEmail|generateLink\(/);
 });
 test('invite activation UI has no mandatory email and requires password twice',async()=>{
@@ -94,4 +94,8 @@ test('phone invitation activation does not insert a text NULL into uuid person_i
  assert.match(sql,/select distinct l\.unit_id,p_user,l\.role,null::uuid,true/);
  assert.doesNotMatch(sql,/select distinct l\.unit_id,p_user,l\.role,null,true/);
  assert.match(sql,/revoke all on function public\.ay3_redeem_phone_invite\(text,uuid\) from PUBLIC,anon,authenticated/);
+});
+
+test('email invitation text never claims an email-free account',()=>{
+ for(const language of ['de','tr']){const text=inviteText({name:'Synthetic',units:'A-7',link:'https://example.invalid/?invite=abc',language,contactKind:'email'});assert.doesNotMatch(text,/ohne E-Mail|E-posta gerekmez/);assert.match(text,/7/);}
 });

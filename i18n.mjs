@@ -1,5 +1,21 @@
 // Only authored interface text is translated. Stored content is never sent to a service.
 export const german = {
+ "Giriş yöntemi": "Anmeldemethode",
+ "Davet e-postası": "E-Mail für die Einladung",
+ "Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir. Giriş için telefon veya e-posta seçin.": "Der Link gilt 7 Tage und ist einmal verwendbar. Wähle Telefon oder E-Mail für die Anmeldung.",
+ "Lütfen kendi şifrenizi oluşturun.": "Bitte erstelle dein eigenes Passwort.",
+ "Hesabın etkinleştirildi. Giriş bilgin ve yeni şifrenle giriş yap.": "Dein Konto wurde aktiviert. Melde dich mit deinen Zugangsdaten und dem neuen Passwort an.",
+ "Hesabın durumu yönetim tarafından kontrol edilmelidir. Yeni bir hesap oluşturmayın.": "Die Verwaltung muss den Kontostatus prüfen. Bitte kein weiteres Konto erstellen.",
+
+ "Erişimi yenile": "Zugang wiederherstellen",
+ "Bu bağlantı mevcut hesabın şifresini yeniler. Yeni hesap veya daire yetkisi oluşturmaz.": "Dieser Link setzt das Passwort des bestehenden Kontos zurück. Er erstellt kein Konto und keine Wohnungsberechtigung.",
+ "Kimlik kontrolü notu": "Notiz zur Identitätsprüfung",
+ "Kişinin kimliğini güvenilir bir yöntemle kontrol ettim.": "Ich habe die Identität der Person mit einem zuverlässigen Verfahren geprüft.",
+ "Yenileme bağlantısı oluştur": "Wiederherstellungslink erstellen",
+ "Kişisel yenileme bağlantısı": "Persönlicher Wiederherstellungslink",
+ "E-posta kullanmıyorsanız kimliğinizi doğrulamak ve kişisel yenileme bağlantısı almak için yönetime başvurun.": "Ohne E-Mail: Wende dich für eine Identitätsprüfung und einen persönlichen Wiederherstellungslink an die Verwaltung.",
+ "Şifre kaydedilemedi. En az 6 karakter kullanın ve tekrar deneyin.": "Das Passwort konnte nicht gespeichert werden. Verwende mindestens 6 Zeichen und versuche es erneut.",
+
  "Bağlantı geçersiz veya süresi dolmuş. Yeni bir bağlantı iste veya e-postadaki kodu kullan.": "Der Link ist ungültig oder abgelaufen. Fordere einen neuen Link an oder verwende den Code aus der E-Mail.",
  "Kod doğrulanıyor…": "Code wird überprüft …",
  "Kod geçersiz veya süresi dolmuş. Yeni bir kod iste.": "Der Code ist ungültig oder abgelaufen. Fordere einen neuen an.",
@@ -1248,3 +1264,28 @@ Object.assign(german,{
  'Etkinleştir':'Aktivieren',
  'Hesabın etkinleştirildi. Telefon numaran ve yeni şifrenle giriş yap.':'Ihr Konto ist aktiviert. Melden Sie sich mit Ihrer Telefonnummer und Ihrem neuen Passwort an.'
 });
+
+Object.assign(german,{
+ 'En az 6 karakter kullan.':'Verwende mindestens 6 Zeichen.',
+ 'Şifre en fazla 256 karakter olabilir.':'Das Passwort darf höchstens 256 Zeichen enthalten.',
+ 'Telefon veya şifre geçersiz. Bilgilerinizi kontrol edin.':'Telefonnummer oder Passwort ungültig. Bitte prüfen Sie Ihre Angaben.',
+ 'Telefonla giriş henüz kullanıma hazır değil. E-posta ile giriş yapın veya yönetime başvurun.':'Telefonanmeldung ist noch nicht verfügbar. Melden Sie sich per E-Mail an oder kontaktieren Sie die Verwaltung.',
+ 'Giriş hizmetine şu anda ulaşılamıyor. Lütfen tekrar deneyin.':'Der Anmeldedienst ist derzeit nicht erreichbar. Bitte erneut versuchen.'
+});
+
+Object.assign(german,{'Telefon veya e-posta':'Telefonnummer oder E-Mail-Adresse'});
+
+Object.assign(german,{'Bekleyen davetleri iptal et':'Ausstehende Einladungen widerrufen','Yeni şifre (en az 6 karakter)':'Neues Passwort (mindestens 6 Zeichen)','Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir. Etkinleştirme için e-posta gerekmez.':'Der Link ist 7 Tage gültig und nur einmal verwendbar. Für die Aktivierung ist keine E-Mail erforderlich.'});
+
+Object.assign(german,{'En az 6 karakterli bir şifre kullanın.':'Verwende ein Passwort mit mindestens 6 Zeichen.'});
+
+Object.assign(german,{
+ 'Erişim Talepleri':'Zugangsanfragen','Yeni':'Neu','İnceleniyor':'In Prüfung','Onaylandı':'Freigegeben','Davet gönderildi':'Einladung versendet','Etkinleştirildi':'Aktiviert','Reddedildi':'Abgelehnt',
+ 'Yeni / okunmadı':'Neu / ungelesen','Yenile':'Aktualisieren','Son 200 talep gösterilir.':'Angezeigt werden die letzten 200 Anfragen.','Okundu olarak işaretle':'Als gelesen markieren','İncelemeye al':'In Prüfung nehmen','Kişiyi eşleştir':'Person zuordnen','Davet oluştur':'Einladung erstellen','Gönderimi onayla':'Versand bestätigen','Reddet':'Ablehnen','Henüz erişim talebi yok.':'Keine Zugangsanfragen vorhanden.',
+ 'İlk kez erişim iste':'Zugang erstmals aktivieren','Yönetimden kişisel davet bağlantısı isteyin. Bu form hesap oluşturmaz.':'Fordern Sie einen persönlichen Einladungslink von der Verwaltung an. Dieses Formular erstellt kein Konto.',
+ 'İletişim yöntemi':'Kontaktmethode','Daire (isteğe bağlı, ör. A-7)':'Wohnung (optional, z. B. A-7)','Talep gönder':'Anfrage senden','Erişim talebini incele':'Zugangsanfrage prüfen','Kişi ara':'Person suchen','Kimliği ve güncel daire rolünü kontrol ettim.':'Ich habe die Identität und die aktuelle Wohnungsrolle geprüft.','Onayla':'Bestätigen','Talebi reddet':'Anfrage ablehnen',
+ 'Kişiyi, iletişim bilgisini ve güncel daire rolünü kontrol edin.':'Prüfen Sie Person, Kontaktdaten und aktuelle Wohnungsrolle.','Önce kontrolü onaylayın.':'Bestätigen Sie zuerst die Prüfung.','İşlem tamamlanamadı. Kaydı yenileyip tekrar kontrol edin.':'Die Aktion konnte nicht abgeschlossen werden. Aktualisieren und prüfen Sie den Eintrag erneut.',
+ 'Talebiniz alındı. Yönetim incelemeden sonra sizinle iletişime geçecektir.':'Ihre Anfrage wurde entgegengenommen. Die Verwaltung meldet sich nach der Prüfung.','Talep gönderilemedi. Bilgilerinizi kontrol edip daha sonra tekrar deneyin.':'Die Anfrage konnte nicht gesendet werden. Prüfen Sie Ihre Angaben und versuchen Sie es später erneut.','Talepler yüklenemedi. Yenileyin.':'Anfragen konnten nicht geladen werden. Bitte aktualisieren.'
+});
+
+Object.assign(german,{'Sayfa başına en fazla 200 talep.':'Bis zu 200 Anfragen pro Seite.','Önceki talepler':'Vorherige Anfragen','Sonraki talepler':'Weitere Anfragen'});

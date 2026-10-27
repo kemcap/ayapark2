@@ -1,2 +1,12 @@
 [functions.ay3-whatsapp-invite]
 verify_jwt = false
+
+# Development endpoint: handler also requires explicit server-side enablement.
+[functions.ay3-password-login]
+verify_jwt = false
+
+[functions.ay3-access-requests]
+verify_jwt = false
+
+[functions.ay3-admin-recovery]
+verify_jwt = false

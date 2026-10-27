@@ -1,0 +1,1 @@
+#accessRequestPanel{margin:20px 34px;min-width:0}#accessRequestPanel .person-card,#requestApplicantDetails,#requestPersonDetails{overflow-wrap:anywhere}#accessRequestPanel .row-actions{flex-wrap:wrap}#requestPersonField input,#requestPersonField select{width:100%}@media(max-width:760px){#accessRequestPanel{margin:16px}#accessRequestPanel .row-actions .button{flex:1 1 140px}}

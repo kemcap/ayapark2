@@ -1,4 +1,4 @@
-import {AyaparkApi} from './api.mjs?v=5.3.1';
+import {AyaparkApi} from './api.mjs?v=5.8.1';
 
 // Recovery sessions stay in memory. This client never reads apartment or finance data.
 export class RecoveryApi extends AyaparkApi {
@@ -32,8 +32,8 @@ export class RecoveryApi extends AyaparkApi {
  }
  async savePassword(password){
   if(!this.recovery)throw Error('No verified recovery session');
-  const generation=this.generation,token=await this.token();
-  await this.raw('/auth/v1/user','PUT',{password},token);
+  const generation=this.generation;
+  await this.setPassword(password);
   if(this.generation!==generation)throw Error('Session changed');
   this.recovery=false;
   await this.logout().catch(()=>this.clear());
@@ -43,7 +43,7 @@ export class RecoveryApi extends AyaparkApi {
 export function takeRecoveryLocation(location,history){
  const hash=new URLSearchParams(location.hash.replace(/^#/,''));
  const query=new URLSearchParams(location.search);
- const payload={accessToken:hash.get('access_token'),refreshToken:hash.get('refresh_token'),tokenHash:query.get('token_hash'),type:hash.get('type')||query.get('type')};
+ const payload={accessToken:hash.get('access_token'),refreshToken:hash.get('refresh_token'),tokenHash:hash.get('token_hash')||query.get('token_hash'),type:hash.get('type')||query.get('type')};
  const error=hash.has('error')||query.has('error')||hash.has('error_code')||query.has('error_code');
  const present=error||payload.type==='recovery'||!!(payload.accessToken||payload.refreshToken||payload.tokenHash||query.has('code'));
  // Remove credentials even when the link is invalid, before any network call or render.

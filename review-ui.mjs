@@ -1,5 +1,5 @@
-import {t as tr} from './i18n.mjs?v=5.3.1';
-import {escapeHtml as e,money} from './core.mjs?v=5.3.1';
+import {t as tr} from './i18n.mjs?v=5.8.1';
+import {escapeHtml as e,money} from './core.mjs?v=5.8.1';
 const actionButton=i=>`<button type="button" class="button" data-action="${e(i.action)}" ${Object.entries(i.args).map(([k,v])=>`data-${k}="${e(v)}"`).join(' ')}>${tr('Açıklığa kavuştur')}</button>`;
 export function compactReview(info){const kinds=new Map();for(const i of info.openIssues){const k=i.short;if(!kinds.has(k))kinds.set(k,new Map());kinds.get(k).set(i.key,i.amount);}return [...kinds].slice(0,3).map(([k,items])=>`<div>${e(k)}${[...items.values()].some(v=>v!=null)?' · '+money([...items.values()].reduce((n,v)=>n+(v||0),0)):''}</div>`).join('')+(kinds.size>3?`<small>+ ${kinds.size-3} ${tr('diğer tür')}</small>`:'');}
 export function reviewPanel(info){
