@@ -22,9 +22,9 @@ import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.8.1';
-import {AyaparkApi} from './api.mjs?v=5.8.1';
+import {AyaparkApi} from './api.mjs?v=5.8.5';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.8.1';
-import {buildForm,payloadFor} from './forms.mjs?v=5.8.4';
+import {buildForm,payloadFor} from './forms.mjs?v=5.8.5';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -127,12 +127,43 @@ async function mutateInner(action,payload){
   try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
   return result;
  }
+ if(action==='person_lifecycle'||action==='person_restore'){
+  if(!can(state,'admin'))throw Error(tr('Bu işlem için yetkiniz yok.'));
+  const mode=action==='person_restore'?'restore':payload.mode;
+  if(state.mode==='demo'){
+   const d=state.data,person=d.persons.find(x=>x.id===payload.person_id);
+   if(!person)throw Error('Person nicht gefunden.');
+   if(person.auth_user_id)throw Error('Verknüpften Anmeldezugang vorher entfernen.');
+   if(mode==='archive'){
+    if(person.archived_at)throw Error('Bereits archiviert.');
+    person.archived_at=new Date().toISOString();person.archive_note=payload.note;
+    for(const l of d.links.filter(l=>l.person_id===person.id&&l.active)){
+     l.active=false;l.archived_at=person.archived_at;l.archive_reason='person_archived';l.archive_note=payload.note;l.revision=(l.revision||0)+1;
+    }
+   }else if(mode==='restore'){
+    if(!person.archived_at)throw Error('Nicht archiviert.');
+    person.archived_at=null;person.archive_note=null;
+   }else if(mode==='delete'){
+    const ids=new Set(d.links.filter(l=>l.person_id===person.id).map(l=>l.id));
+    if(d.charges.some(c=>c.person_id===person.id||ids.has(c.link_id))||(d.credits||[]).some(c=>c.person_id===person.id)||(d.exceptions||[]).some(c=>c.person_id===person.id))
+     throw Error('Finanzvorgänge vorhanden: Bitte archivieren.');
+    d.matchRules=(d.matchRules||[]).filter(r=>r.person_id!==person.id);
+    d.links=d.links.filter(l=>l.person_id!==person.id);
+    d.persons=d.persons.filter(p=>p.id!==person.id);
+   }else throw Error('Ungültige Aktion.');
+   render();return {ok:true,mode};
+  }
+  const attempt=epoch,result=await api.rpc('ay3_manage_person',{p_site:state.data.site.id,p_person:payload.person_id,p_mode:mode,p_note:payload.note||'',p_confirm:payload.confirmation===true});
+  if(attempt!==epoch)throw Error(tr('Oturum değişti.'));
+  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
+  return result;
+ }
  if(state.mode==='demo'){const r=demoCommand(state.data,action,payload);state.data.transactions.sort((a,b)=>b.date.localeCompare(a.date));refreshDebts(state.data);render();return r;}
  const attempt=epoch,result=await api.command(state.data.site.id,action,payload);if(attempt!==epoch)throw Error(tr("Oturum değişti."));
  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
  return result;
 }
-function permissionFor(action){return ['user_access','staff_remove','settings','permissions','publish_report'].includes(action)?'admin':['assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
+function permissionFor(action){return ['user_access','staff_remove','person_lifecycle','person_restore','settings','permissions','publish_report'].includes(action)?'admin':['assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
 function showForm(action,args={}){
  if(isAccessPreview())throw Error(tr('Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.'));
  if(writeBusy)throw Error(tr("Önce devam eden işlemin tamamlanmasını bekleyin."));
@@ -141,7 +172,7 @@ function showForm(action,args={}){
  const built=buildForm(state,action,{period:state.period,...args});
  if($('detailDialog').open)$('detailDialog').close();
  formAction={action,args,context:built.context,origin};$('actionFields').dataset.financeAction=financeActions.includes(action)?action:'';
- $('actionTitle').textContent=built.title;$('actionFields').innerHTML=built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');$('actionDialog').showModal();updateConditionalForm();if(financeActions.includes(action))updateFinanceForm($('actionFields'),state.data);updateAnnouncementTargets();
+ $('actionTitle').textContent=built.title;$('actionFields').innerHTML=built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=action==='person_lifecycle'?(getLanguage()==='de'?'Aktion bestätigen':'İşlemi onayla'):action==='person_restore'?(getLanguage()==='de'?'Wiederherstellen':'Arşivden çıkar'):tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');$('actionDialog').showModal();updateConditionalForm();if(financeActions.includes(action))updateFinanceForm($('actionFields'),state.data);updateAnnouncementTargets();
 }
 function showDetail(html){
  if(!html)return;
