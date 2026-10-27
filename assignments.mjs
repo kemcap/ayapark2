@@ -1,3 +1,4 @@
+import {personCombobox,bindPersonCombobox} from './person-combobox.mjs?v=5.9.0';
 import {fieldError} from './ui-feedback.mjs?v=5.8.1';
 import {t as tr} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,randomId} from './core.mjs?v=5.8.1';
@@ -13,6 +14,7 @@ export function buildAssignmentForm(d,action,args={}){
  const l=d.links.find(x=>x.id===args.id),p=d.persons.find(x=>x.id===(l?.person_id||args.person));
  if(action!=='assignment_add'&&!l)throw Error(tr('Kayıt bulunamadı.'));
  const unit=args.unit||l?.unit_id||d.units[0]?.id,context={request_id:randomId(),id:l?.id,unit_id:unit,person_id:p?.id,revision:l?.revision??1};
+ if(action==='assignment_add')context.persons=d.persons.map(({id,full_name,phone,email,archived_at})=>({id,full_name,phone,email,archived_at}));
  const unitName=d.units.find(u=>u.id===unit)?.code||'',role=assignmentRoles.find(([v])=>v===l?.role)?.[1]||'';
  const intro=`<p class="assignment-context"><strong>${e(unitName)}</strong>${p?' · '+e(p.full_name):''}${role?' · '+e(tr(role)):''}</p>`;
  let title,body;
@@ -25,29 +27,35 @@ export function buildAssignmentForm(d,action,args={}){
  }else{
   title=tr('Kişi ekle');
   body=(args.unit?`<p class="assignment-context"><strong>${e(unitName)}</strong></p>`:select('unit_id','Daire',d.units.map(u=>[u.id,u.code]),unit))+
-   `<fieldset class="person-choice"><legend>${tr('Kişi seçimi')}</legend><label><input type="radio" name="person_mode" value="existing" ${args.person==='__new__'?'':'checked'}>${tr('Kayıtlı kişi seç')}</label><label><input type="radio" name="person_mode" value="new" ${args.person==='__new__'?'checked':''}>${tr('Yeni kişi oluştur')}</label></fieldset>`+
-   `<div id="existingPersonFields">${field('person_search','Kişi ara','search','','placeholder="'+e(tr('Ad, telefon veya e-posta ara'))+'"')}${select('person_id','Kişi',[['','Kişi seçin.'],...d.persons.map(p=>[p.id,p.full_name])],p?.id||'')}</div><div id="newPersonFields" hidden>${personFields(null)}</div>`+
+   `<input type="hidden" name="person_mode" value="${args.person==='__new__'?'new':'existing'}"><div id="existingPersonFields">${personCombobox(d.persons,p?.id||'')}</div><div id="newPersonFields" hidden><button type="button" class="button" data-combo-existing>${tr('Kayıtlı kişi seç')}</button>${personFields(null)}</div>`+
    select('role','Dairedeki rol',assignmentRoles,'tenant')+dates(null);
  }
  if(['assignment_add','assignment_edit','assignment_restore'].includes(action))body+=`<details><summary>${tr('Temsilci bildirim yetkisi')}</summary><p>${tr('Yalnızca temsilci rolü için. Ek borç oluşturmaz.')}</p><label class="check-field"><input type="checkbox" name="mandate_owners" ${l?.mandates?.includes('owners')?'checked':''}>${tr('Malik duyurularını alabilir')}</label><label class="check-field"><input type="checkbox" name="mandate_residents" ${l?.mandates?.includes('residents')?'checked':''}>${tr('Sakin duyurularını alabilir')}</label></details>`;
  return {title,body:`<div class="assignment-form">${body}</div>`,context};
 }
 export function updateAssignmentForm(container,d,changed=''){
- const mode=container.querySelector('[name="person_mode"]:checked')?.value;
+ const mode=container.querySelector('[name="person_mode"]')?.value;
  if(mode){
   const fresh=mode==='new',old=container.querySelector('#existingPersonFields'),newFields=container.querySelector('#newPersonFields');old.hidden=fresh;newFields.hidden=!fresh;
-  for(const node of old.querySelectorAll('input,select'))node.disabled=fresh;
+  for(const node of old.querySelectorAll('input,select,button'))node.disabled=fresh;
   for(const node of newFields.querySelectorAll('input,textarea')){node.disabled=!fresh;node.required=fresh&&['first_name','last_name'].includes(node.name);}
-  const list=old.querySelector('[name="person_id"]'),q=norm(old.querySelector('[name="person_search"]').value),value=list.value;
-  const matches=d.persons.filter(p=>!q||norm([p.full_name,p.phone,p.email].join(' ')).includes(q));
-  list.innerHTML=`<option value="">${e(tr(matches.length?'Kişi seçin.':'Kişi bulunamadı.'))}</option>`+matches.map(p=>`<option value="${e(p.id)}" ${p.id===value?'selected':''}>${e(p.full_name)}</option>`).join('');
+  bindPersonCombobox(container,d.persons,()=>{container.querySelector('[name="person_mode"]').value='new';updateAssignmentForm(container,d);newFields.querySelector('[name="first_name"]').focus();});
+  const back=container.querySelector('[data-combo-existing]');if(back&&!back.dataset.bound){back.dataset.bound='true';back.addEventListener('click',()=>{container.querySelector('[name="person_mode"]').value='existing';updateAssignmentForm(container,d);old.querySelector('button').focus();});}
+
  }
  const reason=container.querySelector('[name="reason"]'),note=container.querySelector('#removalNote');if(reason&&note){note.hidden=reason.value!=='other';note.querySelector('input').disabled=note.hidden;}
 }
 export function assignmentPayload(action,form,ctx){
- const p={request_id:ctx.request_id,id:ctx.id,unit_id:ctx.unit_id,revision:ctx.revision};for(const[k,v]of form)if(k!=='person_search')p[k]=String(v).trim();
+ const p={request_id:ctx.request_id,id:ctx.id,unit_id:ctx.unit_id,revision:ctx.revision};for(const[k,v]of form)p[k]=String(v).trim();
  if(action==='assignment_add'){p.new_person=p.person_mode==='new';if(!p.new_person&&!p.person_id)throw fieldError(tr('Kişi seçin.'),'person_id');}
  if(action==='assignment_edit'||action==='assignment_add'&&p.new_person){if(!p.first_name||!p.last_name)throw fieldError(tr('Ad ve soyad gerekli.'),!p.first_name?'first_name':'last_name');}
+ if(action==='assignment_add'&&p.new_person){
+  const name=norm(p.first_name+' '+p.last_name),phone=String(p.phone||'').replace(/\D/g,''),email=String(p.email||'').toLowerCase();
+  const matches=(ctx.persons||[]).filter(person=>norm(person.full_name)===name&&
+   (email&&String(person.email||'').toLowerCase()===email||phone&&String(person.phone||'').replace(/\D/g,'')===phone||!phone&&!email&&!person.phone&&!person.email));
+  if(matches.length>1||matches[0]?.archived_at)throw fieldError(tr('Bu kişi zaten kayıtlı. Mevcut kişiyi seçin; arşivdeyse önce geri getirin.'),'first_name');
+  if(matches.length===1){p.new_person=false;p.person_mode='existing';p.person_id=matches[0].id;}
+ }
  if(['assignment_add','assignment_edit'].includes(action)){
   if(!assignmentRoles.some(([r])=>r===p.role))throw Error(tr('Geçerli bir rol seçin.'));
   for(const key of ['starts_on','ends_on']){if(p[key]&&!dateValid(p[key]))throw fieldError(tr('Geçerli bir tarih girin veya boş bırakın.'),key);p[key]=p[key]||null;}

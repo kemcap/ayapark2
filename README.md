@@ -40,7 +40,7 @@ V3.13.5: In **Verwaltungsrechte / Yönetim yetkileri**, the Superadmin can remov
 V3.13.4: Replaces the upper-left generic building icon with a 3 KB 96x96 WebP photo thumbnail; adds a recovery OTP fallback to the reset form and email template for cases where a reset link expires or redirects incorrectly. The published Supabase email template and Auth URL allowlist must still be configured in the dashboard, and the separate GPT preview is not automatically synchronized.
 
 - Current app: https://kemcap.github.io/ayapark2/
-- Archived original: https://kemcap.github.io/ayapark2/old/
+- Legacy address redirects to the authenticated application: https://kemcap.github.io/ayapark2/old/
 - Owner-only preview: https://ayapark2-v2-private.kemcap.chatgpt.site
 
 V3.13 adds compact, collapsed clarification tasks with direct actions, multi-selection and audited review receipts. Reviewing never creates payments, assigns debtors or confirms imported charges. Mandatory missing information must be corrected; receipts become stale when source records change. The selected record is preserved in review history.
@@ -69,9 +69,9 @@ Apply `supabase/migrations/20261024_simple_active_assignments.sql` after earlier
 
 Read AUTH-SETUP.md for remaining mail configuration and real-device verification. Password is the default login method; System is the default appearance. Browser sessions persist until logout, local data removal, or server-side expiry/revocation.
 
-The public distribution contains application code and fictitious test data. Bank statements and resident records remain outside the repository. The browser receives only the public client key; permissions are enforced server-side. Role preview does not change memberships or server authorization.
+The current distribution contains application code and fictitious demo data. An older static financial snapshot was removed from the legacy entry page by the people-access change; earlier public Git history still contains that snapshot and requires separate visibility/history remediation. Current bank statements and resident data are loaded through authorized backend access. The browser receives only the public client key; permissions are enforced server-side. Role preview does not change memberships or server authorization.
 
-Run `node --test tests/*.test.mjs`. Application assets are in the repository root. GitHub Pages uses the root distribution and preserves the original application under `old/`.
+Run `node --test tests/*.test.mjs`. Application assets are in the repository root. GitHub Pages uses the root distribution. The `old/` entry redirects to the current application; embedded historical financial snapshots are no longer served from that page. Earlier copies remain in public Git history until repository visibility/history is separately addressed.
 
 ### Datenbank- und Ladeleistung (V3.15)
 

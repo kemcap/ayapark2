@@ -64,8 +64,8 @@ test('void allocations do not reduce debts and negative overpayments do not crea
 test('site-wide disclosure sends only aggregate and my own apartment details',async()=>{
  const f=await readFile(new URL('../supabase/functions/ay3-site-open-claims/index.ts',import.meta.url),'utf8');
  assert.match(f,/getUser\(bearer\)/);
- assert.match(f,/site_resident_units/);
- assert.match(f,/siteUnitIds\.has\(r\.unit_id\)/);
+ assert.match(f,/ay3_persons/);assert.match(f,/ay3_links/);assert.match(f,/access_revoked_at/);assert.match(f,/eq\('active',true\)/);
+ assert.match(f,/siteUnitIds\.has\(l\.unit_id\)/);
  assert.match(f,/siteClaims|calculateClaims/);
  assert.doesNotMatch(f,/reply\(\{.*charges/);
  const r=calculateClaims(fixture);

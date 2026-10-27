@@ -1,5 +1,10 @@
 // Only authored interface text is translated. Stored content is never sent to a service.
 export const german = {
+ "kişi": "Personen",
+ "Bu kişi zaten kayıtlı. Mevcut kişiyi seçin; arşivdeyse önce geri getirin.": "Diese Person ist bereits erfasst. Wähle den vorhandenen Datensatz; stelle eine archivierte Person zuerst wieder her.",
+ "Yalnızca kendi geçmiş daire ilişkilerinizi, borçlarınızı ve ödemelerinizi görebilirsiniz.": "Du siehst ausschließlich deine eigenen früheren Wohnverhältnisse, Forderungen und Zahlungen.",
+ "Kayıtlı": "Registriert",
+ "Kayıtlı değil": "Unregistriert",
  "Giriş yöntemi": "Anmeldemethode",
  "Davet e-postası": "E-Mail für die Einladung",
  "Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir. Giriş için telefon veya e-posta seçin.": "Der Link gilt 7 Tage und ist einmal verwendbar. Wähle Telefon oder E-Mail für die Anmeldung.",

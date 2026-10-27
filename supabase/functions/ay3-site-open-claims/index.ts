@@ -40,15 +40,20 @@ Deno.serve(async req=>{
    .select('id,code').eq('site_id',site.id).order('code');
   if(unitError||!units?.length)return reply({error:'site_unavailable'},503);
   const siteUnitIds=new Set(units.map(u=>u.id));
-  const [{data:staff}, {data:residents,error:residentError}]=await Promise.all([
-   admin.from('site_staff_memberships').select('role').eq('site_id',site.id)
-    .eq('user_id',identity.user.id).maybeSingle(),
-   admin.from('site_resident_units').select('unit_id,role,active')
-    .eq('user_id',identity.user.id).eq('active',true)
+  // Re-evaluate actual dated relationships on every request; stale portal mappings confer no rights.
+  const [{data:staff,error:staffError},{data:people,error:peopleError}]=await Promise.all([
+   admin.from('site_staff_memberships').select('role').eq('site_id',site.id).eq('user_id',identity.user.id).maybeSingle(),
+   admin.from('ay3_persons').select('id').eq('site_id',site.id).eq('auth_user_id',identity.user.id).is('access_revoked_at',null)
   ]);
-  if(residentError)return reply({error:'accounting_unavailable'},503);
-  const ownUnitIds=[...new Set((residents||[]).filter(r=>siteUnitIds.has(r.unit_id)&&
-    ['owner','tenant'].includes(r.role)).map(r=>r.unit_id))];
+  if(staffError||peopleError)return reply({error:'accounting_unavailable'},503);
+  let ownUnitIds:string[]=[];
+  if(people?.length){
+   const {data:links,error}=await admin.from('ay3_links').select('unit_id,starts_on,ends_on')
+    .eq('site_id',site.id).in('person_id',people.map(p=>p.id)).in('role',['owner','tenant','representative']).eq('active',true).is('archived_at',null);
+   if(error)return reply({error:'accounting_unavailable'},503);
+   const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+   ownUnitIds=[...new Set((links||[]).filter(l=>siteUnitIds.has(l.unit_id)&&(!l.starts_on||l.starts_on<=today)&&(!l.ends_on||l.ends_on>=today)).map(l=>l.unit_id))];
+  }
   if(!staff&&!ownUnitIds.length)return reply({error:'access_denied'},403);
   const [charges,allocations,entries,credits,staged]=await Promise.all([
    fetchAll('ay2_charges','id,unit_id,cents,void_reason'),

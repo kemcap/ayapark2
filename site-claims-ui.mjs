@@ -28,7 +28,7 @@ export function residentClaimsCards(s){
  `<article class="card claim-metric"><div class="card-head"><div><h2>${text('site')}</h2><p>${hint}</p></div></div><strong class="large-amount">${site}</strong><small>${text('notAdd')}</small></article>`;
 }
 export function residentClaimsPanel(s){
- if(s.data.role!=='resident')return '';
+ if(s.data.role!=='resident'||s.data.limitedAccess)return '';
  const stats=s.data.siteClaims;
  const units=Array.isArray(stats?.own_units)?stats.own_units:[];
  const breakdown=units.length>1?`<article class="card claim-breakdown"><h2>${text('detail')}</h2><div class="claims-unit-list">${units.map(unit=>`<div class="contact-row"><strong>${escape(unit.code||'—')}</strong><span>${valid(unit.open_cents)?money(unit.open_cents):text('unavailable')}</span></div>`).join('')}</div></article>`:'';
