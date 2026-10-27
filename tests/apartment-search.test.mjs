@@ -46,7 +46,7 @@ test('apartment card shows the owner even without a tenant or contact details',(
  const s=sample();s.data.persons=[{id:'owner',full_name:'Hülya Karşıt',phone:'',email:''}];
  s.data.links=[{id:'owner-link',unit_id:'x',person_id:'owner',role:'owner',active:true}];
  assert.deepEqual(unitCardResidents(s.data,'x'),[{role:'owner',label:'Ev sahibi',names:['Hülya Karşıt']}]);
- const html=unitMapV3(s);
+ const html=unitMapV3(s).replace(/<span class="registration-status[^"]*"><span[^>]*><\/span>[^<]*<\/span>/g,'');
  assert(html.includes('Ev sahibi:</strong> <span class="apartment-person-names">Hülya Karşıt</span>'));
  assert(!html.includes('Sakin bilgisi eksik.'));
 });
@@ -58,7 +58,7 @@ test('every populated role appears in order: owner, tenant, authorized contact',
  assert.deepEqual(rows.map(x=>x.role),['owner','tenant','representative']);
  assert.deepEqual(rows.map(x=>x.names[0]),['Malik Kişi','Kiracı Kişi','Yetkili Kişi']);
  assert.deepEqual(rows.map(x=>x.label),['Ev sahibi','Kiracı','Yetkili kişi']);
- const html=unitMapV3(s);
+ const html=unitMapV3(s).replace(/<span class="registration-status[^"]*"><span[^>]*><\/span>[^<]*<\/span>/g,'');
  assert(html.indexOf('Ev sahibi:')<html.indexOf('Kiracı:'));
  assert(html.indexOf('Kiracı:')<html.indexOf('Yetkili kişi:'));
  assert(html.includes('Yetkili Kişi'));
@@ -68,7 +68,7 @@ test('multiple names in one role are preserved and duplicate links do not repeat
  s.data.persons=[{id:'p1',full_name:'Birinci Malik'},{id:'p2',full_name:'İkinci Malik'},{id:'p3',full_name:'Kiracı Kişi'}];
  s.data.links=[{unit_id:'x',person_id:'p1',role:'owner',active:true},{unit_id:'x',person_id:'p2',role:'owner',active:true},{unit_id:'x',person_id:'p1',role:'owner',active:true},{unit_id:'x',person_id:'p3',role:'tenant',active:true}];
  assert.deepEqual(unitCardResidents(s.data,'x').map(x=>x.names),[['Birinci Malik','İkinci Malik'],['Kiracı Kişi']]);
- assert(unitMapV3(s).includes('Birinci Malik, İkinci Malik'));
+ assert(unitMapV3(s).replace(/<span class="registration-status[^"]*"><span[^>]*><\/span>[^<]*<\/span>/g,'').includes('Birinci Malik, İkinci Malik'));
 });
 test('inactive, archived and expired links are not shown',()=>{
  const s=sample();
@@ -82,7 +82,7 @@ test('vacant occupancy does not hide the existing owner',()=>{
  const s=sample();s.data.units[0].occupancy_status='vacant';
  s.data.persons=[{id:'owner',full_name:'Kayıtlı Malik'}];
  s.data.links=[{unit_id:'x',person_id:'owner',role:'owner',active:true}];
- const html=unitMapV3(s);
+ const html=unitMapV3(s).replace(/<span class="registration-status[^"]*"><span[^>]*><\/span>[^<]*<\/span>/g,'');
  assert(html.includes('Kayıtlı Malik'));
  assert(html.includes('Ev sahibi:'));
  assert(html.includes('>Boş<'));
@@ -95,7 +95,7 @@ test('building plan puts B on left and A on right, each ordered from 1 to 10 in 
   ...Array.from({length:10},(_,i)=>({id:'a'+(10-i),code:'A-'+(10-i),number:10-i,block:'A',occupancy_status:'unknown'})),
   ...Array.from({length:10},(_,i)=>({id:'b'+(10-i),code:'B-'+(10-i),number:10-i,block:'B',occupancy_status:'unknown'}))
  ];
- const html=unitMapV3(s);
+ const html=unitMapV3(s).replace(/<span class="registration-status[^"]*"><span[^>]*><\/span>[^<]*<\/span>/g,'');
  const bStart=html.indexOf('<h3>B Blok</h3>'),aStart=html.indexOf('<h3>A Blok</h3>');
  assert(bStart>=0&&aStart>bStart);
  const b=html.slice(bStart,aStart),a=html.slice(aStart);

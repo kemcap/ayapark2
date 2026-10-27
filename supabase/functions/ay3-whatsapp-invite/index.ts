@@ -14,8 +14,8 @@ const normalizedPhone=(input:unknown)=>{
  else if(digits.length===11&&digits.startsWith('05'))digits='90'+digits.slice(1);
  return /^[1-9]\d{9,14}$/.test(digits)?'+'+digits:'';
 };
-const active=(r:{role:string,active:boolean,starts_on:string|null,ends_on:string|null})=>
- r.active&&['owner','tenant'].includes(r.role)&&(!r.starts_on||r.starts_on<=day())&&(!r.ends_on||r.ends_on>=day());
+const eligible=(r:{role:string,starts_on:string|null,archive_reason?:string|null})=>
+ ['owner','tenant','representative'].includes(r.role)&&r.archive_reason!=='mistake'&&(!r.starts_on||r.starts_on<=day());
 const emailAlias=(phone:string)=>'resident-'+phone.slice(1)+'@ayapark2.invalid';
 const b64url=(bytes:Uint8Array)=>btoa(String.fromCharCode(...bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 async function sha256(value:string){
@@ -58,11 +58,11 @@ Deno.serve(async req=>{
    if(!ticket||ticket.consumed_at||ticket.revoked_at||new Date(ticket.expires_at).getTime()<=Date.now())
     return reply({error:'expired_or_invalid'},410);
    const {data:person}=await admin.from('ay3_persons')
-    .select('id,first_name,auth_user_id').eq('id',ticket.person_id).eq('site_id',ticket.site_id).maybeSingle();
+    .select('id,first_name,auth_user_id,archived_at').eq('id',ticket.person_id).eq('site_id',ticket.site_id).maybeSingle();
    if(!person||person.auth_user_id)return reply({error:'invite_unavailable'},410);
-   const {data:roles}=await admin.from('ay3_links').select('role,active,starts_on,ends_on')
+   const {data:roles}=await admin.from('ay3_links').select('role,active,starts_on,ends_on,archive_reason')
     .eq('site_id',ticket.site_id).eq('person_id',ticket.person_id).eq('unit_id',ticket.unit_id);
-   if(!(roles||[]).some(active))return reply({error:'invite_unavailable'},410);
+   if(!(roles||[]).some(eligible))return reply({error:'invite_unavailable'},410);
    const {data:staff}=await admin.from('site_staff_memberships').select('role')
     .eq('site_id',ticket.site_id).eq('user_id',ticket.issued_by).eq('role','manager').maybeSingle();
    if(!staff)return reply({error:'invite_unavailable'},410);
@@ -105,7 +105,7 @@ Deno.serve(async req=>{
   if(action==='create'&&!emailMode&&!phone)return reply({error:'invalid_phone'},400);
   if(input.confirmed!==true)return reply({error:'confirmation_required'},400);
   const {data:person}=await admin.from('ay3_persons')
-   .select('id,site_id,auth_user_id').eq('id',personId).maybeSingle();
+   .select('id,site_id,auth_user_id,archived_at').eq('id',personId).maybeSingle();
   if(!person)return reply({error:'invalid_person'},404);
   const {data:staff}=await admin.from('site_staff_memberships').select('role')
    .eq('site_id',person.site_id).eq('user_id',identity.user.id).eq('role','manager').maybeSingle();
@@ -113,10 +113,10 @@ Deno.serve(async req=>{
   if(action==='revoke'){const {error}=await admin.rpc('ay_auth_revoke_invites',{p_actor:identity.user.id,p_person:personId});return error?reply({error:'invitation_failed'},409):reply({ok:true});}
   if(person.auth_user_id)return reply({error:'already_activated'},409);
   const {data:roles,error:rolesError}=await admin.from('ay3_links')
-   .select('unit_id,role,active,starts_on,ends_on')
+   .select('unit_id,role,active,starts_on,ends_on,archive_reason')
    .eq('site_id',person.site_id).eq('person_id',personId);
   if(rolesError)return reply({error:'invitation_failed'},500);
-  const role=(roles||[]).find(active);
+  const role=(roles||[]).find(eligible);
   if(!role)return reply({error:'active_apartment_required'},409);
   const token=b64url(crypto.getRandomValues(new Uint8Array(32)));
   const token_hash=await sha256(token);

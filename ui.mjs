@@ -13,7 +13,7 @@ const labelText={overview:'Genel bakış',units:'Daireler',persons:'Kişiler',du
 export const labels=new Proxy(labelText,{get:(target,key)=>tr(target[key])});
 export const date=v=>v?new Intl.DateTimeFormat(locale(),{day:'numeric',month:'short',year:'numeric',timeZone:'Europe/Istanbul'}).format(new Date(v)):'—';
 export const can=(s,k)=>s.mode==='demo'?s.data.role==='super'||(s.data.role==='staff'&&['finance','people','announcements'].includes(k)):!!s.data.capabilities[k];
-export const pages=s=>Object.keys(labels).filter(p=>p!=='transactions'||can(s,'finance')).filter(p=>p!=='persons'||can(s,'people'));
+export const pages=s=>Object.keys(labels).filter(p=>!s.data.limitedAccess||!['reports','announcements','providers','transactions'].includes(p)).filter(p=>p!=='transactions'||can(s,'finance')).filter(p=>p!=='persons'||can(s,'people'));
 export const visible=s=>s.data.role==='resident'?s.data.units.filter(u=>s.data.ownIds.includes(u.id)):s.data.units;
 export const demo=s=>s.mode==='demo';
 export const badge=(text,kind='')=>`<span class="badge ${kind}">${e(text)}</span>`;
@@ -27,7 +27,7 @@ export function unitTable(s,list){return `<div class="table-wrap"><table><captio
 export const monthName=period=>new Intl.DateTimeFormat(locale(),{month:'long',year:'numeric',timeZone:'Europe/Istanbul'}).format(new Date(period+'-01'));
 export function allocationTable(s,unit){const d=s.data,rows=d.allocations.filter(a=>d.charges.some(c=>(d.role!=='resident'||(d.ownPersonIds?.includes(c.person_id)||d.financialUnitIds?.includes(c.unit_id)))&&c.id===a.charge_id&&visible(s).some(u=>u.id===c.unit_id)&&(!unit||c.unit_id===unit)));return `<div class="table-wrap"><table><thead><tr><th>${tr("Borç")}</th><th class="numeric">${tr("Tutar")}</th><th>${tr("Durum / İşlem")}</th></tr></thead><tbody>${rows.map(a=>{const c=d.charges.find(c=>c.id===a.charge_id);return `<tr><td>${e(d.units.find(u=>u.id===c?.unit_id)?.code||'')} · ${e(c?.label||'')}</td><td class="numeric">${money(a.cents)}</td><td>${a.void_reason?badge(tr("Kaldırıldı"),'neutral'):can(s,'finance')?button(tr("Eşleştirmeyi kaldır"),'unallocate',`data-id="${e(a.id)}"`):badge(tr("Eşleştirildi"))}</td></tr>`;}).join('')||`<tr><td colspan="3">${tr("Henüz ödeme eşleştirmesi yok.")}</td></tr>`}</tbody></table></div>`;}
 function settings(s){return settingsPage(s,can(s,'admin'));}
-export function renderPage(s){return decorateModernPage(s,withLedgerIndex(s.data,()=>({overview:overviewV3,directory:directoryV3,units:directoryV3,dues:duesV3,transactions:bankV3,reports:reportV3,announcements:announcementsV3,providers:providersV3,persons:peoplePage,law:lawPage,settings}[s.page](s))));}
+export function renderPage(s){if(!pages(s).includes(s.page))s={...s,page:'overview'};return decorateModernPage(s,withLedgerIndex(s.data,()=>({overview:overviewV3,directory:directoryV3,units:directoryV3,dues:duesV3,transactions:bankV3,reports:reportV3,announcements:announcementsV3,providers:providersV3,persons:peoplePage,law:lawPage,settings}[s.page](s))));}
 export const chargeTable=charges;
 
 export const filteredUnits=filteredUnitsV3;

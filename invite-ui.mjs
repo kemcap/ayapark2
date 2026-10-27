@@ -1,10 +1,12 @@
 import {escapeHtml as escape} from './core.mjs?v=5.8.1';
-import {activeAt} from './v3-domain.mjs?v=5.8.1';
 import {getLanguage} from './i18n.mjs?v=5.8.1';
+
+export const invitationRelationship=link=>['owner','tenant','representative'].includes(link.role)
+ && link.archive_reason!=='mistake' && (!link.starts_on||link.starts_on<=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Istanbul'}).format(new Date()));
 
 export const inviteEligible=(state,person)=>state.mode==='connected' && state.data.role==='super'
  && Boolean(person?.id) && !person?.auth_user_id
- && (state.data.links||[]).some(link=>link.person_id===person.id && ['owner','tenant'].includes(link.role) && activeAt(link));
+ && (state.data.links||[]).some(link=>link.person_id===person.id && invitationRelationship(link));
 
 export function whatsappNumber(input) {
  const raw=String(input||'').trim();
@@ -43,7 +45,7 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
  function open(personId){
   const s=getState(),person=s.data.persons?.find(p=>p.id===personId);
   if(!inviteEligible(s,person))throw Error(tx('Bu kişi davet için uygun değil.','Für diese Person ist keine Einladung möglich.'));
-  const units=[...new Set(s.data.links.filter(link=>link.person_id===person.id&&['owner','tenant'].includes(link.role)&&activeAt(link))
+  const units=[...new Set(s.data.links.filter(link=>link.person_id===person.id&&invitationRelationship(link))
    .map(link=>s.data.units.find(unit=>unit.id===link.unit_id)?.code).filter(Boolean))].join(', ');
   selected={id:person.id,name:person.full_name||'',units,email:person.email||''};
   inviteUrl='';

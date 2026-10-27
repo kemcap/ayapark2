@@ -40,6 +40,10 @@ BEGIN
       WHERE site_id=p_site AND id<>p_person AND auth_user_id=target.auth_user_id) THEN
       RAISE EXCEPTION 'Paylaşılan hesap: Aynı hesaba bağlı diğer kişilerin erişimi korunmalıdır.';
     END IF;
+    -- Keep revocation explicit when replayed after the historical-access migration.
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='ay3_persons' AND column_name='access_revoked_at') THEN
+      UPDATE public.ay3_persons SET access_revoked_at=now() WHERE id=p_person AND site_id=p_site;
+    END IF;
     DELETE FROM public.site_resident_units ru USING public.site_units su
      WHERE ru.unit_id=su.id AND su.site_id=p_site AND ru.user_id=target.auth_user_id;
   END IF;

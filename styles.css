@@ -1598,3 +1598,19 @@ dialog #detailTitle:focus{outline:none}
 /* V3.14.3: Keep former-person balances visible in relationship history. */
 .former-person-debt{margin:9px 0;padding:9px 11px;border-left:3px solid var(--primary);background:var(--info-bg);color:var(--info-ink);border-radius:5px;font-size:.88rem;overflow-wrap:anywhere}
 .former-person-debt strong{font-weight:700}
+
+.registration-status{display:inline-flex;align-items:center;gap:.3rem;font-size:.69rem;line-height:1.4;font-weight:400;white-space:nowrap;margin-inline-start:.3rem;color:var(--muted,#596575)}
+.registration-dot{width:6px;height:6px;flex:none;border-radius:50%;background:#b83b3b}
+.registration-status.registered .registration-dot{background:#248047}
+.card-head p .registration-status{margin-inline-start:0}
+
+.person-combobox{position:relative;min-width:0;margin-block:.75rem}
+.person-combobox>label{display:block;margin-bottom:.35rem}
+.person-combo-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;text-align:start;border:1px solid var(--border,#c5cbd0);border-radius:10px;padding:.7rem;background:var(--surface,#fff);color:inherit;font:inherit}
+.person-combo-popup{position:relative;margin-top:.35rem;border:1px solid var(--border,#c5cbd0);border-radius:10px;padding:.5rem;background:var(--surface,#fff);color:inherit}
+.person-combo-popup>input{width:100%;min-height:44px}
+.person-combo-popup [role=listbox]{max-height:240px;overflow-y:auto;overscroll-behavior:contain}
+.person-combo-popup [role=option]{padding:.6rem;min-height:44px;cursor:pointer;border-radius:6px;overflow-wrap:anywhere}
+.person-combo-popup [role=option] small{display:block;font-size:.75rem}
+.person-combo-popup [role=option][aria-selected=true]{background:var(--accent-soft,#e2efea);outline:2px solid var(--accent,#248047);outline-offset:-2px}
+.person-combo-popup [role=option]:hover{background:var(--accent-soft,#e2efea)}

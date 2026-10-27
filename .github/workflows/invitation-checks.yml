@@ -6,6 +6,7 @@ on:
       - '**/*.mjs'
       - 'tests/**'
       - 'package*.json'
+      - 'supabase/**'
       - '.github/workflows/invitation-checks.yml'
   push:
     branches:
@@ -57,6 +58,8 @@ jobs:
         run: npm run test:recovery:sql
       - name: Integrated auth SQL checks
         run: npm run test:integration:sql
+      - name: People invitations and historical RLS
+        run: npm run test:people:sql
       - name: Safe Edge Function smoke checks (no resident data)
         run: node tests/invite-edge-smoke.mjs
       - name: Safe site receivables smoke checks (no resident data)

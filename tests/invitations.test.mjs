@@ -6,12 +6,12 @@ import {AyaparkApi,loginIdentifier} from '../api.mjs?v=5.8.1';
 
 const person={id:'p1',full_name:'Test Resident',phone:'0542 111 22 33',email:''};
 const base={mode:'connected',data:{role:'super',persons:[person],links:[{person_id:'p1',role:'tenant',starts_on:'2024-01-01',ends_on:null}],units:[]}};
-test('only managers can invite unactivated active resident without email',()=>{
+test('only managers can invite persisted resident, representative and former relationships',()=>{
  assert.equal(inviteEligible(base,person),true);
  assert.equal(inviteEligible({...base,data:{...base.data,role:'staff'}},person),false);
  assert.equal(inviteEligible({...base,mode:'demo'},person),false);
- assert.equal(inviteEligible({...base,data:{...base.data,links:[{person_id:'p1',role:'representative',starts_on:'2024-01-01'}]}},person),false);
- assert.equal(inviteEligible({...base,data:{...base.data,links:[{person_id:'p1',role:'owner',ends_on:'2024-01-01'}]}},person),false);
+ assert.equal(inviteEligible({...base,data:{...base.data,links:[{person_id:'p1',role:'representative',starts_on:'2024-01-01'}]}},person),true);
+ assert.equal(inviteEligible({...base,data:{...base.data,links:[{person_id:'p1',role:'owner',ends_on:'2024-01-01'}]}},person),true);
  assert.equal(inviteEligible(base,{...person,auth_user_id:'already-active'}),false);
 });
 test('normalize WhatsApp numbers before sending',()=>{

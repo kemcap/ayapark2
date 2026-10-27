@@ -1,0 +1,57 @@
+import {PGlite} from '@electric-sql/pglite';
+import {readFile,readdir} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const db=new PGlite(),id=n=>'8f000000-0000-0000-0000-'+String(n).padStart(12,'0');let checks=0;
+const scalar=async(q,p=[])=>Object.values((await db.query(q,p)).rows[0])[0];
+const as=async n=>db.exec(`reset role;set role authenticated;select set_config('request.jwt.claims','{"sub":"${id(n)}","role":"authenticated"}',false)`);
+const check=(label,value)=>{assert(value,label);checks++};
+try{
+ for(const f of ['tests/sql/schema.sql','supabase/migrations/20261025073340_v4_finance_release_safety.sql','supabase/migrations/20261025194333_v5_notifications_finance.sql','supabase/migrations/20261026_email_free_whatsapp_activation.sql','supabase/migrations/20261027083400_auth_controlled_access_release.sql','supabase/migrations/20261027143000_person_archive_purge.sql','supabase/migrations/20261027171500_person_account_lifecycle_v2.sql'])await db.exec(await readFile(new URL('../../'+f,import.meta.url),'utf8'));
+ for(const suffix of ['_person_invitation_eligibility.sql','_historical_person_access.sql','_prevent_duplicate_people.sql']){
+  const f=(await readdir(new URL('../../supabase/migrations/',import.meta.url))).find(f=>f.endsWith(suffix));await db.exec(await readFile(new URL('../../supabase/migrations/'+f,import.meta.url),'utf8'));
+ }
+ await db.exec(`insert into auth.users(id,email) select ('8f000000-0000-0000-0000-'||lpad(i::text,12,'0'))::uuid,'synthetic-'||i||'@example.invalid' from generate_series(1,6)i;
+ insert into public.site_sites(id,slug,name) values('${id(10)}','people-security-test','Synthetic');
+ insert into public.site_blocks(id,site_id,code) values('${id(11)}','${id(10)}','A');
+ insert into public.site_units(id,site_id,block_id,number,code) values('${id(12)}','${id(10)}','${id(11)}',1,'A-1'),('${id(13)}','${id(10)}','${id(11)}',2,'A-2');
+ insert into public.site_staff_memberships(site_id,user_id,role) values('${id(10)}','${id(1)}','manager'),('${id(10)}','${id(6)}','deputy');
+ insert into public.ay2_permissions(site_id,user_id,capabilities) values('${id(10)}','${id(6)}',array['people','finance']);
+ insert into public.ay2_settings(site_id,opening_cents,initialized) values('${id(10)}',100000,true);
+ insert into public.ay3_persons(id,site_id,full_name,auth_user_id) values('${id(22)}','${id(10)}','Former synthetic','${id(2)}'),('${id(23)}','${id(10)}','Successor synthetic','${id(3)}'),('${id(24)}','${id(10)}','Representative synthetic','${id(4)}');
+ insert into public.ay3_links(id,site_id,unit_id,person_id,role,active,starts_on,ends_on,archive_reason) values('${id(32)}','${id(10)}','${id(12)}','${id(22)}','tenant',false,'2018-01-01','2020-01-01','ended'),('${id(33)}','${id(10)}','${id(12)}','${id(23)}','tenant',true,'2021-01-01',null,null),('${id(34)}','${id(10)}','${id(12)}','${id(24)}','representative',true,'2021-01-01',null,null);
+ insert into public.site_resident_units(unit_id,user_id,role,active) values('${id(12)}','${id(2)}','tenant',true);
+ insert into public.ay2_charges(id,site_id,unit_id,person_id,link_id,category,label,due_on,cents,payer,reference,created_by) values('${id(42)}','${id(10)}','${id(12)}','${id(22)}','${id(32)}','Aidat','Former charge','2019-01-01',10000,'tenant','former','${id(1)}'),('${id(43)}','${id(10)}','${id(12)}','${id(23)}','${id(33)}','Aidat','Successor charge','2026-01-01',20000,'tenant','current','${id(1)}'),('${id(44)}','${id(10)}','${id(12)}',null,null,'Aidat','Unassigned','2026-01-01',30000,'review','unassigned','${id(1)}');
+ insert into public.ay2_entries(id,site_id,booked_on,description,cents,dedup_key,created_by) values('${id(50)}','${id(10)}','2020-01-01','Secret bank text with third party',15000,'bank','${id(1)}');
+ insert into public.ay2_allocations(site_id,entry_id,charge_id,request_id,cents,created_by) values('${id(10)}','${id(50)}','${id(42)}','${id(51)}',10000,'${id(1)}'),('${id(10)}','${id(50)}','${id(43)}','${id(52)}',5000,'${id(1)}');
+ insert into public.ay3_credits(site_id,entry_id,unit_id,person_id,cents,request_id,created_by) values('${id(10)}','${id(50)}','${id(12)}','${id(22)}',1000,'${id(53)}','${id(1)}'),('${id(10)}','${id(50)}','${id(12)}','${id(23)}',2000,'${id(54)}','${id(1)}');
+ insert into public.ay2_announcements(site_id,title,body,published,created_by) values('${id(10)}','Internal','Secret',true,'${id(1)}');
+ insert into public.ay2_reports(site_id,period,opening_cents,income_cents,expense_cents,closing_cents,published_by) values('${id(10)}','2026-01-01',1,2,3,0,'${id(1)}');`);
+ await as(2);
+ check('historical account can discover site',await scalar('select count(*)::int from public.site_sites')===1);
+ check('historical account only own apartment',await scalar('select count(*)::int from public.site_units')===1);
+ check('only own charge including paid history',await scalar('select count(*)::int from public.ay2_charges')===1);
+ check('manipulated successor id returns no rows',await scalar('select count(*)::int from public.ay2_charges where person_id=$1',[id(23)])===0);
+ check('only own allocation',await scalar('select count(*)::int from public.ay2_allocations')===1);
+ check('only own credit',await scalar('select count(*)::int from public.ay3_credits')===1);
+ for(const table of ['ay2_entries','ay2_reports','ay2_announcements','ay2_settings','ay2_audit','ay3_match_rules','ay3_providers','ay3_provider_notes','ay2_staged_charges'])check('no '+table,await scalar('select count(*)::int from public.'+table)===0);
+ check('summary RPC does not expose aggregate',JSON.stringify(await scalar('select public.ay3_financial_summary($1)',[id(10)]))==='{}');
+ const workspace=await scalar('select public.ay5_workspace($1)',[id(10)]);
+ check('workspace marks historical account limited',workspace.limited_access===true);check('workspace only own person',workspace.persons.length===1&&workspace.persons[0].id===id(22));
+ check('safe payment projection has no bank description',workspace.entries.length===1&&workspace.entries[0].cents===10000&&!JSON.stringify(workspace.entries).includes('Secret'));
+ check('foreign site rejected',await scalar('select public.ay5_workspace($1)',[id(999)])===null);
+ check('historical raw relationships hide internal notes',await scalar('select count(*)::int from public.ay3_links')===0);check('historical relationships projected without internal notes',workspace.links.length===1&&!('archive_note' in workspace.links[0]));
+ await as(3);check('successor does not inherit prior debt',await scalar('select count(*)::int from public.ay2_charges where id=$1',[id(42)])===0);check('successor sees own charge',await scalar('select count(*)::int from public.ay2_charges')===1);check('active retains regular access',(await scalar('select public.ay5_workspace($1)',[id(10)])).limited_access===false);
+ await as(4);check('representative no invented financial mandate',await scalar('select count(*)::int from public.ay2_charges')===0);check('representative current stored role grants notices',await scalar('select count(*)::int from public.ay2_announcements')===1);
+ await db.exec(`reset role;update public.ay3_links set active=false,starts_on='2018-01-01',ends_on='2020-01-01' where id='${id(34)}'`);await as(4);check('former representative loses notices',await scalar('select count(*)::int from public.ay2_announcements')===0);
+ await as(5);check('stranger has no site',await scalar('select count(*)::int from public.site_sites')===0);check('stranger has no charges',await scalar('select count(*)::int from public.ay2_charges')===0);
+ await db.exec('reset role;set role anon');await assert.rejects(db.query('select public.ay3_financial_summary($1)',[id(10)]));checks++;
+ await as(1);check('manager retains all charges',await scalar('select count(*)::int from public.ay2_charges')===3);
+ await assert.rejects(db.query('select public.ay3_manage_person_v2($1,$2,$3,$4,true,true)',[id(10),id(22),'delete','test']));checks++;
+ await db.query('select public.ay3_manage_person_v2($1,$2,$3,$4,true,true)',[id(10),id(22),'archive','Explicit synthetic revocation']);
+ await as(2);check('explicit revocation blocks history too',await scalar('select count(*)::int from public.ay2_charges')===0);check('revoked site hidden',await scalar('select count(*)::int from public.site_sites')===0);
+ await db.exec(`reset role;update public.ay3_persons set access_revoked_at=null,archived_at=null where id='${id(22)}';update public.ay3_links set active=true,archived_at=null,ends_on=null where id='${id(32)}'`);await as(2);check('return to current automatically restores regular mode',(await scalar('select public.ay5_workspace($1)',[id(10)])).limited_access===false);
+ await as(6);check('delegated management finance preserved',await scalar('select count(*)::int from public.ay2_charges')===3);
+ await db.exec('reset role');await assert.rejects(db.query('update public.ay3_links set person_id=$1 where id=$2',[id(23),id(32)]));checks++;await assert.rejects(db.query('update public.ay2_charges set person_id=$1 where id=$2',[id(23),id(42)]));checks++;
+ await assert.rejects(db.query('insert into public.ay3_persons(site_id,full_name) values($1,$2)',[id(10),'Former synthetic']));checks++;
+ console.log(JSON.stringify({checks,failed:0,scope:'direct RLS and RPC synthetic PostgreSQL'}));
+} catch(e){console.error(e.message);process.exitCode=1;}finally{await db.close();}

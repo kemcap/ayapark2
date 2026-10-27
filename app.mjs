@@ -294,7 +294,7 @@ $('roleSelect').addEventListener('change',event=>changePreviewRole(event.target.
 $('residentPreviewSelect').addEventListener('change',event=>changePreviewRole('resident',event.target.value));
 document.addEventListener('input',event=>{
  clearFieldError(event.target);
- if(formAction?.action.startsWith('assignment_')&&event.target.closest('#actionFields')){if(event.target.name==='person_search')updateConditionalForm('person_search');$('actionMessage').textContent='';}
+ if(formAction?.action.startsWith('assignment_')&&event.target.closest('#actionFields')){$('actionMessage').textContent='';}
  if(event.target.id==='unitSearch'){state.filter.q=event.target.value;$('unitResults').innerHTML=unitResults(state);$('resultCount').textContent=filteredUnits(state).length+tr(" daire");}
  if(event.target.id==='peopleSearch'){clearTimeout(peopleSearchTimer);const value=event.target.value,pos=event.target.selectionStart;peopleSearchTimer=setTimeout(()=>{state.peopleQuery=value;render();$('peopleSearch')?.focus();$('peopleSearch')?.setSelectionRange(pos,pos);},160);return;}
 

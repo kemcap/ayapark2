@@ -1,0 +1,1 @@
+{"passed":36,"failed":0,"scope":"native staging PostgreSQL with actual production RLS read policies; synthetic changes rolled back","project":"nphmuecdapvebcnpuqvp","cleanup":{"remaining_test_sites":0,"remaining_sql_test_users":0,"remaining_test_auth_users":0}}
