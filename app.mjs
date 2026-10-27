@@ -1,4 +1,4 @@
-import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.8.1';
+import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.9.2';
 import {bindAccessRequests} from './access-request-ui.mjs?v=5.9.0';
 import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.8.1';
 import {prepareV5Demo} from './finance-demo.mjs?v=5.8.1';
