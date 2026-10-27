@@ -57,8 +57,17 @@ export function assignmentPayload(action,form,ctx){
  if(['assignment_add','assignment_edit','assignment_restore'].includes(action))p.mandates=[...(form.has('mandate_owners')?['owners']:[]),...(form.has('mandate_residents')?['residents']:[])];
  return p;
 }
+const canonicalPayload=value=>JSON.stringify(value,(_key,item)=>
+ item&&typeof item==='object'&&!Array.isArray(item)
+  ?Object.fromEntries(Object.entries(item).sort(([a],[b])=>a.localeCompare(b)))
+  :item);
 export function applyAssignmentDemo(d,action,p){
- if(d.audit.some(x=>x.action===action&&x.details?.request_id===p.request_id))return {ok:true,already_recorded:true};
+ const prior=p.request_id?d.audit.find(x=>x.action===action&&x.details?.request_id===p.request_id):null;
+ if(prior){
+  if(!prior.details?.payload||canonicalPayload(prior.details.payload)!==canonicalPayload(p))
+   throw Error(tr('Bu istek farklı değerlerle kaydedildi.'));
+  return {ok:true,already_recorded:true};
+ }
  const clone=structuredClone(d),result=changeDemo(clone,action,p);Object.assign(d,clone);return result;
 }
 function changeDemo(d,action,p){
@@ -84,5 +93,5 @@ function changeDemo(d,action,p){
   if(p.additional_role&&p.additional_role!==p.role){if(!assignmentRoles.some(([r])=>r===p.additional_role))throw Error(tr('Geçerli bir rol seçin.'));add(p.additional_role,p.starts_on,p.ends_on);}
  }
  const changed=d.links.find(x=>x.id===id);if(changed&&p.mandates)changed.mandates=changed.role==='representative'?[...new Set(p.mandates)]:[];
- d.audit.unshift({id:randomId(),action,at:new Date().toISOString(),details:{request_id:p.request_id,before,after:changed?{...changed}:null,reason:p.reason,note:p.note,person_id:pid}});return {ok:true,id};
+ d.audit.unshift({id:randomId(),action,at:new Date().toISOString(),details:{request_id:p.request_id,payload:structuredClone(p),before,after:changed?{...changed}:null,reason:p.reason,note:p.note,person_id:pid}});return {ok:true,id};
 }
