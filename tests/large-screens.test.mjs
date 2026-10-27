@@ -23,7 +23,10 @@ test('both design modes gain fluid width and readable unit-card grids',()=>{
  assert.match(css,/--ay-wide-max:2840px/);
  assert.match(css,/\.building-plan,\s*:root\[data-design="modern"\] \.building-plan/);
  assert.match(css,/\.unit-card-grid,\s*:root\[data-design="modern"\] \.unit-card-grid/);
- assert.match(css,/repeat\(4,minmax\(0,1fr\)\)/);
+ assert.match(css,/repeat\(2,minmax\(0,1fr\)\)/);
+ assert.doesNotMatch(css,/grid-template-columns:repeat\([34],minmax\(0,1fr\)\)/,'wide screens must keep paired apartments');
+ const modern=readFileSync(new URL('../modern.css',import.meta.url),'utf8');
+ assert.doesNotMatch(modern,/\.unit-card-grid\s*\{[^}]*grid-template-columns:repeat\([34],/);
  assert.match(css,/main#content \.table-wrap/);
 });
 

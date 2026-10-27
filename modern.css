@@ -158,7 +158,7 @@
 :root[data-design="modern"] .signed-out .shell{display:block}
 :root[data-design="modern"] .signed-out #content{max-width:780px}
 :root[data-design="modern"] .signed-out .topbar{justify-content:flex-end}
-@media(min-width:1500px){:root[data-design="modern"] #content{padding-inline:48px}:root[data-design="modern"] .topbar{padding-inline:48px}:root[data-design="modern"] .context-bar{margin-inline:48px}:root[data-design="modern"] .unit-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1500px){:root[data-design="modern"] #content{padding-inline:48px}:root[data-design="modern"] .topbar{padding-inline:48px}:root[data-design="modern"] .context-bar{margin-inline:48px}:root[data-design="modern"] .unit-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:1150px){:root[data-design="modern"] .shell{grid-template-columns:196px minmax(0,1fr)}:root[data-design="modern"] .sidebar{padding:27px 15px}:root[data-design="modern"] .brand{font-size:16px;gap:9px;margin-inline:4px}:root[data-design="modern"] .topbar{padding-inline:24px}:root[data-design="modern"] .context-bar{margin-inline:24px}:root[data-design="modern"] #content{padding:25px 24px 35px}:root[data-design="modern"] .main-grid{grid-template-columns:minmax(0,1.45fr) minmax(230px,1fr);gap:16px}:root[data-design="modern"] .card{padding:21px}:root[data-design="modern"] .modern-hero-copy{padding:27px}:root[data-design="modern"] .summary-grid>.card{padding:22px 19px}}
 @media(max-width:1000px){
  :root[data-design="modern"] .shell{display:block}
