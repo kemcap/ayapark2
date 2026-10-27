@@ -12,7 +12,7 @@ import {initializePreferences,syncPreferences,endPreferenceSession,changePrefere
 import {updateAssignmentForm} from './assignments.mjs?v=5.8.1';
 import {personManager} from './people-ui.mjs?v=5.8.1';
 import {bindInvitations} from './invite-ui.mjs?v=5.8.1';
-import {mayPreview,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.8.1';
+import {mayPreview,residentPreviewOptions,previewProjection,previewBanner,viewSwitchDialogMarkup,canPreviewView} from './access-preview.mjs?v=5.8.1';
 import {bindInstall} from './install.mjs?v=5.8.1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
@@ -91,7 +91,7 @@ function render(focus=false){
  if(focus)$('content').focus({preventScroll:true});
 }
 function navigate(page){mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
-function closeDialogs(){for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
+function closeDialogs(){for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog','viewSwitchDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
@@ -158,6 +158,11 @@ $('urgentDialog').addEventListener('cancel',event=>{if($('urgentDialog').dataset
 function updateAnnouncementTargets(){const root=$('actionFields'),kind=root.querySelector('[name="target_kind"]')?.value;for(const section of root.querySelectorAll('[data-notification-target]'))section.hidden=section.dataset.notificationTarget!==kind;}
 
 document.addEventListener('click',async event=>{
+ const switchRole=event.target.closest('#viewSwitchDialog [data-switch-role]');
+ if(switchRole){const role=switchRole.dataset.switchRole;const selected=role==='resident'?$('viewSwitchPerson')?.value:undefined;changePreviewRole(role,selected);return;}
+ if(event.target.closest('#viewSwitchDialog [data-view-switch-close]')){$('viewSwitchDialog').close();return;}
+ const switchTrigger=event.target.closest('#nav [data-view-switch]');
+ if(switchTrigger){mobileNavGroup=null;renderNavigation();openViewSwitchDialog();return;}
  if(event.target.closest('.unit-history-link')){event.preventDefault();$('unitPaymentHistory')?.scrollIntoView({block:'start'});$('unitPaymentHistory')?.focus({preventScroll:true});return;}
  if(event.target.closest('[data-preview-return]')){changePreviewRole('super');return;}
  if(event.target.closest('[data-reset-appearance]')){resetPreferences(state.mode==='connected'?api:null,message=>{const el=$('preferenceStatus');if(el)el.textContent=message;});applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));const panel=document.querySelector('.appearance-settings');if(panel)panel.open=true;document.querySelector('[data-reset-appearance]')?.focus();return;}
@@ -175,6 +180,7 @@ document.addEventListener('click',async event=>{
   if(navLink.getAttribute('href')===location.hash){event.preventDefault();renderNavigation();}
   return;
  }
+ if(mobileNavGroup!==null&&!$('nav').contains(event.target)){mobileNavGroup=null;renderNavigation();}
  const blockButton=event.target.closest('[data-block]');
  if(blockButton){
   const block=blockButton.dataset.block;if(!['A','B'].includes(block))return;
@@ -238,7 +244,13 @@ $('languageToggle').addEventListener('click',()=>{
  updateConditionalForm();document.dispatchEvent(new Event('ay2:languagechange'));
 });
 window.addEventListener('hashchange',()=>navigate(location.hash.slice(1)));
-function changePreviewRole(role,selection){if(writeBusy||loginBusy||!mayPreview(state.fullData)||!['super','staff','resident'].includes(role))return;closeDialogs();state.viewRole=role;if(selection!==undefined)state.previewSelection=selection;else if(role==='resident')state.previewSelection=residentPreviewOptions(state.fullData)[0]?.id||'';state.page='overview';state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.reportFilter={preset:'all'};render(true);}
+function changePreviewRole(role,selection){if(writeBusy||loginBusy||!mayPreview(state.fullData)||!['super','staff','resident'].includes(role))return;closeDialogs();mobileNavGroup=null;state.viewRole=role;if(selection!==undefined)state.previewSelection=selection;else if(role==='resident')state.previewSelection=residentPreviewOptions(state.fullData)[0]?.id||'';state.page='overview';state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.reportFilter={preset:'all'};render(true);}
+function openViewSwitchDialog(){
+ if(!window.matchMedia('(max-width:1000px)').matches||!canPreviewView(state))return;
+ const dialog=$('viewSwitchDialog');dialog.innerHTML=viewSwitchDialogMarkup(state);
+ if(!dialog.innerHTML)return;
+ dialog.showModal();dialog.querySelector('[data-switch-role][aria-pressed="true"]')?.focus();
+}
 $('roleSelect').addEventListener('change',event=>changePreviewRole(event.target.value));
 $('residentPreviewSelect').addEventListener('change',event=>changePreviewRole('resident',event.target.value));
 document.addEventListener('input',event=>{
@@ -486,3 +498,4 @@ async function refreshWhenIdle(){if(autoRefreshBusy||state.mode!=='connected'||d
 setInterval(()=>void refreshWhenIdle(),90000);window.addEventListener('focus',()=>void refreshWhenIdle());document.addEventListener('visibilitychange',()=>void refreshWhenIdle());
 
 window.addEventListener('scroll',event=>{if(mobileNavGroup!==null&&closeMenuOnScroll(event,$('nav'))){mobileNavGroup=null;renderNavigation();}},{passive:true,capture:true});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&mobileNavGroup!==null){const group=mobileNavGroup;mobileNavGroup=null;renderNavigation();$('nav').querySelector(`[data-nav-group="${group}"]`)?.focus({preventScroll:true});}});

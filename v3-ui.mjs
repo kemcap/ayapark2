@@ -11,6 +11,7 @@ import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 import {remaining,paid,unassigned} from './ledger.mjs?v=5.8.1';
 import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs?v=5.8.1';
 import {residentClaimsPanel} from './site-claims-ui.mjs?v=5.8.1';
+import {canPreviewView,previewRoleName} from './access-preview.mjs?v=5.8.1';
 import {norm,today,activeAt,personLinks,personName,scopedCharges,filteredTransactions,selectedRange,rangeError,financialSeries,buildSummaryDays,announcementActive,announcementStatus,suggestUnits,creditAvailable,isReversed,acknowledgementKey,unitSearchMatches} from './v3-domain.mjs?v=5.8.1';
 export const roleLabel=r=>tr({owner:'Ev sahibi',tenant:'Kiracı',representative:'Temsilci',debtor:'Borçlu',source:'Kaynak kaydı'}[r]||'Kişi');
 export const info=(short,detail)=>`<details class="help-line info-help help-disclosure"><summary><span>${e(tr(short))}</span><span aria-hidden="true">ⓘ</span></summary><p>${e(tr(detail))}</p></details>`;
@@ -73,5 +74,6 @@ const controls=tiles.map(({i,allowed,current,label})=>{
  return `<div class="nav-group ${current?'current':''}"><button type="button" class="nav-group-toggle" data-nav-group="${i}" aria-expanded="${expanded?.i===i}" aria-controls="nav-submenu">${icon(['overview','units','wallet','more'][i])}<span>${e(tr(label))}</span></button></div>`;
 }).join('');
 // Only one shared panel, placed below all category tiles in the normal document flow.
-const submenu=`<div id="nav-submenu" class="nav-submenu" role="group" ${expanded?`aria-label="${e(tr(expanded.label))}"`:'hidden'}>${expanded?expanded.allowed.map(([p,l])=>`<a href="#${p}" ${p===s.page?'aria-current="page"':''}>${e(tr(l))}</a>`).join(''):''}</div>`;
+const switchAction=expanded?.i===3&&canPreviewView(s)?`<button type="button" class="nav-view-switch" data-view-switch>${e(tr('Görünümü değiştir'))}<small>${e(tr('Etkin görünüm'))}: ${e(previewRoleName(s.viewRole||'super'))}</small></button>`:'';
+const submenu=`<div id="nav-submenu" class="nav-submenu" role="group" ${expanded?`aria-label="${e(tr(expanded.label))}"`:'hidden'}>${expanded?expanded.allowed.map(([p,l])=>`<a href="#${p}" ${p===s.page?'aria-current="page"':''}>${e(tr(l))}</a>`).join('')+switchAction:''}</div>`;
 return controls+submenu;}
