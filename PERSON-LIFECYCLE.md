@@ -28,3 +28,12 @@
 - SQL **nicht** auf Produktion angewendet und keinerlei echte Personen gelöscht.
 - Vor Livegang: auf einem vollständigen Schema-Klon mit synthetischen Testpersonen, Rolle, Debitor und Login testen; Backup und Wiederherstellung prüfen; anschließend Migration freigeben, GitHub-Branch mergen, Website-Cache aktualisieren und Testfälle erneut manuell ausführen.
 - Andere Löschaktionen (z. B. Forderungsstorno oder Verwaltungsmitglied entfernen) bleiben unverändert und sind **nicht** Teil dieser Änderung. Insbesondere müssen Buchungen als revisionsrelevante Datensätze erhalten bleiben.
+
+## Echte Testdatensätze in separatem Supabase-Staging (27.10.2026)
+
+Staging-Projekt: `ayapark-auth-staging`; eigene QA-Site `qa-personen-20261027`, nicht Produktivprojekt.
+
+1. **Profesör Pofuduk Patatesoğlu** — `+90 000 000 00 01`, `pofuduk.patatesoglu@example.invalid`, Sprache TR, Testnotiz, Mieter-Verknüpfung T-1. Über Datenbank-SQL mit Schutzprüfung gelöscht. Kontrollabfrage: **0 Personen und 0 Wohnungszuordnungen**.
+2. **Graf Gurkenhelm von Kichererbse** — `+90 000 000 00 02`, `gurkenhelm.kichererbse@example.invalid`, Sprache DE, Testnotiz, Eigentümer-Verknüpfung T-2. Mit Archivhinweis über Datenbank-SQL archiviert. Kontrollabfrage: **Person bleibt mit `archived_at` und `archive_note` erhalten; Wohnungszuordnung ist `active=false` und ebenfalls archiviert**.
+
+Für diese Datensatztests war im Staging kein Anmeldekonto erforderlich. Die SQL-Funktion `ay3_manage_person` konnte nach Einrichtung eines minimalen `ay2_private.can`-Helfers **erfolgreich installiert** werden, wurde jedoch **nicht über die authentifizierte RPC mit einem echten User-Token getestet** (das Auth-Testprojekt hat derzeit keine `auth.users`-Konten). Die praktischen Datenänderungen wurden durch direktes, auf die QA-Site beschränktes SQL ausgeführt, entsprechend der vorgesehenen Lösch-/Archivsemantik. Dies ist ein **Datenbank-Verhaltenstest, keine vollständige Ende-zu-Ende-Abnahme**.
