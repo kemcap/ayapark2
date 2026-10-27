@@ -38,7 +38,7 @@ export function personManager(s,id){
  const archived=!!p.archived_at;
  const lifecycle=can(s,'admin')
   ? (archived?button(loc('Wiederherstellen','Arşivden çıkar'),'person_restore',`data-id="${e(id)}"`):'')
-    +button(loc('Archivieren / endgültig löschen','Arşivle / kalıcı sil'),'person_lifecycle',`data-id="${e(id)}"`)
+    +button(loc('Löschen / Archivieren','Sil / Arşivle'),'person_lifecycle',`data-id="${e(id)}"`)
   :'';
  return `<h2 id="detailTitle">${e(p.full_name)}</h2>${archived?`<div class="info-strip"><strong>${loc('Archivierte Person','Arşivlenen kişi')}</strong><p>${e(p.archive_note||'—')}</p></div>`:''}<section class="person-card"><h3>${tr('Kişi bilgileri')}</h3><p>${e(p.phone||'—')} · ${e(p.email||'—')}</p>${p.notes?`<p class="pre-wrap">${e(p.notes)}</p>`:''}${archived?'':button(tr('Kişi bilgilerini düzenle'),'person',`data-id="${e(id)}"`)} ${archived?'':invitationButton(s,p)} ${lifecycle}</section><section><div class="row"><h3>${tr('Güncel roller')}</h3>${archived?'':button(tr('Kişi ekle'),'assignment_add',`data-person="${e(id)}"`)}</div>${current.map(l=>assignmentCard(s,l,true)).join('')||`<p>${tr('Güncel daire bağlantısı yok.')}</p>`}</section>${history.length?`<details class="assignment-history"><summary>${tr('Önceki roller')} (${history.length})</summary>${history.map(l=>assignmentCard(s,l,true)).join('')}</details>`:''}`;
 }
