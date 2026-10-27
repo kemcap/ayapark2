@@ -1,7 +1,6 @@
--- AYAPARK 2: do not store internal, server-generated Auth email aliases as real contact emails.
--- Link-only invitations use existing service-only seven-day issue / single-use redemption RPCs.
--- The actual Auth identity stays in auth.users. This patch preserves linked real contact data.
--- Never run on production without verified backup, test approval and explicit release permission.
+-- AYAPARK 2: keep internal generated Auth login aliases out of real person's contact email.
+-- Preserves manager-only issuance, token locking, expiry, one-time redemption and service-role grants.
+-- Requires reviewed backup and explicit production migration approval.
 BEGIN;
 SET LOCAL lock_timeout='5s';
 create or replace function public.ay3_redeem_phone_invite(p_token_hash text,p_user uuid)
@@ -30,30 +29,7 @@ begin
  then raise exception 'No current apartment'; end if;
  if exists(select 1 from public.ay3_persons p where p.auth_user_id=p_user and p.id<>ticket.person_id)
  then raise exception 'Account already linked elsewhere'; end if;
- update public.ay3_persons set auth_user_id=p_user, phone=coalesce(ticket.phone_e164,phone), email=CASE WHEN ticket.email ~ '^resident-code-[a-hj-np-z2-9]{12}@ayapark2[.]invalid
- where id=ticket.person_id;
- insert into public.site_resident_units(unit_id,user_id,role,person_id,active)
- select distinct l.unit_id,p_user,l.role,null::uuid,true from public.ay3_links l
- where l.person_id=ticket.person_id and l.site_id=ticket.site_id
-   and l.role in ('owner','tenant') and l.active
-   and (l.starts_on is null or l.starts_on<=(now() at time zone 'Europe/Istanbul')::date)
-   and (l.ends_on is null or l.ends_on>=(now() at time zone 'Europe/Istanbul')::date)
- on conflict(unit_id,user_id,role) do update set active=true;
- if ticket.phone_e164 is not null then
-  perform public.ay_auth_bind_phone(ticket.issued_by,ticket.person_id,ticket.phone_e164,'Administrator confirmed and delivered personal invitation',true);
- end if;
- update public.ay3_invite_tokens set consumed_at=now() where id=ticket.id;
- update public.ay3_invite_tokens set revoked_at=now()
- where person_id=ticket.person_id and id<>ticket.id and consumed_at is null and revoked_at is null;
- insert into public.ay2_audit(site_id,actor,action,entity_id,details)
- values(ticket.site_id,ticket.issued_by,'whatsapp_invite_activated',ticket.person_id,
- jsonb_build_object('unit_id',ticket.unit_id));
- return jsonb_build_object('ok',true,'person_id',ticket.person_id);
-end;
-$$;
-revoke all on function public.ay3_redeem_phone_invite(text,uuid) from PUBLIC,anon,authenticated;
-grant execute on function public.ay3_redeem_phone_invite(text,uuid) to service_role;
- THEN email ELSE coalesce(ticket.email,email) END
+ update public.ay3_persons set auth_user_id=p_user, phone=coalesce(ticket.phone_e164,phone), email=CASE WHEN ticket.email ~ '^resident-code-[a-hj-np-z2-9]{12}@ayapark2[.]invalid$' THEN email ELSE coalesce(ticket.email,email) END
  where id=ticket.person_id;
  insert into public.site_resident_units(unit_id,user_id,role,person_id,active)
  select distinct l.unit_id,p_user,l.role,null::uuid,true from public.ay3_links l
