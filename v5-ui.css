@@ -31,9 +31,44 @@
 @media print{.install-banner,.notification-test,#notificationBell{display:none!important}.law-grid{display:block}}
 
 /* Seven agreed UX refinements. */
-#roleControl,#residentPreviewControl{display:none!important}
+/* Role-preview controls live in the header; visibility follows the [hidden] attribute. */
 .access-preview-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 18px;margin:0 18px 12px;border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:10px;font-size:12px;flex-wrap:wrap}.access-preview-banner .text-button{min-height:44px}
 .unit-dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.unit-dialog-heading h2{margin:0!important}.unit-history-link{font-size:12px;color:var(--primary);padding:12px 0;min-height:44px;display:inline-flex;align-items:center}.review-panel,:root[data-design="modern"] .review-panel,:root[data-theme="dark"] .review-panel{margin-top:16px;background:var(--paper);border:1px solid var(--line);color:var(--ink);padding:12px}.review-panel>summary{font-size:12px}
 #unitPaymentHistory{scroll-margin-top:12px;outline-offset:4px}.person-open-amount{display:inline;font-size:11px;font-weight:600;color:var(--debt-ink);white-space:normal}.apartment-total-label{display:block;font-size:11px;color:var(--muted);margin-top:12px}.unassigned-amount{display:block;font-size:11px;color:var(--muted);margin-top:8px}
 .announcement-status{margin-bottom:18px;border-radius:16px;border:1px solid var(--line)}.announcement-status .card{margin:0}.announcement-active{border-inline-start:3px solid var(--primary)}.announcement-expired{border-inline-start:3px solid var(--muted)}.announcement-expired .badge{background:var(--soft);color:var(--ink)}#urgentProgress{display:block;color:var(--muted);font-size:11px;margin-bottom:8px}.preview-controls select{width:100%;max-width:100%;min-height:44px}.preview-controls .field{max-width:100%}.install-settings .button{white-space:normal}
 @media(max-width:600px){.install-banner{margin-inline:16px}.install-banner>span{font-size:24px}.install-banner #installApp{max-width:100px}.access-preview-banner{margin-inline:16px;font-size:11px}.unit-dialog-heading{gap:4px}.unit-history-link{font-size:11px}.person-open-amount{font-size:10px}}
+
+/* Role preview is a read-only display switch for authenticated Superadmins.
+   Keep it alongside the language flag on mobile and desktop. */
+.header-actions .role-preview-control{
+ order:-1;display:inline-flex;align-items:center;flex:none;gap:7px;min-width:0;
+ min-height:44px;max-width:100%;padding:3px 7px;border:1px solid var(--line);
+ border-radius:11px;background:var(--paper);color:var(--ink);
+}
+.header-actions .role-preview-control[hidden]{display:none!important}
+.role-preview-eye{width:17px;height:17px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.role-preview-label{font-size:11px;font-weight:650;white-space:nowrap;color:var(--ink)}
+#roleSelect{min-width:0;width:130px;max-width:100%;min-height:38px;margin:0;padding:5px 19px 5px 7px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:inherit;font-size:12px;font-weight:600;text-overflow:ellipsis;cursor:pointer}
+#roleSelect:focus-visible,#residentPreviewSelect:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.preview-target-bar{display:flex;justify-content:flex-start;align-items:center;min-width:0;margin:0 18px 12px;padding:0 4px}
+.preview-target-bar[hidden]{display:none!important}
+#residentPreviewControl{display:flex;align-items:center;gap:9px;min-width:0;max-width:100%;flex-wrap:wrap;font-size:12px;color:var(--ink)}
+#residentPreviewControl[hidden]{display:none!important}
+#residentPreviewSelect{min-height:44px;max-width:min(100%,440px);width:min(340px,75vw);padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--paper);color:var(--ink)}
+@media(max-width:1000px){
+ .header-actions.has-role-preview #languageToggle{margin-right:auto}
+ .header-actions .role-preview-control{gap:0;padding:3px;min-height:44px}
+ .role-preview-eye,.role-preview-label{display:none}
+ #roleSelect{width:clamp(72px,22vw,104px);height:38px;min-height:38px;font-size:11px;padding:4px 17px 4px 5px}
+ .preview-target-bar{margin-inline:16px}
+}
+@media(max-width:380px){
+ .topbar,:root[data-design="modern"] .topbar{padding-inline:10px}
+ .header-actions,:root[data-design="modern"] .header-actions{gap:4px}
+ #roleSelect{width:76px;font-size:10px}
+ .header-actions .language-toggle{min-width:44px;padding-inline:6px}
+ .header-actions .language-toggle .language-code{display:none}
+ #themeMenu,#notificationBell,#connectionButton{flex-shrink:0}
+ #residentPreviewSelect{width:100%}
+}
+@media print{.role-preview-control,.preview-target-bar{display:none!important}}

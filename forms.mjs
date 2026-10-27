@@ -1,5 +1,5 @@
 import {buildFinanceForm,financePayload} from './finance-forms.mjs?v=5.8.1';
-import {buildV3Form,payloadV3} from './v3-forms.mjs?v=5.8.1';
+import {buildV3Form,payloadV3} from './v3-forms.mjs?v=5.8.4';
 import {t as tr} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,money,randomId} from './core.mjs?v=5.8.1';
 import {remaining,unassigned} from './ledger.mjs?v=5.8.1';

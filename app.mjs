@@ -24,7 +24,7 @@ import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.8.1';
 import {AyaparkApi} from './api.mjs?v=5.8.1';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.8.1';
-import {buildForm,payloadFor} from './forms.mjs?v=5.8.1';
+import {buildForm,payloadFor} from './forms.mjs?v=5.8.4';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -55,7 +55,7 @@ function render(focus=false){
  }else if(state.mode==='demo'){if(!state.demoFullData||state.data.role==='super'){state.demoFullData=state.data;state.demoFullData.serverRole='manager';}state.fullData=state.demoFullData;state.data=previewProjection(state.fullData,state.viewRole||'super',state.previewSelection||'');}else{state.fullData=null;state.demoFullData=null;state.viewRole='super';state.previewSelection='';}
 
  document.documentElement.lang=getLanguage();
- $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> '+getLanguage().toUpperCase();$('languageToggle').title=getLanguage()==='tr'?'Deutsch':'Türkçe';
+ $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> <span class="language-code">'+getLanguage().toUpperCase()+'</span>';$('languageToggle').title=getLanguage()==='tr'?'Deutsch':'Türkçe';
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
  const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V5.1'+(IS_PREVIEW?' · '+tr('Önizleme'):'');
@@ -63,9 +63,23 @@ function render(focus=false){
  updateDesignControl();
  $('breadcrumb').textContent=labels[state.page];
  const previewAllowed=['connected','demo'].includes(state.mode)&&mayPreview(state.fullData);if(previewAllowed&&state.viewRole==='resident'){const opts=residentPreviewOptions(state.fullData);if(!opts.some(o=>o.id===state.previewSelection))state.previewSelection=opts[0]?.id||'';}
- $('roleControl').hidden=state.mode!=='demo'&&!previewAllowed;$('roleSelect').value=d.role;
- $('roleLabel').textContent=tr(previewAllowed?'Görünüm':'Görünümü dene');
- $('residentPreviewControl').hidden=!previewAllowed||d.role!=='resident';
+ $('roleControl').hidden=!previewAllowed;$('roleSelect').value=d.role;
+ $('roleLabel').textContent=tr('Görünüm');
+ const narrowRoleLabels=window.matchMedia('(max-width:440px)').matches;
+ const deutsch=getLanguage()==='de';
+ const roleLabels={
+  super:narrowRoleLabels?(deutsch?'Super':'Süper'):tr('Süper Admin'),
+  staff:narrowRoleLabels?(deutsch?'Verw.':'Yönetim'):tr('Yönetim'),
+  resident:narrowRoleLabels?(deutsch?'Bewohner':'Sakin'):tr('Site Sakini')
+ };
+ for(const option of $('roleSelect').options)option.textContent=roleLabels[option.value]||option.textContent;
+ $('roleSelect').setAttribute('aria-label',tr('Görünümü dene'));
+ $('roleSelect').title=tr('Önizlemede değişiklikler kaydedilmez.');
+ $('residentPreviewLabel').textContent=tr('Daire / Kişi');
+ const showResidentPreview=previewAllowed&&d.role==='resident';
+ $('residentPreviewControl').hidden=!showResidentPreview;
+ $('previewTargetBar').hidden=!showResidentPreview;
+ document.querySelector('.header-actions').classList.toggle('has-role-preview',previewAllowed);
  if(previewAllowed&&d.role==='resident'){
   const options=residentPreviewOptions(state.fullData);$('residentPreviewSelect').innerHTML=options.map(o=>`<option value="${e(o.id)}">${e(o.label.replace(/ · owner$/,' · '+tr('Ev sahibi')).replace(/ · tenant$/,' · '+tr('Kiracı')))}</option>`).join('');
   if(!options.some(o=>o.id===state.previewSelection))state.previewSelection=options[0]?.id||'';
