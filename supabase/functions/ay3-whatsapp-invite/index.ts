@@ -17,6 +17,9 @@ const normalizedPhone=(input:unknown)=>{
 const active=(r:{role:string,active:boolean,starts_on:string|null,ends_on:string|null})=>
  r.active&&['owner','tenant'].includes(r.role)&&(!r.starts_on||r.starts_on<=day())&&(!r.ends_on||r.ends_on>=day());
 const emailAlias=(phone:string)=>'resident-'+phone.slice(1)+'@ayapark2.invalid';
+const contactlessAlias=/^resident-code-([a-hj-np-z2-9]{12})@ayapark2[.]invalid$/;
+const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const createLoginCode=()=> 'AY2-'+Array.from(crypto.getRandomValues(new Uint8Array(12)),b=>alphabet[b&31]).join('');
 const b64url=(bytes:Uint8Array)=>btoa(String.fromCharCode(...bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 async function sha256(value:string){
  const hash=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)));
@@ -68,7 +71,7 @@ Deno.serve(async req=>{
    if(!staff)return reply({error:'invite_unavailable'},410);
    if(action==='inspect'){
      return reply({valid:true,first_name:String(person.first_name||'').slice(0,70),
-      phone_hint:ticket.phone_e164?'••'+ticket.phone_e164.slice(-3):'••@'+String(ticket.email).split('@')[1],
+      phone_hint:ticket.phone_e164?'••'+ticket.phone_e164.slice(-3):contactlessAlias.test(String(ticket.email||''))?'':'••@'+String(ticket.email).split('@')[1],
       expires_at:ticket.expires_at});
    }
    const password=String(input.password||'');
@@ -90,7 +93,8 @@ Deno.serve(async req=>{
     const {data:linked}=await admin.from('ay3_persons').select('auth_user_id').eq('id',ticket.person_id).eq('site_id',ticket.site_id).maybeSingle();
     if(linked?.auth_user_id!==userId)return reply({error:'activation_reconciliation_required'},409);
    }
-   return reply({ok:true,phone:ticket.phone_e164,identifier:ticket.email||ticket.phone_e164});
+   const internal=contactlessAlias.exec(String(ticket.email||''));
+   return reply({ok:true,phone:ticket.phone_e164,identifier:internal?'AY2-'+internal[1].toUpperCase():ticket.email||ticket.phone_e164});
   }
   const bearer=/^Bearer\s+(.+)$/i.exec(req.headers.get('Authorization')||'')?.[1];
   if(!bearer)return reply({error:'sign_in_required'},401);
@@ -98,11 +102,14 @@ Deno.serve(async req=>{
   if(authError||!identity.user)return reply({error:'invalid_session'},401);
   const personId=String(input.person_id||'');
   const phone=normalizedPhone(input.phone);
-  const email=input.contact_kind==='email'?String(input.email||'').trim().toLowerCase():'';
-  const emailMode=input.contact_kind==='email';
+  const kind=String(input.contact_kind||'phone');
+  if(!['phone','email','link'].includes(kind))return reply({error:'invalid_request'},400);
+  const code=kind==='link'&&action==='create'?createLoginCode():'';
+  const email=kind==='email'?String(input.email||'').trim().toLowerCase():kind==='link'?'resident-code-'+code.slice(4).toLowerCase()+'@ayapark2.invalid':'';
+  const emailMode=kind!=='phone';
   if(!uuid.test(personId))return reply({error:'invalid_person'},400);
   if(action==='create'&&emailMode&&(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254))return reply({error:'invalid_email'},400);
-  if(action==='create'&&!emailMode&&!phone)return reply({error:'invalid_phone'},400);
+  if(action==='create'&&kind==='phone'&&!phone)return reply({error:'invalid_phone'},400);
   if(input.confirmed!==true)return reply({error:'confirmation_required'},400);
   const {data:person}=await admin.from('ay3_persons')
    .select('id,site_id,auth_user_id').eq('id',personId).maybeSingle();
