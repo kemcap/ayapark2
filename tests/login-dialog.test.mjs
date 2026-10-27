@@ -12,7 +12,7 @@ function harness(){
  const $=id=>{if(!elements.has(id))elements.set(id,{value:'',open:false,disabled:false,classList:{remove(){},add(){}},listeners:{},addEventListener(type,fn){this.listeners[type]=fn;},setAttribute(){},showModal(){this.open=true;},close(){if(!this.open)return;this.open=false;queueMicrotask(()=>this.listeners.close?.());},reset(){},reportValidity(){return true;}});return elements.get(id);};
  const loaded={role:'super',transactions:[{date:'2026-10-01'}]};let saved=false;
  const api={async login(){saved=true;},async verifyCode(){saved=true;},saved:()=>saved,async restore(){calls.restore++;return saved;},async load(){calls.load++;return loaded;},async logout(){calls.logout++;saved=false;}};
- const context=vm.createContext({$,api,state:{mode:'signedout'},epoch:0,loginBusy:false,loginMethod:'password',tr:s=>s,beginLoading:()=>()=>{},syncPreferences:async()=>{},hideLoginPassword(){},navigate(){calls.navigate++;},toast(){},URLSearchParams,Date,setTimeout(){},location:{hash:'',pathname:'/',search:''},history:{replaceState(){}}});
+ const context=vm.createContext({$,api,nativePreviewRole:d=>d?.role==='super'?'super':d?.role==='staff'?'staff':null,state:{mode:'signedout'},epoch:0,loginBusy:false,loginMethod:'password',tr:s=>s,beginLoading:()=>()=>{},syncPreferences:async()=>{},hideLoginPassword(){},navigate(){calls.navigate++;},toast(){},URLSearchParams,Date,setTimeout(){},location:{hash:'',pathname:'/',search:''},history:{replaceState(){}}});
  vm.runInContext(handlers+'\n'+restore,context);
  return {$,api,context,calls,loaded,submit:()=>$('loginForm').listeners.submit({preventDefault(){}}),restore:()=>vm.runInContext('resumeSession()',context)};
 }
