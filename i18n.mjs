@@ -1289,3 +1289,5 @@ Object.assign(german,{
 });
 
 Object.assign(german,{'Sayfa başına en fazla 200 talep.':'Bis zu 200 Anfragen pro Seite.','Önceki talepler':'Vorherige Anfragen','Sonraki talepler':'Weitere Anfragen'});
+
+Object.assign(german,{'Görünümü değiştir':'Ansicht wechseln','Etkin görünüm':'Aktive Ansicht','Önizleme erişim haklarını değiştirmez.':'Die Vorschau ändert keine Zugriffsrechte.'});
