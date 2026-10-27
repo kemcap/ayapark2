@@ -37,3 +37,10 @@ Staging-Projekt: `ayapark-auth-staging`; eigene QA-Site `qa-personen-20261027`, 
 2. **Graf Gurkenhelm von Kichererbse** — `+90 000 000 00 02`, `gurkenhelm.kichererbse@example.invalid`, Sprache DE, Testnotiz, Eigentümer-Verknüpfung T-2. Mit Archivhinweis über Datenbank-SQL archiviert. Kontrollabfrage: **Person bleibt mit `archived_at` und `archive_note` erhalten; Wohnungszuordnung ist `active=false` und ebenfalls archiviert**.
 
 Für diese Datensatztests war im Staging kein Anmeldekonto erforderlich. Die SQL-Funktion `ay3_manage_person` konnte nach Einrichtung eines minimalen `ay2_private.can`-Helfers **erfolgreich installiert** werden, wurde jedoch **nicht über die authentifizierte RPC mit einem echten User-Token getestet** (das Auth-Testprojekt hat derzeit keine `auth.users`-Konten). Die praktischen Datenänderungen wurden durch direktes, auf die QA-Site beschränktes SQL ausgeführt, entsprechend der vorgesehenen Lösch-/Archivsemantik. Dies ist ein **Datenbank-Verhaltenstest, keine vollständige Ende-zu-Ende-Abnahme**.
+
+## UI-Korrektur: eindeutig sichtbare Löschtaste
+
+- Separate rot umrandete **Kişiyi sil / Person löschen**-Taste für Superadmins auf der **Personenübersicht**, in den **Personendetails** und zusätzlich bei **Wohnungs-Personenzuordnungen**.
+- Der vorhandene Befehl **Kaldır** entfernt nur die jeweilige Rolle/Zuordnung; der neue Befehl betrifft die Person als Datenbankeintrag. Klick öffnet weiterhin die Auswahl **Kalıcı sil** oder **Arşivle**.
+- Auch bereits archivierte Personen können im Archiv dauerhaft gelöscht werden, falls keine geschützten Finanz- oder Zugangsverknüpfungen bestehen.
+- Isolierte JavaScript-Syntax- und Sichtbarkeits-Smoketests bestanden (Karte, Detail, Wohnungszuordnung, fehlende Verwaltungsberechtigung, archivierte Person). **Kein Live-Deployment.**
