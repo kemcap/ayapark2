@@ -37,3 +37,8 @@
 #unitPaymentHistory{scroll-margin-top:12px;outline-offset:4px}.person-open-amount{display:inline;font-size:11px;font-weight:600;color:var(--debt-ink);white-space:normal}.apartment-total-label{display:block;font-size:11px;color:var(--muted);margin-top:12px}.unassigned-amount{display:block;font-size:11px;color:var(--muted);margin-top:8px}
 .announcement-status{margin-bottom:18px;border-radius:16px;border:1px solid var(--line)}.announcement-status .card{margin:0}.announcement-active{border-inline-start:3px solid var(--primary)}.announcement-expired{border-inline-start:3px solid var(--muted)}.announcement-expired .badge{background:var(--soft);color:var(--ink)}#urgentProgress{display:block;color:var(--muted);font-size:11px;margin-bottom:8px}.preview-controls select{width:100%;max-width:100%;min-height:44px}.preview-controls .field{max-width:100%}.install-settings .button{white-space:normal}
 @media(max-width:600px){.install-banner{margin-inline:16px}.install-banner>span{font-size:24px}.install-banner #installApp{max-width:100px}.access-preview-banner{margin-inline:16px;font-size:11px}.unit-dialog-heading{gap:4px}.unit-history-link{font-size:11px}.person-open-amount{font-size:10px}}
+
+/* Person deletion is distinct from removing one apartment assignment. */
+.button[data-action="person_lifecycle"]{border:1px solid var(--red);color:var(--red);background:transparent;min-height:44px;white-space:normal}
+.button[data-action="person_lifecycle"]:hover{background:color-mix(in srgb,var(--red) 9%,transparent)}
+.button[data-action="person_lifecycle"]:focus-visible{outline:3px solid var(--red);outline-offset:2px}

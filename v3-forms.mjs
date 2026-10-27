@@ -1,11 +1,12 @@
 import {buildAssignmentForm,assignmentPayload} from './assignments.mjs?v=5.8.1';
 import {effectiveOccupancy} from './relationships.mjs?v=5.8.1';
 import {announcementTime,validateAnnouncement} from './announcement-validation.mjs?v=5.8.1';
-import {t as tr} from './i18n.mjs?v=5.8.1';
+import {t as tr,getLanguage} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,randomId,money} from './core.mjs?v=5.8.1';
 import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.8.1';
 import {today,personName,personLinks,activeAt,dateValid} from './v3-domain.mjs?v=5.8.1';
 import {roleLabel} from './v3-ui.mjs?v=5.8.1';
+const loc=(de,trText)=>getLanguage()==='de'?de:trText;
 const sel=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}">${options.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(l)}</option>`).join('')}</select></label>`;
 const text=(name,label,value='')=>`<label class="field">${tr(label)}<textarea name="${name}" maxlength="5000" rows="3">${e(value)}</textarea></label>`;
 const check=(name,label,checked=false)=>`<label class="check-field"><input type="checkbox" name="${name}" ${checked?'checked':''}>${tr(label)}</label>`;
@@ -32,6 +33,23 @@ export function buildV3Form(s,action,args={}){
  }
  else if(action==='occupancy'){
   const u=d.units.find(u=>u.id===args.unit);context.unit_id=args.unit;title=tr('Kullanımı düzenle');body=sel('status','Kullanım',[['occupied',tr('Dolu')],['vacant',tr('Boş')],['unknown',tr('Bilinmiyor')]],u?effectiveOccupancy(d,u):'unknown')+`<p class="fine">${tr('Kullanım durumu kişi kaydından ayrıdır. Ev sahibi dairede oturabilir; eski borçlar değişmez.')}</p>`;
+ }
+ else if(action==='person_lifecycle'){
+  const person=d.persons.find(x=>x.id===args.id);if(!person)throw Error(loc('Person nicht gefunden.','Kişi bulunamadı.'));
+  context.person_id=person.id;context.expected_name=person.full_name;
+  title=loc('Person löschen oder archivieren','Kişiyi sil veya arşivle');
+  body=`<div class="info-strip"><strong>${e(person.full_name)}</strong><p>${loc('Archivieren erhält die Stammdaten mit Hinweis und verschiebt aktuelle Wohnungszuordnungen ins Archiv. Endgültig löschen entfernt den Personendatensatz und ungeschützte Verknüpfungen. Bei Finanzdaten oder verknüpftem Login ist das Löschen gesperrt.','Arşivleme kişi bilgilerini not ile saklar ve güncel daire bağlantılarını geçmişe taşır. Kalıcı silme kişi kaydını ve korunmayan ilişkilerini siler. Mali kayıt veya giriş hesabı varsa silme engellenir.')}</p></div>`
+   +`<fieldset><legend>${loc('Aktion auswählen','İşlem seç')}</legend><label class="check-field"><input type="radio" name="mode" value="archive" ${person.archived_at?'disabled':''}>${loc('Archivieren (mit Hinweis)','Arşivle (not ile)')}</label><label class="check-field"><input type="radio" name="mode" value="delete" checked>${loc('Endgültig löschen (unwiderruflich)','Kalıcı sil (geri alınamaz)')}</label></fieldset>`
+   +`<label class="field">${loc('Archivierungshinweis (beim Archivieren erforderlich)','Arşiv notu (arşivleme için zorunlu)')}<textarea name="note" maxlength="500" rows="3"></textarea></label>`
+   +field('verify_name',loc('Zur endgültigen Löschung Namen exakt eingeben','Kalıcı silmek için tam adı yazın'),'text','','autocomplete="off" maxlength="180"')
+   +`<p class="fine">${loc('Zur endgültigen Löschung den Namen exakt wie oben eingeben. Buchungen und Anmeldekonten bleiben geschützt.','Kalıcı silmek için yukarıdaki tam adı birebir yazın. Mali kayıtlar ve giriş hesapları korunur.')}</p>`
+   +check('confirmation',loc('Ich bestätige die ausgewählte Aktion.','Seçilen işlemi onaylıyorum.'));
+ }
+ else if(action==='person_restore'){
+  const person=d.persons.find(x=>x.id===args.id&&x.archived_at);if(!person)throw Error(loc('Archivierte Person nicht gefunden.','Arşivlenen kişi bulunamadı.'));
+  context.person_id=person.id;title=loc('Person wiederherstellen','Kişiyi arşivden çıkar');
+  body=`<div class="info-strip"><strong>${e(person.full_name)}</strong><p>${loc('Die Person erscheint wieder in der aktiven Liste. Alte Wohnungszuordnungen bleiben im Archiv.','Kişi aktif listeye döner. Eski daire bağlantıları arşivde kalır.')}</p></div>`
+  +check('confirmation',loc('Wiederherstellung bestätigen','Arşivden çıkarmayı onayla'));
  }
  else if(action==='person'){
   const p=d.persons?.find(x=>x.id===args.id);context.person_id=p?.id||'';const unit=args.unit;
@@ -76,8 +94,17 @@ export function buildV3Form(s,action,args={}){
 }
 export function payloadV3(action,form,ctx){
  if(action.startsWith('assignment_'))return assignmentPayload(action,form,ctx);
- const special=['person_link','occupancy','edit_link','user_access','staff_remove','person','link','end_link','unlink','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_note','classify_entry'];
+ const special=['person_lifecycle','person_restore','person_link','occupancy','edit_link','user_access','staff_remove','person','link','end_link','unlink','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_note','classify_entry'];
  if(!special.includes(action)){const p=payloadLegacy(action,form,ctx);if(action==='charge'&&(p.period_from||p.period_to)&&(!dateValid(p.period_from)||!dateValid(p.period_to)||p.period_to<p.period_from))throw Error(tr('Borç döneminin başlangıç ve bitiş tarihlerini kontrol edin.'));if(action==='entry'&&p.category==='Diğer'&&!p.desc)throw Error(tr('Açıklama gerekli.'));return p;}
+ if(['person_lifecycle','person_restore'].includes(action)){
+  if(!form.has('confirmation')||!ctx.person_id)throw Error(loc('Bestätigung erforderlich.','Onay gerekli.'));
+  if(action==='person_restore')return {person_id:ctx.person_id,mode:'restore',note:'',confirmation:true};
+  const mode=String(form.get('mode')||''),note=String(form.get('note')||'').trim();
+  if(!['archive','delete'].includes(mode))throw Error(loc('Aktion auswählen.','İşlem seç.'));
+  if(mode==='archive'&&(note.length<3||note.length>500))throw Error(loc('Archivierungshinweis mit 3 bis 500 Zeichen angeben.','Arşiv notu 3 ila 500 karakter olmalıdır.'));
+  if(mode==='delete'&&String(form.get('verify_name')||'')!==ctx.expected_name)throw Error(loc('Den vollständigen Namen exakt eingeben.','Tam adı birebir yazın.'));
+  return {person_id:ctx.person_id,mode,note,confirmation:true};
+ }
  if(action==='staff_remove'&&(!form.has('confirmation')||!ctx.user_id))throw Error(tr('Devam etmek için onay kutusunu işaretleyin.'));
  if(action==='staff_remove'&&String(form.get('reason')||'').trim().length<3)throw Error(tr('En az üç karakterlik gerekçe yazın.'));
  if(action==='user_access'&&((form.get('person_mode')!=='new'&&!form.get('person_id'))||!form.has('confirmation')))throw Error(tr('Kişi seçin ve erişimi onaylayın.'));
