@@ -3,10 +3,18 @@ import {escapeHtml as e} from './core.mjs?v=5.8.1';
 import {t as tr} from './i18n.mjs?v=5.8.1';
 import {activeAt} from './v3-domain.mjs?v=5.9.0';
 import {calculateClaims} from './supabase/functions/ay3-site-open-claims/math.mjs?v=5.8.1';
-export const mayPreview=d=>d?.role==='super'&&d?.serverRole==='manager'&&d?.capabilities?.admin===true;
+// Only roles verified by the server may access the read-only view simulator.
+// Staff may select the resident view but never the Super Admin view.
+export function nativePreviewRole(d){
+ if(d?.role==='super'&&d?.serverRole==='manager'&&d?.capabilities?.admin===true)return 'super';
+ if(d?.role==='staff'&&['deputy','auditor'].includes(d?.serverRole))return 'staff';
+ return null;
+}
+export const mayPreview=d=>nativePreviewRole(d)!==null;
+export const allowedPreviewRoles=d=>nativePreviewRole(d)==='super'?['super','staff','resident']:nativePreviewRole(d)==='staff'?['staff','resident']:[];
 export function residentPreviewOptions(d){return (d.units||[]).flatMap(u=>{const ls=(d.links||[]).filter(l=>l.unit_id===u.id&&['owner','tenant'].includes(l.role)&&activeAt(l));return ls.length?ls.map(l=>({id:l.id,unitId:u.id,personId:l.person_id,label:u.code+' · '+(d.persons?.find(p=>p.id===l.person_id)?.full_name||'—')+' · '+l.role})):[{id:'unit:'+u.id,unitId:u.id,personId:null,label:u.code}];});}
 export function previewProjection(source,role='super',selection=''){
- if(!mayPreview(source)||!['staff','resident'].includes(role))return source;
+ if(!allowedPreviewRoles(source).includes(role)||role===nativePreviewRole(source))return source;
  const d=structuredClone(source);d.summaryBalance=source.summaryBalance??(source.opening==null?null:Number(source.opening)+source.transactions.reduce((n,t)=>n+Number(t.cents),0));d.sourceLastDate=source.sourceLastDate||source.transactions.map(t=>t.date).sort().at(-1);d.role=role;d.capabilities=Object.fromEntries(Object.keys(source.capabilities).map(k=>[k,role==='staff'&&['finance','people','announcements'].includes(k)]));d.staff=[];d.permissions=[];d.residentAccounts=[];
  if(role==='staff')return d;
  const opts=residentPreviewOptions(source),o=opts.find(o=>o.id===selection)||opts[0];d.ownIds=o?[o.unitId]:[];d.ownPersonIds=o?.personId?[o.personId]:[];d.siteClaims=calculateClaims({units:source.units,charges:source.charges,allocations:source.allocations,entries:source.transactions,credits:source.credits||[],staged:source.staged||[],ownUnitIds:d.ownIds});
@@ -15,5 +23,5 @@ export function previewProjection(source,role='super',selection=''){
 }
 
 export const canPreviewView=s=>s.mode!=='signedout'&&mayPreview(s.fullData||s.data);
-export function previewControls(s){if(!canPreviewView(s))return '';const source=s.fullData||s.data,role=s.viewRole||'super',options=residentPreviewOptions(source);return `<section class="card preview-controls"><h2>${tr('Görünümü dene')}</h2><label class="field">${tr('Rol')}<select id="previewRoleSelect">${[['super','Süper Admin'],['staff','Yönetim'],['resident','Site Sakini']].map(([v,l])=>`<option value="${v}" ${v===role?'selected':''}>${tr(l)}</option>`).join('')}</select></label>${role==='resident'?`<label class="field">${tr('Daire / Kişi')}<select id="previewPersonSelect">${options.map(o=>`<option value="${e(o.id)}" ${o.id===s.previewSelection?'selected':''}>${e(o.label.replace(' · owner',' · '+tr('Ev sahibi')).replace(' · tenant',' · '+tr('Kiracı')))}</option>`).join('')}</select></label>`:''}<p class="fine">${tr('Önizlemede değişiklikler kaydedilmez.')}</p></section>`;}
-export function previewBanner(s){if(!canPreviewView(s)||!['staff','resident'].includes(s.viewRole))return '';const source=s.fullData||s.data,o=residentPreviewOptions(source).find(o=>o.id===s.previewSelection);return `<span>${tr(s.viewRole==='resident'?'Sakin görünümü':'Yönetim görünümü')}${o&&s.viewRole==='resident'?' · '+e(source.units.find(u=>u.id===o.unitId)?.code||''):''}</span><button class="text-button" data-preview-return type="button">${tr('Süper Admin görünümüne dön')}</button>`;}
+export function previewControls(s){if(!canPreviewView(s))return '';const source=s.fullData||s.data,role=s.viewRole||nativePreviewRole(source),options=residentPreviewOptions(source),allowed=allowedPreviewRoles(source);return `<section class="card preview-controls"><h2>${tr('Görünümü dene')}</h2><label class="field">${tr('Rol')}<select id="previewRoleSelect">${[['super','Süper Admin'],['staff','Yönetim'],['resident','Site Sakini']].filter(([v])=>allowed.includes(v)).map(([v,l])=>`<option value="${v}" ${v===role?'selected':''}>${tr(l)}</option>`).join('')}</select></label>${role==='resident'?`<label class="field">${tr('Daire / Kişi')}<select id="previewPersonSelect">${options.map(o=>`<option value="${e(o.id)}" ${o.id===s.previewSelection?'selected':''}>${e(o.label.replace(' · owner',' · '+tr('Ev sahibi')).replace(' · tenant',' · '+tr('Kiracı')))}</option>`).join('')}</select></label>`:''}<p class="fine">${tr('Önizlemede değişiklikler kaydedilmez.')}</p></section>`;}
+export function previewBanner(s){if(!canPreviewView(s))return '';const source=s.fullData||s.data,native=nativePreviewRole(source);if(s.viewRole===native||!allowedPreviewRoles(source).includes(s.viewRole))return '';const o=residentPreviewOptions(source).find(o=>o.id===s.previewSelection);return `<span>${tr(s.viewRole==='resident'?'Sakin görünümü':'Yönetim görünümü')}${o&&s.viewRole==='resident'?' · '+e(source.units.find(u=>u.id===o.unitId)?.code||''):''}</span><button class="text-button" data-preview-return type="button">${tr(native==='super'?'Süper Admin görünümüne dön':'Yönetim görünümüne dön')}</button>`;}

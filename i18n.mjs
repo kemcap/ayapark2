@@ -882,7 +882,10 @@ Object.assign(german,{'İlişkiyi bitir':'Zuordnung beenden'});
 Object.assign(german,{
  'Görünüm':'Ansicht','Daire / Kişi':'Wohnung / Person','Sakin önizlemesi için daire ve kişi':'Wohnung und Person für die Bewohner-Vorschau',
  'Görünüm önizlemesi · İşlemler kaydedilmez. Süper Admin görünümüne dönerek düzenleyin.':'Ansichtsvorschau · Änderungen werden hier nicht gespeichert. Zum Bearbeiten zur Super-Admin-Ansicht zurückkehren.',
- 'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'In der Vorschau sind keine Änderungen möglich. Bitte zur Super-Admin-Ansicht zurückkehren.'
+ 'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'In der Vorschau sind keine Änderungen möglich. Bitte zur Super-Admin-Ansicht zurückkehren.',
+ 'Yönetim görünümüne dön':'Zurück zur Verwaltungsansicht',
+ 'Görünüm önizlemesi · İşlemler kaydedilmez. Yönetim görünümüne dönerek düzenleyin.':'Ansichtsvorschau · Änderungen werden nicht gespeichert. Zum Bearbeiten zur Verwaltungsansicht zurückkehren.',
+ 'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.':'In der Vorschau sind keine Änderungen möglich. Bitte zur Verwaltungsansicht zurückkehren.'
 });
 
 Object.assign(german,{
