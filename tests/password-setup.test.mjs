@@ -58,7 +58,7 @@ function harness(){
   async setPassword(){calls.password++;},async load(){calls.load++;return {role:'super',transactions:[]};},
   async logout(){calls.logout++;},saved(){return null;}
  };
- const context=vm.createContext({$,api,state:{mode:'signedout'},epoch:0,loginBusy:false,loginMethod:'password',
+ const context=vm.createContext({$,api,nativePreviewRole:d=>d?.role==='super'?'super':d?.role==='staff'?'staff':null,state:{mode:'signedout'},epoch:0,loginBusy:false,loginMethod:'password',
   tr:t,beginLoading:()=>()=>{},syncPreferences:async()=>{},hideLoginPassword(){},
   navigate(){},toast(){},URLSearchParams,Date,setTimeout(){},location:{hash:'',pathname:'/',search:''},
   history:{replaceState(){}},applyStaticLanguage(){},render(){},document:{dispatchEvent(){}},Event});
