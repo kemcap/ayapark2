@@ -19,16 +19,7 @@ export function buildV3Form(s,action,args={}){
   title=tr('Kullanıcı erişimi');
   body=`<fieldset class="person-choice"><legend>${tr('Kişi seçimi')}</legend><label class="check-field"><input type="radio" name="person_mode" value="existing" checked>${tr('Kayıtlı kişi seç')}</label><label class="check-field"><input type="radio" name="person_mode" value="new">${tr('Yeni kişi oluştur')}</label></fieldset><div id="accessExisting">${sel('person_id','Kişi',personOptions(d))}</div><div id="accessNew" hidden>${field('first_name',tr('Ad'),'text','','maxlength="75" disabled')}${field('last_name',tr('Soyad'),'text','','maxlength="75" disabled')}${field('email',tr('E-posta'),'email','','maxlength="254" disabled')}</div>`+sel('access_role','Erişim rolü',[['resident',tr('Site Sakini')],['deputy',tr('Yönetim')],['manager',tr('Süper Admin')]],'deputy')+`<p class="fine">${tr('Yönetim için daire ilişkisi gerekmez. Sakin erişimi için güncel bir daire ilişkisi ve her durumda geçerli e-posta gerekir. Bu işlem e-posta göndermez.')}</p>`+check('confirmation','Erişimi tanımlamayı onaylıyorum.');
  }
- else if(['person_lifecycle','person_restore'].includes(action)){
-  if(!form.has('confirmation')||!ctx.person_id)throw Error(loc('Bestätigung erforderlich.','Onay gerekli.'));
-  if(action==='person_restore')return {person_id:ctx.person_id,mode:'restore',note:'',confirmation:true};
-  const mode=String(form.get('mode')||''),note=String(form.get('note')||'').trim();
-  if(!['archive','delete'].includes(mode))throw Error(loc('Aktion auswählen.','İşlem seç.'));
-  if(mode==='archive'&&(note.length<3||note.length>500))throw Error(loc('Archivierungshinweis mit 3 bis 500 Zeichen angeben.','Arşiv notu 3 ila 500 karakter olmalıdır.'));
-  if(mode==='delete'&&String(form.get('verify_name')||'')!==ctx.expected_name)throw Error(loc('Den vollständigen Namen exakt eingeben.','Tam adı birebir yazın.'));
-  return {person_id:ctx.person_id,mode,note,confirmation:true};
- }
- if(action==='staff_remove'){
+ else if(action==='staff_remove'){
   const member=d.staff.find(x=>x.user_id===args.id);
   if(!member)throw Error(tr('Yönetim üyesi bulunamadı.'));
   if(member.user_id===d.userId)throw Error(tr('Kendi yönetim erişiminizi kaldıramazsınız.'));
@@ -107,6 +98,15 @@ export function payloadV3(action,form,ctx){
  if(action.startsWith('assignment_'))return assignmentPayload(action,form,ctx);
  const special=['person_lifecycle','person_restore','person_link','occupancy','edit_link','user_access','staff_remove','person','link','end_link','unlink','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_note','classify_entry'];
  if(!special.includes(action)){const p=payloadLegacy(action,form,ctx);if(action==='charge'&&(p.period_from||p.period_to)&&(!dateValid(p.period_from)||!dateValid(p.period_to)||p.period_to<p.period_from))throw Error(tr('Borç döneminin başlangıç ve bitiş tarihlerini kontrol edin.'));if(action==='entry'&&p.category==='Diğer'&&!p.desc)throw Error(tr('Açıklama gerekli.'));return p;}
+ if(['person_lifecycle','person_restore'].includes(action)){
+  if(!form.has('confirmation')||!ctx.person_id)throw Error(loc('Bestätigung erforderlich.','Onay gerekli.'));
+  if(action==='person_restore')return {person_id:ctx.person_id,mode:'restore',note:'',confirmation:true};
+  const mode=String(form.get('mode')||''),note=String(form.get('note')||'').trim();
+  if(!['archive','delete'].includes(mode))throw Error(loc('Aktion auswählen.','İşlem seç.'));
+  if(mode==='archive'&&(note.length<3||note.length>500))throw Error(loc('Archivierungshinweis mit 3 bis 500 Zeichen angeben.','Arşiv notu 3 ila 500 karakter olmalıdır.'));
+  if(mode==='delete'&&String(form.get('verify_name')||'')!==ctx.expected_name)throw Error(loc('Den vollständigen Namen exakt eingeben.','Tam adı birebir yazın.'));
+  return {person_id:ctx.person_id,mode,note,confirmation:true};
+ }
  if(action==='staff_remove'&&(!form.has('confirmation')||!ctx.user_id))throw Error(tr('Devam etmek için onay kutusunu işaretleyin.'));
  if(action==='staff_remove'&&String(form.get('reason')||'').trim().length<3)throw Error(tr('En az üç karakterlik gerekçe yazın.'));
  if(action==='user_access'&&((form.get('person_mode')!=='new'&&!form.get('person_id'))||!form.has('confirmation')))throw Error(tr('Kişi seçin ve erişimi onaylayın.'));
