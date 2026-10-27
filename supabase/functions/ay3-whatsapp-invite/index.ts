@@ -14,8 +14,8 @@ const normalizedPhone=(input:unknown)=>{
  else if(digits.length===11&&digits.startsWith('05'))digits='90'+digits.slice(1);
  return /^[1-9]\d{9,14}$/.test(digits)?'+'+digits:'';
 };
-const active=(r:{role:string,active:boolean,starts_on:string|null,ends_on:string|null})=>
- r.active&&['owner','tenant'].includes(r.role)&&(!r.starts_on||r.starts_on<=day())&&(!r.ends_on||r.ends_on>=day());
+const eligible=(r:{role:string,starts_on:string|null,archive_reason?:string|null})=>
+ ['owner','tenant','representative'].includes(r.role)&&(!r.starts_on||r.starts_on<=day())&&r.archive_reason!=='mistake';
 const emailAlias=(phone:string)=>'resident-'+phone.slice(1)+'@ayapark2.invalid';
 const b64url=(bytes:Uint8Array)=>btoa(String.fromCharCode(...bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 async function sha256(value:string){
@@ -59,10 +59,11 @@ Deno.serve(async req=>{
     return reply({error:'expired_or_invalid'},410);
    const {data:person}=await admin.from('ay3_persons')
     .select('id,first_name,auth_user_id').eq('id',ticket.person_id).eq('site_id',ticket.site_id).maybeSingle();
-   if(!person||person.auth_user_id)return reply({error:'invite_unavailable'},410);
-   const {data:roles}=await admin.from('ay3_links').select('role,active,starts_on,ends_on')
+   if(!person)return reply({error:'invite_unavailable'},410);
+   if(person.auth_user_id){const {data:pending,error}=await admin.rpc('ay_auth_invite_pending',{p_user:person.auth_user_id,p_contact:ticket.email||emailAlias(ticket.phone_e164)});if(error||pending!==true)return reply({error:'invite_unavailable'},410);}
+   const {data:roles}=await admin.from('ay3_links').select('role,active,starts_on,ends_on,archive_reason')
     .eq('site_id',ticket.site_id).eq('person_id',ticket.person_id).eq('unit_id',ticket.unit_id);
-   if(!(roles||[]).some(active))return reply({error:'invite_unavailable'},410);
+   if(!(roles||[]).some(eligible))return reply({error:'invite_unavailable'},410);
    const {data:staff}=await admin.from('site_staff_memberships').select('role')
     .eq('site_id',ticket.site_id).eq('user_id',ticket.issued_by).eq('role','manager').maybeSingle();
    if(!staff)return reply({error:'invite_unavailable'},410);
@@ -75,6 +76,14 @@ Deno.serve(async req=>{
    if([...password].length<6||[...password].length>256)return reply({error:'weak_password'},400);
    // A dummy internal email identifier is used for password auth; residents never supply an email.
    // The manual WhatsApp invitation is NOT independent proof of ownership of this phone number.
+   if(person.auth_user_id){
+    // Consume atomically before touching existing credentials: concurrent/replayed requests cannot reset a password twice.
+    const {data:bound,error:bindError}=await admin.rpc('ay3_redeem_phone_invite',{p_token_hash:token_hash,p_user:person.auth_user_id});
+    if(bindError||!bound?.ok)return reply({error:'expired_or_invalid'},410);
+    const {error:updateError}=await admin.auth.admin.updateUserById(person.auth_user_id,{password,email_confirm:true});
+    if(updateError)return reply({error:'activation_reconciliation_required'},409);
+    return reply({ok:true,phone:ticket.phone_e164,identifier:ticket.email||ticket.phone_e164});
+   }
    const {data:created,error:createError}=await admin.auth.admin.createUser({
     email:ticket.email||emailAlias(ticket.phone_e164),email_confirm:true,password
    });
@@ -111,13 +120,13 @@ Deno.serve(async req=>{
    .eq('site_id',person.site_id).eq('user_id',identity.user.id).eq('role','manager').maybeSingle();
   if(!staff)return reply({error:'access_denied'},403);
   if(action==='revoke'){const {error}=await admin.rpc('ay_auth_revoke_invites',{p_actor:identity.user.id,p_person:personId});return error?reply({error:'invitation_failed'},409):reply({ok:true});}
-  if(person.auth_user_id)return reply({error:'already_activated'},409);
+
   const {data:roles,error:rolesError}=await admin.from('ay3_links')
-   .select('unit_id,role,active,starts_on,ends_on')
+   .select('unit_id,role,active,starts_on,ends_on,archive_reason')
    .eq('site_id',person.site_id).eq('person_id',personId);
   if(rolesError)return reply({error:'invitation_failed'},500);
-  const role=(roles||[]).find(active);
-  if(!role)return reply({error:'active_apartment_required'},409);
+  const role=(roles||[]).find(eligible);
+  if(!role)return reply({error:'eligible_apartment_required'},409);
   const token=b64url(crypto.getRandomValues(new Uint8Array(32)));
   const token_hash=await sha256(token);
   const {data:expires_at,error:insertError}=await admin.rpc(emailMode?'ay_auth_issue_email_invite':'ay_auth_issue_invite',{p_actor:identity.user.id,p_person:personId,...(emailMode?{p_email:email}:{p_phone:phone}),p_hash:token_hash});

@@ -1,0 +1,271 @@
+{
+  "date": "2026-10-27",
+  "environment": "ayapark-auth-staging",
+  "passed": 64,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "owner: issue invite",
+      "passed": true
+    },
+    {
+      "name": "owner: seven days",
+      "passed": true
+    },
+    {
+      "name": "owner: inspect valid",
+      "passed": true
+    },
+    {
+      "name": "owner: activate",
+      "passed": true
+    },
+    {
+      "name": "owner: replay denied",
+      "passed": true
+    },
+    {
+      "name": "owner: native login",
+      "passed": true
+    },
+    {
+      "name": "owner: registered status",
+      "passed": true
+    },
+    {
+      "name": "tenant: issue invite",
+      "passed": true
+    },
+    {
+      "name": "tenant: seven days",
+      "passed": true
+    },
+    {
+      "name": "tenant: inspect valid",
+      "passed": true
+    },
+    {
+      "name": "tenant: activate",
+      "passed": true
+    },
+    {
+      "name": "tenant: replay denied",
+      "passed": true
+    },
+    {
+      "name": "tenant: native login",
+      "passed": true
+    },
+    {
+      "name": "tenant: registered status",
+      "passed": true
+    },
+    {
+      "name": "representative: issue invite",
+      "passed": true
+    },
+    {
+      "name": "representative: seven days",
+      "passed": true
+    },
+    {
+      "name": "representative: inspect valid",
+      "passed": true
+    },
+    {
+      "name": "representative: activate",
+      "passed": true
+    },
+    {
+      "name": "representative: replay denied",
+      "passed": true
+    },
+    {
+      "name": "representative: native login",
+      "passed": true
+    },
+    {
+      "name": "representative: registered status",
+      "passed": true
+    },
+    {
+      "name": "former: issue invite",
+      "passed": true
+    },
+    {
+      "name": "former: seven days",
+      "passed": true
+    },
+    {
+      "name": "former: inspect valid",
+      "passed": true
+    },
+    {
+      "name": "former: activate",
+      "passed": true
+    },
+    {
+      "name": "former: replay denied",
+      "passed": true
+    },
+    {
+      "name": "former: native login",
+      "passed": true
+    },
+    {
+      "name": "former: registered status",
+      "passed": true
+    },
+    {
+      "name": "provisional: issue invite",
+      "passed": true
+    },
+    {
+      "name": "provisional: seven days",
+      "passed": true
+    },
+    {
+      "name": "provisional: inspect valid",
+      "passed": true
+    },
+    {
+      "name": "provisional: activate",
+      "passed": true
+    },
+    {
+      "name": "provisional account ID reused",
+      "passed": true
+    },
+    {
+      "name": "provisional: replay denied",
+      "passed": true
+    },
+    {
+      "name": "provisional: native login",
+      "passed": true
+    },
+    {
+      "name": "provisional: registered status",
+      "passed": true
+    },
+    {
+      "name": "phone: issue invite",
+      "passed": true
+    },
+    {
+      "name": "phone: seven days",
+      "passed": true
+    },
+    {
+      "name": "phone: inspect valid",
+      "passed": true
+    },
+    {
+      "name": "phone: activate",
+      "passed": true
+    },
+    {
+      "name": "phone: replay denied",
+      "passed": true
+    },
+    {
+      "name": "phone: native login",
+      "passed": true
+    },
+    {
+      "name": "phone: registered status",
+      "passed": true
+    },
+    {
+      "name": "owner: direct API debtor isolation",
+      "passed": true
+    },
+    {
+      "name": "owner: aggregate authorization",
+      "passed": true
+    },
+    {
+      "name": "owner: own aggregate excludes other debtors",
+      "passed": true
+    },
+    {
+      "name": "tenant: direct API debtor isolation",
+      "passed": true
+    },
+    {
+      "name": "tenant: aggregate authorization",
+      "passed": true
+    },
+    {
+      "name": "tenant: own aggregate excludes other debtors",
+      "passed": true
+    },
+    {
+      "name": "representative: direct API debtor isolation",
+      "passed": true
+    },
+    {
+      "name": "representative: no global summary",
+      "passed": true
+    },
+    {
+      "name": "representative: aggregate authorization",
+      "passed": true
+    },
+    {
+      "name": "former: direct API debtor isolation",
+      "passed": true
+    },
+    {
+      "name": "former: no global summary",
+      "passed": true
+    },
+    {
+      "name": "former: aggregate authorization",
+      "passed": true
+    },
+    {
+      "name": "former cannot read bank",
+      "passed": true
+    },
+    {
+      "name": "former cannot read other people",
+      "passed": true
+    },
+    {
+      "name": "former cannot read internal announcements",
+      "passed": true
+    },
+    {
+      "name": "provisional: direct API debtor isolation",
+      "passed": true
+    },
+    {
+      "name": "provisional: aggregate authorization",
+      "passed": true
+    },
+    {
+      "name": "provisional: own aggregate excludes other debtors",
+      "passed": true
+    },
+    {
+      "name": "phone: direct API debtor isolation",
+      "passed": true
+    },
+    {
+      "name": "phone: aggregate authorization",
+      "passed": true
+    },
+    {
+      "name": "phone: own aggregate excludes other debtors",
+      "passed": true
+    }
+  ],
+  "cleanup": {
+    "synthetic_accounts_removed": 7,
+    "synthetic_site_removed": true,
+    "remaining_test_accounts": 0,
+    "qa_endpoint_disabled": true
+  },
+  "scope": "Native GoTrue, deployed invitation and claims handlers, direct PostgREST/RPC authorization. No real residents or SMTP. Staging has prior schema additions; isolated SQL tests also use the repository baseline."
+}

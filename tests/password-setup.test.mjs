@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-import {AyaparkApi} from '../api.mjs?v=5.8.1';
+import {AyaparkApi} from '../api.mjs?v=5.9.0';
 import {t,setLanguage} from '../i18n.mjs?v=5.8.1';
 
 test('recovery callback at root goes to reset page with credentials preserved',()=>{

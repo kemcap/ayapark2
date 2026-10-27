@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {mayPreview,previewProjection,residentPreviewOptions} from '../access-preview.mjs?v=5.8.1';
+import {mayPreview,previewProjection,residentPreviewOptions} from '../access-preview.mjs?v=5.9.0';
 
 const index=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const css=readFileSync(new URL('../v5-ui.css',import.meta.url),'utf8');

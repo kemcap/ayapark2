@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {unitSearchMatches} from '../v3-domain.mjs?v=5.8.1';
+import {unitSearchMatches} from '../v3-domain.mjs?v=5.9.0';
 const unit={id:'a1',code:'A-1'},other={id:'b1',code:'B-1'};
 const data={role:'super',persons:[{id:'p',full_name:'Özdemir Yılmaz',email:'oz@example.invalid',phone:'+90 555 123 45 67',notes:'havuz anahtarı'}],links:[{unit_id:'a1',person_id:'p',role:'owner'},{unit_id:'b1',person_id:'p',role:'representative'}]};
 test('apartment code and block letter do not create search hits',()=>{
@@ -26,7 +26,7 @@ test('source-only debt label is searchable without inventing a resident',()=>{
  assert.equal(unitSearchMatches(d,unit,'Günebir',false).length,0);
 });
 
-const {unitClarifications,unitBalance,unitMapV3,unitCardResidents}=await import('../v3-ui.mjs?v=5.8.1');
+const {unitClarifications,unitBalance,unitMapV3,unitCardResidents}=await import('../v3-ui.mjs?v=5.9.0');
 function sample(){return {mode:'demo',data:{role:'super',units:[{id:'x',code:'A-4',number:4,block:'A',occupancy_status:'unknown',debt:0}],persons:[],links:[],charges:[],allocations:[],transactions:[],staged:[]}};}
 test('card computes posted current and former debt instead of stale unit cache',()=>{
  const s=sample(),u=s.data.units[0];s.data.links=[{id:'former',unit_id:'x',ends_on:'2020-01-01'}];s.data.charges=[{id:'old',unit_id:'x',link_id:'former',cents:720000},{id:'current',unit_id:'x',cents:360000},{id:'void',unit_id:'x',cents:100000,void_reason:'correction'}];
@@ -47,7 +47,7 @@ test('apartment card shows the owner even without a tenant or contact details',(
  s.data.links=[{id:'owner-link',unit_id:'x',person_id:'owner',role:'owner',active:true}];
  assert.deepEqual(unitCardResidents(s.data,'x'),[{role:'owner',label:'Ev sahibi',names:['Hülya Karşıt']}]);
  const html=unitMapV3(s);
- assert(html.includes('Ev sahibi:</strong> <span class="apartment-person-names">Hülya Karşıt</span>'));
+ assert.match(html,/Ev sahibi:<\/strong> <span class="apartment-person-names">Hülya Karşıt<span class="registration-status/);
  assert(!html.includes('Sakin bilgisi eksik.'));
 });
 test('every populated role appears in order: owner, tenant, authorized contact',()=>{
@@ -68,7 +68,7 @@ test('multiple names in one role are preserved and duplicate links do not repeat
  s.data.persons=[{id:'p1',full_name:'Birinci Malik'},{id:'p2',full_name:'İkinci Malik'},{id:'p3',full_name:'Kiracı Kişi'}];
  s.data.links=[{unit_id:'x',person_id:'p1',role:'owner',active:true},{unit_id:'x',person_id:'p2',role:'owner',active:true},{unit_id:'x',person_id:'p1',role:'owner',active:true},{unit_id:'x',person_id:'p3',role:'tenant',active:true}];
  assert.deepEqual(unitCardResidents(s.data,'x').map(x=>x.names),[['Birinci Malik','İkinci Malik'],['Kiracı Kişi']]);
- assert(unitMapV3(s).includes('Birinci Malik, İkinci Malik'));
+ const html=unitMapV3(s);assert.match(html,/Birinci Malik.*registration-status.*İkinci Malik/);assert.equal((html.match(/Birinci Malik/g)||[]).length,1);
 });
 test('inactive, archived and expired links are not shown',()=>{
  const s=sample();

@@ -6,7 +6,7 @@ import {cleanPreferences,preferenceOptions,loaderMarkup} from '../preferences.mj
 import {apartmentInfo} from '../apartment-info.mjs?v=5.8.1';
 import {reviewPanel,compactReview} from '../review-ui.mjs?v=5.8.1';
 import {settingsPage} from '../settings-ui.mjs?v=5.8.1';
-import {AyaparkApi} from '../api.mjs?v=5.8.1';
+import {AyaparkApi} from '../api.mjs?v=5.9.0';
 import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.8.1';
 import {fullDemo} from '../ledger.mjs?v=5.8.1';
 import {setLanguage} from '../i18n.mjs?v=5.8.1';

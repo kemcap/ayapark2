@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {AyaparkApi} from '../api.mjs?v=5.8.1';
+import {AyaparkApi} from '../api.mjs?v=5.9.0';
 import {RecoveryApi} from '../recovery-api.mjs?v=5.8.1';
 import {buildForm,payloadFor} from '../forms.mjs?v=5.8.1';
 import {fullDemo} from '../ledger.mjs?v=5.8.1';

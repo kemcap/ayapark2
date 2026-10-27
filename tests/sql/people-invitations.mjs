@@ -1,0 +1,57 @@
+import {PGlite} from '@electric-sql/pglite';import {readFile} from 'node:fs/promises';import assert from 'node:assert/strict';
+const db=new PGlite();let passed=0;const id=n=>'6f000000-0000-0000-0000-'+String(n).padStart(12,'0');const hash=n=>String(n).repeat(64);
+const scalar=async(sql,args=[])=>Object.values((await db.query(sql,args)).rows[0])[0];const check=(label,v)=>{assert(v,label);passed++;};const denied=async(sql,args)=>{let fail=false;try{await db.query(sql,args);}catch{fail=true;}check('denied',fail);};
+try{
+ for(const path of ['./schema.sql','../../supabase/migrations/20261026_email_free_whatsapp_activation.sql','../../supabase/auth-phase3.sql','../../supabase/auth-phase4.sql','../../supabase/auth-phase5.sql','../../supabase/auth-phase6.sql','../../supabase/auth-phase8.sql'])await db.exec(await readFile(new URL(path,import.meta.url),'utf8'));
+ await db.exec('alter table auth.users add column encrypted_password text,add column email_confirmed_at timestamptz,add column phone_confirmed_at timestamptz,add column last_sign_in_at timestamptz,add column deleted_at timestamptz,add column banned_until timestamptz');
+ await db.exec(await readFile(new URL('../../supabase/migrations/20261027174427_people_invitation_eligibility.sql',import.meta.url),'utf8'));
+ await db.exec(`insert into auth.users(id,email) values('${id(1)}','manager@example.invalid'),('${id(2)}','emailonly@example.invalid'),('${id(3)}','alien@example.invalid'),('${id(4)}','resident-905321234567@ayapark2.invalid');
+ insert into public.site_sites(id,slug,name) values('${id(10)}','integration-qa','Synthetic');
+ insert into public.site_blocks(id,site_id,code) values('${id(11)}','${id(10)}','A');
+ insert into public.site_units(id,site_id,block_id,number,code) values('${id(12)}','${id(10)}','${id(11)}',7,'A-7');
+ insert into public.site_staff_memberships(site_id,user_id,role) values('${id(10)}','${id(1)}','manager');
+ insert into public.ay3_persons(id,site_id,full_name) values('${id(20)}','${id(10)}','Email only'),('${id(21)}','${id(10)}','Phone');
+ insert into public.ay3_links(site_id,unit_id,person_id,role,active) values('${id(10)}','${id(12)}','${id(20)}','tenant',true),('${id(10)}','${id(12)}','${id(21)}','owner',true);
+ grant select,insert,update on all tables in schema public to service_role;`);
+ await db.exec('grant usage on schema ay2_private to service_role');
+ const issue='select public.ay_auth_issue_email_invite($1,$2,$3,$4)',redeem='select public.ay3_redeem_phone_invite($1,$2)';
+ await db.exec('set role anon');await denied(issue,[id(1),id(20),'emailonly@example.invalid',hash(1)]);await db.exec('reset role;set role service_role');
+ await denied(issue,[id(3),id(20),'emailonly@example.invalid',hash(1)]);await denied(issue,[id(1),id(20),'not an email',hash(1)]);
+ await db.query('select public.ay_access_submit($1,$2,$3,$4,$5,$6)',[id(10),'Email','Only','email','emailonly@example.invalid','A-7']);
+ const request=(await scalar('select public.ay_access_list($1,$2)',[id(10),id(1)])).requests[0];
+ await db.query('select public.ay_access_update($1,$2,$3,$4,$5,$6,$7)',[id(10),id(1),request.id,1,'approve',id(20),true]);
+ await db.query(issue,[id(1),id(20),'EmailOnly@Example.invalid',hash(1)]);
+ await db.exec('reset role');check('email normalized, no phone required',await scalar('select email from public.ay3_invite_tokens where token_hash=$1',[hash(1)])==='emailonly@example.invalid');
+ check('seven days',await scalar("select expires_at-created_at=interval '7 days' from public.ay3_invite_tokens where token_hash=$1",[hash(1)]));
+ check('no access before consumption',await scalar('select count(*)::int from public.site_resident_units where user_id=$1',[id(2)])===0);
+ await db.exec('set role service_role');await db.query(issue,[id(1),id(20),'emailonly@example.invalid',hash(2)]);await denied(redeem,[hash(1),id(2)]);
+ await db.query(redeem,[hash(2),id(2)]);await db.exec(`reset role;update auth.users set encrypted_password='synthetic',email_confirmed_at=now() where id='${id(2)}';set role service_role`);await denied(redeem,[hash(2),id(2)]);await denied(issue,[id(1),id(20),'emailonly@example.invalid',hash(3)]);
+ await db.query('select public.ay_auth_issue_invite($1,$2,$3,$4)',[id(1),id(21),'+905321234567',hash(4)]);await db.query(redeem,[hash(4),id(4)]);
+ await db.exec('reset role');check('email account attached unchanged',await scalar('select auth_user_id from public.ay3_persons where id=$1',[id(20)])===id(2));
+ check('no invented phone',await scalar("select coalesce(phone,'')='' from public.ay3_persons where id=$1",[id(20)]));
+ check('request activates after consumption',await scalar('select status from public.ay_access_requests where id=$1',[request.id])==='activated');
+ check('only authorized unit assigned',await scalar('select count(*)::int from public.site_resident_units where user_id=$1 and unit_id=$2 and role=$3',[id(2),id(12),'tenant'])===1);
+ check('existing phone flow remains compatible',await scalar('select auth_user_id from public.ay3_persons where id=$1',[id(21)])===id(4));
+ check('no phone binding for email-only',await scalar('select count(*)::int from ay_auth_private.phone_contacts where user_id=$1',[id(2)])===0);
+ for(const [n,role] of [[30,'representative'],[31,'tenant'],[32,'owner']]){
+ await db.exec(`insert into auth.users(id,email) values('${id(n+100)}','invite${n}@example.invalid');insert into public.ay3_persons(id,site_id,full_name) values('${id(n)}','${id(10)}','Fixture ${n}');insert into public.ay3_links(site_id,unit_id,person_id,role,active,starts_on,ends_on) values('${id(10)}','${id(12)}','${id(n)}','${role}',false,'2020-01-01','2021-01-01');set role service_role;`);
+ await db.query(issue,[id(1),id(n),`invite${n}@example.invalid`,String(n).padStart(64,'0')]);
+ await denied(redeem,[String(n).padStart(64,'0'),id(3)]);
+ await db.query(redeem,[String(n).padStart(64,'0'),id(n+100)]);
+ await denied(redeem,[String(n).padStart(64,'0'),id(n+100)]);
+ await db.exec('reset role');
+ check('historical role preserved '+role,await scalar('select role from public.site_resident_units where user_id=$1',[id(n+100)])===role);
+ }
+ await db.exec(`insert into auth.users(id,email) values('${id(150)}','provisional@example.invalid');insert into public.ay3_persons(id,site_id,full_name,auth_user_id) values('${id(50)}','${id(10)}','Provisional','${id(150)}');insert into public.ay3_links(site_id,unit_id,person_id,role,active) values('${id(10)}','${id(12)}','${id(50)}','tenant',true);set role service_role;`);
+ await denied(issue,[id(1),id(50),'wrong@example.invalid',hash(7)]);
+ await db.query(issue,[id(1),id(50),'provisional@example.invalid',hash(7)]);
+ await db.query(redeem,[hash(7),id(150)]);await denied(redeem,[hash(7),id(150)]);
+ await db.exec('reset role');check('provisioned account identity preserved',await scalar('select auth_user_id from public.ay3_persons where id=$1',[id(50)])===id(150));
+ await db.exec(`insert into auth.users(id,email) values('${id(160)}','expiry@example.invalid');insert into public.ay3_persons(id,site_id,full_name) values('${id(60)}','${id(10)}','Expiry');insert into public.ay3_links(site_id,unit_id,person_id,role,active,ends_on) values('${id(10)}','${id(12)}','${id(60)}','tenant',false,'2020-01-01');set role service_role;`);
+ await db.query(issue,[id(1),id(60),'expiry@example.invalid',hash(8)]);
+ await db.exec(`reset role;update public.ay3_invite_tokens set expires_at=now()-interval '1 second' where token_hash='${hash(8)}';set role service_role;`);
+ await denied(redeem,[hash(8),id(160)]);
+ await db.query(issue,[id(1),id(60),'expiry@example.invalid',hash(9)]);await db.query(redeem,[hash(9),id(160)]);
+ await db.exec('reset role');check('expired historical invitation can be replaced',await scalar('select auth_user_id from public.ay3_persons where id=$1',[id(60)])===id(160));
+ console.log(JSON.stringify({passed,failed:0,scope:'combined drafts, synthetic SQL, no GoTrue'}));
+}catch(e){console.error(e.message);process.exitCode=1;}finally{await db.close();}

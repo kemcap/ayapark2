@@ -27,8 +27,8 @@ export function residentClaimsCards(s){
  return `<article class="card claim-metric"><div class="card-head"><div><h2>${text('own')}</h2><p>${text('ownNote')}</p></div></div><strong class="large-amount">${owned}</strong></article>`+
  `<article class="card claim-metric"><div class="card-head"><div><h2>${text('site')}</h2><p>${hint}</p></div></div><strong class="large-amount">${site}</strong><small>${text('notAdd')}</small></article>`;
 }
-export function residentClaimsPanel(s){
- if(s.data.role!=='resident')return '';
+export function residentClaimsPanel(s,{dashboard=false}={}){
+ if(s.data.role!=='resident'||s.data.communityAccess===false)return '';
  const stats=s.data.siteClaims;
  const units=Array.isArray(stats?.own_units)?stats.own_units:[];
  const breakdown=units.length>1?`<article class="card claim-breakdown"><h2>${text('detail')}</h2><div class="claims-unit-list">${units.map(unit=>`<div class="contact-row"><strong>${escape(unit.code||'—')}</strong><span>${valid(unit.open_cents)?money(unit.open_cents):text('unavailable')}</span></div>`).join('')}</div></article>`:'';
@@ -36,5 +36,5 @@ export function residentClaimsPanel(s){
   ?`<p class="fine">${text('pending')}: <strong>${stats.unmatched_entry_count}</strong> · ${money(stats.unmatched_entry_cents)}. ${text('pendingNote')}</p>`:'';
  const staged=stats?.pending_source_count>0
   ?`<p class="fine">${text('staged')}: <strong>${stats.pending_source_count}</strong>. ${text('stagedNote')}</p>`:'';
- return `<section class="resident-claims-panel" aria-label="${text('site')}"><div class="summary-grid">${residentClaimsCards(s)}</div>${breakdown}<div class="claims-notes"><p class="fine">${text('source')} ${text('notAdd')}</p>${pending}${staged}</div></section>`;
+ return `<section class="resident-claims-panel ${dashboard?'resident-dashboard-claims':''}" aria-label="${text('site')}"><div class="summary-grid">${residentClaimsCards(s)}</div>${breakdown}<div class="claims-notes"><p class="fine">${text('source')} ${text('notAdd')}</p>${pending}${staged}</div></section>`;
 }

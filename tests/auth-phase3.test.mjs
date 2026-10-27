@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {newPasswordError,classifyIdentifier} from '../auth-policy.mjs?v=5.8.1';
-import {AyaparkApi} from '../api.mjs?v=5.8.1';
+import {AyaparkApi} from '../api.mjs?v=5.9.0';
 import {passwordLoginHandler} from '../supabase/functions/ay3-password-login/handler.mjs';
 const session={access_token:'synthetic-access',refresh_token:'synthetic-refresh',expires_in:3600,user:{id:'existing-user'}};
 function server(overrides={}){const calls=[];const options={enabled:true,origins:new Set(['https://test.invalid']),clientIp:()=> 'synthetic-ip',hash:async x=>x,delay:async()=>{},admin:{limit:async()=>true,lookup:async()=> 'existing-user',account:async()=>({email:'existing@example.invalid'}),user:async()=>({id:'manager'}),bind:async p=>calls.push(p)},signIn:async(e,p)=>{calls.push({email:e,password:p});return session;},...overrides};return {calls,handler:passwordLoginHandler(options)};}

@@ -13,6 +13,6 @@ export function showFormError(form,summary,error){
   clearFieldError(input);const doc=input.ownerDocument,id='field-error-'+form.id+'-'+input.name;
   const note=doc.createElement('p');note.id=id;note.className='field-error';note.textContent=error.message;
   input.dataset.errorId=id;input.setAttribute('aria-invalid','true');input.setAttribute('aria-describedby',((input.getAttribute('aria-describedby')||'')+' '+id).trim());
-  (input.closest('label.field')||input).insertAdjacentElement('afterend',note);input.closest('details')?.setAttribute('open','');input.focus();
+  (input.closest('label.field')||input).insertAdjacentElement('afterend',note);input.closest('details')?.setAttribute('open','');(input.type==='hidden'?input.closest('.person-picker')?.querySelector('button'):input)?.focus();
  }else summary.focus();
 }

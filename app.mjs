@@ -1,29 +1,29 @@
 import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.8.1';
-import {bindAccessRequests} from './access-request-ui.mjs?v=5.8.1';
+import {bindAccessRequests} from './access-request-ui.mjs?v=5.9.0';
 import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.8.1';
 import {prepareV5Demo} from './finance-demo.mjs?v=5.8.1';
 import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.8.1';
-import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.8.1';
+import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.9.0';
 import {bindDesign} from './design.mjs?v=5.8.1';
 import {enhanceTables} from './ui-accessibility.mjs?v=5.8.1';
-import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.8.1';
+import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.9.0';
 import {apartmentInfo} from './apartment-info.mjs?v=5.8.1';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.8.1';
-import {updateAssignmentForm} from './assignments.mjs?v=5.8.1';
-import {personManager} from './people-ui.mjs?v=5.8.1';
-import {bindInvitations} from './invite-ui.mjs?v=5.8.1';
-import {mayPreview,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.8.1';
+import {updateAssignmentForm} from './assignments.mjs?v=5.9.0';
+import {personManager} from './people-ui.mjs?v=5.9.0';
+import {bindInvitations} from './invite-ui.mjs?v=5.9.0';
+import {mayPreview,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.0';
 import {bindInstall} from './install.mjs?v=5.8.1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs?v=5.8.1';
-import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.8.1';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs?v=5.9.0';
+import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.0';
 import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.8.1';
-import {AyaparkApi} from './api.mjs?v=5.8.6';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.8.1';
+import {AyaparkApi} from './api.mjs?v=5.9.0';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.0';
 import {buildForm,payloadFor} from './forms.mjs?v=5.8.6';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
@@ -99,7 +99,7 @@ function render(focus=false){
  const previewBar=$('accessPreviewBanner');previewBar.innerHTML=previewBanner(state);previewBar.hidden=!isAccessPreview();labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
  document.dispatchEvent(new CustomEvent('ay5:view',{detail:{resident:own,page:state.page,mode:state.mode}}));
  for(const card of document.querySelectorAll('.summary-grid .card')){const links=card.querySelectorAll('a[href]');if(links.length===1&&!card.querySelector('button,input,select')){card.classList.add('stretched-card');links[0].setAttribute('aria-label',(card.querySelector('h2')?.textContent||'')+': '+links[0].textContent);}}
- $('refreshButton').hidden=true;const powerLabel=tr(state.mode==='connected'?'Çıkış yap':'Giriş yap');$('connectionButton').innerHTML=icon('power');$('connectionButton').setAttribute('aria-label',powerLabel);$('connectionButton').title=powerLabel;
+ $('refreshButton').hidden=state.mode!=='connected';const powerLabel=tr(state.mode==='connected'?'Çıkış yap':'Giriş yap');$('connectionButton').innerHTML=icon('power');$('connectionButton').setAttribute('aria-label',powerLabel);$('connectionButton').title=powerLabel;
  if(state.page==='settings'&&can(state,'admin')&&!state.auditLoading&&state.auditData!==state.data){void loadAuditPage(0);}
  for(const [id,value] of [['statusFilter',state.filter.status],['txnFilter',state.filter.type],['periodFilter',state.filter.period]])if($(id))$(id).value=value;
  if(focus)$('content').focus({preventScroll:true});
@@ -525,7 +525,8 @@ window.addEventListener('storage',event=>{
 });
 // Refresh on resume and periodically while open. Network failures preserve the saved session.
 setInterval(()=>{if(state.mode==='connected')void api.token().catch(error=>{if([400,401,403].includes(error.status)){epoch++;closeDialogs();state.mode='signedout';state.data=prepareV5Demo(fullDemo());navigate('overview');toast(error.message);}});},30000);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&state.mode==='signedout'&&api.saved())void resumeSession();});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&state.mode==='signedout'&&api.saved())void resumeSession();else if(document.visibilityState==='visible'&&state.mode==='connected'&&!writeBusy&&!document.querySelector('dialog[open]'))void reload().catch(()=>{});});
+setInterval(()=>{if(document.visibilityState==='visible'&&state.mode==='connected'&&['persons','units'].includes(state.page)&&!writeBusy&&!document.querySelector('dialog[open]'))void reload().catch(()=>{});},60000);
 void resumeSession();
 void invitationUi.inspect();
 

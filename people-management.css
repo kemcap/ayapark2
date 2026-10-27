@@ -1,0 +1,30 @@
+/* Only the two summary pairs on the resident overview change at mobile widths. */
+@media (max-width:600px){
+ :root[data-design] .resident-dashboard-claims>.summary-grid,
+ :root[data-design] .summary-grid.resident-dashboard-summary{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:.6rem;align-items:stretch}
+ :root[data-design] .resident-dashboard-claims>.summary-grid>.card,
+ :root[data-design] .summary-grid.resident-dashboard-summary>.card{grid-column:auto;display:block;min-width:0;min-height:0;padding:.8rem .65rem;border-radius:16px}
+ :root[data-design] .resident-dashboard-claims>.summary-grid .card-head,
+ :root[data-design] .summary-grid.resident-dashboard-summary .card-head{margin-bottom:.5rem;min-width:0}
+ :root[data-design] .resident-dashboard-claims>.summary-grid .card-head h2,
+ :root[data-design] .summary-grid.resident-dashboard-summary .card-head h2{font-size:.78rem;line-height:1.45;overflow-wrap:anywhere}
+ :root[data-design] .resident-dashboard-claims>.summary-grid .card-head p,
+ :root[data-design] .summary-grid.resident-dashboard-summary .card-head p{font-size:.68rem;line-height:1.5;overflow-wrap:anywhere}
+ :root[data-design] .resident-dashboard-claims>.summary-grid .large-amount,
+ :root[data-design] .summary-grid.resident-dashboard-summary .large-amount{display:block;margin:.5rem 0;font-size:clamp(1rem,4.2vw,1.4rem);line-height:1.35;white-space:normal;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+ :root[data-design] .resident-dashboard-claims>.summary-grid small,
+ :root[data-design] .summary-grid.resident-dashboard-summary .text-button{font-size:.68rem;line-height:1.5;overflow-wrap:anywhere}
+ .resident-summary-wrap{container-type:inline-size}
+ .resident-dashboard-claims{margin-bottom:.65rem;container-type:inline-size}
+ .resident-dashboard-claims .claims-notes{margin-bottom:.3rem}
+ .summary-grid.resident-dashboard-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:299px){
+ :root[data-design] .resident-dashboard-claims>.summary-grid,
+ :root[data-design] .summary-grid.resident-dashboard-summary{grid-template-columns:minmax(0,1fr)}
+}
+/* Large text gets a single-column fallback without shrinking user-selected type. */
+@container (max-width:16rem){
+ :root[data-design] .resident-dashboard-claims>.summary-grid,
+ :root[data-design] .resident-summary-wrap>.resident-dashboard-summary{grid-template-columns:minmax(0,1fr)}
+}
