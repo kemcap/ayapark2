@@ -53,3 +53,21 @@ test('superadmin sees separate permanent person deletion in list and detail',()=
  assert.doesNotMatch(personManager(state,person.id),/data-action="person_lifecycle"/);
  setLanguage('tr');
 });
+
+test('account-linked person can be archived without losing login, but purge requires explicit site revocation',()=>{
+ setLanguage('de');
+ const state=testState(), person=state.data.persons[0];
+ person.auth_user_id='11111111-1111-4111-8111-111111111111';
+ const built=buildForm(state,'person_lifecycle',{id:person.id});
+ assert.match(built.body,/name="revoke_access"/);
+ assert.match(built.body,/Bei Archivierung bleibt der App-Zugang/);
+ const archive=payloadFor('person_lifecycle',form({mode:'archive',note:'Umzug mit bestehendem Zugang',confirmation:true}),built.context);
+ assert.equal(archive.mode,'archive');
+ assert.equal(archive.revoke_access,false);
+ assert.throws(()=>payloadFor('person_lifecycle',form({mode:'delete',verify_name:person.full_name,confirmation:true}),built.context),/Standortzugangs/);
+ const purge=payloadFor('person_lifecycle',form({mode:'delete',verify_name:person.full_name,revoke_access:true,confirmation:true}),built.context);
+ assert.equal(purge.revoke_access,true);
+ const archiveAndRevoke=payloadFor('person_lifecycle',form({mode:'archive',note:'Auf eigenen Wunsch deaktiviert',revoke_access:true,confirmation:true}),built.context);
+ assert.equal(archiveAndRevoke.revoke_access,true);
+ setLanguage('tr');
+});
