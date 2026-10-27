@@ -52,9 +52,9 @@ test('dialog marks active role, provides apartment choice and escapes private na
 test('outside clicks, scrolls and Escape close a single submenu, without a sticky overlay',async()=>{
  const app=await readFile(new URL('../app.mjs',import.meta.url),'utf8');
  const css=await readFile(new URL('../v5-ui.css',import.meta.url),'utf8');
- assert.match(app,/mobileNavGroup!==null&&!\$('nav'\)\.contains\(event\.target\)/);
- assert.match(app,/event\.key==='Escape'&&mobileNavGroup!==null/);
- assert.match(app,/closeMenuOnScroll\(event,\$\('nav'\)\)/);
+ assert.ok(app.includes("mobileNavGroup!==null&&!$('nav').contains(event.target)"));
+ assert.ok(app.includes("event.key==='Escape'&&mobileNavGroup!==null"));
+ assert.ok(app.includes("closeMenuOnScroll(event,$('nav'))"));
  assert.match(css,/\.nav-view-switch/);
  const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
  assert.match(html,/id="viewSwitchDialog"/);
