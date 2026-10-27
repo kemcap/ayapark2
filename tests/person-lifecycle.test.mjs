@@ -40,3 +40,16 @@ test('archived people are moved to archive filter and restored without restoring
  const built=buildForm(state,'person_restore',{id:person.id});
  assert.equal(payloadFor('person_restore',form({confirmation:true}),built.context).mode,'restore');
 });
+
+test('superadmin sees separate permanent person deletion in list and detail',()=>{
+ setLanguage('tr');
+ const state=testState(),person=state.data.persons[0];
+ const page=peoplePage(state),detail=personManager(state,person.id);
+ assert.match(page,new RegExp('data-action="person_lifecycle" data-id="'+person.id+'"'));
+ assert.match(detail,new RegExp('data-action="person_lifecycle" data-id="'+person.id+'"'));
+ assert.match(detail,/Kişiyi sil/);
+ state.data.role='staff';state.data.capabilities={people:true};
+ assert.doesNotMatch(peoplePage(state),/data-action="person_lifecycle"/);
+ assert.doesNotMatch(personManager(state,person.id),/data-action="person_lifecycle"/);
+ setLanguage('tr');
+});
