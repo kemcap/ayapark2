@@ -36,7 +36,9 @@ export function buildV3Form(s,action,args={}){
  else if(action==='person'){
   const p=d.persons?.find(x=>x.id===args.id);context.person_id=p?.id||'';const unit=args.unit;
   title=tr(p?'Kişi bilgilerini düzenle':'Yeni kişi');
-  body=field('first_name',tr('Ad'),'text',p?.first_name||'','required maxlength="75"')+field('last_name',tr('Soyad'),'text',p?.last_name||'','required maxlength="75"')+field('phone',tr('Telefon'),'tel',p?.phone||'','maxlength="60"')+field('email',tr('E-posta'),'email',p?.email||'','maxlength="254"')+sel('language','İletişim dili',[['tr','Türkçe'],['de','Deutsch'],['en','English'],['fr','Français'],['ru','Русский'],['other',tr('Başka dil')]],p?.language||'tr')+text('notes','Notlar',p?.notes||'')+(s.data.role==='super'?sel('auth_user_id','Uygulama hesabı',[['',tr('Hesap bağlanmadı')],...[...new Map([...(d.residentAccounts||[]).map(a=>[a.user_id,a.label||a.user_id]),...(d.staff||[]).map(a=>[a.user_id,a.name||a.email||tr('Ad bağlanmadı')]),...(p?.auth_user_id?[[p.auth_user_id,p.full_name]]:[])]).entries()]],p?.auth_user_id||''):'');
+  body=field('first_name',tr('Ad'),'text',p?.first_name||'','required maxlength="75"')+field('last_name',tr('Soyad'),'text',p?.last_name||'','required maxlength="75"')+field('phone',tr('Telefon'),'tel',p?.phone||'','maxlength="60"')+field('email',tr('E-posta'),'email',p?.email||'','maxlength="254"')+sel('language','İletişim dili',[['tr','Türkçe'],['de','Deutsch'],['en','English'],['fr','Français'],['ru','Русский'],['other',tr('Başka dil')]],p?.language||'tr')+text('notes','Notlar',p?.notes||'')
+  +(p?'':`<div class="person-initial-assignment">${sel('unit_id','Daire',[['',tr('Daire seçin.')],...(d.units||[]).map(u=>[u.id,u.code])],unit||'')}${sel('role','Dairedeki rol',[['',tr('Rol seçin.')],['owner',tr('Ev sahibi')],['tenant',tr('Kiracı')],['representative',tr('Temsilci')]])}<p class="fine">${tr('Kişi kaydedildiğinde daire ve rolü de aynı anda atanır.')}</p></div>`)
+  +(s.data.role==='super'?sel('auth_user_id','Uygulama hesabı',[['',tr('Hesap bağlanmadı')],...[...new Map([...(d.residentAccounts||[]).map(a=>[a.user_id,a.label||a.user_id]),...(d.staff||[]).map(a=>[a.user_id,a.name||a.email||tr('Ad bağlanmadı')]),...(p?.auth_user_id?[[p.auth_user_id,p.full_name]]:[])]).entries()]],p?.auth_user_id||''):'');
  }
  else if(action==='bind_charge'){
   const c=d.charges.find(c=>c.id===args.id);title=tr('Sorumlu kişiyi seçin');body=sel('link_id','Kişi',[['',tr('Kişi seçin.')],...d.links.filter(l=>l.unit_id===c?.unit_id).map(l=>[l.id,personName(d,l.person_id)+' · '+roleLabel(l.role)+' · '+l.starts_on+(l.ends_on?' – '+l.ends_on:'')])])+`<p class="fine">${tr('Borç bu kişiye bağlanır. Sonraki sakin değişiklikleri bunu değiştirmez.')}</p>`;
@@ -84,6 +86,10 @@ export function payloadV3(action,form,ctx){
  const p={...ctx};for(const[k,v]of form)p[k]=String(v).trim();const get=k=>String(form.get(k)||'').trim();
  if(['void_credit'].includes(action)&&!form.has('confirmation'))throw Error(tr('Devam etmek için onay kutusunu işaretleyin.'));
  if(action==='person'&&(!get('first_name')||!get('last_name')))throw Error(tr('Ad ve soyad gerekli.'));
+ if(action==='person'&&!ctx.person_id){
+  if(!get('unit_id'))throw Error(tr('Yeni kişi için daire seçin.'));
+  if(!['owner','tenant','representative'].includes(get('role')))throw Error(tr('Yeni kişi için rol seçin.'));
+ }
  if(action==='staff_remove'){p.user_id=ctx.user_id;p.confirmation=true;}
  p.primary_contact=form.has('primary_contact');if(action==='user_access'){p.confirmation=true;p.new_person=get('person_mode')==='new';if(p.new_person&&(!get('first_name')||!get('last_name')||!get('email')))throw Error(tr('Ad, soyad ve geçerli e-posta gerekli.'));}
  if(action==='bind_charge'&&!get('link_id'))throw Error(tr('Kişi seçin.'));
