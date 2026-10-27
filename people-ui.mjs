@@ -7,7 +7,7 @@ import {can,heading,card,button,badge,date} from './ui.mjs?v=5.9.0';
 import {remaining} from './ledger.mjs?v=5.8.1';
 import {roleLabel} from './v3-ui.mjs?v=5.9.0';
 import {removalReasons} from './assignments.mjs?v=5.9.0';
-import {recoveryEligible} from './admin-recovery-ui.mjs?v=5.8.1';
+import {recoveryEligible} from './admin-recovery-ui.mjs?v=5.9.2';
 import {inviteEligible} from './invite-ui.mjs?v=5.9.0';
 import {getLanguage} from './i18n.mjs?v=5.8.1';
 const loc=(de,trText)=>getLanguage()==='de'?de:trText;

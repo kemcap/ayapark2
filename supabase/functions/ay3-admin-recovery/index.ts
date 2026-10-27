@@ -7,8 +7,8 @@ Deno.serve(adminRecoveryHandler({enabled:Deno.env.get('ENABLE_ADMIN_RECOVERY')==
  hash:async(v:string)=>{const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return [...new Uint8Array(await crypto.subtle.sign('HMAC',k,new TextEncoder().encode(v)))].map(n=>n.toString(16).padStart(2,'0')).join('');},
  admin:{user:async(t:string)=>{const {data,error}=await client.auth.getUser(t);return error?null:data.user;},
  limit:(b:string,l:number)=>rpc('ay_auth_login_limit',{p_bucket:b,p_limit:l}),
- authorize:(a:string,p:string,r:string,c:boolean)=>rpc('ay_auth_recovery_authorize',{p_actor:a,p_person:p,p_reason:r,p_confirmed:c}),
+ authorize:(a:string,p:string,r:string,c:boolean,staff:boolean)=>rpc('ay_auth_recovery_authorize_v2',{p_actor:a,p_person:p,p_reason:r,p_confirmed:c,p_staff_confirmed:staff}),
  account:async(id:string)=>{const {data,error}=await client.auth.admin.getUserById(id);if(error)throw error;return data.user;},
  generate:async(email:string)=>{const {data,error}=await client.auth.admin.generateLink({type:'recovery',email});if(error)throw error;return data;},
- issued:(a:string,p:string,u:string)=>rpc('ay_auth_recovery_issued',{p_actor:a,p_person:p,p_user:u})}
+ issued:(a:string,p:string,u:string,staff:boolean)=>rpc('ay_auth_recovery_issued_v2',{p_actor:a,p_person:p,p_user:u,p_staff_confirmed:staff})}
 }));
