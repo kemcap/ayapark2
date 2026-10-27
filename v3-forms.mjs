@@ -3,7 +3,7 @@ import {effectiveOccupancy} from './relationships.mjs?v=5.8.1';
 import {announcementTime,validateAnnouncement} from './announcement-validation.mjs?v=5.8.1';
 import {t as tr} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,randomId,money} from './core.mjs?v=5.8.1';
-import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.8.1';
+import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.8.4';
 import {today,personName,personLinks,activeAt,dateValid} from './v3-domain.mjs?v=5.8.1';
 import {roleLabel} from './v3-ui.mjs?v=5.8.1';
 const sel=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}">${options.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(l)}</option>`).join('')}</select></label>`;
