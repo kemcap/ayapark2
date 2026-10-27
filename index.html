@@ -62,19 +62,20 @@
 <dialog id="inviteDialog" aria-labelledby="inviteTitle" class="invitation-dialog">
  <div class="dialog-kicker">AYAPARK 2 · DAVET</div><h2 id="inviteTitle">Davet</h2>
  <p id="invitePersonLabel" class="muted"></p>
- <label class="field">Giriş yöntemi<select id="inviteContactKind"><option value="phone">Telefon</option><option value="email">E-posta</option></select></label>
+ <label class="field">Giriş yöntemi<select id="inviteContactKind"><option value="link">Yalnız bağlantı (iletişim bilgisi gerekmez)</option><option value="phone">Telefon</option><option value="email">E-posta</option></select></label>
  <label class="field" id="inviteEmailField">Davet e-postası<input id="inviteEmail" type="email" autocomplete="email"></label>
- <label class="field">WhatsApp telefonu<input id="invitePhone" type="tel" autocomplete="tel"></label>
+ <label class="field">WhatsApp telefonu (isteğe bağlı, paylaşım için)<input id="invitePhone" type="tel" autocomplete="tel"></label>
  <label class="field">Davet metni<textarea id="inviteMessage" rows="9"></textarea></label>
  <label class="invite-consent"><input type="checkbox" id="inviteConfirm"><span>Bu kişi için erişim yetkisini onaylıyorum. Otomatik gönderim yapılmaz.</span></label>
  <button type="button" id="inviteRevoke" class="button">Bekleyen davetleri iptal et</button>
  <button type="button" id="inviteGenerate" class="button primary">Bağlantı oluştur</button>
  <label class="field">Kişisel bağlantı<input type="url" id="inviteLink" readonly aria-label="Davet bağlantısı"></label>
- <p class="fine">Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir. Giriş için telefon veya e-posta seçin.</p>
+ <p class="fine">Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir. Telefon veya e-posta olmadan kayıt için kişisel kullanıcı kodu oluşturulur.</p>
  <p id="inviteStatus" role="status" aria-live="polite"></p>
  <div class="invite-actions"><button type="button" class="button" id="inviteCopyLink" disabled>Bağlantıyı kopyala</button><button type="button" class="button" id="inviteCopyText" disabled>Metni kopyala</button><button type="button" class="button primary" id="inviteWhatsApp" disabled>WhatsApp</button></div>
  <form method="dialog" class="dialog-actions"><button type="submit" class="button">Kapat</button></form>
 </dialog>
+<dialog id="inviteIdentifierDialog" class="invitation-dialog" aria-labelledby="inviteIdentifierTitle"><h2 id="inviteIdentifierTitle">Kullanıcı kodunuz</h2><p>Gelecek girişleriniz için bu kodu güvenli bir yerde saklayın. Telefon veya e-posta gerekli değildir. Kod kaybolursa yönetime başvurun.</p><label class="field">Kullanıcı kodu<input id="inviteGeneratedIdentifier" type="text" readonly aria-label="Kullanıcı kodu"></label><p id="inviteIdentifierStatus" role="status"></p><div class="dialog-actions"><button type="button" class="button" id="inviteIdentifierCopy">Kodu kopyala</button><button type="button" class="button primary" id="inviteIdentifierContinue">Devam et</button></div></dialog>
 <dialog id="inviteActivateDialog" class="invitation-dialog" aria-labelledby="inviteActivationTitle">
  <h2 id="inviteActivationTitle">Hesabımı etkinleştir</h2>
  <p class="muted">Lütfen kendi şifrenizi oluşturun.</p>

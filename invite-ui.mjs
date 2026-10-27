@@ -20,12 +20,12 @@ export function whatsappShareUrl(phone,message) {
  const number=whatsappNumber(phone);
  return number?'https://wa.me/'+number+'?text='+encodeURIComponent(message):'';
 }
-export function inviteText({name,units,link='',language='tr',contactKind='phone'}) {
+export function inviteText({name,units,link='',language='tr',contactKind='link'}) {
  const unit=String(units||'').trim();
  const salutation=String(name||'')+(unit?' ('+unit+')':'');
  return language==='de'
- ? '🏡 Willkommen bei AYAPARK 2!\n\nHallo '+salutation+' 👋\n\nUnsere App bietet dir Informationen zu Hausgeld, Mitteilungen und deiner Wohnung.\n\n📲 Konto erstellen:\n'+(link||'[EINLADUNGSLINK]')+'\n\n🔐 '+(contactKind==='email'?'Persönliche Einladung.':'Anmeldung ohne E-Mail.')+' 7 Tage gültig und nur einmal verwendbar.\n\nAYAPARK 2 Verwaltung 🌿'
- : '🏡 AYAPARK 2’ye Hoş Geldiniz!\n\nMerhaba '+salutation+' 👋\n\nSite yönetim uygulamamızla aidat, duyuru ve daire bilgilerinize kolayca ulaşabilirsiniz.\n\n📲 Hesabınızı oluşturmak için:\n'+(link||'[DAVET BAĞLANTISI]')+'\n\n🔐 '+(contactKind==='email'?'Kişisel davet.':'E-posta gerekmez.')+' Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir.\n\nAYAPARK 2 Site Yönetimi 🌿';
+ ? '🏡 Willkommen bei AYAPARK 2!\n\nHallo '+salutation+' 👋\n\nUnsere App bietet dir Informationen zu Hausgeld, Mitteilungen und deiner Wohnung.\n\n📲 Konto erstellen:\n'+(link||'[EINLADUNGSLINK]')+'\n\n🔐 '+(contactKind==='email'?'Persönliche Einladung.':contactKind==='link'?'Keine Telefonnummer oder E-Mail erforderlich.':'Anmeldung ohne E-Mail.')+' 7 Tage gültig und nur einmal verwendbar.\n\nAYAPARK 2 Verwaltung 🌿'
+ : '🏡 AYAPARK 2’ye Hoş Geldiniz!\n\nMerhaba '+salutation+' 👋\n\nSite yönetim uygulamamızla aidat, duyuru ve daire bilgilerinize kolayca ulaşabilirsiniz.\n\n📲 Hesabınızı oluşturmak için:\n'+(link||'[DAVET BAĞLANTISI]')+'\n\n🔐 '+(contactKind==='email'?'Kişisel davet.':contactKind==='link'?'Telefon veya e-posta gerekli değil.':'E-posta gerekmez.')+' Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir.\n\nAYAPARK 2 Site Yönetimi 🌿';
 }
 const tx=(tr,de)=>getLanguage()==='de'?de:tr;
 const $=id=>document.getElementById(id);
@@ -47,9 +47,9 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
    .map(link=>s.data.units.find(unit=>unit.id===link.unit_id)?.code).filter(Boolean))].join(', ');
   selected={id:person.id,name:person.full_name||'',units,email:person.email||''};
   inviteUrl='';
-  $('invitePersonLabel').textContent=selected.name+' · '+(units||'—')+' · '+selected.email;
+  $('invitePersonLabel').textContent=selected.name+' · '+(units||'—')+(selected.email?' · '+selected.email:'');
   $('invitePhone').value=person.phone||'';
-  $('inviteEmail').value=person.email||'';$('inviteContactKind').value=person.phone?'phone':'email';$('inviteEmailField').hidden=$('inviteContactKind').value!=='email';
+  $('inviteEmail').value=person.email||'';$('inviteContactKind').value=person.phone?'phone':person.email?'email':'link';$('inviteEmailField').hidden=$('inviteContactKind').value!=='email';
   message.value=inviteText({name:selected.name,units,language:getLanguage(),contactKind:$('inviteContactKind').value});
   $('inviteConfirm').checked=false;
   $('inviteGenerate').disabled=false;
@@ -74,9 +74,9 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
   if(!inviteEligible(s,s.data.persons.find(p=>p.id===selected.id))){setStatus(tx('Kişi bilgileri değişti. Sayfayı yenileyin.','Der Personenstatus hat sich geändert. Bitte aktualisieren.'),true);return;}
   inviteBusy=true;button.disabled=true;$('inviteRevoke').disabled=true;setStatus(tx('Hesap hazırlanıyor ve güvenli bağlantı oluşturuluyor…','Konto wird vorbereitet und der geschützte Link erstellt…'));
   try{
-   const phone=whatsappNumber($('invitePhone').value);
-   if($('inviteContactKind').value!=='email'&&!phone)throw Error(tx('Geçerli bir WhatsApp numarası girin.','Bitte eine gültige WhatsApp-Nummer eintragen.'));
-   const result=await api.invitation({action:'create',person_id:selected.id,phone,contact_kind:$('inviteContactKind').value,email:$('inviteEmail').value,confirmed:true},true);
+   const kind=$('inviteContactKind').value,phone=kind==='phone'?whatsappNumber($('invitePhone').value):'';
+   if(kind==='phone'&&!phone)throw Error(tx('Geçerli bir WhatsApp numarası girin.','Bitte eine gültige WhatsApp-Nummer eintragen.'));
+   const result=await api.invitation({action:'create',person_id:selected.id,phone,contact_kind:kind,email:kind==='email'?$('inviteEmail').value:'',confirmed:true},true);
    if(typeof result?.url!=='string'||!result.url.startsWith(new URL('./',location.href).href+'?invite='))throw Error(tx('Sunucudan geçerli bir davet bağlantısı alınamadı. Lütfen tekrar deneyin.','Der Server hat keinen gültigen Einladungslink geliefert. Bitte erneut versuchen.'));
    inviteUrl=result.url;
    $('inviteLink').value=inviteUrl;
@@ -119,6 +119,10 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
   if(!token)return;
   const url=new URL(location.href);url.searchParams.delete('invite');history.replaceState(null,'',url.pathname+url.search+url.hash);token=null;preview=null;
  }
+ $('inviteIdentifierCopy').addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText($('inviteGeneratedIdentifier').value);$('inviteIdentifierStatus').textContent=tx('Kopyalandı.','Kopiert.');}
+  catch{$('inviteIdentifierStatus').textContent=tx('Kodu seçip kopyalayın.','Bitte Kennung markieren und kopieren.');}
+ });
  const form=$('inviteActivateForm'),activationStatus=$('inviteActivateStatus'),activationDialog=$('inviteActivateDialog');
  $('inviteActivationCancel').addEventListener('click',()=>activationDialog.close());
  form.addEventListener('submit',async(event)=>{
@@ -132,10 +136,14 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
    const result=await api.invitation({action:'activate',token,password});
    const phone=result.identifier||result.phone;
    clearUrl();activationDialog.close();form.reset();
-   try{await onActivated({phone,password});}
-   catch{
-    openPhoneLogin(phone);
-   }
+   let signedIn=true;
+   try{await onActivated({phone,password});}catch{signedIn=false;}
+   if(/^AY2-[A-HJ-NP-Z2-9]{12}$/.test(phone)){
+    $('inviteGeneratedIdentifier').value=phone;
+    $('inviteIdentifierStatus').textContent='';
+    $('inviteIdentifierDialog').showModal();
+    $('inviteIdentifierContinue').onclick=()=>{$('inviteIdentifierDialog').close();if(!signedIn)openPhoneLogin(phone);};
+   }else if(!signedIn)openPhoneLogin(phone);
   }catch(err){activationStatus.textContent=err.message||tx('Hesap etkinleştirilemedi.','Konto konnte nicht aktiviert werden.');}
   finally{submit.disabled=false;}
  });

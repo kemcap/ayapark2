@@ -7,6 +7,8 @@ const KEY='sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc';
 export function loginIdentifier(input){
  const raw=String(input||'').trim();
  if(raw.includes('@'))return raw;
+ const code=/^AY2-([A-HJ-NP-Z2-9]{12})$/i.exec(raw);
+ if(code)return 'resident-code-'+code[1].toLowerCase()+'@ayapark2.invalid';
  if(!/^[+()\d\s./-]+$/.test(raw))return raw;
  let digits=raw.replace(/\D/g,'');
  if(digits.startsWith('00'))digits=digits.slice(2);
