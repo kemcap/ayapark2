@@ -2,7 +2,7 @@ import {PGlite} from '@electric-sql/pglite';import {readFile} from 'node:fs/prom
 const db=new PGlite();let passed=0;const id=n=>'6f000000-0000-0000-0000-'+String(n).padStart(12,'0');const hash=n=>String(n).repeat(64);
 const scalar=async(sql,args=[])=>Object.values((await db.query(sql,args)).rows[0])[0];const check=(label,v)=>{assert(v,label);passed++;};const denied=async(sql,args)=>{let fail=false;try{await db.query(sql,args);}catch{fail=true;}check('denied',fail);};
 try{
- for(const path of ['./schema.sql','../../supabase/migrations/20261026_email_free_whatsapp_activation.sql','../../supabase/auth-phase3.sql','../../supabase/auth-phase4.sql','../../supabase/auth-phase5.sql','../../supabase/auth-phase6.sql','../../supabase/auth-phase8.sql'])await db.exec(await readFile(new URL(path,import.meta.url),'utf8'));
+ for(const path of ['./schema.sql','../../supabase/migrations/20261026_email_free_whatsapp_activation.sql','../../supabase/auth-phase3.sql','../../supabase/auth-phase4.sql','../../supabase/auth-phase5.sql','../../supabase/auth-phase6.sql','../../supabase/auth-phase8.sql','../../supabase/migrations/20261027135000_contactless_invite_alias.sql'])await db.exec(await readFile(new URL(path,import.meta.url),'utf8'));
  await db.exec(`insert into auth.users(id,email) values('${id(1)}','manager@example.invalid'),('${id(2)}','emailonly@example.invalid'),('${id(3)}','alien@example.invalid'),('${id(4)}','resident-905321234567@ayapark2.invalid');
  insert into public.site_sites(id,slug,name) values('${id(10)}','integration-qa','Synthetic');
  insert into public.site_blocks(id,site_id,code) values('${id(11)}','${id(10)}','A');
@@ -30,5 +30,19 @@ try{
  check('only authorized unit assigned',await scalar('select count(*)::int from public.site_resident_units where user_id=$1 and unit_id=$2 and role=$3',[id(2),id(12),'tenant'])===1);
  check('existing phone flow remains compatible',await scalar('select auth_user_id from public.ay3_persons where id=$1',[id(21)])===id(4));
  check('no phone binding for email-only',await scalar('select count(*)::int from ay_auth_private.phone_contacts where user_id=$1',[id(2)])===0);
+ // A contactless code is an internal Auth alias, never a real email in the residents table.
+ await db.exec("reset role;insert into auth.users(id,email) values('"+id(5)+"','resident-code-abcdefghjkmn@ayapark2.invalid');insert into public.ay3_persons(id,site_id,full_name,phone,email) values('"+id(22)+"','"+id(10)+"','Contactless','','');insert into public.ay3_links(site_id,unit_id,person_id,role,active) values('"+id(10)+"','"+id(12)+"','"+id(22)+"','tenant',true);set role service_role;");
+ await db.query(issue,[id(1),id(22),'resident-code-abcdefghjkmn@ayapark2.invalid',hash(5)]);
+ await db.exec('reset role');
+ check('contactless invite valid seven days',await scalar("select expires_at-created_at=interval '7 days' from public.ay3_invite_tokens where token_hash=$1",[hash(5)]));
+ check('contactless invitation does not grant early apartment access',await scalar('select count(*)::int from public.site_resident_units where user_id=$1',[id(5)])===0);
+ await db.exec('set role service_role');
+ await db.query(redeem,[hash(5),id(5)]);
+ await denied(redeem,[hash(5),id(5)]);
+ await db.exec('reset role');
+ check('internal Auth identifier does not overwrite contact email',await scalar("select coalesce(email,'')='' from public.ay3_persons where id=$1",[id(22)]));
+ check('no invented phone number',await scalar("select coalesce(phone,'')='' from public.ay3_persons where id=$1",[id(22)]));
+ check('contactless user limited to linked unit',await scalar('select count(*)::int from public.site_resident_units where user_id=$1 and unit_id=$2',[id(5),id(12)])===1);
+ check('contactless recipient gains no administrative role',await scalar('select count(*)::int from public.site_staff_memberships where user_id=$1',[id(5)])===0);
  console.log(JSON.stringify({passed,failed:0,scope:'combined drafts, synthetic SQL, no GoTrue'}));
 }finally{await db.close();}
