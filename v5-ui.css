@@ -72,3 +72,8 @@
  #residentPreviewSelect{width:100%}
 }
 @media print{.role-preview-control,.preview-target-bar{display:none!important}}
+
+/* Explicit person deletion, distinct from removing a role. */
+.button[data-action="person_lifecycle"]{border:1px solid var(--red);color:var(--red);background:transparent;min-height:44px;white-space:normal}
+.button[data-action="person_lifecycle"]:hover{background:color-mix(in srgb,var(--red) 9%,transparent)}
+.button[data-action="person_lifecycle"]:focus-visible{outline:3px solid var(--red);outline-offset:2px}
