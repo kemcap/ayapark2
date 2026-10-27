@@ -1,0 +1,124 @@
+/* Ayapark 2: spacious desktop layouts.
+   Deliberately screen-only and min-width gated: layouts below 1440px,
+   print views, login and modal proportions keep their existing rules. */
+
+@media screen and (min-width:1440px) {
+  .workspace { min-width:0; }
+  main#content { max-width:1640px; }
+  :root[data-design="modern"] main#content { max-width:1680px; }
+
+  /* Grid items must be allowed to shrink before a table can scroll locally. */
+  .summary-grid > *,
+  .main-grid > *,
+  .building-plan > *,
+  .provider-grid > *,
+  .unit-card-grid > * { min-width:0; }
+  main#content .table-wrap { max-width:100%; overflow-x:auto; }
+  main#content .table-wrap table { width:100%; }
+
+  .unit-toolbar {
+    grid-template-columns:minmax(280px,1.6fr) auto minmax(170px,220px) auto;
+    column-gap:18px;
+  }
+
+  /* Authentication pages remain deliberately narrow. */
+  body.signed-out main#content,
+  :root[data-design="modern"] body.signed-out main#content { max-width:800px; }
+}
+
+@media screen and (min-width:1920px) {
+  .workspace {
+    --ay-wide-max:1920px;
+    --ay-wide-inset:52px;
+  }
+  .shell { grid-template-columns:264px minmax(0,1fr); }
+  :root[data-design="modern"] .shell { grid-template-columns:248px minmax(0,1fr); }
+
+  main#content,
+  :root[data-design="modern"] main#content {
+    max-width:var(--ay-wide-max);
+    padding-inline:var(--ay-wide-inset);
+  }
+
+  /* Align top controls with centered dashboard content on ultrawide screens. */
+  .topbar,
+  :root[data-design="modern"] .topbar {
+    padding-inline:max(var(--ay-wide-inset),calc((100% - var(--ay-wide-max))/2 + var(--ay-wide-inset)));
+  }
+  .context-bar,
+  :root[data-design="modern"] .context-bar,
+  .preview-target-bar {
+    margin-inline:max(var(--ay-wide-inset),calc((100% - var(--ay-wide-max))/2 + var(--ay-wide-inset)));
+  }
+
+  .summary-grid,
+  :root[data-design="modern"] .summary-grid { gap:22px; }
+  .main-grid,
+  :root[data-design="modern"] .main-grid {
+    grid-template-columns:minmax(0,1.65fr) minmax(350px,1fr);
+    gap:26px;
+  }
+
+  /* Two blocks beside each other; legible unit cards in each block. */
+  .building-plan,
+  :root[data-design="modern"] .building-plan {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:28px;
+  }
+  .unit-card-grid,
+  :root[data-design="modern"] .unit-card-grid {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+  }
+
+  .provider-grid,
+  :root[data-design="modern"] .provider-grid {
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));
+    gap:22px;
+  }
+  .report-metrics { grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); }
+  .unit-toolbar { grid-template-columns:minmax(360px,2fr) auto minmax(220px,280px) auto; }
+  main#content .table-wrap td,
+  main#content .table-wrap th { padding-inline:14px; }
+
+  body.signed-out main#content,
+  :root[data-design="modern"] body.signed-out main#content {
+    max-width:800px;
+    padding-inline:32px;
+  }
+}
+
+@media screen and (min-width:2560px) {
+  .workspace { --ay-wide-max:2380px; --ay-wide-inset:56px; }
+  .shell { grid-template-columns:276px minmax(0,1fr); }
+  :root[data-design="modern"] .shell { grid-template-columns:264px minmax(0,1fr); }
+  .main-grid,
+  :root[data-design="modern"] .main-grid {
+    grid-template-columns:minmax(0,1.75fr) minmax(440px,1fr);
+    gap:30px;
+  }
+  .unit-card-grid,
+  :root[data-design="modern"] .unit-card-grid {
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+  .provider-grid,
+  :root[data-design="modern"] .provider-grid {
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr));
+  }
+  .summary-grid,
+  :root[data-design="modern"] .summary-grid { gap:26px; }
+  .report-metrics { grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+}
+
+@media screen and (min-width:3200px) {
+  /* Do not stretch reading lines or forms across an entire 4K display. */
+  .workspace { --ay-wide-max:2840px; --ay-wide-inset:64px; }
+  .shell { grid-template-columns:284px minmax(0,1fr); }
+  :root[data-design="modern"] .shell { grid-template-columns:270px minmax(0,1fr); }
+  .building-plan,
+  :root[data-design="modern"] .building-plan { gap:36px; }
+  .unit-card-grid,
+  :root[data-design="modern"] .unit-card-grid { gap:18px; }
+  .main-grid,
+  :root[data-design="modern"] .main-grid { gap:32px; }
+}
