@@ -20,7 +20,7 @@ export function whatsappShareUrl(phone,message) {
  const number=whatsappNumber(phone);
  return number?'https://wa.me/'+number+'?text='+encodeURIComponent(message):'';
 }
-export function inviteText({name,units,link='',language='tr',contactKind='link'}) {
+export function inviteText({name,units,link='',language='tr',contactKind='phone'}) {
  const unit=String(units||'').trim();
  const salutation=String(name||'')+(unit?' ('+unit+')':'');
  return language==='de'
@@ -64,8 +64,8 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
   try{await api.invitation({action:'revoke',person_id:selected.id,confirmed:true},true);inviteUrl='';$('inviteLink').value='';message.value=inviteText({name:selected.name,units:selected.units,language:getLanguage(),contactKind:$('inviteContactKind').value});toggleSend();setStatus(tx('Bekleyen davetler iptal edildi.','Ausstehende Einladungen widerrufen.'));}
   catch(e){setStatus(e.message,true);}finally{inviteBusy=false;b.disabled=false;$('inviteGenerate').disabled=false;}
  });
- $('invitePhone').addEventListener('input',()=>{if(inviteUrl){inviteUrl='';$('inviteLink').value='';message.value=inviteText({name:selected.name,units:selected.units,language:getLanguage(),contactKind:$('inviteContactKind').value});setStatus(tx('Numara değişti. Yeni bağlantı oluşturun.','Nummer geändert. Bitte einen neuen Link erstellen.'));}toggleSend();});
- $('inviteEmail').addEventListener('input',()=>{inviteUrl='';$('inviteLink').value='';toggleSend();});
+ $('invitePhone').addEventListener('input',()=>{if(inviteUrl&&$('inviteContactKind').value==='phone'){inviteUrl='';$('inviteLink').value='';message.value=inviteText({name:selected.name,units:selected.units,language:getLanguage(),contactKind:$('inviteContactKind').value});setStatus(tx('Numara değişti. Yeni bağlantı oluşturun.','Nummer geändert. Bitte einen neuen Link erstellen.'));}toggleSend();});
+ $('inviteEmail').addEventListener('input',()=>{if($('inviteContactKind').value==='email'){inviteUrl='';$('inviteLink').value='';}toggleSend();});
  $('inviteContactKind').addEventListener('change',()=>{inviteUrl='';$('inviteLink').value='';$('inviteEmailField').hidden=$('inviteContactKind').value!=='email';toggleSend();});
  $('inviteGenerate').addEventListener('click',async ()=>{
   if(!selected||inviteBusy)return;
