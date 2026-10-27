@@ -30,9 +30,10 @@ test('person lifecycle offers archive and actual removal with separate confirmat
 });
 test('archived people are moved to archive filter and restored without restoring apartment links',()=>{
  const state=testState(),person=state.data.persons[0];
+ person.full_name='Archive QA Fixture';
  person.archived_at='2026-10-27T13:00:00Z';
  person.archive_note='Taşındı';
- assert(!peoplePage(state).includes(`data-action="person_manage" data-id="${person.id}"`));
+ assert(!peoplePage(state).includes(person.full_name));
  state.peopleFilter='archived';
  assert(peoplePage(state).includes(person.full_name));
  assert(personManager(state,person.id).includes('person_restore'));
