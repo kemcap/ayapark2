@@ -3,9 +3,9 @@ import {escapeHtml as escape,money} from './core.mjs?v=5.8.1';
 
 const labels={
  own:['Dairelerimin açık borçları','Meine offenen Forderungen'],
- site:['Sitenin toplam açık alacakları','Offene Forderungen der gesamten Wohnanlage'],
+ site:['Sitenin Toplam Alacakları','Offene Forderungen der gesamten Wohnanlage'],
  ownNote:['Yalnızca erişim yetkiniz olan daireleriniz','Nur Ihre berechtigten Wohnungen'],
- siteNote:['Tüm 20 daire; dairelerinizin borçları zaten dahildir','Alle Wohnungen; Ihre Forderungen sind bereits enthalten'],
+ siteNote:['Tüm 20 dairenin borçları dahildir. Sizin borcunuz da bu tutara dahildir.','Alle Wohnungen; Ihre Forderungen sind bereits enthalten'],
  notAdd:['Bu iki tutar toplanmaz.','Beide Beträge dürfen nicht addiert werden.'],
  unavailable:['Şu anda hesaplanamıyor','Derzeit nicht verfügbar'],
  detail:['Daire bazında döküm','Aufschlüsselung nach Wohnung'],
