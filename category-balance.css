@@ -187,3 +187,9 @@
   .devir-archive::details-content,
   .balance-mobile-item::details-content{transition:none}
 }
+
+/* The archive is a separate sibling card, so its phone table switches independently. */
+@media screen and (max-width:760px){
+ .devir-archive .balance-desktop{display:none}
+ .devir-archive .balance-mobile{display:block}
+}
