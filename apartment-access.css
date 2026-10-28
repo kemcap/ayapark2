@@ -98,3 +98,30 @@
 @media(prefers-reduced-motion:reduce){
   .apartment-access-chevron{transition:none}
 }
+
+/* Phone layout: one readable apartment card per row; actions remain compact. */
+@media screen and (max-width:600px){
+  .unit-card-grid,
+  :root[data-design="modern"] .unit-card-grid{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .apartment-card .apartment-access-person{
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    column-gap:12px;
+  }
+  .apartment-card .apartment-access-actions{justify-content:flex-end;}
+  .apartment-card .apartment-access-actions .button{
+    min-height:44px;
+    padding-inline:12px;
+    white-space:nowrap;
+  }
+  .apartment-card .apartment-open,
+  :root[data-design="modern"] .apartment-card .apartment-open{
+    padding:15px;
+  }
+}
+@media screen and (max-width:340px){
+  .apartment-card .apartment-access-person{grid-template-columns:minmax(0,1fr);}
+  .apartment-card .apartment-access-actions{justify-content:flex-start;}
+}
