@@ -4,7 +4,8 @@ const base='./'+bundle+'/';
 const [{renderPage,labels},{fullDemo},{navigation,unitDetailV3},{buildForm},{updateAssignmentForm},i18n,prefs]=await Promise.all(['ui.mjs','ledger.mjs','v3-ui.mjs','forms.mjs','assignments.mjs','i18n.mjs','preferences.mjs'].map(f=>import(base+f+(bundle==='current'?'?v=5.3.1':''))));
 let design;try{design=await import(base+'design.mjs?v=5.8.0');}catch{}
 const template=new DOMParser().parseFromString(await (await fetch(base+'index.html')).text(),'text/html');
-for(const f of ['styles.css','recovery.css','install-tutorial.css','v4-ui.css','modern.css','v5-ui.css','invite-ui.css','site-claims.css']){const link=document.createElement('link');link.rel='stylesheet';link.href=base+f;document.head.append(link);}
+// Use every production stylesheet in its real cascade order, including later refinements.
+for(const sheet of template.querySelectorAll('link[rel=stylesheet]')){const link=document.createElement('link');link.rel='stylesheet';link.href=new URL(sheet.getAttribute('href'),new URL(base,location.href)).href;document.head.append(link);}
 let enhance;try{enhance=(await import(base+'ui-accessibility.mjs')).enhanceTables;}catch{}
 // Measure settled presentation; entry opacity animations otherwise produce false contrast failures.
 const settledStyle=document.createElement('style');settledStyle.textContent='*,*::before,*::after{animation:none!important;transition:none!important}';document.head.append(settledStyle);
