@@ -1,4 +1,4 @@
-import {categoryBalanceSummary} from './category-balance-ui.mjs?v=5.9.8';
+import {categoryBalanceSummary} from './category-balance-ui.mjs?v=5.9.9';
 import {registrationStatus} from './person-status.mjs?v=5.9.0';
 import {apartmentAmounts} from './seven-ux.mjs?v=5.8.1';
 import {financePanel} from './finance-forms.mjs?v=5.8.1';
