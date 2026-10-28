@@ -1,0 +1,100 @@
+
+/* AYAPARK 2 — compact, accessible access management on apartment tiles. */
+.apartment-card .apartment-access{
+  margin:0 10px 10px;
+  padding-top:2px;
+  border-top:1px solid var(--line);
+  min-width:0;
+}
+.apartment-access>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-height:44px;
+  padding:8px 5px;
+  list-style:none;
+  cursor:pointer;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:650;
+  line-height:1.25;
+  border-radius:7px;
+}
+.apartment-access>summary::-webkit-details-marker{display:none}
+.apartment-access>summary:hover{
+  color:var(--ink);
+  background:var(--hover);
+}
+.apartment-access>summary:focus-visible{
+  outline:2px solid var(--focus);
+  outline-offset:2px;
+}
+.apartment-access-title{display:inline-flex;align-items:center;gap:6px;min-width:0;}
+.apartment-access-count{
+  display:inline-grid;
+  place-items:center;
+  min-width:19px;
+  height:19px;
+  padding:0 5px;
+  font-size:11px;
+  line-height:1;
+  border:1px solid var(--line);
+  border-radius:6px;
+  color:var(--muted);
+}
+.apartment-access-chevron{
+  font-size:19px;
+  line-height:1;
+  transition:transform .16s ease;
+  transform:translateY(-2px);
+}
+.apartment-access[open] .apartment-access-chevron{transform:rotate(180deg) translateY(2px)}
+.apartment-access-people{
+  display:grid;
+  min-width:0;
+  padding:1px 2px 4px;
+}
+.apartment-access-person{
+  display:grid;
+  gap:5px;
+  padding:9px 0 10px;
+  min-width:0;
+}
+.apartment-access-person+.apartment-access-person{border-top:1px solid var(--subtle-line,var(--line))}
+.apartment-access-name{
+  display:block;
+  min-width:0;
+  font-size:12px;
+  font-weight:550;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+  color:var(--ink);
+}
+.apartment-access-actions{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  min-width:0;
+}
+.apartment-card .apartment-access-actions .button{
+  width:auto;
+  max-width:100%;
+  min-height:40px;
+  padding:6px 11px;
+  font-size:12px;
+  font-weight:650;
+  line-height:1.2;
+  white-space:nowrap;
+  text-align:center;
+  border-radius:9px;
+}
+@media(max-width:600px){
+  .apartment-card .apartment-access{margin:0 9px 9px}
+  .apartment-access>summary{padding-inline:3px}
+  .apartment-access-person{padding-block:7px 8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .apartment-access-chevron{transition:none}
+}
