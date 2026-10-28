@@ -11,9 +11,9 @@ import {recoveryEligible} from './admin-recovery-ui.mjs?v=5.9.2';
 import {inviteEligible} from './invite-ui.mjs?v=5.9.0';
 import {getLanguage} from './i18n.mjs?v=5.8.1';
 const loc=(de,trText)=>getLanguage()==='de'?de:trText;
-const recoveryButton=(s,p)=>!p.provisional&&recoveryEligible(s,p)?button(getLanguage()==='de'?'Zugang wiederherstellen':'Erişimi yenile','recover_person',`data-id="${e(p.id)}"`):'';
+const recoveryButton=(s,p,compact=false)=>!p.provisional&&recoveryEligible(s,p)?button(compact?loc('Erneuern','Yenile'):loc('Zugang wiederherstellen','Erişimi yenile'),'recover_person',`data-id="${e(p.id)}" aria-label="${e(loc('Zugang wiederherstellen: ','Erişimi yenile: ')+p.full_name)}"`):'';
 const personDeleteButton=(s,p)=>can(s,'admin')?button(loc('Person löschen','Kişiyi sil'),'person_lifecycle',`data-id="${e(p.id)}" data-destructive="true" title="${loc('Person löschen oder archivieren','Kişiyi sil veya arşivle')}"`):'';
-export const invitationButton=(s,p)=>recoveryButton(s,p)+(inviteEligible(s,p)?button(loc('Zur App einladen','Uygulamaya davet et'),'invite_person',`data-id="${e(p.id)}" aria-label="${e(loc('Zur App einladen: ','Uygulamaya davet et: ')+p.full_name)}"`):'');
+export const invitationButton=(s,p,{compact=false}={})=>recoveryButton(s,p,compact)+(inviteEligible(s,p)?button(compact?loc('Einladen','Davet et'):loc('Zur App einladen','Uygulamaya davet et'),'invite_person',`data-id="${e(p.id)}" aria-label="${e(loc('Zur App einladen: ','Uygulamaya davet et: ')+p.full_name)}"`):'');
 export const historicalRoleLabel=r=>tr({owner:'Eski ev sahibi',tenant:'Eski kiracı',representative:'Eski yetkili kişi'}[r]||'Eski kişi');
 const role=l=>badge(activeAt(l)?roleLabel(l.role):historicalRoleLabel(l.role),'role-badge role-'+l.role);
 export function assignmentCard(s,l,showUnit=false,{showAmount=true}={}){
