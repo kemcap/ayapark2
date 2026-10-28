@@ -1,4 +1,4 @@
-import {devirArchive} from './devir-archive-ui.mjs?v=5.9.13';
+import {devirArchive} from './devir-archive-ui.mjs?v=5.9.16';
 import {t as tr,getLanguage} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,money} from './core.mjs?v=5.8.1';
 import {remaining} from './ledger.mjs?v=5.8.1';
