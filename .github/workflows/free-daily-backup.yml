@@ -1,0 +1,37 @@
+name: AyaPark 2 Free Backup (disabled until approved)
+
+on:
+  schedule:
+    - cron: '41 1 * * *' # 04:41 Europe/Istanbul (UTC+3)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ayapark2-free-backup
+  cancel-in-progress: false
+
+jobs:
+  encrypted-backup:
+    # Explicit manual activation. The variable does NOT exist by default.
+    if: ${{ vars.AYAPARK_BACKUP_ENABLED == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      BACKUP_EXECUTION_ACK: 'YES'
+      SUPABASE_PROJECT_REF: eisozwhhinqszfikemot
+      SUPABASE_DB_URL: ${{ secrets.AYAPARK_BACKUP_DB_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.AYAPARK_BACKUP_SERVICE_ROLE_KEY }}
+      BACKUP_AGE_RECIPIENT: ${{ vars.AYAPARK_BACKUP_AGE_RECIPIENT }}
+      RCLONE_CONFIG_B64: ${{ secrets.AYAPARK_BACKUP_RCLONE_CONFIG_B64 }}
+      RCLONE_REMOTE_DEST: ${{ vars.AYAPARK_BACKUP_REMOTE_DEST }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install open-source backup tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends age rclone python3
+          docker pull postgres:17
+      - name: Perform read-only export and encrypted offsite upload
+        run: bash scripts/backup/backup.sh
