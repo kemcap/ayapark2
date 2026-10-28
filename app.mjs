@@ -166,6 +166,18 @@ async function mutateInner(action,payload){
   try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
   return result;
  }
+ if(action==='assignment_add'&&payload.historical){
+  if(state.mode==='demo'){
+   const d=state.data,unit=d.units.find(u=>u.id===payload.unit_id);if(!unit)throw Error(tr('Daire bulunamadı.'));
+   let person=d.persons.find(x=>x.id===payload.person_id);
+   if(payload.new_person){person={id:randomId(),first_name:payload.first_name,last_name:payload.last_name,full_name:payload.first_name+' '+payload.last_name,phone:payload.phone||'',email:payload.email||'',notes:payload.notes||''};d.persons.push(person);}
+   if(!person)throw Error(tr('Kişi seçin.'));
+   if(d.links.some(l=>l.unit_id===unit.id&&l.person_id===person.id&&l.role===payload.role&&l.active))throw Error(tr('Bu kişinin aynı dairede güncel rolü var.'));
+   d.links.push({id:randomId(),unit_id:unit.id,person_id:person.id,role:payload.role,active:false,archived_at:new Date().toISOString(),archive_reason:'historical_import',starts_on:payload.starts_on||null,ends_on:payload.ends_on||null,revision:1});render();return {ok:true};
+  }
+  const attempt=epoch,result=await api.rpc('ay3_add_historical_assignment',{p_site:state.data.site.id,p_payload:payload});if(attempt!==epoch)throw Error(tr('Oturum değişti.'));
+  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}return result;
+ }
  if(state.mode==='demo'){const r=demoCommand(state.data,action,payload);state.data.transactions.sort((a,b)=>b.date.localeCompare(a.date));refreshDebts(state.data);render();return r;}
  const attempt=epoch,result=await api.command(state.data.site.id,action,payload);if(attempt!==epoch)throw Error(tr("Oturum değişti."));
  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
