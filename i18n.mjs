@@ -1,5 +1,8 @@
 // Only authored interface text is translated. Stored content is never sent to a service.
 export const german = {
+ "Listeyi aç": "Liste öffnen",
+ "Listeyi kapat": "Liste schließen",
+
  "Giriş yöntemi": "Anmeldemethode",
  "Davet e-postası": "E-Mail für die Einladung",
  "Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir. Giriş için telefon veya e-posta seçin.": "Der Link gilt 7 Tage und ist einmal verwendbar. Wähle Telefon oder E-Mail für die Anmeldung.",
