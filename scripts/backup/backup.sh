@@ -62,14 +62,16 @@ items = {}
 for path in sorted(root.rglob("*")):
     if path.is_file() and path.name != "manifest.json":
         rel = path.relative_to(root).as_posix()
-        items[rel] = {"bytes": path.stat().st_size, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+        with path.open("rb") as source:
+            digest = hashlib.file_digest(source, "sha256").hexdigest()
+        items[rel] = {"bytes": path.stat().st_size, "sha256": digest}
 manifest = {"format": 1, "project_ref": os.environ["SUPABASE_PROJECT_REF"], "files": items,
             "note": "Logical dumps require a supervised restore drill; platform configuration and credentials are excluded."}
 (root / "manifest.json").write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
 PY
 
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-NAME="ayapark2-$STAMP-$GITHUB_RUN_ID.tar.age"
+NAME="ayapark2-$STAMP-${GITHUB_RUN_ID:-manual}.tar.age"
 OUT="$TEMP/$NAME"
 # Pipe tar straight into age, never persist an unencrypted tar archive.
 tar -C "$TEMP/export" -cf - . | age -r "$BACKUP_AGE_RECIPIENT" -o "$OUT"
