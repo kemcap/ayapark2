@@ -4,6 +4,7 @@ import {t as tr} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,randomId} from './core.mjs?v=5.8.1';
 import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=5.9.0';
 export const assignmentRoles=[['owner','Ev sahibi'],['tenant','Kiracı'],['representative','Temsilci']];
+export const historicalRoles=[['historical_owner','Eski Ev Sahibi'],['historical_tenant','Eski Kiracı'],['historical_representative','Eski Temsilci']];
 export const removalReasons=role=>[['mistake','Yanlışlıkla eklendi'],['ended',role==='owner'?'Mülkiyet ilişkisi sona erdi':role==='tenant'?'Kiracılık sona erdi':'Temsilcilik sona erdi'],['other','Diğer neden']];
 const select=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}" aria-label="${e(tr(label))}">${options.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(tr(l))}</option>`).join('')}</select></label>`;
 const field=(name,label,type='text',value='',attrs='')=>`<label class="field">${tr(label)}<input name="${name}" aria-label="${e(tr(label))}" type="${type}" value="${e(value)}" ${attrs}></label>`;
@@ -28,7 +29,7 @@ export function buildAssignmentForm(d,action,args={}){
   body=(args.unit?`<p class="assignment-context"><strong>${e(unitName)}</strong></p>`:select('unit_id','Daire',d.units.map(u=>[u.id,u.code]),unit))+
    `<fieldset class="person-choice"><legend>${tr('Kişi seçimi')}</legend><label><input type="radio" name="person_mode" value="existing" ${args.person==='__new__'?'':'checked'}>${tr('Kayıtlı kişi seç')}</label><label><input type="radio" name="person_mode" value="new" ${args.person==='__new__'?'checked':''}>${tr('Yeni kişi oluştur')}</label></fieldset>`+
    `<div id="existingPersonFields">${personPicker(d.persons,p?.id||'')}</div><div id="newPersonFields" hidden>${personFields(null)}</div>`+
-   select('role','Dairedeki rol',assignmentRoles,'tenant')+dates(null);
+   select('role','Dairedeki rol',[...assignmentRoles,...historicalRoles],'tenant')+dates(null);
  }
  if(['assignment_add','assignment_edit','assignment_restore'].includes(action))body+=`<details><summary>${tr('Temsilci bildirim yetkisi')}</summary><p>${tr('Yalnızca temsilci rolü için. Ek borç oluşturmaz.')}</p><label class="check-field"><input type="checkbox" name="mandate_owners" ${l?.mandates?.includes('owners')?'checked':''}>${tr('Malik duyurularını alabilir')}</label><label class="check-field"><input type="checkbox" name="mandate_residents" ${l?.mandates?.includes('residents')?'checked':''}>${tr('Sakin duyurularını alabilir')}</label></details>`;
  return {title,body:`<div class="assignment-form">${body}</div>`,context};
@@ -48,6 +49,7 @@ export function assignmentPayload(action,form,ctx){
  if(action==='assignment_add'){p.new_person=p.person_mode==='new';if(!p.new_person&&!p.person_id)throw fieldError(tr('Kişi seçin.'),'person_id');}
  if(action==='assignment_edit'||action==='assignment_add'&&p.new_person){if(!p.first_name||!p.last_name)throw fieldError(tr('Ad ve soyad gerekli.'),!p.first_name?'first_name':'last_name');}
  if(['assignment_add','assignment_edit'].includes(action)){
+  if(action==='assignment_add'&&p.role.startsWith('historical_')){p.historical=true;p.role=p.role.slice('historical_'.length);}
   if(!assignmentRoles.some(([r])=>r===p.role))throw Error(tr('Geçerli bir rol seçin.'));
   for(const key of ['starts_on','ends_on']){if(p[key]&&!dateValid(p[key]))throw fieldError(tr('Geçerli bir tarih girin veya boş bırakın.'),key);p[key]=p[key]||null;}
   if(p.starts_on&&p.ends_on&&p.ends_on<p.starts_on)throw fieldError(tr('Bitiş tarihi başlangıç tarihinden önce olamaz.'),'ends_on');
