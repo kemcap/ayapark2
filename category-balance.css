@@ -193,3 +193,101 @@
  .devir-archive .balance-desktop{display:none}
  .devir-archive .balance-mobile{display:block}
 }
+
+/* v5.9.16: archived source list is a secondary action within the expanded current ledger. */
+.category-balance-summary .balance-expanded{min-width:0}
+.category-balance-summary .balance-archive-toolbar{
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-end;
+  width:100%;
+  margin:0 0 10px;
+  min-width:0;
+}
+.category-balance-summary .devir-archive{
+  flex:0 1 auto;
+  width:auto;
+  max-width:100%;
+  margin:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  overflow:visible;
+}
+.category-balance-summary .devir-archive>summary{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:9px;
+  width:fit-content;
+  max-width:100%;
+  min-height:40px;
+  padding:7px 12px;
+  margin-left:auto;
+  color:var(--muted);
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:9px;
+  font-size:.82rem;
+  line-height:1.35;
+  font-weight:600;
+  text-align:left;
+}
+.category-balance-summary .devir-archive>summary:hover,
+.category-balance-summary .devir-archive>summary:focus-visible{
+  background:var(--hover);
+  color:var(--ink);
+  border-color:var(--primary);
+}
+.category-balance-summary .devir-archive-title{
+  flex:0 1 auto;
+  min-width:0;
+  font-size:inherit;
+  font-weight:600;
+  overflow-wrap:anywhere;
+}
+.category-balance-summary .devir-archive-date{
+  flex:0 0 auto;
+  font-size:.76rem;
+  opacity:.8;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.category-balance-summary .devir-archive[open]{width:100%;flex:1 1 100%}
+.category-balance-summary .devir-archive-content{
+  width:100%;
+  padding:12px 0 16px;
+  border-top:0;
+}
+.category-balance-summary .devir-archive-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:baseline;
+  margin-bottom:12px;
+}
+.category-balance-summary .devir-archive-meta .fine{
+  flex:1 1 auto;
+  margin:0;
+  min-width:0;
+  line-height:1.5;
+}
+.category-balance-summary .devir-archive-total{
+  flex:0 0 auto;
+  white-space:nowrap;
+  font-size:.82rem;
+  color:var(--muted);
+}
+.category-balance-summary .devir-archive-total strong{color:var(--ink)}
+@media(max-width:760px){
+  .category-balance-summary .devir-archive>summary{
+    gap:7px;
+    justify-content:flex-start;
+    flex-wrap:wrap;
+  }
+  .category-balance-summary .devir-archive-meta{
+    flex-direction:column;
+    gap:7px;
+  }
+  .category-balance-summary .devir-archive-total{white-space:normal}
+}
