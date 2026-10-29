@@ -138,8 +138,8 @@ export class AyaparkApi {
 
   assertSession();
   const linksV3=byName.links||[],persons=(byName.persons||[]).map(p=>({...p,...(byName.person_access?.[p.id]||{})}));
-  const ownPersonIds=[...new Set([...linksV3.filter(l=>role==='resident'||persons.find(p=>p.id===l.person_id)?.auth_user_id===this.session.user.id).map(l=>l.person_id),...persons.filter(p=>role==='resident'||p.auth_user_id===this.session.user.id).map(p=>p.id)])];
-  for(const link of linksV3)if(role==='resident'&&!ownIds.includes(link.unit_id))ownIds.push(link.unit_id);
+  const ownPersonIds=[...new Set(persons.filter(p=>p.auth_user_id===this.session.user.id).map(p=>p.id))];
+  // Unit access comes only from active, server-verified resident grants, not from historical person links.
   const transactions=byName.entries.map(t=>({...t,date:t.booked_on,desc:t.description,iban:t.sender_iban||'',cents:Number(t.cents)})).sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
   const charges=byName.charges.map(c=>({...c,cents:Number(c.cents)})),allocations=byName.allocations.map(a=>({...a,cents:Number(a.cents)}));
   // Index once per response; repeated charge/allocation scans grow quadratically.
