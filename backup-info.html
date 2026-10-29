@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>AyaPark2 Backup – Informationen</title><style>:root{color-scheme:light}*{box-sizing:border-box}body{font:17px/1.65 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f7f4;color:#20322b;margin:0}main{max-width:850px;margin:45px auto;padding:32px 38px;background:#fff;border:1px solid #dce5df;border-radius:16px}h1,h2{line-height:1.25;color:#123b2c}h1{font-size:2rem}h2{margin-top:2rem;font-size:1.3rem}a{color:#11634a}a:focus-visible{outline:3px solid #11634a;outline-offset:3px}.eyebrow{color:#4b695c;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase}footer{border-top:1px solid #dce5df;margin-top:36px;padding-top:16px;color:#52695c;font-size:.9rem}@media(max-width:680px){main{margin:0;padding:22px;border-radius:0}h1{font-size:1.7rem}}</style></head>
+<body><main>
+<p class="eyebrow">AyaPark 2 · Privates Backup-Werkzeug</p>
+<h1>AyaPark2 Backup</h1>
+<p>Diese Informationsseite beschreibt ein privates, nicht kommerzielles Desktop-Werkzeug zur Sicherung von AyaPark-2-Verwaltungsdaten in Google Drive. Es ist von der öffentlichen AyaPark-2-Webanwendung getrennt. Das Backup-Werkzeug ist ausschließlich für den persönlich autorisierten Verwalter vorgesehen.</p>
+<h2>Wie funktioniert es?</h2>
+<p>Die Sicherung wird auf einem eigenen Mac vorbereitet. Backupdateien werden vor dem Hochladen mit <strong>age</strong> verschlüsselt; <strong>rclone</strong> überträgt die verschlüsselten Dateien in den Google-Drive-Ordner <strong>AyaPark2-Backups</strong>. Der private Entschlüsselungsschlüssel bleibt außerhalb von Google Drive. Die Automatisierung wird separat eingerichtet; diese Seite bedeutet nicht, dass bereits regelmäßige Backups laufen.</p>
+<h2>Warum wird Google-Drive-Zugriff angefordert?</h2>
+<p>Das verwendete OAuth-Zugriffsrecht <code>https://www.googleapis.com/auth/drive</code> ermöglicht technisch den umfassenden Zugriff auf Dateien in dem Google-Drive-Konto, einschließlich Lesen, Erstellen, Ändern und Löschen. Für den vorgesehenen Einsatz wird dieses Zugriffsrecht ausschließlich zum Übertragen, Prüfen, Abrufen und Verwalten der verschlüsselten Sicherungen im Ordner <strong>AyaPark2-Backups</strong> genutzt. Andere Drive-Inhalte sollen nicht verarbeitet werden.</p>
+<p><a href="./backup-datenschutz.html">Datenschutzerklärung / Gizlilik politikası</a></p>
+<h2 lang="tr">Türkçe özet</h2>
+<p lang="tr">AyaPark2 Backup, site yönetimi verilerini kişisel kullanım için Google Drive'a şifreli olarak yedeklemeye yönelik bir masaüstü aracıdır. Dosyalar, Google Drive'a yüklenmeden önce Mac üzerinde age ile şifrelenir. Özel çözme anahtarı Google Drive'a yüklenmez. Google Drive için verilen izin teknik olarak geniş kapsamlıdır; kullanım amacı yalnızca AyaPark2-Backups klasöründeki şifreli yedekleri yönetmektir. Otomatik yedekleme ayrıca kurulacaktır.</p>
+<p lang="tr"><a href="./backup-datenschutz.html">Gizlilik politikası ve veri kullanımı</a></p>
+<footer>AYA PARK 2 · Private Nutzung / Kişisel kullanım · <a href="./">Zur AyaPark-2-Anwendung</a></footer>
+</main></body></html>
