@@ -4,7 +4,7 @@ import {apartmentAmounts} from './seven-ux.mjs?v=5.8.1';
 import {financePanel} from './finance-forms.mjs?v=5.8.1';
 import {notificationTitle,notificationBody,hasRead,receives,notificationCenter,notificationState,notificationExpired} from './notifications.mjs?v=5.9.0';
 import {compactReview,reviewPanel} from './review-ui.mjs?v=5.8.1';
-import {apartmentInfo,unitDebtCategory} from './apartment-info.mjs?v=5.8.1';
+import {apartmentInfo,unitDebtCategory} from './apartment-info.mjs?v=5.9.20';
 import {assignmentCard,invitationButton} from './people-ui.mjs?v=5.9.10';
 import {effectiveOccupancy} from './relationships.mjs?v=5.8.1';
 import {t as tr,locale} from './i18n.mjs?v=5.8.1';
@@ -13,11 +13,11 @@ import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 import {remaining,paid,unassigned} from './ledger.mjs?v=5.8.1';
 import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs?v=5.9.0';
 import {residentClaimsPanel} from './site-claims-ui.mjs?v=5.9.0';
-import {norm,today,activeAt,personLinks,personName,scopedCharges,filteredTransactions,selectedRange,rangeError,financialSeries,buildSummaryDays,announcementActive,announcementStatus,suggestUnits,creditAvailable,isReversed,acknowledgementKey,unitSearchMatches} from './v3-domain.mjs?v=5.9.0';
+import {norm,today,activeAt,personLinks,personName,scopedCharges,filteredTransactions,selectedRange,rangeError,financialSeries,buildSummaryDays,announcementActive,announcementStatus,suggestUnits,creditAvailable,isReversed,acknowledgementKey,unitSearchMatches} from './v3-domain.mjs?v=5.9.20';
 export const roleLabel=r=>tr({owner:'Ev sahibi',tenant:'Kiracı',representative:'Temsilci',debtor:'Borçlu',source:'Kaynak kaydı'}[r]||'Kişi');
 export const info=(short,detail)=>`<details class="help-line info-help help-disclosure"><summary><span>${e(tr(short))}</span><span aria-hidden="true">ⓘ</span></summary><p>${e(tr(detail))}</p></details>`;
 const chargeName=c=>c.reference?.startsWith('demo-')?tr('Açık borç'):c.category==='Aidat'&&/^\d{4}-\d{2}$/.test(c.label)?tr('Aidat')+' · '+c.label:e(c.label);
-const residentDebtor=(d,c)=>tr((d.ownPersonIds||[]).includes(c.person_id)?'Sorumlu: siz':c.payer==='owner'?'Sorumlu: ev sahibi':c.payer==='tenant'?'Sorumlu: kiracı':'Sorumlu: kayıtlı kişi');
+const residentDebtor=(d,c)=>{const person=d.persons?.find(p=>p.id===c.person_id),unitRole=person?.unit_roles?.find(x=>x.unit_id===c.unit_id&&['owner','tenant'].includes(x.role))?.role,role=unitRole||(['owner','tenant'].includes(c.payer)?c.payer:null);return tr('Sorumlu kişi')+': '+chargePerson(d,c)+(role?' · '+roleLabel(role):'');};
 const chargePerson=(d,c)=>personName(d,c.person_id)||(d.staged||[]).find(r=>c.reference?.startsWith('staged:'+r.id))?.person_label||tr('Kişi belirlenmedi');
 export const former=(d,c)=>!!(d.links||[]).find(l=>l.id===c.link_id&&!activeAt(l))&&!personLinks(d,c.unit_id).some(l=>l.person_id===c.person_id);
 export function charges(s,list,showUnit=true){const d=s.data;const action=c=>`${button(tr('Detay'),'charge_detail',`data-id="${e(c.id)}"`)}${can(s,'finance')&&!c.void_reason?(!c.person_id?button(tr('Kişi belirle'),'bind_charge',`data-id="${e(c.id)}"`):'')+(remaining(d,c)>0?button(tr('Ödeme eşleştir'),'auto_allocate',`data-charge="${e(c.id)}"`):'')+(paid(d,c.id)===0?button(tr('Borcu iptal et'),'void_charge',`data-id="${e(c.id)}"`):''):''}`;
@@ -33,7 +33,9 @@ function occupancy(u,d){u={...u,occupancy_status:effectiveOccupancy(d,u)};return
 export function unitBalance(s,u){return scopedCharges(s.data).filter(c=>c.unit_id===u.id&&!c.void_reason).reduce((sum,c)=>sum+remaining(s.data,c),0);}
 export function unitCardResidents(d,unitId,{withIds=false}={}){
  const day=today();
- const links=personLinks(d,unitId).filter(l=>(d.role!=='resident'||(d.ownPersonIds||[]).includes(l.person_id))&&!l.archived_at&&(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day));
+ const ownLinks=personLinks(d,unitId).filter(l=>d.role!=='resident'||(d.ownPersonIds||[]).includes(l.person_id));
+ const financeRoles=d.role==='resident'?(d.persons||[]).flatMap(p=>(p.unit_roles||[]).filter(r=>r.unit_id===unitId).map(r=>({person_id:p.id,unit_id:unitId,role:r.role,active:true}))):[];
+ const links=[...ownLinks,...financeRoles].filter(l=>!l.archived_at&&(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day));
  return ['owner','tenant','representative'].map(role=>{
   const names=[...new Set(links.filter(l=>l.role===role).map(l=>personName(d,l.person_id).trim()).filter(Boolean))];
   return {role,...(withIds?{people:[...new Set(links.filter(l=>l.role===role).map(l=>l.person_id))].map(id=>({id,name:personName(d,id)}))}:{}),label:role==='representative'?tr('Yetkili kişi'):roleLabel(role),names};
