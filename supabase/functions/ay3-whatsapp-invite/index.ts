@@ -142,9 +142,14 @@ Deno.serve(async req=>{
   const role=(roles||[]).find(eligible);
   if(!role)return reply({error:'eligible_apartment_required'},409);
   const contact=emailMode?email:emailAlias(phone);
-  const {data:candidate,error:candidateError}=await admin.rpc('ay_auth_orphan_candidate',
-   {p_actor:identity.user.id,p_person:personId,p_contact:contact,p_approve:false});
-  if(candidateError)return reply({error:'invitation_failed'},409);
+  // Accounts that are already provisionally bound retain the existing invitation workflow.
+  let candidate:{state:string,user_id?:string}={state:'new'};
+  if(!person.auth_user_id){
+    const {data:found,error:candidateError}=await admin.rpc('ay_auth_orphan_candidate',
+     {p_actor:identity.user.id,p_person:personId,p_contact:contact,p_approve:false});
+    if(candidateError)return reply({error:'invitation_failed'},409);
+    candidate=found;
+  }
   if(candidate?.state==='conflict')return reply({error:'account_already_linked_elsewhere'},409);
   if(candidate?.state==='recoverable'&&input.recovery_confirmed!==true)
     return reply({error:'recovery_confirmation_required'},409);
