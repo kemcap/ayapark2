@@ -1,6 +1,6 @@
 import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.9.2';
 import {bindAccessRequests} from './access-request-ui.mjs?v=5.9.0';
-import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.8.1';
+import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.9.20';
 import {prepareV5Demo} from './finance-demo.mjs?v=5.8.1';
 import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.8.1';
 import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.9.0';
