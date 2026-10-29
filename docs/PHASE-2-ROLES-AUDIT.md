@@ -2,7 +2,7 @@
 
 Stand: 30.10.2026 (Europe/Istanbul). Basis: main `2c55873506c1e132067876efae12cdc6e42fa358`.
 Branch: `feature/phase2-role-permission-audit-20261030`.
-**Status: Codeprüfung und isolierte Tests abgeschlossen; Zielberechtigungen noch nicht implementiert oder produktiv abgenommen.**
+**Status: Codeprüfung und isolierte Tests abgeschlossen; vier kritische Finanzkorrekturen im Entwicklungsstand auf Superadmin beschränkt. Fünf Zielberechtigungen und Produktivabnahme bleiben offen.**
 
 Der Nutzer hat den Backup-Arbeitsschritt ausdrücklich übersprungen. Keine erneute Einrichtung, keine Backup-Tests und keine Aktivierung in dieser Aufgabe. Daraus wird keine zusätzliche technische Restore-Bestätigung abgeleitet.
 
@@ -56,4 +56,26 @@ Die bestehenden `npm test`-Dateien und Anwendungsmodule wurden in diesem Arbeits
 2. Fünf fachliche Rechte zentral definieren und mit DB-Constraint, `can`, Workspace, Formularen und Edge-Actor-Prüfungen konsistent umsetzen. Technische Namen und Datenmigration explizit versionieren. Alte breite `finance`-/`people`-Werte nicht still in neue privilegierte Rechte übersetzen. Bis zur gezielten Vergabe gilt für neue delegierte Aktionen deny-by-default.
 3. Aidat-/Umlagenentwurf von endgültiger Buchung trennen; nur Superadmin finalisiert. Kein rein optischer Entwurfszustand bei bereits erzeugten Forderungen.
 4. Überholte Tests anhand nachgewiesener fachlicher Entscheidungen aktualisieren; echten Modulversionskonflikt beheben. Danach aktuelles Backend schreibgeschützt vergleichen und freigegebene isolierte Integration ausführen.
-5. Vor Produktivmigration separate ausdrückliche Freigabe. Dieser Branch enthält keine deploybare Rechte-Migration und ändert keine produktiven Rechte.
+5. Vor Produktivmigration separate ausdrückliche Freigabe. Eine separat geprüfte Migrationsvorbereitung liegt vor; keine produktiven Rechte wurden geändert.
+
+## Abgeschlossener Folgeschritt: kritische Finanzkorrekturen
+
+**Vorbereitet und lokal getestet, nicht veröffentlicht:** Migration `supabase/migrations/20261029212437_phase2_superadmin_finance_corrections.sql` ergänzt in beiden tatsächlich buchenden Funktionen `command` und `command_v2` eine Superadmin-Prüfung für `reverse`, `unallocate`, `void_charge`, `void_credit`. Sie erfolgt vor jeder ID-/Payload-Auswertung. V5 unterstützt diese vier Korrekturaktionen nicht; reguläre V5-Zuordnungen erreichen weiterhin den geschützten Legacy-Kern. Ein Schutz nur im public-RPC wäre wegen vorhandener privater Aufrufpfade unzureichend.
+
+Die Migration enthält vollständige unveränderte Funktionssnapshots mit dieser einen ergänzten Autorisierung. Signaturen/OIDs, bestehende ACLs, SECURITY-DEFINER-Eigenschaft und search_path bleiben erhalten. Ein vorgeschalteter Body-Hashvergleich akzeptiert nur die geprüfte Ausgangsfassung oder dieselbe bereits gehärtete Fassung. Backend-Drift führt zum atomaren Abbruch; keine unbekannten neueren Funktionsänderungen überschreiben.
+
+Die UI zeigt diese vier Korrekturen nur mit `admin`; die zentrale Aktionsprüfung in `app.mjs` verlangt ebenfalls `admin`. Zahlungsvorschläge und neue Zuordnungen bleiben für Verwaltung mit bestehendem Finanzrecht verfügbar. Die übrigen breiten Finanzrechte sind damit ausdrücklich noch nicht in die fünf beschlossenen Aufgabenrechte umgebaut.
+
+Zusätzliche Nachweise:
+- `npm run test:corrections:sql`: **28 bestanden**, einschließlich Rechteentzug vor ungültiger UUID-Verarbeitung, privatem Umgehungspfad, positiver Zuordnung durch Verwaltung, Idempotenz, allen vier Superadmin-Korrekturen, unverändertem Original, Audit-Actor, erhaltenen Funktions-ACLs/OIDs, Wiederholbarkeit der Migration und Abbruch bei synthetischem Backend-Drift.
+- `node --test tests/finance-correction-access.test.mjs`: **2 bestanden**, Verwaltung behält Zuordnung, Superadmin behält Korrekturen.
+- Vorhandene `test:sql` und `test:v5:sql` führen nun die Kandidatenmigration vor ihren Assertions aus: **120 + 50 bestanden**.
+- JS-Syntax und `git diff --check` bestanden.
+
+### Kontrollierter späterer Rollout (nicht ausgeführt)
+
+Vor Freigabe aktuellen Live-Funktionsstand schreibgeschützt vergleichen und Migrationsplan prüfen. Backend zuerst und UI danach nur mit ausdrücklicher Freigabe ausrollen. Modul-Cacheversionen und bestehende Modulidentitätsfehler vor einem Frontendrelease konsistent beheben. Kein automatischer Rollback: ein Zurücknehmen würde die alten breiteren Korrekturrechte wieder öffnen und benötigt eine eigene Entscheidung. Datenbestände werden durch die Kandidatenmigration nicht umgeschrieben.
+
+Nächster Schritt: fünf fachliche Aufgabenrechte und der Entwurfs-/Endfreigabeablauf; 13 bestehende allgemeine Testfehler vor einem Release fachlich auflösen. Offizielle Grundlage zu Funktions-EXECUTE und RLS: https://supabase.com/docs/guides/api/securing-your-api (30.10.2026 geprüft). Supabase-Changelog auf relevante Änderungen gesichtet; keine neuen Plattform-/Auth-/RLS-Einstellungen werden eingeführt.
+
+Allgemeine Suite nach der Korrektur erneut geprüft: **251 bestanden / dieselben 13 Fehler**, insgesamt 264 Tests einschließlich der zwei neuen UI-Tests. Keine zusätzlichen allgemeinen Fehler durch diesen Kandidaten.

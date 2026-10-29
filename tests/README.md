@@ -55,3 +55,9 @@ all 16 combinations of the four existing flags for deputy/auditor membership,
 site isolation, forged user metadata, stale grants and membership revocation.
 This verifies existing boundaries, not implementation of the five target task
 permissions. See `docs/PHASE-2-ROLES-AUDIT.md` for gaps and baseline failures.
+
+`npm run test:corrections:sql` applies the prepared correction migration only to
+in-memory synthetic PostgreSQL, including function-body drift rejection, ACL/OID
+preservation, staff allocation and Superadmin correction/audit positives. The
+ordinary SQL audit and V5 runners apply this candidate too. No production schema
+or credentials are used.
