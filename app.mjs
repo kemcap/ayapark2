@@ -262,7 +262,7 @@ function updateAnnouncementTargets(){const root=$('actionFields'),kind=root.quer
 
 document.addEventListener('click',async event=>{
  // The normal close button also returns to the person card when an apartment was opened from there.
- if(event.target.closest('#detailDialog .dialog-actions button')&&personUnitReturn&&detailView?.action==='unit'){
+ if(event.target.closest('#detailDialog > .dialog-actions button')&&personUnitReturn&&detailView?.action==='unit'){
   event.preventDefault();
   returnFromPersonUnit();
   return;
