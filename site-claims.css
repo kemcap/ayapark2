@@ -12,3 +12,23 @@
  .resident-claims-panel .summary-grid { display: grid; grid-template-columns: minmax(0,1fr); }
  .claim-metric .large-amount { font-size: clamp(1.45rem,5vw,2rem); }
 }
+
+/* Apartment-level claim summary opens a fully attributed, resident-scoped detail dialog. */
+.claim-metric-action {padding:0;overflow:hidden;}
+.claim-metric-trigger {display:flex;flex-direction:column;align-items:flex-start;gap:.4rem;width:100%;padding:1.15rem 1.2rem;text-align:left;border:0;border-radius:inherit;background:transparent;color:inherit;font:inherit;cursor:pointer;}
+.claim-metric-trigger:focus-visible {outline:3px solid var(--accent,#a34c62);outline-offset:-4px;}
+.claim-metric-trigger:hover {background:var(--surface-hover,rgba(128,128,128,.07));}
+.claim-metric-heading {font-size:1.06rem;font-weight:700;line-height:1.4;}
+.claim-metric-note {font-size:.83rem;line-height:1.45;color:var(--muted,#6b7280);}
+.claim-metric-trigger .large-amount {margin:.3rem 0;line-height:1.2;}
+.claim-drilldown {font-size:.85rem;font-weight:650;text-decoration:underline;text-underline-offset:3px;}
+.claim-unit-detail-list {display:grid;gap:1.1rem;margin-top:1.2rem;}
+.claim-unit-details {border:1px solid var(--line,rgba(128,128,128,.24));border-radius:.7rem;padding:1rem;}
+.claim-unit-head {display:flex;align-items:baseline;justify-content:space-between;gap:.7rem;margin-bottom:.4rem;font-variant-numeric:tabular-nums;}
+.claim-unit-head h3 {margin:0;font-size:1.1rem;}
+.claim-debt-row {display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;border-top:1px solid var(--line,rgba(128,128,128,.18));padding:.9rem 0;}
+.claim-debt-main {display:grid;gap:.3rem;min-width:0;}
+.claim-debt-main strong {overflow-wrap:anywhere;}
+.claim-debt-main small {color:var(--muted,#6b7280);line-height:1.45;}
+.claim-debt-actions {display:flex;align-items:flex-end;flex-direction:column;gap:.4rem;white-space:nowrap;font-variant-numeric:tabular-nums;}
+@media(max-width:550px){.claim-debt-row{flex-direction:column;gap:.6rem;}.claim-debt-actions{width:100%;align-items:flex-start;flex-direction:row;justify-content:space-between;white-space:normal;flex-wrap:wrap;}}
