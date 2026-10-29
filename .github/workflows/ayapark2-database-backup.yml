@@ -57,14 +57,14 @@ jobs:
           enc_name="${dump_name}.age"
           remote="drive:AyaPark2-Backups/${enc_name}"
 
-          echo "Exporting public and auth schemas using PostgreSQL 17..."
+          echo "Exporting AyaPark 2 app schemas (public, auth, ay2_private, ay_auth_private) using PostgreSQL 17..."
           docker run --rm \
             --user "$(id -u):$(id -g)" \
             --env PGHOST --env PGUSER --env PGPASSWORD \
             --env PGDATABASE --env PGPORT --env PGSSLMODE \
             --volume "$scratch:/backup" \
             postgres:17 \
-            pg_dump -Fc --no-owner --no-acl -n public -n auth \
+            pg_dump -Fc --no-owner --no-acl -n public -n auth -n ay2_private -n ay_auth_private \
               -f "/backup/$dump_name"
 
           echo "Checking backup archive entries..."
@@ -77,6 +77,10 @@ jobs:
           grep -Eq 'TABLE DATA[[:space:]]+auth[[:space:]]+users' "$scratch/archive-index.txt"
           grep -Eq 'TABLE DATA[[:space:]]+public[[:space:]]+ay2_entries' "$scratch/archive-index.txt"
           grep -Eq 'TABLE DATA[[:space:]]+public[[:space:]]+site_units' "$scratch/archive-index.txt"
+
+          # Ensure private application code and private auth tables were included.
+          grep -Eq 'FUNCTION[[:space:]]+ay2_private[[:space:]]+guard_person_identity' "$scratch/archive-index.txt"
+          grep -Eq 'TABLE DATA[[:space:]]+ay_auth_private[[:space:]]+' "$scratch/archive-index.txt"
 
           echo "Encrypting archive with the existing public age recipient..."
           age -r 'age1amttspnqe7l3sdk3g4c725qgr0ta5a7x4as5fjd782wlkvvpjvmselx87p' \
