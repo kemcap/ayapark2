@@ -16,14 +16,14 @@ import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,
 import {bindInstall} from './install.mjs?v=5.8.1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info} from './v3-ui.mjs?v=5.9.21';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.25';
 import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.20';
 import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.8.1';
 import {AyaparkApi} from './api.mjs?v=5.9.24';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.21';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.25';
 import {buildForm,payloadFor} from './forms.mjs?v=5.8.6';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
@@ -307,7 +307,8 @@ document.addEventListener('click',async event=>{
  if(previewButton&&formAction){try{previewButton.disabled=true;const {action,context}=formAction,payload=financePayload(action,new FormData($('actionForm')),context,{previewing:true});const value=action==='auto_allocate'&&state.mode==='connected'?await api.rpc('ay5_payment_plan',{p_site:state.data.site.id,p_payload:payload}):localFinancePreview(state.data,action,payload);context.preview=value;context.previewSignature=JSON.stringify(payload);$('financePreview').innerHTML=financePreviewMarkup(state.data,action,value);labelTables();$('actionMessage').textContent='';}catch(error){$('actionMessage').textContent=tr(error.message);}finally{previewButton.disabled=false;}return;}
  const b=event.target.closest('[data-action]');if(!b)return;const action=b.dataset.action;
  try{
-  if(action==='audit_page'){if(can(state,'admin'))await loadAuditPage(Number(b.dataset.page));return;}
+  if(action==='claims_detail'){if(state.data.role!=='resident'||state.data.communityAccess===false)return;detailView={action};return showDetail(residentClaimsDetail(state));}
+   if(action==='audit_page'){if(can(state,'admin'))await loadAuditPage(Number(b.dataset.page));return;}
   if(action==='review_selected'){await reviewSelected();return;}
   if(action==='recover_person'){adminRecoveryUi.open(b.dataset.id);return;}
   if(action==='invite_person'){invitationUi.open(b.dataset.id);return;}
@@ -349,7 +350,7 @@ $('languageToggle').addEventListener('click',()=>{
  changePreference('language',getLanguage()==='tr'?'de':'tr',state.mode==='connected'?api:null);applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));
  if($('detailDialog').open&&detailView){
   if(detailView.action==='staged')staged();
-  else showDetail(detailView.action==='person_manage'?personManager(state,detailView.id):detailView.action==='unit'?linkedUnitDetail(detailView.id):detailView.action==='charge_detail'?chargeDetail(state,detailView.id):detailView.action==='provider_detail'?providerDetail(state,detailView.id):transactionDetail(state,detailView.id));
+  else showDetail(detailView.action==='claims_detail'?residentClaimsDetail(state):detailView.action==='person_manage'?personManager(state,detailView.id):detailView.action==='unit'?linkedUnitDetail(detailView.id):detailView.action==='charge_detail'?chargeDetail(state,detailView.id):detailView.action==='provider_detail'?providerDetail(state,detailView.id):transactionDetail(state,detailView.id));
  }
  if($('actionDialog').open&&formAction){
   const built=buildForm(state,formAction.action,{period:state.period,...formAction.args});
