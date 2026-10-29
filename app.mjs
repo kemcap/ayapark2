@@ -16,13 +16,13 @@ import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,
 import {bindInstall} from './install.mjs?v=5.8.1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.25';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.27';
 import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
 import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.8.1';
-import {AyaparkApi} from './api.mjs?v=5.9.24';
+import {AyaparkApi} from './api.mjs?v=5.9.27';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.25';
 import {buildForm,payloadFor} from './forms.mjs?v=5.8.6';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
@@ -112,6 +112,7 @@ async function reload(){const stop=beginLoading($('contextText'));try{const atte
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
  if(action==='person_link')action='link';
+ if(action==='draft_decision'){if(isAccessPreview()||state.mode!=='connected'||!can(state,'admin'))throw Error('Access denied');const r=await api.rpc('ay3_decide_charge_draft',{p_site:state.data.site.id,p_id:payload.id,p_approve:payload.approve});await reload();return r;}
  if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
  if(state.mode==='demo'&&action==='user_access')return {ok:true};
  if(action==='user_access'){const result=await api.provision({...payload,site_id:state.data.site.id});await reload();return result;}
@@ -192,7 +193,7 @@ function showForm(action,args={}){
  const built=buildForm(state,action,{period:state.period,...args});
  if($('detailDialog').open)$('detailDialog').close();
  formAction={action,args,context:built.context,origin};$('actionFields').dataset.financeAction=financeActions.includes(action)?action:'';
- $('actionTitle').textContent=built.title;$('actionFields').innerHTML=built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=action==='person_lifecycle'?(getLanguage()==='de'?'Aktion bestätigen':'İşlemi onayla'):action==='person_restore'?(getLanguage()==='de'?'Wiederherstellen':'Arşivden çıkar'):tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');$('actionDialog').showModal();updateConditionalForm();if(financeActions.includes(action))updateFinanceForm($('actionFields'),state.data);updateAnnouncementTargets();
+ $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(action)?'<p class="info-strip">'+(getLanguage()==='de'?'Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.':'Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.')+'</p>':'')+built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=action==='person_lifecycle'?(getLanguage()==='de'?'Aktion bestätigen':'İşlemi onayla'):action==='person_restore'?(getLanguage()==='de'?'Wiederherstellen':'Arşivden çıkar'):tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');if(['batch_charge','monthly_v5'].includes(action))$('saveAction').textContent=getLanguage()==='de'?'Entwurf einreichen':'Taslağı gönder';$('actionDialog').showModal();updateConditionalForm();if(financeActions.includes(action))updateFinanceForm($('actionFields'),state.data);updateAnnouncementTargets();
 }
 function showDetail(html){
  if(!html)return;
@@ -354,7 +355,7 @@ $('languageToggle').addEventListener('click',()=>{
  }
  if($('actionDialog').open&&formAction){
   const built=buildForm(state,formAction.action,{period:state.period,...formAction.args});
-  $('actionTitle').textContent=built.title;$('actionFields').innerHTML=built.body;
+  $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(action)?'<p class="info-strip">'+(getLanguage()==='de'?'Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.':'Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.')+'</p>':'')+built.body;
   if(formAction.action.startsWith('assignment_'))updateAssignmentForm($('actionFields'),state.data);
   for(const saved of controls){const node=$('actionFields').querySelector(`[name="${saved.name}"]`);if(node){node.value=saved.value;if(node.type==='checkbox')node.checked=saved.checked;}}
  }
@@ -611,3 +612,5 @@ async function refreshWhenIdle(){if(autoRefreshBusy||state.mode!=='connected'||d
 setInterval(()=>void refreshWhenIdle(),90000);window.addEventListener('focus',()=>void refreshWhenIdle());document.addEventListener('visibilitychange',()=>void refreshWhenIdle());
 
 window.addEventListener('scroll',event=>{if(mobileNavGroup!==null&&closeMenuOnScroll(event,$('nav'))){mobileNavGroup=null;renderNavigation();}},{passive:true,capture:true});
+
+document.addEventListener('click',async event=>{const button=event.target.closest('[data-draft-decision]');if(!button||writeBusy)return;try{writeBusy=true;button.disabled=true;await mutate('draft_decision',{id:button.dataset.id,approve:button.dataset.draftDecision==='approve'});}catch(error){toast(error.message);}finally{writeBusy=false;button.disabled=false;}});

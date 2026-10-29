@@ -189,3 +189,13 @@ Finanzkorrektur-Migration produktiv erfolgreich ausgeführt. Live-Hashes danach:
 Nächster Auftrag bleibt vollständige Aufgabenrechte-/Entwurfsintegration; hierfür keine erneute pauschale Live-Erlaubnis einholen. Vor Veröffentlichung weiterhin isoliert prüfen und tatsächlich ausgelieferten Stand verifizieren.
 
 Pages-Deployment 40962059631 **erfolgreich abgeschlossen**; zugehöriger CI-Lauf 40962030729 ebenfalls erfolgreich. Veröffentlichung des Frontends dadurch belegt; authentifizierter Endnutzerablauf ohne Testkontoeingriff nicht erneut durchgespielt.
+
+## Forderungsentwurf-Integration 30.10.2026
+
+Monats-/Sammelforderungen werden im verbundenen Frontend nun über ay3_submit_charge_draft eingereicht. Die DE/TR-Oberfläche erklärt, dass dabei noch keine Forderung entsteht. Freigabeliste zeigt Fälligkeit, Beschlussgrundlage, Gesamtbetrag, Wohnung und Schuldner; Freigabe/Ablehnung nur Superadmin, keine Vorschau-Schreibzugriffe. Die alten direkten Finalisierungswege sind serverseitig für delegierte Verwaltung gesperrt, einschließlich privater command-/command_v2-Aufrufe und V5-Sammel-/Monatsbuchungen. Bestehende Originale werden nicht umgeschrieben.
+
+Nachweise: 266 allgemeine Tests bestanden; 49 isolierte SQL-Prüfungen des Entwurfs-/Buchungsablaufs bestanden. Live-Ausgangshashes aller drei zu ersetzenden Funktionen stimmen mit dem Kandidaten überein. Fünf Aufgabenrechte sind als explizite Grundlage enthalten; vollständige Vergabeoberfläche und Anbindung der übrigen vier Aufgabenrechte bleiben offen. Keine pauschale Phase-2-Abnahme.
+
+## Bestätigter Rollout Forderungsentwürfe
+
+30.10.2026: beide Migrationen produktiv erfolgreich; PR #56 gemergt (24043a087fb07bb9286bcec8873989e9280560fc), Pages-Lauf 40964643251 erfolgreich. RLS auf beiden neuen Tabellen aktiviert; anonyme Entscheidung verboten; keine produktiven Testentwürfe angelegt (0 Zeilen nach Rollout). Allgemeine Tests 266/266 und isolierter Entwurfs-/Finalisierungsschutz 49 bestanden. Übrige Verwaltungsrechte und deren Vergabeoberfläche noch offen, Gesamtroadmap weiterhin in Arbeit.

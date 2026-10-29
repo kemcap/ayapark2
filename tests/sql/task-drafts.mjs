@@ -7,7 +7,7 @@ const check=(name,value)=>{assert(value,name);passed++;};
 const as=async n=>{await db.exec('reset role;set role authenticated');await q("select set_config('request.jwt.claims',$1,false)",[JSON.stringify({sub:u(n),role:'authenticated'})]);};
 const deny=async f=>{await assert.rejects(f,{code:'42501'});passed++;};
 try{
- for(const f of ['schema.sql','../../supabase/migrations/20261025073340_v4_finance_release_safety.sql','../../supabase/migrations/20261025194333_v5_notifications_finance.sql','../../supabase/migrations/20261029214410_phase2_task_grants_charge_drafts.sql'])await db.exec(await readFile(new URL(f,import.meta.url),'utf8'));
+ for(const f of ['schema.sql','../../supabase/migrations/20261025073340_v4_finance_release_safety.sql','../../supabase/migrations/20261025194333_v5_notifications_finance.sql','../../supabase/migrations/20261029212437_phase2_superadmin_finance_corrections.sql','../../supabase/migrations/20261029214410_phase2_task_grants_charge_drafts.sql','../../supabase/migrations/20261029221256_phase2_draft_workflow_integration.sql'])await db.exec(await readFile(new URL(f,import.meta.url),'utf8'));
  await db.exec(`insert into public.site_staff_memberships(site_id,user_id,role) values('${s}','${u(2)}','deputy');`);
  const tasks=['people_manage','occupancy_invite','charges_prepare','bank_reconcile','announcements_publish'];
  for(const task of tasks){
@@ -18,6 +18,9 @@ try{
  await deny(()=>q('select public.ay3_set_task_grants($1,$2,$3)',[s,u(2),tasks]));
  await as(1);await q('select public.ay3_set_task_grants($1,$2,$3)',[s,u(2),['charges_prepare']]);await as(2);
  const submit=(request,p={})=>q('select public.ay3_submit_charge_draft($1,$2,$3,$4)',[s,request,'batch_charge',p]);
+ await deny(()=>q('select public.ay5_command($1,$2,$3)',[s,'batch_charge',{}]));
+ await db.exec('reset role');await q('insert into public.ay2_permissions(site_id,user_id,capabilities) values($1,$2,$3) returning true',[s,u(2),['finance']]);await as(2);
+ for(const action of ['charge','monthly','confirm_staged'])await deny(()=>q('select public.ay2_command($1,$2,$3)',[s,action,{}]));
  const draft=await submit(u(40));check('stable draft id',draft===await submit(u(40)));
  check('no financial effects',await q('select count(*)::int from public.ay2_charges')===0);
  await deny(()=>q('select public.ay3_decide_charge_draft($1,$2,true)',[s,draft]));
@@ -43,5 +46,5 @@ try{
  await as(3);check('resident cannot read drafts',await q('select count(*)::int from public.ay3_charge_drafts')===0);
  await deny(()=>submit(u(41)));
  await db.exec('reset role;set role anon');await deny(()=>submit(u(42)));
- console.log(JSON.stringify({passed,failed:0,scope:'isolated task-grant and draft foundation; booking tested; legacy route and UI integration still pending'}));
+ console.log(JSON.stringify({passed,failed:0,scope:'isolated task-grant and draft foundation; draft lifecycle, booking and legacy-finalization rejection tested'}));
 }finally{await db.close();}
