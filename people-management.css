@@ -28,3 +28,26 @@
  :root[data-design] .resident-dashboard-claims>.summary-grid,
  :root[data-design] .resident-summary-wrap>.resident-dashboard-summary{grid-template-columns:minmax(0,1fr)}
 }
+
+/* Linked apartments from person cards: accessible controls and a reversible editing view. */
+.person-unit-reference{display:inline-flex;align-items:center;gap:.45rem;flex-wrap:wrap;min-width:0}
+.person-unit-reference .button{min-height:40px;padding:.42rem .8rem;font-weight:750}
+.person-record .person-unit-reference .button{position:relative;z-index:2}
+.person-unit-nav{display:flex;align-items:center;justify-content:flex-start;gap:.6rem;margin-bottom:16px}
+.person-unit-back{min-height:44px;white-space:normal;text-align:left}
+#detailDialog.person-unit-drawer{
+ position:fixed;inset:0 0 0 auto;margin:0;
+ width:min(600px,100vw);max-width:600px;
+ height:100dvh;max-height:100dvh;
+ border-radius:20px 0 0 20px;
+ overscroll-behavior:contain;
+}
+@media(max-width:760px){
+ #detailDialog.person-unit-drawer{
+  inset:0;margin:0;width:100vw;max-width:100vw;
+  height:100dvh;max-height:100dvh;
+  border-radius:0;padding:20px 16px max(18px,env(safe-area-inset-bottom));
+ }
+ #detailDialog.person-unit-drawer .person-unit-nav{position:sticky;top:-20px;z-index:3;padding:10px 0;background:var(--paper)}
+ #detailDialog.person-unit-drawer .person-unit-back{width:100%}
+}
