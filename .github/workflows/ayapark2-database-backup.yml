@@ -1,0 +1,96 @@
+name: AyaPark 2 - Encrypted database backup
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 00:17 UTC = 03:17 in Türkiye (Europe/Istanbul)
+    - cron: "17 0 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ayapark2-encrypted-database-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+
+    steps:
+      - name: Export, verify, encrypt and upload backup
+        shell: bash
+        env:
+          PGHOST: ${{ secrets.AY_BACKUP_DB_HOST }}
+          PGUSER: ${{ secrets.AY_BACKUP_DB_USER }}
+          PGPASSWORD: ${{ secrets.AY_BACKUP_DB_PASSWORD }}
+          PGDATABASE: postgres
+          PGPORT: "5432"
+          PGSSLMODE: require
+          RCLONE_CONFIG_B64: ${{ secrets.AY_BACKUP_RCLONE_CONFIG_B64 }}
+        run: |
+          set -euo pipefail
+          umask 077
+
+          for key in PGHOST PGUSER PGPASSWORD RCLONE_CONFIG_B64; do
+            if [[ -z "${!key:-}" ]]; then
+              echo "::error::Required repository secret missing for $key"
+              exit 1
+            fi
+          done
+
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq age rclone
+
+          scratch="$(mktemp -d "$RUNNER_TEMP/ayapark2-db-backup.XXXXXXXX")"
+          trap 'rm -rf "$scratch"' EXIT
+          chmod 700 "$scratch"
+
+          export RCLONE_CONFIG="$scratch/rclone.conf"
+          printf '%s' "$RCLONE_CONFIG_B64" | base64 --decode > "$RCLONE_CONFIG"
+          unset RCLONE_CONFIG_B64
+          chmod 600 "$RCLONE_CONFIG"
+
+          date_stamp="$(date -u +%Y%m%d-%H%M%S)"
+          dump_name="ayapark2-${date_stamp}.dump"
+          enc_name="${dump_name}.age"
+          remote="drive:AyaPark2-Backups/${enc_name}"
+
+          echo "Exporting public and auth schemas using PostgreSQL 17..."
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --env PGHOST --env PGUSER --env PGPASSWORD \
+            --env PGDATABASE --env PGPORT --env PGSSLMODE \
+            --volume "$scratch:/backup" \
+            postgres:17 \
+            pg_dump -Fc --no-owner --no-acl -n public -n auth \
+              -f "/backup/$dump_name"
+
+          echo "Checking backup archive entries..."
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --volume "$scratch:/backup:ro" \
+            postgres:17 \
+            pg_restore --list "/backup/$dump_name" > "$scratch/archive-index.txt"
+
+          grep -Eq 'TABLE DATA[[:space:]]+auth[[:space:]]+users' "$scratch/archive-index.txt"
+          grep -Eq 'TABLE DATA[[:space:]]+public[[:space:]]+ay2_entries' "$scratch/archive-index.txt"
+          grep -Eq 'TABLE DATA[[:space:]]+public[[:space:]]+site_units' "$scratch/archive-index.txt"
+
+          echo "Encrypting archive with the existing public age recipient..."
+          age -r 'age1amttspnqe7l3sdk3g4c725qgr0ta5a7x4as5fjd782wlkvvpjvmselx87p' \
+            -o "$scratch/$enc_name" "$scratch/$dump_name"
+
+          test -s "$scratch/$enc_name"
+          rm -f "$scratch/$dump_name" "$scratch/archive-index.txt"
+
+          echo "Uploading encrypted archive to Google Drive..."
+          rclone copyto "$scratch/$enc_name" "$remote"
+
+          echo "Verifying Google Drive ciphertext checksum..."
+          local_hash="$(sha256sum "$scratch/$enc_name" | awk '{print $1}')"
+          remote_hash="$(rclone cat "$remote" | sha256sum | awk '{print $1}')"
+          test "$local_hash" = "$remote_hash"
+
+          echo "BACKUP ERFOLGREICH ERSTELLT: $remote"
