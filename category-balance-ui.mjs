@@ -2,7 +2,7 @@ import {devirArchive} from './devir-archive-ui.mjs?v=5.9.16';
 import {t as tr,getLanguage} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,money} from './core.mjs?v=5.8.1';
 import {remaining} from './ledger.mjs?v=5.8.1';
-import {scopedCharges} from './v3-domain.mjs?v=5.9.0';
+import {scopedCharges} from './v3-domain.mjs?v=5.9.20';
 
 const categories=['Su dijital kafa','Aidat','Asansör','Bina kapısı bakımı','Havuz','Demirbaş','Su arıtma bakımı','Diğer'];
 function classify(c){
