@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="./styles.css?v=5.9.0">
 <link rel="stylesheet" href="./recovery.css">
 <link rel="stylesheet" href="./install-tutorial.css">
-<script type="module" src="./app.mjs?v=5.9.22"></script>
+<script type="module" src="./app.mjs?v=5.9.24"></script>
 <link rel="stylesheet" href="./v4-ui.css?v=4.0">
 <link rel="stylesheet" href="./access-requests.css?v=5.8.1">
 <link rel="stylesheet" href="./invite-ui.css?v=5.2.0">
@@ -71,6 +71,10 @@
  <label class="field">WhatsApp telefonu<input id="invitePhone" type="tel" autocomplete="tel"></label>
  <label class="field">Davet metni<textarea id="inviteMessage" rows="9"></textarea></label>
  <label class="invite-consent"><input type="checkbox" id="inviteConfirm"><span>Bu kişi için erişim yetkisini onaylıyorum. Otomatik gönderim yapılmaz.</span></label>
+ <div id="inviteRecoveryBox" hidden>
+  <p class="info-strip">Bu telefon veya e-posta ile önceden oluşturulmuş, artık daireye bağlı olmayan bir hesap bulundu. Yeni hesap açmak yerine eski hesap güvenli şekilde yeniden kullanılacak.</p>
+  <label class="invite-consent"><input type="checkbox" id="inviteRecoveryConfirm"><span>Kişinin kimliğini ve eski hesabın kendisine ait olduğunu ayrıca doğruladım; hesabın yeniden kullanılmasına ve şifresinin değiştirilmesine onay veriyorum.</span></label>
+ </div>
  <button type="button" id="inviteRevoke" class="button">Bekleyen davetleri iptal et</button>
  <button type="button" id="inviteGenerate" class="button primary">Bağlantı oluştur</button>
  <label class="field">Kişisel bağlantı<input type="url" id="inviteLink" readonly aria-label="Davet bağlantısı"></label>
