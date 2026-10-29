@@ -9,12 +9,12 @@ import {setLanguage} from '../i18n.mjs?v=5.8.1';
 const state=()=>({data:fullDemo(),mode:'demo',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',preset:'all'},reportFilter:{preset:'all'}});
 const csv=(income,expense,unit='A-1')=>templateHeader+'\n2026-10-23;ref;Sender;Payment;'+income+';'+expense+';'+unit+';;';
 
-test('a resident retains own former debt in dues and unit details, without another person’s debt',()=>{
+test('authorized apartment view retains both debtors with no management actions',()=>{
  const s=state();s.data.role='resident';s.data.ownPersonIds=['demo-former'];
  s.data.charges.find(c=>c.id==='demo-former-charge').label='OWN FORMER DEBT';
  s.data.charges.find(c=>c.id==='demo-own-charge').label='OTHER PERSON DEBT';
  for(const html of [duesV3(s),unitDetailV3(s,'A-4')]){
-  assert(html.includes('OWN FORMER DEBT'));assert(!html.includes('OTHER PERSON DEBT'));
+  assert(html.includes('OWN FORMER DEBT'));assert(html.includes('OTHER PERSON DEBT'));
   assert(!html.includes('data-action="allocate"'));assert(!html.includes('data-action="void_charge"'));
  }
  assert(unitDetailV3(s,'A-4').includes('₺7.200,00'));

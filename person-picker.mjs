@@ -1,4 +1,4 @@
-import {norm} from './v3-domain.mjs?v=5.9.0';
+import {norm} from './v3-domain.mjs?v=5.9.26';
 import {escapeHtml as e} from './core.mjs?v=5.8.1';
 import {getLanguage} from './i18n.mjs?v=5.8.1';
 const text=(tr,de)=>getLanguage()==='de'?de:tr;

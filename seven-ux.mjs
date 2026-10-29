@@ -1,5 +1,5 @@
 import {remaining} from './ledger.mjs?v=5.8.1';
-import {scopedCharges} from './v3-domain.mjs?v=5.9.20';
+import {scopedCharges} from './v3-domain.mjs?v=5.9.26';
 import {t as tr} from './i18n.mjs?v=5.8.1';
 export function apartmentAmounts(d,unitId){
  const persons=new Map();let unassigned=0,total=0;

@@ -1,5 +1,5 @@
 import {escapeHtml as escape} from './core.mjs?v=5.8.1';
-import {today} from './v3-domain.mjs?v=5.9.0';
+import {today} from './v3-domain.mjs?v=5.9.26';
 import {getLanguage} from './i18n.mjs?v=5.8.1';
 
 export const invitableRelationship=link=>['owner','tenant','representative'].includes(link.role)

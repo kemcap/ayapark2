@@ -3,7 +3,7 @@ import {buildV3Form,payloadV3} from './v3-forms.mjs?v=5.8.6';
 import {t as tr} from './i18n.mjs?v=5.8.1';
 import {escapeHtml as e,money,randomId} from './core.mjs?v=5.8.1';
 import {remaining,unassigned} from './ledger.mjs?v=5.8.1';
-import {personName,creditAvailable} from './v3-domain.mjs?v=5.9.0';
+import {personName,creditAvailable} from './v3-domain.mjs?v=5.9.26';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 export const field=(name,label,type='text',value='',attrs='')=>`<label class="field">${tr(label)}<input name="${name}" type="${type}" value="${e(value)}" ${attrs}></label>`;
 const select=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}">${options.map(([v,l])=>`<option value="${e(v)}" ${String(v)===String(value)?'selected':''}>${e(tr(l))}</option>`).join('')}</select></label>`;

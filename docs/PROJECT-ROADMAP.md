@@ -165,3 +165,7 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 
 Nächster Schritt: Abschnitt 3 der neuen Anleitung lokal durchführen (OAuth-Status, echte Datei herunterladen, mit vorhandenem privaten Schlüssel lokal entschlüsseln und mit PostgreSQL 17 auflisten). Danach isolierten versionsgebundenen Importplan erstellen. Produktionsdaten, main, Secrets und Workflow-Aktivierung wurden bei diesem Abgleich nicht verändert.
 
+
+## Fehlerbereinigung 30.10.2026
+
+Die 13 fehlgeschlagenen allgemeinen Prüfungen wurden behoben. Ergebnis: **264/264 bestanden, 0 fehlgeschlagen**, keine Tests deaktiviert. Anwendungskorrekturen: persönliche historische Forderungen zusätzlich zur berechtigten Wohnungssicht erhalten; deutschen Sprachcode korrekt auswerten; Cacheversionen derselben Laufzeitmodule über App/Recovery konsistent verwenden. Testkorrekturen: Detaildialog-Funktion gezielt isolieren, neue Devir-API-Antwort im Mock berücksichtigen, zusätzliche CSS-Klasse akzeptieren, überholte persönliche Sichtannahmen an die beschlossene gemeinsame Wohnungssicht anpassen. Fremde Wohnungen und private Kontaktdaten bleiben in den Prüfungen ausgeschlossen. Kein Live-Deployment oder produktiver Datenbankzugriff.

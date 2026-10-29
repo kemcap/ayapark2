@@ -79,3 +79,7 @@ Vor Freigabe aktuellen Live-Funktionsstand schreibgeschützt vergleichen und Mig
 Nächster Schritt: fünf fachliche Aufgabenrechte und der Entwurfs-/Endfreigabeablauf; 13 bestehende allgemeine Testfehler vor einem Release fachlich auflösen. Offizielle Grundlage zu Funktions-EXECUTE und RLS: https://supabase.com/docs/guides/api/securing-your-api (30.10.2026 geprüft). Supabase-Changelog auf relevante Änderungen gesichtet; keine neuen Plattform-/Auth-/RLS-Einstellungen werden eingeführt.
 
 Allgemeine Suite nach der Korrektur erneut geprüft: **251 bestanden / dieselben 13 Fehler**, insgesamt 264 Tests einschließlich der zwei neuen UI-Tests. Keine zusätzlichen allgemeinen Fehler durch diesen Kandidaten.
+
+## Fehlerbereinigung 30.10.2026
+
+Die 13 fehlgeschlagenen allgemeinen Prüfungen wurden behoben. Ergebnis: **264/264 bestanden, 0 fehlgeschlagen**, keine Tests deaktiviert. Anwendungskorrekturen: persönliche historische Forderungen zusätzlich zur berechtigten Wohnungssicht erhalten; deutschen Sprachcode korrekt auswerten; Cacheversionen derselben Laufzeitmodule über App/Recovery konsistent verwenden. Testkorrekturen: Detaildialog-Funktion gezielt isolieren, neue Devir-API-Antwort im Mock berücksichtigen, zusätzliche CSS-Klasse akzeptieren, überholte persönliche Sichtannahmen an die beschlossene gemeinsame Wohnungssicht anpassen. Fremde Wohnungen und private Kontaktdaten bleiben in den Prüfungen ausgeschlossen. Kein Live-Deployment oder produktiver Datenbankzugriff.

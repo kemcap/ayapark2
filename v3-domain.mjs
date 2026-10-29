@@ -17,7 +17,7 @@ export const today=()=>new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/I
 export const activeAt=(l,day=today())=>typeof l.active==='boolean'?l.active:(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day);
 export const personName=(d,id)=>d.persons?.find(p=>p.id===id)?.full_name||'';
 export function personLinks(d,unit,day=today()){return (d.links||[]).filter(l=>(!unit||l.unit_id===unit)&&activeAt(l,day));}
-export function scopedCharges(d){return d.role==='resident'?d.charges.filter(c=>(d.ownIds||[]).includes(c.unit_id)):d.charges;}
+export function scopedCharges(d){return d.role==='resident'?d.charges.filter(c=>((d.ownIds||[]).includes(c.unit_id)||(d.ownPersonIds||[]).includes(c.person_id))):d.charges;}
 export const dateValid=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'')&&Number.isFinite(Date.parse(s))&&new Date(s).toISOString().slice(0,10)===s;
 export function rangeFor(preset,now=today()){
  const day=new Date(now+'T12:00:00Z');const iso=d=>d.toISOString().slice(0,10);let from='',to='';
