@@ -43,15 +43,24 @@ Deno.serve(async req=>{
    .select('id,code').eq('site_id',site.id).order('code');
   if(unitError||!units?.length)return reply({error:'site_unavailable'},503);
   const siteUnitIds=new Set(units.map(u=>u.id));
-  const [{data:staff}, {data:residents,error:residentError}]=await Promise.all([
+  const [{data:staff}, {data:residents,error:residentError}, {data:people,error:peopleError}]=await Promise.all([
    admin.from('site_staff_memberships').select('role').eq('site_id',site.id)
     .eq('user_id',identity.user.id).maybeSingle(),
    admin.from('site_resident_units').select('unit_id,role,active')
-    .eq('user_id',identity.user.id).eq('active',true)
+    .eq('user_id',identity.user.id).eq('active',true),
+   admin.from('ay3_persons').select('id').eq('site_id',site.id).eq('auth_user_id',identity.user.id).is('archived_at',null)
   ]);
-  if(residentError)return reply({error:'accounting_unavailable'},503);
+  if(residentError||peopleError)return reply({error:'accounting_unavailable'},503);
+  const ids=new Set((people||[]).map(p=>p.id));
+  const {data:personLinks,error:linksError}=ids.size?await admin.from('ay3_links')
+   .select('unit_id,person_id,role,active,archived_at,starts_on,ends_on').eq('site_id',site.id)
+   .in('person_id',[...ids]):{data:[],error:null};
+  if(linksError)return reply({error:'accounting_unavailable'},503);
+  const today=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'});
+  const entitledUnits=new Set((personLinks||[]).filter(l=>['owner','tenant'].includes(l.role)&&
+    l.active&&!l.archived_at&&(!l.starts_on||l.starts_on<=today)&&(!l.ends_on||l.ends_on>=today)).map(l=>l.unit_id));
   const ownUnitIds=[...new Set((residents||[]).filter(r=>siteUnitIds.has(r.unit_id)&&
-    ['owner','tenant'].includes(r.role)).map(r=>r.unit_id))];
+    ['owner','tenant'].includes(r.role)&&entitledUnits.has(r.unit_id)).map(r=>r.unit_id))];
   if(!staff&&!ownUnitIds.length)return reply({error:'access_denied'},403);
   const [charges,allocations,entries,credits,staged]=await Promise.all([
    fetchAll('ay2_charges','id,unit_id,person_id,cents,void_reason'),
@@ -60,11 +69,9 @@ Deno.serve(async req=>{
    fetchAll('ay3_credits','entry_id,cents,void_reason'),
    fetchAll('ay2_staged_charges','id,confirmed_charge,ignored_reason')
   ]);
-  const {data:people,error:peopleError}=await admin.from('ay3_persons').select('id').eq('site_id',site.id).eq('auth_user_id',identity.user.id);
-  if(peopleError)return reply({error:'accounting_unavailable'},503);
-  const ids=new Set((people||[]).map(p=>p.id));
   const result=calculateClaims({units,charges,allocations,entries,credits,staged,ownUnitIds:[]});
-  const personal=calculateClaims({units,charges:charges.filter(c=>ids.has(c.person_id)),allocations,entries:[],credits:[],staged:[],ownUnitIds});
+  // Residents see all charges belonging to their authorized apartments, regardless of debtor.
+  const personal=calculateClaims({units,charges,allocations,entries:[],credits:[],staged:[],ownUnitIds});
   result.own_total_cents=personal.own_total_cents;result.own_units=personal.own_units;
   // Staff may see site aggregate but not their own-units breakdown unless explicitly linked.
   return reply(result);
