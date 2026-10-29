@@ -1,6 +1,6 @@
 # AyaPark 2 – kostenloser Backup-Prototyp (Phase 1)
 
-Status: **PREPARED / NICHT AKTIVIERT**. Stand: 28.10.2026.
+Status: **PREPARED / NICHT AKTIVIERT**. Stand: 29.10.2026.
 Branch: `feature/free-backup-preparation-20261028`. **Nicht mit `main` mergen, bevor die Prüfungen abgeschlossen und ausdrücklich freigegeben sind.**
 
 ## 1. Was existiert bereits?
@@ -11,6 +11,9 @@ Branch: `feature/free-backup-preparation-20261028`. **Nicht mit `main` mergen, b
 - `scripts/backup/export_storage.py` lädt tatsächliche Dateien separat lesend über die Storage-API herunter und erstellt ein Manifest. Derzeit hat das Produktivprojekt **0 Storage-Buckets**. Dieses Skript ist für spätere Buckets vorbereitet und muss bei vorhandenen Dateien separat getestet werden.
 - Die Ausgabedateien und Prüfsummen werden in einen Stream gepackt und sofort mittels `age` verschlüsselt. **Keine unverschlüsselten Sicherungen werden im GitHub-Repository oder in GitHub Actions Artifacts gespeichert.**
 - `rclone` lädt nur die **verschlüsselte** Sicherung zum externen Speicher hoch und prüft anschließend, ob der Ziel-Dateiname aufgelistet wird. Eine separate vollständige Download-/Restoreprüfung folgt noch.
+- `scripts/backup/export_source.py` erzeugt aus einem vollständigen Checkout ein eigenständiges Git-Bundle aller lokal verfügbaren Referenzen und ihrer erreichbaren Historie. Es prüft direkt einen unabhängigen Spiegel-Restore. LFS-/Submodule-Inhalte und flache Historien führen zum Abbruch.
+- `source/repository.bundle`, `source/refs.json`, `source/head-tree.txt` und `config/recovery-inventory.md` werden vor dem Verschlüsseln in dasselbe Paket aufgenommen; Archivformat 2 verlangt diese Dateien. Format 1 bleibt als älteres DB-/Storage-Archiv lesbar.
+- `docs/BACKUP-RECOVERY-INVENTORY.md` beschreibt den Wiederaufbau ohne GitHub; es ist eine Checkliste, kein Export aktueller Plattform-/Auth-/SMTP-/OAuth-Einstellungen.
 - `scripts/backup/verify_snapshot.py` kontrolliert die Integrität des nach privater Entschlüsselung erzeugten Archivs; es **stellt keine Datenbank wieder her**.
 
 ## 2. Warum ist diese Vorbereitung noch nicht produktionsreif?
@@ -73,7 +76,7 @@ GitHub-Secrets werden einem Workflow mit entsprechendem Zugriff zugänglich: Auf
 
 ### Schritt D: Sichere Tests
 
-1. Workflow- und Skript-Syntax ohne Zugangsdaten lokal testen.
+1. Workflow- und Skript-Syntax ohne Zugangsdaten lokal testen. Offline-Quellcode-/Archivtests: `python3 -B scripts/backup/test_source_backup.py`. Bereits geprüft: 6 Tests sowie tatsächlicher Git-Spiegel mit 62 Referenzen, jeweils unabhängiger Restore und Git-Objektprüfung. Dies ersetzt keine Verschlüsselungs- oder DB-/Storage-Prüfung.
 2. Auf isolierten Testdaten prüfen, ob die Dumps, Dateiexporte, Verschlüsselung und rclone-Übertragung wie erwartet funktionieren.
 3. Aus dem externen Speicher ein archiviertes Paket herunterladen.
 4. Lokal entschlüsseln: `age -d -i /sicherer/pfad/ayapark2-recovery-identity.txt -o snapshot.tar ayapark2-....tar.age`.

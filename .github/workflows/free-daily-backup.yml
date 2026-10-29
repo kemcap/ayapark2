@@ -28,6 +28,10 @@ jobs:
       RCLONE_REMOTE_DEST: ${{ vars.AYAPARK_BACKUP_REMOTE_DEST }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Bundle all branches/tags and their history, not the default shallow clone.
+          fetch-depth: 0
+          persist-credentials: false
       - name: Install open-source backup tools
         run: |
           sudo apt-get update -qq

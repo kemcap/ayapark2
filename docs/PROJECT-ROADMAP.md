@@ -1,6 +1,6 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
 
-Stand: 28.10.2026 · Projekt: `kemcap/ayapark2` · Produktivbranch: `main`
+Stand: 29.10.2026 · Projekt: `kemcap/ayapark2` · Produktivbranch: `main`
 
 **Status:** Phase 0 (erste read-only Bestandsaufnahme) abgeschlossen, Sicherheitsbefunde noch zu prüfen; **Phase 1 (kostenlose und vollständige Backups) in Vorbereitung**. Noch keine Live-Daten-/Schema-/Einstellungsänderungen aufgrund dieser Roadmap.
 
@@ -46,11 +46,11 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 
 ### 1.2 Portabilität vollständig machen – **NÄCHSTE TECHNISCHE AUFGABE**
 
-- [ ] Git-Bundle aller für den vollständigen Wiederaufbau erforderlichen Branches/Tags/Commits in den **verschlüsselten** Sicherungsprozess integrieren.
-- [ ] Website, HTML, CSS, JS, Assets, Design und Edge-Function-Code über Repo-Sicherung nachweisbar erfassen.
-- [ ] Infrastruktur-/Konfigurationsinventar ohne Geheimnisse hinzufügen: GitHub Pages, Supabase-Projekt-, Auth-/SMTP-/OAuth- und Storage-Einstellungen; dokumentieren, welche Secrets bei Umzug *neu gesetzt* werden müssen.
+- [x] Git-Bundle aller im vollständigen Checkout vorhandenen Referenzen und erreichbaren Historie in den **verschlüsselten** Sicherungsprozess integriert; isolierter Git-Restore getestet. Verschlüsselungs-/Offsite-Rundlauf bleibt in 1.4 offen.
+- [x] Versionierte Website, HTML, CSS, JS, Assets, Design und Edge-Function-Code im Git-Bundle erfasst; Ref-/Tree-Inventar und unabhängige Wiederherstellung geprüft.
+- [ ] Infrastruktur-/Konfigurationsinventar ohne Geheimnisse vervollständigen (Checkliste `docs/BACKUP-RECOVERY-INVENTORY.md` ergänzt; Livewerte noch offen): GitHub Pages, Supabase-Projekt-, Auth-/SMTP-/OAuth- und Storage-Einstellungen; dokumentieren, welche Secrets bei Umzug *neu gesetzt* werden müssen.
 - [ ] Prüfen, dass Backup auch bei Totalverlust von GitHub und bei Supabase-Migration auf Self-Hosting nutzbar ist.
-- [ ] Git-Bundle-Inhalt und Wiederherstellung in ein **neues isoliertes** Repository nachweisen.
+- [x] Git-Bundle-Inhalt und Wiederherstellung in ein **neues isoliertes** Repository nachgewiesen: 6 Offline-Integrationstests; zusätzlich tatsächliches Repo mit 62 Referenzen und Git-Objektprüfung (`fsck --full --strict`).
 
 ### 1.3 Einmalige Nutzer-Einrichtung (noch offen)
 
@@ -118,8 +118,15 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 
 ## Nächster Schritt – Übergabe an nächsten Chat
 
-**Aktuell zuerst Phase 1.2:** Auf demselben GitHub-Entwicklungsbranch einen vollständigen Quellcode-/Git-Bundle-Export in das verschlüsselte Offsite-Paket integrieren und testen; produktive Daten, GitHub-`main`, Supabase-Projekt und GitHub-Secrets nicht ändern. Danach fortfahren mit der lokalen einmaligen Einrichtung von `age` und `rclone` auf dem Gerät des Benutzers.
+**Aktuell Phase 1.3 vorbereiten:** Quellcode-/Git-Bundle-Export in PR #52 integriert und isoliert wiederhergestellt. Als nächstes lokale Werkzeuge `age`/`age-keygen`/`rclone` auf dem Gerät des Benutzers prüfen und einrichten; privaten Schlüssel ausschließlich dort erzeugen. Parallel bleibt das Vervollständigen des tatsächlichen Plattforminventars aus 1.2 offen. Kein produktiver Export, Offsite-Upload oder Verschlüsselungs-/Gesamt-Restoretest wurde ausgeführt. Produktivdaten, `main`, Supabase und GitHub-Secrets unverändert lassen.
 
 **Projektkontext:** `docs/AYA-PARK-2-CONTEXT-HANDOFF.md`
 **Backup-Anleitung:** `docs/FREE-BACKUP-SETUP.md`
 **Draft PR:** https://github.com/kemcap/ayapark2/pull/52
+
+## Prüfnachweis 29.10.2026 — Teilaufgabe Quellcode
+
+- `python3 -B scripts/backup/test_source_backup.py`: 6 bestanden (Branches/Tags/Remote-Refs, isolierter Restore ohne Ursprungsrepo, flacher Checkout, ungesicherte Änderungen, LFS-/Submodule-Abbruch, Format-2-Vollständigkeit und Korruption).
+- Tatsächlicher Repository-Spiegel: 62 Referenzen, 1.676.595 Byte Bundle; unabhängiger Clone und `git fsck --full --strict` bestanden. Erfasster `origin/main`: `5ba166cf2960f68cd52eac5b63a44f477fd41645`.
+- `bash -n scripts/backup/backup.sh` und `git diff --check` bestanden.
+- Nur Quellcode- und Archivintegrität geprüft; keine Behauptung eines erfolgreichen Datenbank-/Auth-/Storage-Restores. Workflow bleibt deaktiviert.

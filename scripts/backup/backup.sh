@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 umask 077
 
-if [[ "$BACKUP_EXECUTION_ACK" != "YES" ]]; then
+if [[ "${BACKUP_EXECUTION_ACK:-}" != "YES" ]]; then
   echo "Backup blocked: missing explicit execution acknowledgement." >&2
   exit 1
 fi
@@ -29,6 +29,11 @@ fi
 TEMP="$(mktemp -d)"
 trap 'rm -rf "$TEMP"' EXIT
 mkdir -p "$TEMP/export/db" "$TEMP/export/storage"
+# Only committed Git objects are included. Local config, environment and credentials
+# are never copied. The bundle joins the same encrypted stream as database/files.
+python3 scripts/backup/export_source.py . "$TEMP/export/source"
+mkdir -p "$TEMP/export/config"
+cp docs/BACKUP-RECOVERY-INVENTORY.md "$TEMP/export/config/recovery-inventory.md"
 printf '%s' "$RCLONE_CONFIG_B64" | base64 --decode > "$TEMP/rclone.conf"
 chmod 600 "$TEMP/rclone.conf"
 REMOTE_NAME="$(printf '%s' "$RCLONE_REMOTE_DEST" | cut -d ':' -f 1)"
@@ -65,8 +70,8 @@ for path in sorted(root.rglob("*")):
         with path.open("rb") as source:
             digest = hashlib.file_digest(source, "sha256").hexdigest()
         items[rel] = {"bytes": path.stat().st_size, "sha256": digest}
-manifest = {"format": 1, "project_ref": os.environ["SUPABASE_PROJECT_REF"], "files": items,
-            "note": "Logical dumps require a supervised restore drill; platform configuration and credentials are excluded."}
+manifest = {"format": 2, "project_ref": os.environ["SUPABASE_PROJECT_REF"], "files": items,
+            "note": "Includes verified standalone Git bundle and recovery checklist; actual platform settings/secrets are not exported. Supervised database/Auth/Storage restore drill remains required."}
 (root / "manifest.json").write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
 PY
 

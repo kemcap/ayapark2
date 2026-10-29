@@ -25,7 +25,7 @@ with tarfile.open(sys.argv[1], "r:") as archive:
         raise SystemExit("Incomplete backup: manifests missing")
     raw = archive.extractfile(files["manifest.json"]).read()
     manifest = json.loads(raw)
-    if manifest.get("format") != 1 or not isinstance(manifest.get("files"), dict):
+    if manifest.get("format") not in (1, 2) or not isinstance(manifest.get("files"), dict):
         raise SystemExit("Invalid backup manifest")
     expected = manifest["files"]
     if set(files) != set(expected) | {"manifest.json"}:
@@ -33,6 +33,11 @@ with tarfile.open(sys.argv[1], "r:") as archive:
     for required in ("db/application.dump", "db/auth-data.dump", "db/storage-metadata.dump"):
         if required not in expected:
             raise SystemExit("Missing database dump: " + required)
+    if manifest["format"] == 2:
+        for required in ("source/repository.bundle", "source/refs.json", "source/head-tree.txt",
+                         "config/recovery-inventory.md"):
+            if required not in expected or expected[required]["bytes"] <= 0:
+                raise SystemExit("Missing source/recovery inventory: " + required)
     for name, info in expected.items():
         digest = hashlib.sha256()
         length = 0
@@ -55,3 +60,5 @@ with tarfile.open(sys.argv[1], "r:") as archive:
         if info["sha256"] != obj["sha256"] or info["bytes"] != obj["bytes"]:
             raise SystemExit("Storage file mismatch: " + obj["path"])
 print("Archive integrity VERIFIED; actual Supabase RESTORE is NOT yet tested.")
+if manifest["format"] == 1:
+    print("Legacy format 1: source-code backup is NOT required or verified by this format.")
