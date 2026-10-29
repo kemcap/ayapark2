@@ -1,5 +1,16 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
 
+## Maßgeblicher Abgleich 30.10.2026 – älteren Angaben vorziehen
+
+GitHub am 30.10.2026 geprüft: main `2c55873506c1e132067876efae12cdc6e42fa358`, erfolgreiches Pages-Deployment 40955767893. Im Hauptzweig existiert bereits ein separater aktiver DB-Backup-Workflow (`ayapark2-database-backup.yml`, 03:17 Istanbul). Der Export-/Prüf-/Verschlüsselungs-/Upload-Schritt im Lauf 40945224444 ist erfolgreich. Sein Ergebnis ist **.dump.age**, kein Gesamtarchiv. Keine vollständige Laufhistorie oder erfolgreiche Wiederherstellung daraus ableiten.
+
+PR #52 bleibt offen/Draft; Head vor diesem Dokumentationsabgleich `c1c08843169a225ee562b45c5cc92f34972a048b`, 10 Commits voraus / 51 hinter main. Sein **Gesamtbackup-Entwurf bleibt gesperrt**. Keine Aktivierungsvariable ausgelesen oder geändert. Eine neue Aktivierung ist nicht erfolgt.
+
+Schlüsselanlage, getrennte Schlüsselkopie und rclone-Test sind laut neuerer Roadmap bereits nutzerbestätigt. Aussagen weiter unten zu „noch keine Secrets / kein Upload / keine Automation“ sind **historische Aussagen zum Entwurf**, keine Beschreibung des neueren Hauptzweigs.
+
+**Nächste Aufgabe:** echten Dump lokal entschlüsseln und anschließend isolierten DB-/Auth-/RLS-/Storage-Restore durchführen. Sichere Vorbereitung und konkrete lokale Anleitung: [BACKUP-RESTORE-PREPARATION.md](BACKUP-RESTORE-PREPARATION.md). Weder Entschlüsselung noch vollständiger Restore sind bisher nachgewiesen. Aktiven DB-Workflow nicht doppelt einrichten.
+
+
 Stand: **29.10.2026** · Status: **Phase 1 – Backupvorbereitung, NICHT produktiv aktiviert**.
 
 > Diese Datei ist der dauerhafte Übergabepunkt für neue ChatGPT-Chats und Entwickler. Sie beschreibt **vereinbarte Anforderungen und nachgewiesene Stände**, nicht den Beweis, dass jede Funktion implementiert ist. Vor Änderungen den aktuellen GitHub-Stand und Supabase-Zustand erneut überprüfen. Keine persönlichen Kontodaten, Bankdetails, Passwörter, API-Keys oder Verschlüsselungsschlüssel in dieser Datei ergänzen.
