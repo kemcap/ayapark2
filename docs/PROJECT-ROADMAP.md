@@ -142,3 +142,13 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - Tatsächlicher Repository-Spiegel: 62 Referenzen, 1.676.595 Byte Bundle; unabhängiger Clone und `git fsck --full --strict` bestanden. Erfasster `origin/main`: `5ba166cf2960f68cd52eac5b63a44f477fd41645`.
 - `bash -n scripts/backup/backup.sh` und `git diff --check` bestanden.
 - Nur Quellcode- und Archivintegrität geprüft; keine Behauptung eines erfolgreichen Datenbank-/Auth-/Storage-Restores. Workflow bleibt deaktiviert.
+
+## Prüfnachweis 30.10.2026 – Übernahme und Restore-Vorbereitung
+
+- [x] Alle drei Übergabedokumente vollständig gelesen; tatsächlichen main-/PR-/Branch-Stand verglichen. main: `2c55873506c1e132067876efae12cdc6e42fa358`; Pages-Lauf 40955767893 erfolgreich. PR #52 weiterhin Draft; vor diesem Abgleich 51 Commits hinter main / 10 voraus.
+- [x] Aktiven DB-Workflow gelesen und Erfolg des Export-/Upload-Schritts in Job 123698719576 / Lauf 40945224444 direkt geprüft. Kein neuer Backup-Lauf gestartet.
+- [x] Veraltete Übergabe-/Anleitungsangaben zum fehlenden Backupbetrieb eingeordnet. Nutzerbestätigte lokale Einrichtung nicht erneut angefordert.
+- [x] [BACKUP-RESTORE-PREPARATION.md](BACKUP-RESTORE-PREPARATION.md) ergänzt: aktuelle .dump.age-Sicherung vom .tar.age-Entwurf unterschieden; lokale Entschlüsselung/Inhaltsprüfung und isolierte Restore-Kriterien vorbereitet.
+- [ ] Tatsächliche lokale Entschlüsselung, kompatibles isoliertes Ziel und vollständiger DB-/Auth-/RLS-/Storage-/App-Restore bleiben offen. Kein Restore-Erfolg behauptet.
+
+Nächster Schritt: Abschnitt 3 der neuen Anleitung lokal durchführen (OAuth-Status, echte Datei herunterladen, mit vorhandenem privaten Schlüssel lokal entschlüsseln und mit PostgreSQL 17 auflisten). Danach isolierten versionsgebundenen Importplan erstellen. Produktionsdaten, main, Secrets und Workflow-Aktivierung wurden bei diesem Abgleich nicht verändert.
