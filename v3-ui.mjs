@@ -1,6 +1,6 @@
 import {categoryBalanceSummary} from './category-balance-ui.mjs?v=5.9.16';
 import {registrationStatus} from './person-status.mjs?v=5.9.0';
-import {apartmentAmounts} from './seven-ux.mjs?v=5.8.1';
+import {apartmentAmounts} from './seven-ux.mjs?v=5.9.20';
 import {financePanel} from './finance-forms.mjs?v=5.8.1';
 import {notificationTitle,notificationBody,hasRead,receives,notificationCenter,notificationState,notificationExpired} from './notifications.mjs?v=5.9.0';
 import {compactReview,reviewPanel} from './review-ui.mjs?v=5.8.1';
