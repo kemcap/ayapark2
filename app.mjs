@@ -30,7 +30,7 @@ const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
 const applyStaticLanguage=bindStaticText(document.body);
 const hideLoginPassword=bindPasswordEyes();
-let detailView=null,loginMethod='password';
+let detailView=null,personUnitReturn=null,loginMethod='password';
 bindInstall();
 initializePreferences();
 const updateDesignControl=bindDesign(()=>render());
@@ -107,7 +107,7 @@ function render(focus=false){
  if(focus)$('content').focus({preventScroll:true});
 }
 function navigate(page){mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
-function closeDialogs(){for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
+function closeDialogs(){personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
@@ -201,6 +201,44 @@ function showDetail(html){
  if(!dialog.open)dialog.showModal();
  dialog.scrollTop=0;title?.focus({preventScroll:true});labelTables();applyAmountPrivacy();
 }
+// Preserve the originating person card while a linked apartment is edited.
+function linkedUnitDetail(id){
+ const html=unitDetail(state,id);
+ if(!html)return null;
+ if(!personUnitReturn)return html;
+ const back=getLanguage()==='de'?'Zur Personenkarte':'Kişi kartına dön';
+ return `<nav class="person-unit-nav" aria-label="${e(back)}"><button type="button" class="button person-unit-back" data-action="person_unit_back">← ${e(back)}</button></nav>`+html;
+}
+function returnFromPersonUnit(){
+ if(!personUnitReturn)return false;
+ const context=personUnitReturn;
+ personUnitReturn=null;
+ const dialog=$('detailDialog');
+ dialog.classList.remove('person-unit-drawer');
+ if(context.fromDialog){
+  const personHtml=personManager(state,context.personId);
+  if(personHtml){
+   detailView={action:'person_manage',id:context.personId};
+   showDetail(personHtml);
+   dialog.scrollTop=context.dialogScroll;
+   const ref=[...dialog.querySelectorAll('[data-action="person_unit"]')].find(node=>node.dataset.person===context.personId&&node.dataset.id===context.unitId);
+   ref?.focus({preventScroll:true});
+   return true;
+  }
+ }
+ detailView=null;
+ if(dialog.open)dialog.close();
+ window.scrollTo({top:context.pageY,behavior:'instant'});
+ const ref=[...document.querySelectorAll('[data-action="person_unit"]')].find(node=>node.dataset.person===context.personId&&node.dataset.id===context.unitId);
+ ref?.focus({preventScroll:true});
+ return true;
+}
+$('detailDialog').addEventListener('cancel',event=>{
+ if(personUnitReturn&&detailView?.action==='unit'){
+  event.preventDefault();
+  returnFromPersonUnit();
+ }
+});
 function staged(){
  detailView={action:'staged'};
  if(!can(state,'finance'))return;
@@ -223,6 +261,12 @@ $('urgentDialog').addEventListener('cancel',event=>{if($('urgentDialog').dataset
 function updateAnnouncementTargets(){const root=$('actionFields'),kind=root.querySelector('[name="target_kind"]')?.value;for(const section of root.querySelectorAll('[data-notification-target]'))section.hidden=section.dataset.notificationTarget!==kind;}
 
 document.addEventListener('click',async event=>{
+ // The normal close button also returns to the person card when an apartment was opened from there.
+ if(event.target.closest('#detailDialog .dialog-actions button')&&personUnitReturn&&detailView?.action==='unit'){
+  event.preventDefault();
+  returnFromPersonUnit();
+  return;
+ }
  if(event.target.closest('.unit-history-link')){event.preventDefault();$('unitPaymentHistory')?.scrollIntoView({block:'start'});$('unitPaymentHistory')?.focus({preventScroll:true});return;}
  if(event.target.closest('[data-preview-return]')){changePreviewRole(nativePreviewRole(state.fullData));return;}
  if(event.target.closest('[data-reset-appearance]')){resetPreferences(state.mode==='connected'?api:null,message=>{const el=$('preferenceStatus');if(el)el.textContent=message;});applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));const panel=document.querySelector('.appearance-settings');if(panel)panel.open=true;document.querySelector('[data-reset-appearance]')?.focus();return;}
@@ -268,8 +312,21 @@ document.addEventListener('click',async event=>{
   if(action==='recover_person'){adminRecoveryUi.open(b.dataset.id);return;}
   if(action==='invite_person'){invitationUi.open(b.dataset.id);return;}
   if(action==='invite_activate'){invitationUi.activate();return;}
-  if(action==='person_manage'){detailView={action,id:b.dataset.id};return showDetail(personManager(state,b.dataset.id));}
-  if(action==='unit'){detailView={action,id:b.dataset.id};return showDetail(unitDetail(state,b.dataset.id));}
+  if(action==='person_unit_back'){returnFromPersonUnit();return;}
+  if(action==='person_unit'){
+   if(!can(state,'people'))return;
+   const id=b.dataset.id,personId=b.dataset.person;
+   if(!state.data.links.some(l=>l.person_id===personId&&l.unit_id===id))return;
+   const html=unitDetail(state,id);
+   if(!html)return;
+   const fromDialog=$('detailDialog').open&&detailView?.action==='person_manage'&&detailView.id===personId;
+   personUnitReturn={personId,unitId:id,fromDialog,dialogScroll:fromDialog?$('detailDialog').scrollTop:0,pageY:window.scrollY};
+   detailView={action:'unit',id};
+   $('detailDialog').classList.add('person-unit-drawer');
+   return showDetail(linkedUnitDetail(id));
+  }
+  if(action==='person_manage'){personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');detailView={action,id:b.dataset.id};return showDetail(personManager(state,b.dataset.id));}
+  if(action==='unit'){personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');detailView={action,id:b.dataset.id};return showDetail(unitDetail(state,b.dataset.id));}
   if(action==='transaction'){if(can(state,'finance')){detailView={action,id:b.dataset.id};showDetail(transactionDetail(state,b.dataset.id));}return;}
   if(action==='charge_detail'){detailView={action,id:b.dataset.id};return showDetail(chargeDetail(state,b.dataset.id));}
   if(action==='provider_detail'){detailView={action,id:b.dataset.id};return showDetail(providerDetail(state,b.dataset.id));}
@@ -292,7 +349,7 @@ $('languageToggle').addEventListener('click',()=>{
  changePreference('language',getLanguage()==='tr'?'de':'tr',state.mode==='connected'?api:null);applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));
  if($('detailDialog').open&&detailView){
   if(detailView.action==='staged')staged();
-  else showDetail(detailView.action==='person_manage'?personManager(state,detailView.id):detailView.action==='unit'?unitDetail(state,detailView.id):detailView.action==='charge_detail'?chargeDetail(state,detailView.id):detailView.action==='provider_detail'?providerDetail(state,detailView.id):transactionDetail(state,detailView.id));
+  else showDetail(detailView.action==='person_manage'?personManager(state,detailView.id):detailView.action==='unit'?linkedUnitDetail(detailView.id):detailView.action==='charge_detail'?chargeDetail(state,detailView.id):detailView.action==='provider_detail'?providerDetail(state,detailView.id):transactionDetail(state,detailView.id));
  }
  if($('actionDialog').open&&formAction){
   const built=buildForm(state,formAction.action,{period:state.period,...formAction.args});
@@ -332,7 +389,7 @@ document.addEventListener('change',event=>{
  if(id==='reportPeriod'&&/^\d{4}-\d{2}$/.test(event.target.value)){state.period=event.target.value;render();}
 });
 function restoreParentForm(back){showForm(back.action,back.args);for(const node of $('actionFields').querySelectorAll('[name]')){const values=back.values.filter(([k])=>k===node.name).map(([,v])=>v);if(node.type==='checkbox'||node.type==='radio')node.checked=values.includes(node.value);else if(values.length)node.value=values[0];}updateFinanceForm($('actionFields'),state.data,'restored');}
-function cancelActionForm(){if(writeBusy)return;const back=formAction?.back;$('actionDialog').close();if(back){restoreParentForm(back);return;}const origin=formAction?.origin;if(origin?.action==='unit')showDetail(unitDetail(state,origin.id));else if(origin?.action==='person_manage')showDetail(personManager(state,origin.id));}
+function cancelActionForm(){if(writeBusy)return;const back=formAction?.back;$('actionDialog').close();if(back){restoreParentForm(back);return;}const origin=formAction?.origin;if(origin?.action==='unit')showDetail(linkedUnitDetail(origin.id));else if(origin?.action==='person_manage')showDetail(personManager(state,origin.id));}
 $('cancelAction').addEventListener('click',cancelActionForm);
 $('actionDialog').addEventListener('cancel',event=>{event.preventDefault();cancelActionForm();});
 $('actionForm').addEventListener('submit',async event=>{
@@ -343,7 +400,7 @@ $('actionForm').addEventListener('submit',async event=>{
   const payload=payloadFor(action,new FormData($('actionForm')),context);
   writeBusy=true;$('saveAction').disabled=true;$('cancelAction').disabled=true;$('actionMessage').textContent='';stopLoading=beginLoading($('actionMessage'),tr('Kaydediliyor…'));
   await mutate(action==='ignore_staged'?'confirm_staged':action,payload);
-  if(attempt!==epoch)return;const back=formAction.back;writeBusy=false;$('actionDialog').close();if(back)restoreParentForm(back);if(!state.stale&&formAction.origin){const origin=formAction.origin;if(origin.action==='unit')showDetail(unitDetail(state,origin.id));else if(origin.action==='person_manage')showDetail(personManager(state,origin.id));}toast(state.stale?tr("Kaydedildi; görünüm yenilenemedi. Sayfayı yeniden açın."):state.mode==='demo'?tr("Örnek çalışma alanında kaydedildi."):tr("Kayıt tamamlandı."));
+  if(attempt!==epoch)return;const back=formAction.back;writeBusy=false;$('actionDialog').close();if(back)restoreParentForm(back);if(!state.stale&&formAction.origin){const origin=formAction.origin;if(origin.action==='unit')showDetail(linkedUnitDetail(origin.id));else if(origin.action==='person_manage')showDetail(personManager(state,origin.id));}toast(state.stale?tr("Kaydedildi; görünüm yenilenemedi. Sayfayı yeniden açın."):state.mode==='demo'?tr("Örnek çalışma alanında kaydedildi."):tr("Kayıt tamamlandı."));
  }catch(error){if(attempt===epoch){error.message=tr(error.message);showFormError($('actionForm'),$('actionMessage'),error);}}
  finally{stopLoading();writeBusy=false;$('saveAction').disabled=false;$('cancelAction').disabled=false;}
 });
