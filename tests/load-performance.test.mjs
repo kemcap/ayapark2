@@ -10,7 +10,7 @@ function fixture(role='manager',count=6){
  const allocations=charges.flatMap((c,i)=>[{id:'a'+i,charge_id:c.id,cents:'200'},{id:'v'+i,charge_id:c.id,cents:'100',void_reason:'reversed'}]);
  const capabilities={finance:role==='manager',admin:role==='manager',people:true};
  const workspace={capabilities,entries:[],charges,allocations,settings:[],people:[],links:[],persons:[]};
- api.read=async(table,q)=>{calls.push([table,q]);return ({site_sites:[{id:'s'}],site_staff_memberships:role==='resident'?[]:[{role}],site_units:units,site_blocks:[{id:'b',code:'A'}],site_resident_units:[{unit_id:'u1'}]})[table];};
+ api.read=async(table,q)=>{calls.push([table,q]);return ({site_sites:[{id:'s'}],site_staff_memberships:role==='resident'?[]:[{role}],site_units:units,ay2_devir_snapshot:[],site_blocks:[{id:'b',code:'A'}],site_resident_units:[{unit_id:'u1'}]})[table];};
  api.readAll=async(table,q)=>{calls.push(['all:'+table,q]);return [{user_id:'resident',unit_id:'u1'}];};
  api.rpc=async(name)=>{calls.push([name]);return name==='ay5_workspace'?workspace:name==='ay3_staff_directory'?[]:{};};
  return {api,calls,units,charges,allocations,workspace};

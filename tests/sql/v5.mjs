@@ -16,7 +16,7 @@ const reject=async(name,fn)=>{await assert.rejects(fn);check(name);};
 const all=Array.from({length:20},(_,i)=>uid(i+1));
 function batch(ids=all,mode='total',cents=10001){return {request_id:request(),scope:'selected',unit_ids:ids,distribution:mode,cents,due_on:'2026-11-01',label:'QA synthetic charge',category:'Genel Gider / İşletme',debt_group:'general',basis_ref:'QA resolution',debtors:Object.fromEntries(ids.map(id=>[id,lid(Number(id.slice(-12)))])),expected:Object.fromEntries(distribute(cents,ids,mode).map(r=>[r.unit_id,r.cents])),confirmed:true};}
 try{
- for(const f of ['schema.sql','../../supabase/migrations/20261025073340_v4_finance_release_safety.sql','../../supabase/migrations/20261025194333_v5_notifications_finance.sql','../../supabase/migrations/20261026061016_visible_expired_announcements.sql'])await db.exec(await readFile(new URL(f,import.meta.url),'utf8'));
+ for(const f of ['schema.sql','../../supabase/migrations/20261025073340_v4_finance_release_safety.sql','../../supabase/migrations/20261025194333_v5_notifications_finance.sql','../../supabase/migrations/20261026061016_visible_expired_announcements.sql','../../supabase/migrations/20261029212437_phase2_superadmin_finance_corrections.sql'])await db.exec(await readFile(new URL(f,import.meta.url),'utf8'));
  await db.exec(`INSERT INTO auth.users(id,email) SELECT ('10000000-0000-0000-0000-'||lpad(i::text,12,'0'))::uuid,'qa'||i||'@example.invalid' FROM generate_series(1,6)i ON CONFLICT(id) DO NOTHING;
  INSERT INTO public.site_sites(id,slug,name) VALUES('${site}','qa-v5','QA synthetic site');
  INSERT INTO public.site_blocks(id,site_id,code) VALUES('60000000-0000-0000-0000-000000000001','${site}','A'),('60000000-0000-0000-0000-000000000002','${site}','B');

@@ -13,7 +13,9 @@
     "test:invite:sql": "node tests/sql/auth-phase4.mjs",
     "test:requests:sql": "node tests/sql/auth-phase5.mjs",
     "test:recovery:sql": "node tests/sql/auth-phase6.mjs",
-    "test:integration:sql": "node tests/sql/auth-phase8.mjs"
+    "test:integration:sql": "node tests/sql/auth-phase8.mjs",
+    "test:roles:sql": "node tests/sql/roles.mjs",
+    "test:corrections:sql": "node tests/sql/finance-corrections.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.11",

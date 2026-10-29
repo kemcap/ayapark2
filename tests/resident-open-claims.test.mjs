@@ -78,7 +78,7 @@ test('both resident dashboard and apartment page show separate claims, with no a
  const cards=residentClaimsCards(state);
  const html=residentClaimsPanel(state);
  assert.match(cards,/Açık|alacak|borç/i);
- assert.equal((cards.match(/class="card claim-metric"/g)||[]).length,2);
+ assert.equal((cards.match(/class="card claim-metric(?: claim-metric-action)?"/g)||[]).length,2);
  assert.match(cards,/180.000|1.800/); // locale-dependent thousands or value in TL
  assert.match(cards,/255.000|2.550/);
  assert.match(html,/A-1/);
