@@ -39,6 +39,8 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
  let selected=null,inviteUrl='',preview=null,token=null,inviteBusy=false;
  const dialog=$('inviteDialog');
  const status=$('inviteStatus');
+ const recoveryBox=$('inviteRecoveryBox'),recoveryConfirm=$('inviteRecoveryConfirm');
+ const resetRecovery=()=>{recoveryBox.hidden=true;recoveryConfirm.checked=false;};
  const message=$('inviteMessage');
  const copyText=$('inviteCopyText'),copyLink=$('inviteCopyLink'),share=$('inviteWhatsApp');
  const setStatus=(value,error=false)=>{status.textContent=value;status.classList.toggle('error',error);};
@@ -54,7 +56,7 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
   $('invitePhone').value=person.phone||'';
   $('inviteEmail').value=person.email||'';$('inviteContactKind').value=person.phone?'phone':'email';$('inviteEmailField').hidden=$('inviteContactKind').value!=='email';
   message.value=inviteText({name:selected.name,units,language:getLanguage(),contactKind:$('inviteContactKind').value});
-  $('inviteConfirm').checked=false;
+  $('inviteConfirm').checked=false;resetRecovery();
   $('inviteGenerate').disabled=false;
   $('inviteLink').value='';
   setStatus(person.invite_expires_at&&Date.parse(person.invite_expires_at)>Date.now()?tx('Geçerli bir davet var. Yeni bağlantı oluşturmak önceki bağlantıyı iptal eder.','Eine gültige Einladung liegt vor. Ein neuer Link macht den bisherigen ungültig.'):tx('Bağlantı henüz oluşturulmadı.','Noch kein Einladungslink erzeugt.'));
@@ -67,27 +69,28 @@ export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogi
   try{await api.invitation({action:'revoke',person_id:selected.id,confirmed:true},true);inviteUrl='';$('inviteLink').value='';message.value=inviteText({name:selected.name,units:selected.units,language:getLanguage(),contactKind:$('inviteContactKind').value});toggleSend();setStatus(tx('Bekleyen davetler iptal edildi.','Ausstehende Einladungen widerrufen.'));}
   catch(e){setStatus(e.message,true);}finally{inviteBusy=false;b.disabled=false;$('inviteGenerate').disabled=false;}
  });
- $('invitePhone').addEventListener('input',()=>{if(inviteUrl){inviteUrl='';$('inviteLink').value='';message.value=inviteText({name:selected.name,units:selected.units,language:getLanguage(),contactKind:$('inviteContactKind').value});setStatus(tx('Numara değişti. Yeni bağlantı oluşturun.','Nummer geändert. Bitte einen neuen Link erstellen.'));}toggleSend();});
- $('inviteEmail').addEventListener('input',()=>{inviteUrl='';$('inviteLink').value='';toggleSend();});
- $('inviteContactKind').addEventListener('change',()=>{inviteUrl='';$('inviteLink').value='';$('inviteEmailField').hidden=$('inviteContactKind').value!=='email';toggleSend();});
+ $('invitePhone').addEventListener('input',()=>{resetRecovery();if(inviteUrl){inviteUrl='';$('inviteLink').value='';message.value=inviteText({name:selected.name,units:selected.units,language:getLanguage(),contactKind:$('inviteContactKind').value});setStatus(tx('Numara değişti. Yeni bağlantı oluşturun.','Nummer geändert. Bitte einen neuen Link erstellen.'));}toggleSend();});
+ $('inviteEmail').addEventListener('input',()=>{resetRecovery();inviteUrl='';$('inviteLink').value='';toggleSend();});
+ $('inviteContactKind').addEventListener('change',()=>{resetRecovery();inviteUrl='';$('inviteLink').value='';$('inviteEmailField').hidden=$('inviteContactKind').value!=='email';toggleSend();});
  $('inviteGenerate').addEventListener('click',async ()=>{
   if(!selected||inviteBusy)return;
   if(!$('inviteConfirm').checked){setStatus(tx('Önce bu kişi için erişim yetkisini onaylayın.','Bitte zuerst die Bestätigung für die Kontofreischaltung aktivieren.'),true);return;}
+  if(!recoveryBox.hidden&&!recoveryConfirm.checked){setStatus(tx('Önce eski hesabın bu kişiye ait olduğunu doğrulayın ve onaylayın.','Bitte zuerst die Identität und die Zugehörigkeit des alten Kontos gesondert bestätigen.'),true);return;}
   const s=getState(),button=$('inviteGenerate');
   if(!inviteEligible(s,s.data.persons.find(p=>p.id===selected.id))){setStatus(tx('Kişi bilgileri değişti. Sayfayı yenileyin.','Der Personenstatus hat sich geändert. Bitte aktualisieren.'),true);return;}
   inviteBusy=true;button.disabled=true;$('inviteRevoke').disabled=true;setStatus(tx('Hesap hazırlanıyor ve güvenli bağlantı oluşturuluyor…','Konto wird vorbereitet und der geschützte Link erstellt…'));
   try{
    const phone=whatsappNumber($('invitePhone').value);
    if($('inviteContactKind').value!=='email'&&!phone)throw Error(tx('Geçerli bir WhatsApp numarası girin.','Bitte eine gültige WhatsApp-Nummer eintragen.'));
-   const result=await api.invitation({action:'create',person_id:selected.id,phone,contact_kind:$('inviteContactKind').value,email:$('inviteEmail').value,confirmed:true},true);
+   const result=await api.invitation({action:'create',person_id:selected.id,phone,contact_kind:$('inviteContactKind').value,email:$('inviteEmail').value,confirmed:true,recovery_confirmed:!recoveryBox.hidden&&recoveryConfirm.checked},true);
    if(typeof result?.url!=='string'||!result.url.startsWith(new URL('./',location.href).href+'?invite='))throw Error(tx('Sunucudan geçerli bir davet bağlantısı alınamadı. Lütfen tekrar deneyin.','Der Server hat keinen gültigen Einladungslink geliefert. Bitte erneut versuchen.'));
    const person=s.data.persons.find(p=>p.id===selected.id);if(person)person.invite_expires_at=result.expires_at;
    inviteUrl=result.url;
    $('inviteLink').value=inviteUrl;
    message.value=inviteText({name:selected.name,units:selected.units,link:inviteUrl,language:getLanguage(),contactKind:$('inviteContactKind').value});
    toggleSend();
-   setStatus(tx('Bağlantı hazır. 7 gün geçerlidir. Gönderim sadece sizin onayınızla yapılır.','Link erstellt, 7 Tage gültig. Es wird nichts automatisch verschickt.'));
-  }catch(error){setStatus(error.message||tx('Bağlantı oluşturulamadı.','Der Link konnte nicht erzeugt werden.'),true);}
+   setStatus(result.recovery?tx('Eski hesap için güvenli yenileme bağlantısı hazır. Şifre yenilendiğinde daire erişimi yeniden açılır.','Sicherer Wiederherstellungslink für das bestehende Konto erstellt. Die Wohnungsrechte werden erst nach der Passwortvergabe wiederhergestellt.'):tx('Bağlantı hazır. 7 gün geçerlidir. Gönderim sadece sizin onayınızla yapılır.','Link erstellt, 7 Tage gültig. Es wird nichts automatisch verschickt.'));
+  }catch(error){if(error.code==='recovery_confirmation_required'){recoveryBox.hidden=false;recoveryConfirm.checked=false;setStatus(tx('Önceki hesap bulundu. Kimliği güvenilir şekilde kontrol edin, ayrı onayı işaretleyin ve bağlantıyı tekrar oluşturun.','Vorhandenes, nicht mehr zugeordnetes Konto erkannt. Bitte die Identität prüfen, die gesonderte Zustimmung markieren und den Link erneut erzeugen.'),true);}else setStatus(error.message||tx('Bağlantı oluşturulamadı.','Der Link konnte nicht erzeugt werden.'),true);}
   finally{inviteBusy=false;button.disabled=false;$('inviteRevoke').disabled=false;}
  });
  async function copy(value){
