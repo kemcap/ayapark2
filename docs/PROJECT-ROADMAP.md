@@ -1,5 +1,11 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
 
+## Verbindliche Freigabe und Rollout 30.10.2026
+
+Der Nutzer hat seine frühere Pflicht zur Einzelfreigabe ausdrücklich aufgehoben: geprüfte abgeschlossene Änderungen dürfen direkt produktiv veröffentlicht und erforderliche Schema-/Funktionsänderungen ausgeführt werden. Keine realen Bewohner-/Finanz-/Auth-Datensätze zu Testzwecken ändern. Backup-Part bleibt auf Nutzeranweisung übersprungen.
+
+Release: Finanzkorrektur-Schutz und Behebung der 13 allgemeinen Testfehler aus Commit be762221119d773862c08a8c954771ed3c945977. 264 allgemeine Tests bestanden; separate Finanz-/SQL-Prüfungen bestanden. Live-Funktionshashes stimmen mit dem geprüften Ausgangsstand überein. Aufgabenrechte-/Forderungsentwurfs-Grundlage aus dem späteren Commit 4edf5930 ist nicht Teil dieses Releases und wird in PR #54 weiter integriert. Diese Angaben haben Vorrang vor älteren Freigabe-/Nichtveröffentlichungsnotizen unten.
+
 ## Aktueller Arbeitsauftrag 30.10.2026 – Phase 2
 
 Der Nutzer hat angewiesen, den Backup-Part zu überspringen und ohne erneute Einrichtung/Tests mit Phase 2 fortzufahren. Historische Backup-Nachweise bleiben unverändert; übersprungene Restore-Punkte werden nicht als neu getestet markiert.
