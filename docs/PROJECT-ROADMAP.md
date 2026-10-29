@@ -2,7 +2,18 @@
 
 Stand: 29.10.2026 · Projekt: `kemcap/ayapark2` · Produktivbranch: `main`
 
-**Status:** Phase 0 (erste read-only Bestandsaufnahme) abgeschlossen, Sicherheitsbefunde noch zu prüfen; **Phase 1 (kostenlose und vollständige Backups) in Vorbereitung**. Noch keine Live-Daten-/Schema-/Einstellungsänderungen aufgrund dieser Roadmap.
+**Aktueller Abgleich 29.10.2026:** Phase 0 historisch dokumentiert; Phase 1 teilweise produktiv umgesetzt. Im Hauptzweig läuft bereits eine separate tägliche verschlüsselte Datenbanksicherung. Vollständige portable Sicherung und isolierter DB-/Auth-/Storage-Restore bleiben offen.
+
+## Neuerer Hauptzweig – maßgeblicher Betriebsstand
+
+- Hauptzweig geprüft bei `ebb19543c3d0b695164fb94098fdb2c522b30200`; [Pages-Deployment 40945090260](https://github.com/kemcap/ayapark2/actions/runs/40945090260) erfolgreich.
+- [DB-Workflow in main](https://github.com/kemcap/ayapark2/blob/main/.github/workflows/ayapark2-database-backup.yml): täglich **03:17 Europe/Istanbul**. [Lauf 40945224444](https://github.com/kemcap/ayapark2/actions/runs/40945224444), Backup-Job und Export-/Upload-Schritt erfolgreich.
+- Dieser Workflow exportiert public/auth/ay2_private/ay_auth_private, prüft Dump-Verzeichniseinträge, verschlüsselt mit age und vergleicht den SHA-256-Hash mit dem aus Drive zurückgelesenen Ciphertext. Er ist **nicht** der gesperrte Komplettentwurf dieses PRs und benötigt dessen Aktivierungsvariable nicht.
+- Kein Git-Bundle, keine Storage-Dateien und keine vollständige Plattformkonfiguration im aktiven DB-Backup. Export ohne Owner/ACL; kein fachlicher Restore aus dem erfolgreichen Job ableitbar.
+- Schlüsselanlage, getrennte Schlüsselkopie und lokaler verschlüsselter Testdatei-Rundlauf wurden vom Nutzer bestätigt. OAuth-Produktionsstatus und langfristige Token-Nutzbarkeit bleiben zu bestätigen.
+- PR #52 bleibt Entwurf. Alte Aussagen über fehlende Secrets/Uploads/Automatisierung beziehen sich auf dessen historischen Vorbereitungsstand und dürfen nicht auf main übertragen werden.
+- Haupt-/Nebenaufträge und Überschneidungen der offenen PRs sind aktuell in [SECONDARY-CHANGES.md auf main](https://github.com/kemcap/ayapark2/blob/main/SECONDARY-CHANGES.md) abgeglichen. #42 durch #44/#45 ersetzt; #46 überschneidet sich mit #48; #38/#39 teilweise durch #49 beziehungsweise #43/#51 abgedeckt. Keine PRs aufgrund dieses Abgleichs geschlossen.
+
 
 ## Arbeitsregeln
 
@@ -42,7 +53,7 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [x] Read-only-Skriptentwürfe für PostgreSQL, Auth-Daten, Storage-Metadaten und Datei-Downloads bereitstellen.
 - [x] Skript für `age`-Verschlüsselung, externen `rclone`-Upload, Prüfsummen und Offline-Integritätskontrolle bereitstellen.
 - [x] Sicherheits-/Einrichtungsanleitung `docs/FREE-BACKUP-SETUP.md` erstellen.
-- [ ] Skripte statisch prüfen und mit synthetischen isolierten Beispieldaten tatsächlich testen.
+- [x] Shell-Syntax und sechs synthetische Offline-Quellcode-/Archivtests laut PR #52 geprüft. Keine vollständige DB-/Storage-Integration daraus ableiten.
 
 ### 1.2 Portabilität vollständig machen – **NÄCHSTE TECHNISCHE AUFGABE**
 
@@ -52,18 +63,19 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [ ] Prüfen, dass Backup auch bei Totalverlust von GitHub und bei Supabase-Migration auf Self-Hosting nutzbar ist.
 - [x] Git-Bundle-Inhalt und Wiederherstellung in ein **neues isoliertes** Repository nachgewiesen: 6 Offline-Integrationstests; zusätzlich tatsächliches Repo mit 62 Referenzen und Git-Objektprüfung (`fsck --full --strict`).
 
-### 1.3 Einmalige Nutzer-Einrichtung (noch offen)
+### 1.3 Einmalige Nutzer-Einrichtung (teilweise abgeschlossen)
 
 - [x] Privaten Google-Drive-Ordner `AyaPark2-Backups` vom Benutzer angelegt.
-- [ ] age-Schlüsselpaar auf dem eigenen Computer erzeugen; privaten Schlüssel getrennt sicher verwahren und nie teilen.
-- [ ] rclone installieren, eigenen Google-Drive-OAuth-Zugang einrichten, Lesezugriff auf den Ordner prüfen.
+- [x] age-Schlüsselpaar lokal erzeugt und getrennte Schlüsselkopie laut Nutzer gesichert; keinen privaten Schlüssel teilen.
+- [x] rclone/Drive eingerichtet; Ordnerzugriff sowie Upload, Download und lokale Entschlüsselung der Testdatei vom Nutzer erfolgreich bestätigt.
 - [ ] Google-OAuth-Status für langfristige unbeaufsichtigte Nutzung prüfen.
-- [ ] Nur nach Anweisung und Review: GitHub Secrets/Variablen für verschlüsselte Remote-Backups sicher konfigurieren; **Aktivierungsvariable bleibt aus**.
+- [x] Funktionsfähige Secrets für den separaten DB-Workflow in main durch erfolgreichen Lauf indirekt belegt; keine Geheimniswerte ausgelesen. Aktivierungsvariable des Komplettentwurfs #52 weiterhin nicht aus diesem Lauf ableitbar.
 
 ### 1.4 Restore-Prüfung und Freigabe (noch offen)
 
 - [ ] Exportvollständigkeit der Anwendungsschemas, Rollen, Auth-Daten und RLS testen; Supabase-verwaltete Schemas nicht blind restaurieren.
-- [ ] Verschlüsselten Export in externem Speicher hochladen und wieder herunterladen, Entschlüsselung und SHA-256 prüfen.
+- [x] Separater produktiver DB-Workflow: verschlüsselter Export nach Drive, Ciphertext zurückgelesen und SHA-256 verglichen (Lauf oben).
+- [ ] Echten DB-Dump lokal entschlüsseln und kontrollieren; Testdatei-Entschlüsselung ersetzt diesen Nachweis nicht.
 - [ ] Restore-Durchlauf in **isoliertem Testsystem**: Datenbank, Personen, Buchungen, Berechtigungen, Auth und Storage-Dateien validieren.
 - [ ] Separaten Wiederherstellungsplan für externen Anbieter/selbst gehostetes Supabase festhalten.
 - [ ] Geheimnisbehandlung, Drive-Speichergrenzen, monatliche Sicherungsstichproben und vierteljährliche Restore-Tests klären.
@@ -118,7 +130,7 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 
 ## Nächster Schritt – Übergabe an nächsten Chat
 
-**Aktuell Phase 1.3 vorbereiten:** Quellcode-/Git-Bundle-Export in PR #52 integriert und isoliert wiederhergestellt. Als nächstes lokale Werkzeuge `age`/`age-keygen`/`rclone` auf dem Gerät des Benutzers prüfen und einrichten; privaten Schlüssel ausschließlich dort erzeugen. Parallel bleibt das Vervollständigen des tatsächlichen Plattforminventars aus 1.2 offen. Kein produktiver Export, Offsite-Upload oder Verschlüsselungs-/Gesamt-Restoretest wurde ausgeführt. Produktivdaten, `main`, Supabase und GitHub-Secrets unverändert lassen.
+**Nächste Aufgabe: echtes Backup isoliert wiederherstellen.** Aktive DB-Sicherung nicht erneut einrichten. Zunächst OAuth-Dauerbetrieb bestätigen und einen realen verschlüsselten Dump lokal herunterladen/entschlüsseln, danach ausschließlich in einem isolierten Restore-Ziel Datenbank, Auth und Berechtigungen prüfen. Privater Schlüssel bleibt beim Nutzer. Parallel Plattforminventar und fehlenden Storage-/Git-Umfang vervollständigen. PR #52 mit main abgleichen, bevor ein zweiter Workflow aktiviert oder ein alter Entwurf gemergt wird.
 
 **Projektkontext:** `docs/AYA-PARK-2-CONTEXT-HANDOFF.md`
 **Backup-Anleitung:** `docs/FREE-BACKUP-SETUP.md`
