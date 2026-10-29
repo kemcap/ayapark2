@@ -33,8 +33,8 @@
 :root[data-design="modern"] .topbar{min-height:86px;height:auto;position:relative;padding:16px 34px;border:0;background:var(--bg);color:var(--muted);gap:18px}
 :root[data-design="modern"] #breadcrumb{font-size:11px;line-height:1.6}
 :root[data-design="modern"] .header-actions{gap:8px;flex-wrap:wrap;justify-content:flex-end}
-:root[data-design="modern"] .header-actions>.button,:root[data-design="modern"] .header-actions summary.button{font-size:11px;min-height:40px;border-radius:10px;background:var(--paper);border:1px solid var(--line);padding:9px 12px;color:var(--ink)}
-:root[data-design="modern"] .header-actions .header-icon{width:40px;padding:10px}
+:root[data-design="modern"] .header-actions>.button,:root[data-design="modern"] .header-actions summary.button{font-size:11px;min-height:44px;border-radius:10px;background:var(--paper);border:1px solid var(--line);padding:9px 12px;color:var(--ink)}
+:root[data-design="modern"] .header-actions .header-icon{width:44px;min-width:44px;padding:10px}
 :root[data-design="modern"] .header-actions #connectionButton{background:var(--primary);color:var(--paper);border-color:var(--primary)}
 :root[data-design="modern"][data-theme="dark"] .header-actions #connectionButton{color:var(--bg)}
 :root[data-design="modern"] .context-bar{margin:0 34px;padding:10px 0 15px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted);flex-wrap:wrap}
@@ -81,7 +81,7 @@
 :root[data-design="modern"] .button.primary:hover{background:var(--primary-hover)}
 :root[data-design="modern"] .text-button,:root[data-design="modern"] .unit-link{color:var(--primary);font-weight:600;font-size:12px}
 :root[data-design="modern"] .toolbar{padding:17px 19px;background:var(--paper);border:1px solid var(--line);border-radius:16px;gap:13px;margin-bottom:22px;align-items:end;flex-wrap:wrap}
-:root[data-design="modern"] .toolbar input,:root[data-design="modern"] .toolbar select,:root[data-design="modern"] .field input,:root[data-design="modern"] .field select,:root[data-design="modern"] .field textarea,:root[data-design="modern"] dialog input,:root[data-design="modern"] dialog select,:root[data-design="modern"] dialog textarea{min-height:46px;border-radius:10px;padding:11px 13px;background:var(--tile-bg);border-color:var(--button-border);color:var(--ink);font-size:14px}
+:root[data-design="modern"] .toolbar input,:root[data-design="modern"] .toolbar select,:root[data-design="modern"] .field input,:root[data-design="modern"] .field select,:root[data-design="modern"] .field textarea,:root[data-design="modern"] dialog input:not([type="checkbox"]):not([type="radio"]),:root[data-design="modern"] dialog select,:root[data-design="modern"] dialog textarea{min-height:46px;border-radius:10px;padding:11px 13px;background:var(--tile-bg);border-color:var(--button-border);color:var(--ink);font-size:14px}
 :root[data-design="modern"] .field{font-size:13px;font-weight:600;gap:8px;margin-bottom:17px;line-height:1.6}
 :root[data-design="modern"] input::placeholder,:root[data-design="modern"] textarea::placeholder{color:var(--muted);opacity:1}
 :root[data-design="modern"] .field input:focus,:root[data-design="modern"] .field select:focus,:root[data-design="modern"] .field textarea:focus{border-color:var(--primary)}
@@ -122,7 +122,8 @@
 :root[data-design="modern"] .role-badge{border-radius:6px;background:var(--soft);color:var(--primary);font-size:11px}
 :root[data-design="modern"] .report-metrics{gap:16px;margin:22px 0}
 :root[data-design="modern"] .report-metrics .metric{border:1px solid var(--line);background:var(--paper);border-radius:18px;min-height:130px;padding:22px}
-:root[data-design="modern"] .report-metrics strong{font-size:clamp(20px,2.2vw,31px);letter-spacing:-.8px;font-weight:800}
+/* Keep large amounts readable without forcing their grid track wider. */
+:root[data-design="modern"] .report-metrics strong{min-width:0;overflow-wrap:anywhere;font-size:clamp(20px,2.2vw,31px);letter-spacing:-.8px;font-weight:800}
 :root[data-design="modern"] .report-metrics small{color:var(--muted);font-size:11px}
 :root[data-design="modern"] .income-bar progress::-webkit-progress-value{background:var(--primary)}
 :root[data-design="modern"] .expense-bar progress::-webkit-progress-value{background:#9faecb}
@@ -191,7 +192,7 @@
  :root[data-design="modern"] .table-wrap:not(.desktop-ledger) tr{border-radius:14px;border-color:var(--line);padding:16px;background:var(--paper);margin:12px 0}
  :root[data-design="modern"] .table-wrap:not(.desktop-ledger) td{padding:8px 0;line-height:1.8;background:none}
  :root[data-design="modern"] .table-wrap:not(.desktop-ledger) td:before{font-size:11px;color:var(--muted)}
- :root[data-design="modern"] .field input,:root[data-design="modern"] .field select,:root[data-design="modern"] .field textarea,:root[data-design="modern"] dialog input,:root[data-design="modern"] dialog select{font-size:max(16px,1rem)}
+ :root[data-design="modern"] .toolbar input,:root[data-design="modern"] .toolbar select,:root[data-design="modern"] .field input,:root[data-design="modern"] .field select,:root[data-design="modern"] .field textarea,:root[data-design="modern"] dialog input,:root[data-design="modern"] dialog select,:root[data-design="modern"] dialog textarea{font-size:max(16px,1rem)}
  :root[data-design="modern"] .modern-hero{min-height:222px}
  :root[data-design="modern"] .modern-hero-copy{width:76%;padding:26px}
  :root[data-design="modern"] .modern-hero h2{font-size:35px}
@@ -206,14 +207,14 @@
  :root[data-design="modern"] .dialog-actions{bottom:-23px}
  :root[data-design="modern"] .summary-grid>.card{padding:21px 18px;min-height:165px}
  :root[data-design="modern"] .large-amount{font-size:26px}
- :root[data-design="modern"] .report-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+ :root[data-design="modern"] .report-metrics{grid-template-columns:repeat(auto-fit,minmax(min(100%,9rem),1fr))}
  :root[data-design="modern"] .report-metrics .metric{padding:18px;min-height:115px}
 }
 @media(max-width:480px){
  :root[data-design="modern"] .topbar{padding:14px 18px;gap:11px;align-items:flex-start}
  :root[data-design="modern"] .topbar #breadcrumb{flex:1 1 100%;font-size:11px}
  :root[data-design="modern"] .header-actions{gap:6px;justify-content:flex-start;width:100%}
- :root[data-design="modern"] .header-actions>.button,:root[data-design="modern"] .header-actions summary.button{font-size:10px;padding:9px 10px;min-height:40px}
+ :root[data-design="modern"] .header-actions>.button,:root[data-design="modern"] .header-actions summary.button{font-size:10px;padding:9px 10px;min-height:44px}
  :root[data-design="modern"] .header-actions #installApp{max-width:125px;font-size:10px}
  :root[data-design="modern"] .context-bar{margin-inline:18px;font-size:10px;padding-block:8px 12px;gap:10px}
  :root[data-design="modern"] #content{padding:23px 18px 25px}
