@@ -1,5 +1,5 @@
 import {escapeHtml as e,randomId,money} from './core.mjs?v=5.8.1';
-import {t as tr} from './i18n.mjs?v=5.8.1';
+import {t as tr} from './i18n.mjs?v=5.9.28';
 import {activeAt,personName} from './v3-domain.mjs?v=5.9.26';
 import {financeLinkAt,amountCents,batchPreview,paymentPlan,chargeCategories,debtGroup,availableBudget} from './finance-v5.mjs?v=5.8.1';
 const input=(n,label,type='text',value='',attrs='')=>`<label class="field">${tr(label)}<input name="${n}" type="${type}" value="${e(value)}" ${attrs}></label>`;

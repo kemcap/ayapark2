@@ -1,4 +1,4 @@
-import {getLanguage} from './i18n.mjs?v=5.8.1';
+import {getLanguage} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e} from './core.mjs?v=5.8.1';
 const kmk='https://mevzuat.adalet.gov.tr/mevzuat/103807';
 const kvkk='https://www.kvkk.gov.tr/Icerik/6649/Personal-Data-Protection-Law';

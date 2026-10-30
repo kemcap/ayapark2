@@ -1,6 +1,6 @@
 import {financeLinkAt} from './finance-v5.mjs?v=5.8.1';
 import {announcementActive,announcementStatus,acknowledgementKey,activeAt} from './v3-domain.mjs?v=5.9.26';
-import {getLanguage,t as tr} from './i18n.mjs?v=5.8.1';
+import {getLanguage,t as tr} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e} from './core.mjs?v=5.8.1';
 export const notificationTitle=a=>getLanguage()==='de'&&a.title_de?a.title_de:a.title;
 export const notificationBody=a=>getLanguage()==='de'&&a.body_de?a.body_de:a.body;

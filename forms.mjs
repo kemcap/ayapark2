@@ -1,6 +1,7 @@
-import {buildFinanceForm,financePayload} from './finance-forms.mjs?v=5.8.1';
-import {buildV3Form,payloadV3} from './v3-forms.mjs?v=5.8.6';
-import {t as tr} from './i18n.mjs?v=5.8.1';
+import {taskOptions} from './task-permissions.mjs?v=5.9.28';
+import {buildFinanceForm,financePayload} from './finance-forms.mjs?v=5.9.28';
+import {buildV3Form,payloadV3} from './v3-forms.mjs?v=5.9.28';
+import {t as tr} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,randomId} from './core.mjs?v=5.8.1';
 import {remaining,unassigned} from './ledger.mjs?v=5.8.1';
 import {personName,creditAvailable} from './v3-domain.mjs?v=5.9.26';
@@ -31,7 +32,7 @@ export function buildLegacyForm(s,action,args={}){
   const p=d.people.find(p=>p.id===args.id);title=p?tr("Kişi bilgilerini düzenle"):tr("Kişi ekle");body=(p?'':select('unit_id',tr("Daire"),unitOptions,args.unit))+field('full_name',tr("Ad soyad"),'text',p?.full_name||'','required maxlength="150"')+select('relation',tr("İlişki"),[['owner',tr("Kat maliki")],['tenant',tr("Kiracı")]],p?.relation||'owner')+field('email',tr("E-posta"),'email',p?.email||'','maxlength="254"')+field('phone',tr("Telefon"),'tel',p?.phone||'','maxlength="60"')+(p?check('active',tr("Aktif kişi"),p.active):'');
  }
  else if(action==='announcement'){const a=d.announcements.find(a=>a.id===args.id);title=a?tr("Duyuruyu düzenle"):tr("Duyuru oluştur");body=field('title',tr("Başlık"),'text',a?.title||'','required maxlength="150"')+text('body',tr("Duyuru metni"),a?.body||'')+check('published',tr("Site sakinlerine yayımla"),a?.published||false);}
- else if(action==='permissions'){title=tr("Yönetim yetkileri");const caps=d.permissions.find(p=>p.user_id===args.id)?.capabilities||[];body=`<p class="muted">${tr("Bu yetkiler yalnızca V3 alanı içindir. Süper Admin yetkisi vermez.")}</p>`+[['finance',tr("Mali kayıtlar ve ödeme eşleştirme")],['import',tr("Banka dosyası içe aktarma")],['people',tr("Kişi kayıtları")],['announcements',tr("Duyuru oluşturma ve yayımlama")]].map(([k,l])=>check(k,l,caps.includes(k))).join('');}
+ else if(action==='permissions'){title=tr("Yönetim yetkileri");const taskMode=Array.isArray(d.taskGrants),caps=taskMode?(d.taskGrants.find(p=>p.user_id===args.id)?.tasks||[]):d.permissions.find(p=>p.user_id===args.id)?.capabilities||[];body=`<p class="muted">${tr("Bu yetkiler yalnızca V3 alanı içindir. Süper Admin yetkisi vermez.")}</p>`+(taskMode?taskOptions():[['finance',tr("Mali kayıtlar ve ödeme eşleştirme")],['import',tr("Banka dosyası içe aktarma")],['people',tr("Kişi kayıtları")],['announcements',tr("Duyuru oluşturma ve yayımlama")]]).map(([k,l])=>check(k,l,caps.includes(k))).join('')+(taskMode?'<input type="hidden" name="task_mode" value="1"><p class="fine">'+tr('Kaydetmek eski yetkileri bu beş görevle değiştirir. Seçilmeyen görevler kapalı kalır.')+'</p>':'');}
  else if(action==='settings'){title=tr("Defter açılışı");body=field('opening_date',tr("Açılış tarihi"),'date',today(),'required')+amount(tr("Açılış bakiyesi (TL)"),'0,00');}
  else if(action==='publish_report'){title=tr("Aylık mali raporu yayımla");body=`<p>${e(s.period)}${tr(" döneminin ortak toplamları site sakinlerine açılacak. Kişisel banka açıklamaları rapora dahil edilmez.")}</p><p class="fine">${tr("Aynı döneme ait önceki rapor güncellenir. Verilerin tamlığını kontrol edin.")}</p>`+check('confirmation',tr("Tutarları kontrol ettim, raporu yayımla."));}
  else if(action==='confirm_staged'){
@@ -54,7 +55,7 @@ export function payloadLegacy(action,form,context){
  if(['reverse','unallocate','void_charge','ignore_staged'].includes(action)&&get('reason').length<3)throw Error(tr("En az üç karakterlik gerekçe yazın."));
  if(action==='person'){p.active=context.id?bool('active'):true;if(!p.full_name)throw Error(tr("Ad soyad gerekli."));}
  if(action==='announcement')p.published=bool('published');
- if(action==='permissions'){p.user_id=context.id;p.capabilities=['finance','import','people','announcements'].filter(bool);}
+ if(action==='permissions'){p.user_id=context.id;if(bool('task_mode'))p.tasks=taskOptions().map(([key])=>key).filter(bool);else p.capabilities=['finance','import','people','announcements'].filter(bool);}
  if(action==='publish_report')p.period=context.period+'-01';
  if(action==='confirm_staged'&&!p.unit_id)throw Error(tr("Daire seçin."));
  if(action==='ignore_staged'){p.ignore_reason=p.reason;}

@@ -1,5 +1,6 @@
 // Only authored interface text is translated. Stored content is never sent to a service.
 export const german = {
+ "Kaydetmek eski yetkileri bu beş görevle değiştirir. Seçilmeyen görevler kapalı kalır.": "Beim Speichern werden die bisherigen Rechte durch diese fünf Aufgaben ersetzt. Nicht ausgewählte Aufgaben bleiben gesperrt.",
  "Listeyi aç": "Liste öffnen",
  "Listeyi kapat": "Liste schließen",
 
