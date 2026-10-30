@@ -124,3 +124,12 @@ Der Benutzer hat ausdrücklich verlangt, dass das Backup nicht nur DB + Dateien,
 - Backup-Entwurf PR: https://github.com/kemcap/ayapark2/pull/52
 - Backup-Anleitung im Entwurfsbranch: https://github.com/kemcap/ayapark2/blob/feature/free-backup-preparation-20261028/docs/FREE-BACKUP-SETUP.md
 - Supabase offizielle Migration zu Self-Hosting: https://supabase.com/docs/guides/self-hosting/restore-from-platform
+
+
+## Fortsetzung 30.10.2026 – aktueller Phase-1-Zwischenstand
+
+Der bisherige Backup-Entwurf aus PR #52 bleibt gesperrt; der aktive DB-Workflow auf main ist davon unabhängig. Ein neuer separater Arbeitsbranch feature/phase1-restore-preflight-20261030 baut auf dem PR-#52-Branch auf. Dort liegen ein ausschließlich lokaler PostgreSQL-17-Dump-Preflight, sechs synthetisch bestandene Unit-Tests und docs/PHASE1-RESTORE-GATE-20261030.md. **Es gab keinen echten Restore, keinen Merge, keine Aktivierung und keine produktive Änderung.**
+
+Read-only am 30.10. live bestätigt: 42 Public-Tabellen mit RLS, 0 Storage-Buckets/Objekte, sieben aktive Edge Functions, PostgreSQL 17.11. Die sieben Live-index.ts-Dateien stimmen mit GitHub main überein, Module benötigen bei Redeployment teilweise angepasste relative Importpfade. In privatem Google Drive liegen vier .dump.age-Archive und eine Testdatei; kein Gesamt-.tar.age-Archiv nachgewiesen.
+
+**Nächstes Gate:** echtes .dump.age lokal mit dem bereits vorhandenen privaten age-Schlüssel auf dem geschützten Gerät entschlüsseln und offline prüfen; anschließend ein ganz neues isoliertes Restore-Ziel und versionsgebundene Auth-/RLS-/Storage-Tests durchführen. Secret-Dateien nicht im Chat teilen. Erfolgreiches Gesamtbackup und vollständiger Restore bleiben zwingende Voraussetzung für Freigabe/Phase-1-Abschluss.
