@@ -118,6 +118,25 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [ ] Aufgabenliste mit Verantwortlichkeit, Termin und Status.
 - [ ] Manuelle Wiederholungsanlage und automatische Terminerinnerung; keine automatische neue Aufgabe.
 
+## Phase 7 – Eigenständiger UI/UX-Research, Benchmark und Designoptimierung (P1; RESEARCH AKTIV)
+
+**Quellen und Methodik:** [UI-UX-COMPETITOR-BENCHMARK.md](UI-UX-COMPETITOR-BENCHMARK.md), vorhandene [AUDIT-20261026.md](../AUDIT-20261026.md), [UI-UX-AUDIT-V4.md](../UI-UX-AUDIT-V4.md) und [MODERN-DESIGN.md](../MODERN-DESIGN.md).
+
+- [x] Vorhandene AyaPark-UI/UX-Audits identifiziert: Navigation, Dashboard, Auth, mobile Usability, Designsystem, DE/TR und Accessibility wurden aus Sicht **der eigenen App** untersucht. Ergebnisse enthalten offene manuelle Device-/Browserprüfungen und keine vollständige Konkurrenz-UX-Messung.
+- [x] Erste **öffentliche Herstellerrecherche** zu Apsiyon, Yönetimcell, AidatPro und Yönetion durchgeführt; dokumentierte Produktmerkmale und offizielle Links im Benchmark. Marketingbeschreibungen nicht als bewiesene gute Usability ausgeben.
+- [x] Externe UX-Referenzen für heuristische Bewertung gesammelt: Nielsen Norman Group (Status, Fehlervorbeugung, progressive Offenlegung), W3C WCAG 2.2, Android Responsive Navigation.
+- [ ] **Echte Wettbewerbs-UI-Analyse:** Autorisierte offizielle Demos/Screenshots/Walkthroughs prüfen und für Kernaufgaben vergleichen (Schritte, Informationsarchitektur, mobile Lesbarkeit, Fehler-/Statuskommunikation). Nicht zugängliche UI als `nicht geprüft` kennzeichnen.
+- [ ] **Aktuelle AyaPark-Version prüfen:** Alle drei Rollen und Kernaufgaben inkl. Wohnung/Person, Aidat, Bankimport, Zahlungszuordnung, Berichte, Mitteilungen, Registrierung. Bestehende Verbesserungen nicht noch einmal bauen.
+- [ ] **Navigations-/Dashboard-Konzept:** D1/D2 aus Audit gegen die heutigen Screens und Vergleichsbelege abgleichen, Nutzeraufgaben priorisieren; Desktop und Mobile getrennt testen.
+- [ ] **Anmeldung und Sprache:** D3 aus Audit mit aktueller Einladung/Telefon-/E-Mail-Authentifizierung und bestehenden Auth-Tests abgleichen; DE/TR nach Wechsel, Rückkehr und Fehlerfall prüfen.
+- [ ] **Designsystem und Responsive:** D4 aus Audit; Farben, Typografie, Komponenten, Focus, Light/Dark, große Schrift, sieben Viewports, echte Android-/iOS-Endgeräte.
+- [ ] **Barrierefreiheit:** WCAG 2.2 AA (incl. Tastatur, Fokus, Kontrast, Screenreader, Zoom), unterscheiden zwischen normativer Mindestanforderung und eigenen Komfortzielen.
+- [ ] **Nutzertests mit synthetischen Daten:** Bewohner, Verwaltung, Superadmin; Aufgabenzeit, Fehlerrate, Navigationsschritte und Verständlichkeit dokumentieren; keine echten privaten Finanzdaten für Demo/UX-Test ausgeben.
+- [ ] Priorisierte UI/UX-Änderungsliste mit Ist/Soll, Begründung, nachweisbarem Akzeptanzkriterium, Test, Branch und Rollback erstellen.
+- [ ] UI/UX-Verbesserungen nur nach Review, vollständigen Test- und Berechtigungsprüfungen und ausdrücklicher Live-Freigabe umsetzen.
+
+**Abgrenzung:** Diese UX-Phase ist eigenständig, darf aber P0-Sicherheit/Backup-Restore und kritische Finanz-/RLS-Korrekturen nicht blockieren oder ohne Erlaubnis vorziehen. Konkurrenten liefern Beispiele, keine Copy-Vorlagen und keinen Beweis für rechtliche oder technische Sicherheit.
+
 ## Wiederkehrendes Gate vor jedem produktiven Release
 
 - [ ] Expliziter Geltungsbereich; schriftlich festhalten, welche bestehende Funktion verändert wird.
