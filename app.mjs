@@ -1,3 +1,5 @@
+import {summaryExport,bankExport,receiptExport} from './report-export-domain.mjs?v=5.9.36';
+import {receiptButtons,downloadWorkbook,openExport} from './report-export-ui.mjs?v=5.9.36';
 import {readBankFile} from './bank-file-reader.mjs?v=5.9.35';
 import {bankFileMessage} from './bank-file-adapters.mjs?v=5.9.35';
 import {reviewImport} from './import-review.mjs?v=5.9.33';
@@ -22,7 +24,7 @@ import {bindInstall} from './install.mjs?v=5.8.1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
 import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.29';
-import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
+import {rangeError,selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
 import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
@@ -103,7 +105,7 @@ function render(focus=false){
  $('connectionButton').textContent=IS_PREVIEW?tr('Giriş ekranını incele'):state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/buildings.svg" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>${invitationUi.landing()}`:renderPage(state);
  if(appearanceWasOpen&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;
- const previewBar=$('accessPreviewBanner');previewBar.innerHTML=previewBanner(state);previewBar.hidden=!isAccessPreview();labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
+ addExportControls();const previewBar=$('accessPreviewBanner');previewBar.innerHTML=previewBanner(state);previewBar.hidden=!isAccessPreview();labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
  document.dispatchEvent(new CustomEvent('ay5:view',{detail:{resident:own,page:state.page,mode:state.mode}}));
  for(const card of document.querySelectorAll('.summary-grid .card')){const links=card.querySelectorAll('a[href]');if(links.length===1&&!card.querySelector('button,input,select')){card.classList.add('stretched-card');links[0].setAttribute('aria-label',(card.querySelector('h2')?.textContent||'')+': '+links[0].textContent);}}
  $('refreshButton').hidden=state.mode!=='connected';const powerLabel=tr(state.mode==='connected'?'Çıkış yap':'Giriş yap');$('connectionButton').innerHTML=icon('power');$('connectionButton').setAttribute('aria-label',powerLabel);$('connectionButton').title=powerLabel;
@@ -209,6 +211,20 @@ function showForm(action,args={}){
  formAction={action,args,context:built.context,origin};$('actionFields').dataset.financeAction=financeActions.includes(action)?action:'';
  $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(action)?'<p class="info-strip">'+(getLanguage()==='de'?'Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.':'Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.')+'</p>':'')+built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=action==='person_lifecycle'?(getLanguage()==='de'?'Aktion bestätigen':'İşlemi onayla'):action==='person_restore'?(getLanguage()==='de'?'Wiederherstellen':'Arşivden çıkar'):tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');if(['batch_charge','monthly_v5'].includes(action))$('saveAction').textContent=getLanguage()==='de'?'Entwurf einreichen':'Taslağı gönder';$('actionDialog').showModal();updateConditionalForm();if(financeActions.includes(action))updateFinanceForm($('actionFields'),state.data);updateAnnouncementTargets();
 }
+function exportOptions(){return {language:getLanguage(),demo:state.mode==='demo'||isAccessPreview(),canFinance:can(state,'finance')};}
+function reportExportModel(){const range=selectedRange(state,'report'),error=rangeError(range);if(error)throw Error(error);return summaryExport(state.data,financialSeries(state.data,range,state.reportGroup||'year'),{...exportOptions(),range});}
+function bankExportModel(){return bankExport(filteredTransactions(state),exportOptions());}
+function addExportControls(){
+ if(state.mode==='signedout')return;
+ if(state.page==='reports'&&(can(state,'finance')||state.data.communityAccess===true)){
+  const print=$('content').querySelector('[data-action="print"]');if(print)print.dataset.action='export_report_pdf';
+  const csv=$('content').querySelector('[data-action="export_report"]');if(csv)csv.insertAdjacentHTML('afterend',button(getLanguage()==='de'?'Excel herunterladen':'Excel indir','export_report_xlsx'));
+ }
+ if(state.page==='transactions'&&can(state,'finance')){
+  const csv=$('content').querySelector('[data-action="export_bank"]');if(csv)csv.insertAdjacentHTML('afterend',button(getLanguage()==='de'?'Excel herunterladen':'Excel indir','export_bank_xlsx')+button(getLanguage()==='de'?'Drucken / PDF':'Yazdır / PDF','export_bank_pdf'));
+ }
+}
+function chargeWithReceipts(id){const html=chargeDetail(state,id);return html?html+receiptButtons(state.data,id,exportOptions()):null;}
 function showDetail(html){
  if(!html)return;
  const dialog=$('detailDialog');$('detailContent').innerHTML=html;
@@ -262,7 +278,7 @@ function staged(){
 }
 function downloadCsv(filename,rows){const cell=v=>'"'+String(v??'').replaceAll('"','""')+'"';const safe=v=>/^[=+@\-\t\r]/.test(String(v))?"'"+v:v;const csv='\uFEFF'+rows.map(r=>r.map(v=>cell(typeof v==='number'?v.toLocaleString('tr-TR',{useGrouping:false,maximumFractionDigits:2}):safe(v))).join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function exportReport(){
- const r=financialSeries(state.data,selectedRange(state,'report'),state.reportGroup||'year');downloadCsv('ayapark2-mali-rapor.csv',[[tr('Dönem'),tr('Gelir'),tr('Gider'),tr('Dönem farkı')],...r.buckets.map(b=>[b.period,b.income/100,b.expense/100,(b.income-b.expense)/100])]);
+ const model=reportExportModel();downloadCsv('ayapark2-mali-rapor.csv',[model.columns,...model.rows.map(row=>row.map(v=>v&&typeof v==='object'?v.moneyCents/100:v))]);
 }
 const urgentShown=new Set();let localTest=null,localTestRead=false,popupSession='',importantLoginKeys=new Set(),popupBatch=[],localTestQueue=[],localTestReceipts=new Set();
 function notificationData(){const d=state.data;return {...d,userId:d.userId||'demo-user',announcements:[...(d.announcements||[]),...(localTest&&d.role==='super'?[localTest]:[]),...(d.role==='super'?localTestQueue:[])],acknowledgements:[...(d.acknowledgements||[]),...(localTestRead&&localTest?[{announcement_id:localTest.id,revision:localTest.revision,user_id:d.userId||'demo-user'}]:[]),...localTestQueue.filter(a=>localTestReceipts.has(a.id)).map(a=>({announcement_id:a.id,revision:a.revision,user_id:d.userId||'demo-user'}))]};}
@@ -344,13 +360,18 @@ document.addEventListener('click',async event=>{
   if(action==='person_manage'){personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');detailView={action,id:b.dataset.id};return showDetail(personManager(state,b.dataset.id));}
   if(action==='unit'){personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');detailView={action,id:b.dataset.id};return showDetail(unitDetail(state,b.dataset.id));}
   if(action==='transaction'){if(can(state,'finance')){detailView={action,id:b.dataset.id};showDetail(transactionDetail(state,b.dataset.id));}return;}
-  if(action==='charge_detail'){detailView={action,id:b.dataset.id};return showDetail(chargeDetail(state,b.dataset.id));}
+  if(action==='charge_detail'){detailView={action,id:b.dataset.id};return showDetail(chargeWithReceipts(b.dataset.id));}
   if(action==='provider_detail'){detailView={action,id:b.dataset.id};return showDetail(providerDetail(state,b.dataset.id));}
   if(action==='bank_previous'||action==='bank_next'){state.bankPage=Math.max(0,(state.bankPage||0)+(action==='bank_next'?1:-1));return render();}
   if(action==='staged')return staged();
   if(action==='review_import'){$('importDialog').close();navigate('transactions');state.filter.type='unmatched';render();return;}
   if(action==='print')return window.print();
   if(action==='export_report')return exportReport();
+  if(action==='export_report_pdf')return openExport(reportExportModel());
+  if(action==='export_report_xlsx'){await downloadWorkbook(reportExportModel(),'ayapark2-mali-rapor.xlsx');return;}
+  if(action==='export_bank_pdf')return openExport(bankExportModel());
+  if(action==='export_bank_xlsx'){await downloadWorkbook(bankExportModel(),'ayapark2-banka.xlsx');return;}
+  if(action==='export_receipt')return openExport(receiptExport(state.data,b.dataset.id,exportOptions()));
   if(action==='export_bank'){if(!can(state,'finance'))return;downloadCsv('ayapark2-banka-'+(state.mode==='demo'?'ornek':'kayitlar')+'.csv',[[tr("Tarih"),tr("Açıklama"),tr("Kategori"),tr("Tutar TL"),tr("Referans")],...filteredTransactions(state).map(t=>[t.date,t.desc,t.category,t.cents/100,t.bank_reference||t.reference||''])]);return;}
   if(action==='import'){
    if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
@@ -365,7 +386,7 @@ $('languageToggle').addEventListener('click',()=>{
  changePreference('language',getLanguage()==='tr'?'de':'tr',state.mode==='connected'?api:null);applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));
  if($('detailDialog').open&&detailView){
   if(detailView.action==='staged')staged();
-  else showDetail(detailView.action==='claims_detail'?residentClaimsDetail(state):detailView.action==='person_manage'?personManager(state,detailView.id):detailView.action==='unit'?linkedUnitDetail(detailView.id):detailView.action==='charge_detail'?chargeDetail(state,detailView.id):detailView.action==='provider_detail'?providerDetail(state,detailView.id):transactionDetail(state,detailView.id));
+  else showDetail(detailView.action==='claims_detail'?residentClaimsDetail(state):detailView.action==='person_manage'?personManager(state,detailView.id):detailView.action==='unit'?linkedUnitDetail(detailView.id):detailView.action==='charge_detail'?chargeWithReceipts(detailView.id):detailView.action==='provider_detail'?providerDetail(state,detailView.id):transactionDetail(state,detailView.id));
  }
  if($('actionDialog').open&&formAction){
   const built=buildForm(state,formAction.action,{period:state.period,...formAction.args});

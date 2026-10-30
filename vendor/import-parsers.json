@@ -17,6 +17,11 @@
       "path": "vendor/xlsx-9.3.14/reader.mjs",
       "bytes": 38339,
       "sha256": "b0877306afe1d6284308de5e7c755e8bb2b1b7a139d30d01170ffedf217dc289"
+    },
+    {
+      "path": "vendor/xlsx-writer-fflate-0.8.3.mjs",
+      "bytes": 8951,
+      "sha256": "726a0cd7870c40540b21696b467544509f08bbd95612341877853a08b27536a3"
     }
   ]
 }

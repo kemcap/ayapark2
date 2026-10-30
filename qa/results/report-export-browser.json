@@ -1,0 +1,22 @@
+{
+  "passed": 22,
+  "browser": "153.0.8010.0",
+  "results": [
+    {
+      "language": "de",
+      "layout": {
+        "width": 375,
+        "scroll": 375
+      }
+    },
+    {
+      "language": "tr",
+      "layout": {
+        "width": 375,
+        "scroll": 375
+      }
+    }
+  ],
+  "external": [],
+  "errors": []
+}
