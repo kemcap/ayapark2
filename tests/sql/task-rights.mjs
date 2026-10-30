@@ -12,8 +12,15 @@ try{
  await db.exec('alter table auth.users add column encrypted_password text,add column last_sign_in_at timestamptz,add column email_confirmed_at timestamptz,add column phone_confirmed_at timestamptz,add column deleted_at timestamptz,add column banned_until timestamptz');
  await db.exec(await readFile(new URL('../../supabase/migrations/20261027174427_people_invitation_eligibility.sql',import.meta.url),'utf8'));
  await db.exec(await readFile(new URL('../../supabase/migrations/20261030044641_phase2_task_rights_enforcement.sql',import.meta.url),'utf8'));
+ await db.exec(await readFile(new URL('../../supabase/migrations/20261027232500_deputy_recovery_verified.sql',import.meta.url),'utf8'));
+ await db.exec(await readFile(new URL('../../supabase/migrations/20261030045738_phase2_critical_finance_legacy_guard.sql',import.meta.url),'utf8'));
  await db.exec(`insert into public.site_staff_memberships(site_id,user_id,role) values('${s}','${u(2)}','deputy');`);
  await db.exec('grant select,insert,update on all tables in schema public to service_role;grant usage on schema ay2_private to service_role');
+ await db.exec(`insert into auth.users(id,email) values('${u(4)}','legacy-finance@example.invalid');insert into public.site_staff_memberships(site_id,user_id,role) values('${s}','${u(4)}','deputy');insert into public.ay2_permissions(site_id,user_id,capabilities) values('${s}','${u(4)}',array['finance']);`);
+ await as(4);check('unconverted legacy user retains read permission',await q("select ay2_private.can($1,'finance')",[s]));
+ for(const action of ['entry','classify_entry','bind_charge','reverse','void_charge','unallocate'])await deny(()=>q('select public.ay2_command($1,$2,$3)',[s,action,{}]));
+ for(const action of ['budget','monthly_exception','disable_exception'])await deny(()=>q('select public.ay5_command($1,$2,$3)',[s,action,{}]));
+ await db.exec('reset role');
  const tasks=['people_manage','occupancy_invite','charges_prepare','bank_reconcile','announcements_publish'];
  for(const task of tasks){
  await as(1);await q('select public.ay3_set_task_grants($1,$2,$3)',[s,u(2),[task]]);await as(2);
@@ -63,6 +70,11 @@ try{
  await q('select public.ay3_redeem_phone_invite($1,$2)',[token,u(99)]);
  await assert.rejects(()=>q('select public.ay3_redeem_phone_invite($1,$2)',[token,u(99)]));passed++;
  await db.exec('reset role');check('delegated invite binds only the intended account',await q('select auth_user_id from public.ay3_persons where id=$1',[u(80)])===u(99));
+ await db.exec('set role service_role');
+ await assert.rejects(()=>q('select public.ay_auth_recovery_authorize_v2($1,$2,$3,$4,$5)',[u(2),u(80),'Synthetic identity verified',true,false]));passed++;
+ const recovered=await q('select public.ay_auth_recovery_authorize_v2($1,$2,$3,$4,$5)',[u(1),u(80),'Synthetic identity verified',true,false]);check('Superadmin recovery retains the same account id',recovered===u(99));
+ await db.exec('reset role');
+
  await as(1);await q('select public.ay3_set_task_grants($1,$2,$3)',[s,u(2),['bank_reconcile']]);
  await db.exec(`reset role;insert into public.ay2_entries(id,site_id,booked_on,description,category,cents,dedup_key,created_by) values('${u(70)}','${s}','2026-10-01','Synthetic bank receipt','Aidat',100,'task-bank','${u(1)}');`);
  await as(2);

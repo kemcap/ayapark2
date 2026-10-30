@@ -1,3 +1,4 @@
+import {financePanel} from '../finance-forms.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {charges,transactionDetailV3} from '../v3-ui.mjs?v=5.9.25';
@@ -16,7 +17,7 @@ test('finance staff can allocate but cannot cancel charges or existing allocatio
  assert.doesNotMatch(allocationTable(s),/data-action="unallocate"/);
  const bank=transactionDetailV3(s,'e');
  assert.match(bank,/data-action="auto_allocate"/);
- assert.doesNotMatch(bank,/data-action="reverse"/);
+ assert.doesNotMatch(bank,/data-action="reverse"/);assert.doesNotMatch(bank,/data-action="classify_entry"/);for(const action of ['entry','budget','monthly_exception'])assert(!financePanel(s).includes('data-action="'+action+'"'));
  s.data.credits=[{id:'cr',entry_id:'e',person_id:'p',cents:100}];
  assert.doesNotMatch(transactionDetailV3(s,'e'),/data-action="void_credit"/);
 });
