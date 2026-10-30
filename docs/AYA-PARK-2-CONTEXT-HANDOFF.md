@@ -1,4 +1,16 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Sonderumlagen veröffentlicht, Phase 5 begonnen – 31.10.2026
+
+PR #72 nach erfolgreicher CI 41133654321 gemergt; Hauptzweig d7277a32c851da81f79e00cf23de2b219b809187. Pages 41133899050 erfolgreich. Live ausgelieferte app.mjs, index.html, levy-review-ui.mjs, levy-review.css, finance-forms.mjs, finance-v5.mjs, v3-ui.mjs und forms.mjs bytegleich geprüft. Backendmigration 20261030214643 aktiv; keine echten Reviews/Kapitalentwürfe oder Buchungen für die Abnahme angelegt. Frühere Hinweise „nur vorbereitet/Frontend-Rollout offen“ dieses Schritts sind damit überholt.
+
+Nachweise: 55 isolierte Sonderumlagen-SQL-, 74 native DE/TR-Browserprüfungen, 308 allgemeine Tests und aktuelle Finanz-/Historien-/Abschlussregressionen erfolgreich. Einzelheiten einschließlich externer Beschlussreferenz statt noch ausstehendem privatem Dateiarchiv: PHASE-4-LEVY-AUDIT.md. Keine pauschale juristische oder vollständige Auth-/Mail-/Geräteabnahme.
+
+Zusätzlich gezielt korrigiert: Nach Rücknahme einer Finanzsummenfreigabe muss eine neue Freigabe eine frische Anfrage-ID verwenden; nur die Wiederholung eines unklaren fehlgeschlagenen Versuchs behält dieselbe ID. Sonst konnte das Backend die alte zurückgenommene Freigabe korrekt zurückliefern, während die Oberfläche eine neue Entscheidung vermuten ließ. 26 native Freigabe-Browserprüfungen einschließlich DE/TR-Rücknahme-/Neufreigabe bestanden. Keine Änderung an tatsächlichen Freigabezeilen oder Backend erforderlich. CI-/Live-Nachweis dieser kleinen Frontendkorrektur folgt separat.
+
+Nächster Roadmapschritt bereits sicher vorbereitet: Phase 5 Budget/Rücklagen/Liquidität. Bestandsabgleich in PHASE-5-BUDGET-AUDIT.md und neun reine Prognoseprüfungen im separaten Branch feature/budget-liquidity-preparation-20261031. Noch keine Backend-/UI-Integration oder Veröffentlichung. Offene Forderungen erhöhen niemals den echten Bankbestand; konservative Linie ohne erwartete Geldeingänge, getrenntes Einnahmeszenario, überfällige Kosten sichtbar, bestätigter Rücklageneinsatz und bereits bankgebuchte Teilbeträge getrennt. Alte summarische Budgetwerte müssen bei Integration ausdrücklich abgeglichen werden, damit nichts vergessen oder doppelt abgezogen wird.
+
+Danach offen: privates Dokumenten-/Versammlungsarchiv, Aufgaben/Erinnerungen und restliche reale Auth-/Mail-/Geräteabnahme. Backup weiterhin gemäß Nutzerauftrag übersprungen.
+
 ## Sonderumlagen vollständig lokal geprüft, Backend aktiv – 31.10.2026
 
 Vorhandene Entwurfs-/Restcent-Verteilung und Superadmin-Freigabe gezielt erweitert: eigene Eigentümervorschau, getrennte private Beschlussreferenz und drei explizite Prüfbestätigungen, dokumentierter Verantwortlichkeitszeitpunkt sowie zusätzliche endgültige Buchungsbestätigung. Historische Eigentümer nur ausdrücklich und bei zeitlich belegter Zuordnung, keine Altlastenübertragung auf Nachfolger. Neue Kapital-Sammelforderungen ausschließlich über die dokumentierte bestehende Entwurfsfreigabe; direkter V5-Aufruf gesperrt. Kein zweites Buchungs-/Verteilungssystem.
