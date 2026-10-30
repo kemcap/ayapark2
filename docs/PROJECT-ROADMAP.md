@@ -1,4 +1,14 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Phase 5 integriert und lokal abgenommen – 31.10.2026
+
+Vorhandene Budgetbasis beibehalten; Monats-/Jahrespositionen, Reparaturplanung und getrennte konservative/angenommene 3-/6-Monats-Liquidität ergänzt. Echte Cash-Berechnung zum serverseitigen Ist-Stichtag; offene Forderungen, künftige Bankdaten und bereits im Anfangsbestand enthaltene alte Bewegungen werden nicht als neues heutiges Geld gezählt. Echte Bankteilzuordnungen vermeiden doppelte Kosten; alte Planpauschalen werden ausdrücklich abgeglichen. Gesonderte dokumentierte Superadmin-Rücklagenfreigabe ändert nur Zweckbindung, niemals Bankkonto/Forderungen. Alte direkte Verringerung ohne diese Freigabe serverseitig gesperrt. Keine sechste delegierte Aufgabe.
+
+Neun reine Prognoseprüfungen, 53 isolierte Budget-/Rechte-/Cash-/Rücklagenprüfungen und 66 native DE/TR-Browserprüfungen bei 375/1440 Pixeln bestanden; 317 allgemeine Tests und aktuelle Finanz-/Sonderumlagen-/Abschluss-/Historienregressionen erfolgreich. Details und genaue fachliche Grenzen: PHASE-5-BUDGET-AUDIT.md. Keine juristische Beschlussprüfung durch Software und keine reale Auth-/Mail-/Gerätegesamtabnahme behauptet.
+
+Backendmigration 20261030221947 aktiv und rein lesend geprüft: 0 echte Planpositionen, Bankplanbindungen und Rücklagenfreigaben, bisheriger Budgethash unverändert. RLS/Clientgrenzen geprüft, Advisor-Sammelgruppen unverändert (bestehende Hinweise nicht pauschal gelöst). Keine Bewohner-/Auth-/Bank-/Forderungszeilen für Tests geändert. Frontend-CI und tatsächliche Auslieferung separat bestätigen. Ältere „nur Rechenkern / keine Backendintegration“-Hinweise gelten nicht mehr für diesen Entwicklungsstand.
+
+Nächster Schritt nach Veröffentlichung: Phase 6 – privates Dokumenten-/Versammlungsarchiv und einfache Aufgaben/Erinnerungen, jeweils mit vorhandenen Rollen, RLS und Audit; keine öffentliche Originalbelegablage, keine OCR, keine automatische neue Wartungsaufgabe. Backup bleibt ausdrücklich übersprungen.
+
 ## Live-Abnahme Phase 4 bestätigt – 31.10.2026
 
 Sonderumlagen (#72) vollständig technisch veröffentlicht und ausgelieferte Dateien geprüft: CI 41133654321, Pages 41133899050 erfolgreich, Backendmigration 20261030214643 aktiv. 55 SQL-, 74 DE/TR-Browser- und 308 allgemeine Tests sowie weitere Regressionen bestanden. Keine echten Forderungen, Reviews oder Auth-/Bewohnerdaten zu Testzwecken erzeugt/verändert. Externer unterschriebener Beschluss und manuelle fachliche Prüfung bleiben erforderlich; private Originaldateiablage folgt in Phase 6.

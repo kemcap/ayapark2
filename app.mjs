@@ -1,3 +1,4 @@
+import {budgetPlanning} from './budget-planning-ui.mjs?v=5.9.41';
 import {levyReviews} from './levy-review-ui.mjs?v=5.9.39';
 import {reportReleases} from './report-release-ui.mjs?v=5.9.40';
 import {periodClosings} from './period-closing-ui.mjs?v=5.9.37';
@@ -121,7 +122,8 @@ function navigate(page){mobileNavGroup=null;state.page=page;state.filter={q:'',b
 const closingUI=periodClosings({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,onSaved:reload});
 const releaseUI=reportReleases({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),community:()=>state.mode==='connected'&&!isAccessPreview()&&(can(state,'finance')||state.data.communityAccess===true),site:()=>state.data.site.id,language:getLanguage});
 const levyUI=levyReviews({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),connected:()=>state.mode==='connected'&&!isAccessPreview(),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload});
-function closeDialogs(){closingUI.close();releaseUI.close();levyUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
+const budgetUI=budgetPlanning({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'finance'),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload,onRender:applyAmountPrivacy});
+function closeDialogs(){closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
@@ -223,6 +225,7 @@ function reportExportModel(){const range=selectedRange(state,'report'),error=ran
 function bankExportModel(){return bankExport(filteredTransactions(state),exportOptions());}
 function addExportControls(){
  if(state.mode==='signedout')return;
+ if(state.mode==='connected'&&!isAccessPreview()){const b=$('content').querySelector('[data-action=budget]');if(b){b.textContent=getLanguage()==='de'?'Budget & Liquidität':'Bütçe ve nakit planı';const p=b.closest('section')?.querySelector('p');if(p)p.textContent=getLanguage()==='de'?'Den aktuellen Detailplan und die Liquiditätsvorschau findest du in der Budgetplanung.':'Güncel ayrıntılı planı ve nakit öngörüsünü bütçe planında görebilirsiniz.';}else if(state.page==='dues'&&can(state,'finance'))$('content').insertAdjacentHTML('beforeend','<section class="card">'+button(getLanguage()==='de'?'Budget & Liquidität':'Bütçe ve nakit planı','budget_plan')+'</section>');}
  if(state.page==='dues'&&state.mode==='connected'&&!isAccessPreview())$('content').insertAdjacentHTML('beforeend','<section class="card">'+button(getLanguage()==='de'?'Sonderumlagenentwürfe ansehen':'Ek ödeme taslaklarını gör','levy_owner')+(can(state,'admin')?button(getLanguage()==='de'?'Sonderumlagen prüfen':'Ek ödemeleri incele','levy_manage'):'')+'</section>');
  for(const b of $('content').querySelectorAll('[data-draft-decision=approve]'))if(state.data.chargeDrafts?.find(d=>d.id===b.dataset.id)?.payload?.debt_group==='capital')b.textContent=getLanguage()==='de'?'Beschlussprüfung öffnen':'Karar incelemesini aç';
  if(state.page==='reports'&&(can(state,'finance')||state.data.communityAccess===true)){
@@ -377,6 +380,7 @@ document.addEventListener('click',async event=>{
   if(action==='staged')return staged();
   if(action==='review_import'){$('importDialog').close();navigate('transactions');state.filter.type='unmatched';render();return;}
   if(action==='print')return window.print();
+  if((action==='budget_plan'||action==='budget')&&state.mode==='connected'&&!isAccessPreview())return await budgetUI.open();
   if(action==='levy_manage')return await levyUI.openAdmin();
   if(action==='levy_owner')return await levyUI.openOwner();
   if(action==='report_releases')return await releaseUI.openAdmin();
