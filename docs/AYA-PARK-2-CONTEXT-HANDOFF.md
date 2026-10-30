@@ -1,4 +1,10 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Phase 3 fortgesetzt – Quellenprüfung
+
+PR #62 nach erfolgreichem CI-Lauf 41064856278 in main veröffentlicht (c8374bd51eba370faa5d0af4da1ac8d60585e68a); Backendmigration 20261030133658 bereits aktiv. Anschließend lokalen, rein lesenden PDF-Struktur-/Saldencheck für zwei bekannte Banklayouts ergänzt: 11 synthetische Tests bestanden. Kein DB-Zugriff und keine Buchung durch das Werkzeug. Vollständigkeits-, Anfangssaldo- und Zuordnungsgrenzen ausdrücklich festgehalten. Details und die drei getrennten Quellen-/Saldo-/Zuordnungsabnahmen: [PHASE-3-IMPORT-AUDIT.md](PHASE-3-IMPORT-AUDIT.md).
+
+Nächste Umsetzung: direkte PDF-/XLSX-Parser vor die bestehende Importvorschau integrieren, zunächst Mehrseiten-/Beschreibungs-/Tabellenadapter isoliert absichern. CSV bleibt der einzige gegenwärtige Importdateityp der Live-Maske. Geräte-/Browser-/Mailabnahme weiterhin offen.
+
 ## Fortsetzung 30.10.2026 – Eigentümerwechsel und Finanzimport
 
 **Backend veröffentlicht:** deduplicate_bank_movements_within_import, Supabase-Version 20261030133658. Neue Funktionsdefinition schreibgeschützt bestätigt (43f8931c425ffbc08f92aa0ebd90746c); anonyme Ausführung weiterhin gesperrt. Repository-/CI-Veröffentlichung wird separat bestätigt.
