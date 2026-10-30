@@ -19,7 +19,9 @@
     "test:tasks:sql": "node tests/sql/task-drafts.mjs",
     "test:rights:sql": "node tests/sql/task-rights.mjs",
     "test:contacts:sql": "node tests/sql/contact-requests.mjs",
-    "test:history:sql": "node tests/sql/current-history.mjs"
+    "test:history:sql": "node tests/sql/current-history.mjs",
+    "test:finance:sql": "node tests/sql/v5.mjs --current",
+    "test:bank:sql": "node tests/sql/bank-import.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.11",

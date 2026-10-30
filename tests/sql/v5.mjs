@@ -1,6 +1,8 @@
 import {PGlite} from '@electric-sql/pglite';
 import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
+import {loadCurrentSchema} from './current-schema.mjs';
+const current=process.argv.includes('--current');
 import {distribute} from '../../finance-v5.mjs?v=5.1.0';
 const db=new PGlite(),results=[];
 const site='50000000-0000-0000-0000-000000000001',admin='10000000-0000-0000-0000-000000000001',tenant='10000000-0000-0000-0000-000000000002',owner='10000000-0000-0000-0000-000000000003',rep='10000000-0000-0000-0000-000000000004',stranger='10000000-0000-0000-0000-000000000005',staff='10000000-0000-0000-0000-000000000006';
@@ -16,7 +18,8 @@ const reject=async(name,fn)=>{await assert.rejects(fn);check(name);};
 const all=Array.from({length:20},(_,i)=>uid(i+1));
 function batch(ids=all,mode='total',cents=10001){return {request_id:request(),scope:'selected',unit_ids:ids,distribution:mode,cents,due_on:'2026-11-01',label:'QA synthetic charge',category:'Genel Gider / İşletme',debt_group:'general',basis_ref:'QA resolution',debtors:Object.fromEntries(ids.map(id=>[id,lid(Number(id.slice(-12)))])),expected:Object.fromEntries(distribute(cents,ids,mode).map(r=>[r.unit_id,r.cents])),confirmed:true};}
 try{
- for(const f of ['schema.sql','../../supabase/migrations/20261025073340_v4_finance_release_safety.sql','../../supabase/migrations/20261025194333_v5_notifications_finance.sql','../../supabase/migrations/20261026061016_visible_expired_announcements.sql','../../supabase/migrations/20261029212437_phase2_superadmin_finance_corrections.sql'])await db.exec(await readFile(new URL(f,import.meta.url),'utf8'));
+ if(current)await loadCurrentSchema(db);
+ else for(const f of ['schema.sql','../../supabase/migrations/20261025073340_v4_finance_release_safety.sql','../../supabase/migrations/20261025194333_v5_notifications_finance.sql','../../supabase/migrations/20261026061016_visible_expired_announcements.sql','../../supabase/migrations/20261029212437_phase2_superadmin_finance_corrections.sql'])await db.exec(await readFile(new URL(f,import.meta.url),'utf8'));
  await db.exec(`INSERT INTO auth.users(id,email) SELECT ('10000000-0000-0000-0000-'||lpad(i::text,12,'0'))::uuid,'qa'||i||'@example.invalid' FROM generate_series(1,6)i ON CONFLICT(id) DO NOTHING;
  INSERT INTO public.site_sites(id,slug,name) VALUES('${site}','qa-v5','QA synthetic site');
  INSERT INTO public.site_blocks(id,site_id,code) VALUES('60000000-0000-0000-0000-000000000001','${site}','A'),('60000000-0000-0000-0000-000000000002','${site}','B');
@@ -70,7 +73,7 @@ try{
  const notice={title:'QA notification',body:'QA synthetic test only',published:true,priority:'important',popup_on_login:true,target_kind:'owners',target_units:[],target_blocks:[]};const announcement=(await command('announcement',notice)).id;
  await as(tenant);check('owner-only notice hidden from tenant',!(await value('select exists(select 1 from public.ay2_announcements where id=$1) v',[announcement])));await reject('guessed receipt ID cannot bypass audience',()=>command('acknowledge',{id:announcement,revision:1}));
  await as(owner);check('owner receives targeted notice',await value('select exists(select 1 from public.ay2_announcements where id=$1) v',[announcement]));await command('acknowledge',{id:announcement,revision:1});await command('acknowledge',{id:announcement,revision:1});check('receipt persists and is deduplicated',(await value('select count(*)::int v from public.ay3_acknowledgements where announcement_id=$1',[announcement]))===1);
- await as(rep);check('representative without mandate not implicitly targeted',!(await value('select exists(select 1 from public.ay2_announcements where id=$1) v',[announcement])));check('authorized current representative can view apartment claims',await value('select exists(select 1 from public.ay2_charges where unit_id=$1) v',[uid(1)]));
+ await as(rep);check('representative without mandate not implicitly targeted',!(await value('select exists(select 1 from public.ay2_announcements where id=$1) v',[announcement])));check(current?'notification representative has no implicit financial access':'baseline authorized representative apartment view',(await value('select exists(select 1 from public.ay2_charges where unit_id=$1) v',[uid(1)]))===!current);
  await as(admin);await legacy('assignment_edit',{request_id:request(),id:lid(201),unit_id:uid(1),revision:1,first_name:'QA',last_name:'Representative',role:'representative',starts_on:null,ends_on:null,mandates:['owners']});
  check('mandate history includes before and after',await value("select exists(select 1 from public.ay2_audit where site_id=$1 and action='notification_mandates' and details->'after'='[\"owners\"]'::jsonb) v",[site]));
  await as(rep);check('explicit mandate adds representative recipient',await value('select exists(select 1 from public.ay2_announcements where id=$1) v',[announcement]));
@@ -81,5 +84,5 @@ try{
  await as(owner);check('published expired notice remains visible to its authorized owner',await value('select exists(select 1 from public.ay2_announcements where id=$1) v',[expired]));await reject('expired notice cannot create a new acknowledgement',()=>command('acknowledge',{id:expired,revision:1}));check('draft and future notices remain hidden',!(await value('select exists(select 1 from public.ay2_announcements where id in ($1,$2)) v',[draft,future])));
  await as(tenant);check('expired owner notice does not leak to tenant',!(await value('select exists(select 1 from public.ay2_announcements where id=$1) v',[expired])));
  await db.exec('RESET ROLE;SET ROLE anon;');await reject('anonymous workspace RPC denied',()=>value('select public.ay5_workspace($1) v',[site]));await reject('anonymous command RPC denied',()=>command('budget',{}));
- console.log(JSON.stringify({passed:results.length,failed:0,scope:'isolated PGlite; synthetic identities; no production connection',results},null,2));
+ console.log(JSON.stringify({passed:results.length,failed:0,scope:current?'current relevant released migrations; synthetic finance and permission integration':'isolated legacy baseline; synthetic identities; no production connection',results},null,2));
 }catch(error){console.error(error);console.log(JSON.stringify({passed:results.length,failed:1,results},null,2));process.exitCode=1;}finally{await db.close();}
