@@ -1,0 +1,112 @@
+{
+  "passed": 58,
+  "browser": "153.0.8010.0",
+  "errors": [],
+  "blocked": [],
+  "results": [
+    {
+      "lang": "de",
+      "width": 320,
+      "layout": {
+        "scroll": 286,
+        "client": 286
+      },
+      "contactLayout": {
+        "scroll": 320,
+        "width": 320
+      },
+      "violations": []
+    },
+    {
+      "lang": "de",
+      "width": 375,
+      "layout": {
+        "scroll": 341,
+        "client": 341
+      },
+      "contactLayout": {
+        "scroll": 375,
+        "width": 375
+      },
+      "violations": []
+    },
+    {
+      "lang": "de",
+      "width": 768,
+      "layout": {
+        "scroll": 678,
+        "client": 678
+      },
+      "contactLayout": {
+        "scroll": 768,
+        "width": 768
+      },
+      "violations": []
+    },
+    {
+      "lang": "de",
+      "width": 1440,
+      "layout": {
+        "scroll": 678,
+        "client": 678
+      },
+      "contactLayout": {
+        "scroll": 1440,
+        "width": 1440
+      },
+      "violations": []
+    },
+    {
+      "lang": "tr",
+      "width": 320,
+      "layout": {
+        "scroll": 286,
+        "client": 286
+      },
+      "contactLayout": {
+        "scroll": 320,
+        "width": 320
+      },
+      "violations": []
+    },
+    {
+      "lang": "tr",
+      "width": 375,
+      "layout": {
+        "scroll": 341,
+        "client": 341
+      },
+      "contactLayout": {
+        "scroll": 375,
+        "width": 375
+      },
+      "violations": []
+    },
+    {
+      "lang": "tr",
+      "width": 768,
+      "layout": {
+        "scroll": 678,
+        "client": 678
+      },
+      "contactLayout": {
+        "scroll": 768,
+        "width": 768
+      },
+      "violations": []
+    },
+    {
+      "lang": "tr",
+      "width": 1440,
+      "layout": {
+        "scroll": 678,
+        "client": 678
+      },
+      "contactLayout": {
+        "scroll": 1440,
+        "width": 1440
+      },
+      "violations": []
+    }
+  ]
+}

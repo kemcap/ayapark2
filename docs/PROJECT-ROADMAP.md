@@ -1,4 +1,40 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Bestätigter Rollout 30.10.2026 – Releases #62 bis #64
+
+Bankimport-Dublettenschutz (#62), rein lesende PDF-Quellenprüfung (#63) und CSV-Saldenvorschau mit Sperre widersprüchlicher Angaben (#64) sind nach main übernommen. Aktueller Hauptzweig: 23489cfd649efa8c81d87f4a3fd822fa1a698bd4. CI für den letzten PR-Head: 41067609710 erfolgreich; Pages-Deployment: 41067714654 erfolgreich. Live ausgelieferte app.mjs, index.html und import-review.mjs sind bytegleich mit dem geprüften Stand. Backendmigration 20261030133658 aktiv und schreibgeschützt bestätigt; Advisor-Gruppen vor/nach Änderung unverändert. Keine produktiven Bewohner-, Auth- oder Finanzdatensätze zu Testzwecken geändert.
+
+Nachweise: 281 allgemeine Tests, 84 aktuelle Aufgabenrechteprüfungen, 23 Kontakt-, 43 Historien-, 50 aktuelle Finanz-, 16 Bankimport- und 11 PDF-Strukturprüfungen erfolgreich. 58 lokale tatsächliche Browserprüfungen der Import-/Kontaktoberflächen in DE/TR bei 320–1440 px erfolgreich; ausschließlich synthetische Daten, keine externen Anfragen. Keine pauschale Gesamtgeräte-/Mail-/Auth-E2E-Abnahme.
+
+Nächster offener Fachpunkt: direkte PDF-/XLSX-Parser mit vollständigen Beschreibungen, Mehrseiten- und Spaltenzuordnung vor die vorhandene Vorschau integrieren; aktuell weiterhin nur CSV in der Live-Importmaske. Fortlaufende Abarbeitung und direkte Veröffentlichung geprüfter Änderungen sind ausdrücklich freigegeben. Backup bleibt übersprungen.
+
+## Importvorschau und mobile Kontaktfreigabe – 30.10.2026
+
+PR #63 (PDF-Strukturprüfung) nach erfolgreicher CI 41065619848 veröffentlicht; Pages-Lauf 41065968751 erfolgreich. Der nächste umgesetzte Schritt ergänzt die bestehende CSV-Vorschau um Einnahmen, Ausgaben, Netto und eine exakte Prüfung vorhandener laufender Salden. Beide Druckreihenfolgen und fehlende Zwischenangaben werden berücksichtigt. Widersprüchliche Salden sperren den Importbutton vor Erstellung des Importpayloads; Beträge werden niemals passend gerechnet. Ohne ausreichende Saldoangaben bleibt die Quelle ausdrücklich ungeprüft; Anfangssaldo und Seitenvollständigkeit benötigen weiterhin separate Bestätigung. Dies ist eine zusätzliche Eingabeprüfung der Oberfläche, keine neue Buchungslogik oder Ersatz für serverseitige Rechte.
+
+Acht neue reine Regressionstests bestanden, gesamte JavaScript-Suite 281/281. Nach dem fehlgeschlagenen Standarddownload wurde eine separate lokale Chromium-Testumgebung erfolgreich eingerichtet. 58 tatsächliche Browserprüfungen in DE/TR bei 320/375/768/1440 px bestanden: tatsächlicher Importbutton bei widersprüchlichen Salden gesperrt, fehlende Salden sichtbar ungeprüft, Kontaktfreigabe verlangt unabhängige Bestätigung, keine horizontale Überbreite, keine gefundenen WCAG-A/AA-Verstöße in der geprüften Kontaktkomponente, keine Laufzeitfehler oder externen Anfragen. Ausschließlich synthetische Daten; kein produktiver Account verwendet. Evidenz: qa/results/phase2-import-browser.json und wiederholbarer Test qa/phase2-import-browser.mjs. Keine pauschale Abnahme aller Rollen, Geräte, Mail- oder Authabläufe.
+
+**Nächster offener Schritt:** PDF-/XLSX-Lesen einschließlich vollständiger Beschreibungen/Mehrseiten-/Tabellenzuordnung in denselben kontrollierten Vorschaupfad integrieren. Bis dahin akzeptiert die Live-Maske weiterhin ausschließlich CSV.
+
+## Phase 3 fortgesetzt – Quellenprüfung
+
+PR #62 nach erfolgreichem CI-Lauf 41064856278 in main veröffentlicht (c8374bd51eba370faa5d0af4da1ac8d60585e68a); Backendmigration 20261030133658 bereits aktiv. Anschließend lokalen, rein lesenden PDF-Struktur-/Saldencheck für zwei bekannte Banklayouts ergänzt: 11 synthetische Tests bestanden. Kein DB-Zugriff und keine Buchung durch das Werkzeug. Vollständigkeits-, Anfangssaldo- und Zuordnungsgrenzen ausdrücklich festgehalten. Details und die drei getrennten Quellen-/Saldo-/Zuordnungsabnahmen: [PHASE-3-IMPORT-AUDIT.md](PHASE-3-IMPORT-AUDIT.md).
+
+Nächste Umsetzung: direkte PDF-/XLSX-Parser vor die bestehende Importvorschau integrieren, zunächst Mehrseiten-/Beschreibungs-/Tabellenadapter isoliert absichern. CSV bleibt der einzige gegenwärtige Importdateityp der Live-Maske. Geräte-/Browser-/Mailabnahme weiterhin offen.
+
+## Fortsetzung 30.10.2026 – Eigentümerwechsel und Finanzimport
+
+**Backend veröffentlicht:** deduplicate_bank_movements_within_import, Supabase-Version 20261030133658. Neue Funktionsdefinition schreibgeschützt bestätigt (43f8931c425ffbc08f92aa0ebd90746c); anonyme Ausführung weiterhin gesperrt. Repository-/CI-Veröffentlichung wird separat bestätigt.
+
+43 Historienprüfungen bestehen einschließlich echter Assignment-Befehle: Eigentümerwechsel, wiederholte Anfragen, getrennte Wohnungszugänge, Mehrfachzuordnungen und Zutrittsentzug. Sämtliche synthetischen Forderungs-, Bank- und Zuordnungszeilen bleiben beim Wechsel bytegleich; ursprünglicher Schuldner und Konto-ID bleiben erhalten. Zwölf zentrale Funktionsdefinitionen des isolierten Fixtures wurden vor der Korrektur schreibgeschützt mit Produktion abgeglichen: alle identisch.
+
+50 Finanzprüfungen laufen zusätzlich gegen das relevante aktuelle Migrationspaket (test:finance:sql): Teilzahlungen, oldest-first innerhalb derselben Schuldart, Guthaben, unveränderliche Originale, Storno und Freigaben. Die ältere V5-Baseline bleibt separat erhalten. Ein zentraler Fixture-Loader vermeidet auseinanderlaufende Migrationslisten; er ersetzt keinen vollständigen Live-Schemaexport.
+
+Bankimportfehler reproduziert: dieselbe Referenz konnte innerhalb einer Datei bei geänderter Beschreibung oder laufendem Saldo doppelt gebucht werden. Der Import filtert nun vor der Anlage des Batches auch innerhalb der Anfrage anhand der bereits zwischen Dateien geltenden Identität (Datum, Betrag, Referenz; ohne Referenz zusätzlich Beschreibung). Unterschiedliche echte Referenzen bleiben getrennt. 16 CSV-/SQL-Prüfungen belegen Vorher-/Nachher, separate Gebühren, genaue Centbeträge, Überlappungen, Wiederholungen, unveränderte Originalzeilen und atomaren Rollback. Keine automatische Forderungszuordnung. Migration ersetzt ausschließlich die geprüfte command-Funktion mit Ausgangshash-Schutz, ohne bestehende Finanzdaten oder Rechte zu ändern. Rückfall: geprüfte vorige command-Definition aus 20261030044641 wiederherstellen; keine Datenlöschung oder automatische Dublettenbereinigung.
+
+GitHub-CI führt künftig die aktuellen Rechte-, Kontakt-, Historien-, Finanz- und Bankimportprüfungen zusätzlich zu den bisherigen Prüfungen aus. Allgemeine Suite 273/273. Browser-/Mail-/Geräteabnahme bleibt offen: der lokale Chromium-Download lieferte kein gültiges Archiv; kein erfolgreicher Browserlauf wird daraus behauptet.
+
+**Nächster konkreter Fachpunkt:** PDF-/XLSX-Importpfad gegen den vorhandenen CSV-Vorschau-/Prüfablauf abgleichen und die getrennte Bank-/Saldo-/Zuordnungsabnahme vervollständigen. Derzeit akzeptiert die Importmaske ausschließlich CSV; externe Konvertierungsanleitung ist vorhanden, direkter PDF-/XLSX-Import ist noch nicht umgesetzt. Backup weiterhin gemäß Nutzerauftrag übersprungen.
+
 
 ## Rollout bestätigt – Kontaktfreigaben und Historie
 
@@ -78,7 +114,7 @@ Stand: 29.10.2026 · Projekt: `kemcap/ayapark2` · Produktivbranch: `main`
 - Die **30 verbindlichen Produktentscheidungen** stehen ausführlich in `docs/AYA-PARK-2-CONTEXT-HANDOFF.md`. Diese Roadmap ist die *Abarbeitungsliste*, nicht ein Ersatz für die Spezifikation.
 - Schritt für Schritt; nach jeder Aufgabe Status, Ergebnis, Nachweise, offene Fragen und **den nächsten konkreten Schritt** eintragen.
 - Nur nach echten Nachweisen ein Kästchen abhaken. Code im Entwurfsbranch bedeutet **nicht**, dass etwas produktiv eingerichtet oder getestet ist.
-- Keine produktive Datenbankänderung, RLS-Freigabe, Auth-/Storage-Einstellung, Veröffentlichung oder Backup-Aktivierung ohne Freigabe des Benutzers.
+- Der Nutzer hat die fortlaufende Abarbeitung und direkte Veröffentlichung erfolgreich geprüfter Änderungen ausdrücklich freigegeben. Keine erneute Rückfrage pro Release. Produktive Bewohner-, Finanz- oder Auth-Datensätze dürfen nicht zu Testzwecken verändert werden. Fachliche Änderungen an diesen Daten benötigen weiterhin ausdrückliche Freigabe. Backup bleibt übersprungen; keine neue Aktivierung.
 - Vor kritischen Schritten: geprüfte Sicherung und isolierte Wiederherstellungsprobe.
 - **Supabase Free behalten**; keinen kostenpflichtigen Dienst ohne gesonderte Entscheidung aktivieren.
 - Bei Chatwechsel zuerst beide Dateien lesen, den tatsächlichen GitHub-/Supabase-Stand neu prüfen und beim nächsten offenen Punkt fortfahren.
@@ -100,7 +136,7 @@ Stand: 29.10.2026 · Projekt: `kemcap/ayapark2` · Produktivbranch: `main`
 - [ ] Supabase-Advisor-Hinweise zu `SECURITY DEFINER`, Auth-Passwortschutz und drei RLS-Tabellen ohne Policy fachlich prüfen; nicht pauschal Zugriffsrechte erweitern.
 - [ ] Verbindliche Backupprozedur inklusive Restore-Ziel, maximal tolerierbarem Datenverlust, Betreiberkontakten und Prüfkriterien festhalten.
 
-## Phase 1 – Vollständige portable Backups (P0; AKTIV)
+## Phase 1 – Vollständige portable Backups (auf Nutzerwunsch übersprungen; historischer Nachweisstand)
 
 Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**: https://github.com/kemcap/ayapark2/pull/52
 
@@ -113,7 +149,7 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [x] Sicherheits-/Einrichtungsanleitung `docs/FREE-BACKUP-SETUP.md` erstellen.
 - [x] Shell-Syntax und sechs synthetische Offline-Quellcode-/Archivtests laut PR #52 geprüft. Keine vollständige DB-/Storage-Integration daraus ableiten.
 
-### 1.2 Portabilität vollständig machen – **NÄCHSTE TECHNISCHE AUFGABE**
+### 1.2 Portabilität – historischer, derzeit übersprungener Arbeitsstand
 
 - [x] Git-Bundle aller im vollständigen Checkout vorhandenen Referenzen und erreichbaren Historie in den **verschlüsselten** Sicherungsprozess integriert; isolierter Git-Restore getestet. Verschlüsselungs-/Offsite-Rundlauf bleibt in 1.4 offen.
 - [x] Versionierte Website, HTML, CSS, JS, Assets, Design und Edge-Function-Code im Git-Bundle erfasst; Ref-/Tree-Inventar und unabhängige Wiederherstellung geprüft.
@@ -147,15 +183,15 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [ ] Übrige kritische Finanzfreigaben und fünf getrennte Aufgabenrechte vollständig umsetzen und integriert abnehmen.
 - [x] Fünf getrennte Aufgabenrechte und Aidat-/Umlagenentwurf mit Superadmin-Endfreigabe umgesetzt und veröffentlicht (#56/#57); bestehende Altzuweisungen werden erst bei ausdrücklichem Speichern umgestellt.
 - [x] 13 bestehende allgemeine Testfehler fachlich aufgelöst und veröffentlicht (#55); allgemeine Suite inzwischen 269/269 erfolgreich.
-- [ ] Registrierung/Einladungen, Wiederherstellung, Kontaktfreigaben, Historie und RLS mit synthetischen Identitäten testen.
-- [ ] Eigentümerwechsel, Mehrfachzuordnungen, Altlasten und Zutrittsentzug mit unveränderter Finanzhistorie testen.
+- [x] Registrierung/Einladungen, administrative Wiederherstellung, Kontaktfreigaben, Historie und RLS mit synthetischen Identitäten geprüft (84 aktuelle Rechte-/Einladungs-/Recovery-, 23 Kontakt- und 43 Historienprüfungen; kein echter Mail-/Auth-Browser-E2E).
+- [x] Eigentümerwechsel, Mehrfachzuordnungen, Altlasten und Zutrittsentzug isoliert mit unveränderter Finanzhistorie getestet (43 aktuelle Historienprüfungen; kein Geräte-/Mail-E2E).
 - [ ] Barrierefreie mobile Bedienung, DE/TR und eindeutige Freigabetexte prüfen.
-- [ ] Isolierter Release-Gate; keine Live-Freigabe ohne Zustimmung.
+- [ ] Durchgängige Phase-2-Gesamtabnahme vervollständigen. Grundsätzliche Live-Freigabe liegt vor; offene Geräte-/Mail-/Auth-E2E-Prüfungen nicht als bestanden behaupten.
 
 ## Phase 3 – Finanzkern und Bankimporte (P1)
 
-- [ ] Teilzahlungen, oldest-first-Zuordnung, Stornos und Schuldartgetrenntheit prüfen.
-- [ ] Aidat-/Umlagen-Entwurf und Superadmin-Endfreigabe prüfen.
+- [x] Teilzahlungen, oldest-first-Zuordnung, Stornos und Schuldartgetrenntheit im aktuellen relevanten Migrationspaket isoliert geprüft (50 Finanzprüfungen).
+- [x] Aidat-/Umlagen-Entwurf und Superadmin-Endfreigabe isoliert geprüft und produktiv (#56–#58); tatsächliche Buchung, Wiederholung und Ablehnung ohne Finanzwirkung getestet.
 - [ ] PDF/CSV/XLSX-Import, Bankgebühren und Mehrfachimport-Dubletten testen.
 - [ ] Abstimmung der Bankbewegungen, Salden und Zuordnung in drei getrennten Prüfschritten durchspielen.
 - [ ] Finanzkorrekturen nachvollziehbar und ohne Löschen historischer Buchungen absichern.
@@ -187,12 +223,12 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [ ] Tests in isolierter Umgebung erfolgreich; keine Live-Testbuchungen.
 - [ ] RLS-/Auth-/Finanz-Regressionssuite bestanden; DE/TR und Mobilansichten geprüft.
 - [ ] Migrations- und Rückfallplan dokumentiert; Datenerhalt nach Rollback gewährleistet.
-- [ ] **Nutzerfreigabe erteilt**.
+- [x] Grundsätzliche Nutzerfreigabe für fortlaufende geprüfte Releases erteilt; keine wiederholte Bestätigung pro Release erforderlich.
 - [ ] Rollout kontrolliert durchgeführt und tatsächliche Ergebnisse protokolliert.
 
 ## Nächster Schritt – Übergabe an nächsten Chat
 
-**Nächste Aufgabe: echtes Backup isoliert wiederherstellen.** Aktive DB-Sicherung nicht erneut einrichten. Zunächst OAuth-Dauerbetrieb bestätigen und einen realen verschlüsselten Dump lokal herunterladen/entschlüsseln, danach ausschließlich in einem isolierten Restore-Ziel Datenbank, Auth und Berechtigungen prüfen. Privater Schlüssel bleibt beim Nutzer. Parallel Plattforminventar und fehlenden Storage-/Git-Umfang vervollständigen. PR #52 mit main abgleichen, bevor ein zweiter Workflow aktiviert oder ein alter Entwurf gemergt wird.
+**Aktuelle nächste Aufgabe: direkten PDF-/XLSX-Lesepfad vor die bestehende Importvorschau integrieren.** Die Quellenprüfung und die exakte CSV-Saldenprüfung sind umgesetzt; direkte Dateiformate bleiben offen. Mehrseiten-, Beschreibungs- und Spaltenadapter zunächst mit synthetischen Daten absichern. Details: `docs/PHASE-3-IMPORT-AUDIT.md`. Backup ausdrücklich übersprungen; nicht erneut einrichten oder auf einen Restore umschwenken. Aktuellen Hauptzweig und neueste Fortschrittsnotiz prüfen; ältere Zwischenstände darunter sind historische Nachweise.
 
 **Projektkontext:** `docs/AYA-PARK-2-CONTEXT-HANDOFF.md`
 **Backup-Anleitung:** `docs/FREE-BACKUP-SETUP.md`
