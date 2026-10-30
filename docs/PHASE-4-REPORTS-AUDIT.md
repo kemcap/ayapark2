@@ -18,7 +18,7 @@ Persönliche Zahlungsnachweise beziehen sich auf eine konkrete aktive Zahlungszu
 
 299 allgemeine Tests einschließlich sechs neuer Export-/Datenschutz-/XLSX-Roundtrip-Prüfungen. 22 tatsächliche Browserprüfungen: DE/TR, echte Excel-Downloads und Rücklesen, Exportfenster/Tokenentfernung, PDF-Drucklayout, persönliche Datenabgrenzung, mobile Belegansicht, keine Daten ohne Quellfenster, keine Laufzeitfehler und keine externen Anfragen. PDF-Ausgaben jeweils eine A4-Seite und visuell geprüft; Excel zusätzlich mit unabhängigem openpyxl lesbar und Geldzellen numerisch formatiert. Ausschließlich künstliche Daten; keine echten Belege oder Quelldateien versioniert.
 
-## Noch offen
+Bei fehlender tatsächlicher Finanz-/Gemeinschaftsfreigabe zeigt die Berichtsseite einen Zugangshinweis statt einer scheinbaren Null-Euro-Übersicht und Exportbuttons. Ein manuell ausgelöster Export prüft die Berechtigung ebenfalls.\n\n## Noch offen
 
 - Explizite endgültige Monats-/Jahresabschlüsse mit getrennt bestätigter Quellenvollständigkeit und Bankabstimmung, dokumentierten offenen Zuordnungen sowie strengeren Jahresregeln. Der derzeitige Report ist eine Übersicht und darf nicht als bestätigter Abschluss bezeichnet werden.
 - Veröffentlichung ausschließlich aggregierter Finanzübersichten für eine ausdrücklich gewählte öffentliche Zielgruppe; keine automatische Freigabe bestehender privater Daten.
