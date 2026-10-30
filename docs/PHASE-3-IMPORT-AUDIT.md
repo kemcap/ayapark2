@@ -1,4 +1,12 @@
 # Phase 3 – Bankimport und Abgleich
+## Aktuelle Finanz-/Korrekturabnahme – 30.10.2026
+
+31 zusätzliche SQL-Prüfungen mit dem aktuellen relevanten Migrationspaket bestanden: Forderungszeiträume, Teil-/Vollzahlung, Zuordnungswiederholung mit/ohne Guthaben, Ablehnung geänderter Wiederholung und Überzuordnung, Erhalt ursprünglicher Schuldner/Buchungen bei Archivierung, Stornohindernisse, Gegenbuchungen und periodeübergreifender Kassen-/Berichtsabgleich einschließlich Transfers. Entzogene Finanzrechte sperren selbst exakte Wiederholungen und fehlerhafte Payloads, bevor Finanzdetails verarbeitet werden. Ausführung ausschließlich in PGlite mit künstlichen Identitäten. Bestehende ältere Baseline bleibt erhalten. Neuer Befehl test:finance:audit:sql und zusätzliche CI-Ausführung.
+
+Zusammen mit 50 aktuellen V5-Finanzprüfungen, 16 Bankimportprüfungen, nativer PDF-/XLSX-Quellenprüfung und tatsächlicher synthetischer Importbedienung sind Quellenlesen, Saldenkontrolle und anschließende Zuordnung technisch getrennt geprüft. Daraus wird keine neue fachliche Bestätigung oder Korrektur echter Produktivbuchungen abgeleitet. Finanzoriginale unverändert.
+
+Nächster Schritt: Berichts-/Export- und Abschlusslogik in Phase 4 abgleichen, vorhandene PDF-/CSV-Funktionen weiterverwenden und fehlende Excel-/Beleg-/Abschlussregeln gezielt ergänzen. Backup weiterhin übersprungen.
+
 ## Bestätigter Rollout 30.10.2026 – Releases #62 bis #64
 
 Bankimport-Dublettenschutz (#62), rein lesende PDF-Quellenprüfung (#63) und CSV-Saldenvorschau mit Sperre widersprüchlicher Angaben (#64) sind nach main übernommen. Aktueller Hauptzweig: 23489cfd649efa8c81d87f4a3fd822fa1a698bd4. CI für den letzten PR-Head: 41067609710 erfolgreich; Pages-Deployment: 41067714654 erfolgreich. Live ausgelieferte app.mjs, index.html und import-review.mjs sind bytegleich mit dem geprüften Stand. Backendmigration 20261030133658 aktiv und schreibgeschützt bestätigt; Advisor-Gruppen vor/nach Änderung unverändert. Keine produktiven Bewohner-, Auth- oder Finanzdatensätze zu Testzwecken geändert.

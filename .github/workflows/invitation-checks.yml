@@ -85,6 +85,7 @@ jobs:
       - name: Current financial integration SQL checks
         run: |
           npm run test:finance:sql
+          npm run test:finance:audit:sql
           npm run test:bank:sql
       - name: Safe Edge Function smoke checks (no resident data)
         run: node tests/invite-edge-smoke.mjs
