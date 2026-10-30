@@ -1,4 +1,10 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Private Freigabeanfragen zusätzlich abgeschirmt – 31.10.2026
+
+Beim anschließenden Archiv-Sicherheitsabgleich einen zweiten Lesepfad gefunden und gezielt geschlossen: Die bisherige allgemeine ay5_operations-Policy erlaubte Finanzlesern auch neue private Freigabepayloads. Arbeitsansichten waren bereits getrennt, diese direkte Verlaufstabelle benötigte aber eine zusätzliche restriktive Policy. Neue administrative Requests werden serverseitig als privat markiert; bekannte ältere Budget-/Rücklagenrequests ohne Markierung sind ebenfalls auf Superadmin-Lesen begrenzt. Historische Anfragen werden nicht umgeschrieben; identische Wiederholungen vor/nach der Härtung bleiben gültig. Gewöhnlicher Finanzverlauf bleibt lesbar.
+
+57 isolierte Budgetprüfungen (vier zusätzliche Datenschutz-/Kompatibilitätsprüfungen), aktuelle Finanzsuite 50 und Finanzabnahme 31 erfolgreich. Backendmigration 20261030223550_private_administrative_request_payloads installiert. Keine echten Anfragedaten oder Finanz-/Authdaten verändert; zusätzlicher Leseschutz und Requestmarkierung. Repository-CI separat bestätigen. Archivarbeit wird danach mit diesem geschützten Requestprotokoll fortgesetzt.
+
 ## Phase 5 veröffentlicht – 31.10.2026
 
 Budget/Rücklagen/Liquidität aus PR #74 nach erfolgreicher CI 41137806656 veröffentlicht; Hauptzweig 0c4476ecf4af87bfe6576ae9b4337008f32d6264. Pages 41138023176 erfolgreich. app.mjs, index.html, budget-planning.mjs, budget-planning-ui.mjs und budget-planning.css live bytegleich verifiziert. Backendmigration 20261030221947 aktiv; ursprünglicher Budgethash unverändert und keine echten Pläne/Bankzuordnungen/Rücklagenfreigaben zu Testzwecken angelegt.

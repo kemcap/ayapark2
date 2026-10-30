@@ -13,5 +13,5 @@ export async function loadCurrentSchema(db,{personalHistory=true,bankImport=true
  if(periodClosings)await db.exec(await readFile(new URL('../../supabase/period-closing.sql',import.meta.url),'utf8'));
  if(bankImport)await db.exec(await readFile(new URL('../../supabase/bank-import-dedup.sql',import.meta.url),'utf8'));
  if(levyReview)await db.exec(await readFile(new URL('../../supabase/levy-review.sql',import.meta.url),'utf8'));
- if(budgetPlanning&&levyReview)await db.exec(await readFile(new URL('../../supabase/budget-planning.sql',import.meta.url),'utf8'));
+ if(budgetPlanning&&levyReview){await db.exec(await readFile(new URL('../../supabase/budget-planning.sql',import.meta.url),'utf8'));await db.exec(await readFile(new URL('../../supabase/admin-request-privacy.sql',import.meta.url),'utf8'));}
 }
