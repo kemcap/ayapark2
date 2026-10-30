@@ -152,3 +152,18 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [ ] Tatsächliche lokale Entschlüsselung, kompatibles isoliertes Ziel und vollständiger DB-/Auth-/RLS-/Storage-/App-Restore bleiben offen. Kein Restore-Erfolg behauptet.
 
 Nächster Schritt: Abschnitt 3 der neuen Anleitung lokal durchführen (OAuth-Status, echte Datei herunterladen, mit vorhandenem privaten Schlüssel lokal entschlüsseln und mit PostgreSQL 17 auflisten). Danach isolierten versionsgebundenen Importplan erstellen. Produktionsdaten, main, Secrets und Workflow-Aktivierung wurden bei diesem Abgleich nicht verändert.
+
+
+## Prüfnachweis 30.10.2026 – weiterführende Phase-1-Arbeiten (neuer Branch)
+
+- [x] Privaten Google-Drive-Zielordner live geprüft: vier .dump.age-Archive + eine Testdatei; letzte gefundene Sicherung 30.10.2026 (720.287 Bytes). Kein Komplettarchiv nachgewiesen.
+- [x] Supabase live read-only geprüft: ACTIVE_HEALTHY, PostgreSQL 17.11, 42 Public-Tabellen mit RLS, 0 Storage-Buckets/-Objekte, fünf installierte Extensions; sieben Edge Functions erfasst.
+- [x] Alle sieben deployten Edge-Function-Einstiegsdateien mit GitHub main verglichen; bytegenau gleich. Weitere Module sind vorhanden, müssen beim Wiederaufbau mit passenden Importpfaden paketiert werden.
+- [x] Lokales, nicht-verbindendes PostgreSQL-17-Dump-Prüfskript ergänzt: scripts/backup/check_dump_offline.py; sechs synthetische Unit-Tests bestanden. **Kein echter Dump getestet.**
+- [x] Neues Prüf-/Wiederherstellungsprotokoll: docs/PHASE1-RESTORE-GATE-20261030.md; getrennt vorbereitet auf feature/phase1-restore-preflight-20261030.
+- [ ] Echte .dump.age-Datei auf lokalem, geschütztem Mac mit vorhandenem privaten Schlüssel entschlüsseln und offline prüfen.
+- [ ] Tatsächlicher isolierter PostgreSQL-/Auth-/RLS-/Storage-/Frontend-/Edge-Function-Restore weiterhin OFFEN.
+- [ ] Vollständiger externer verschlüsselter Gesamtbackup-Lauf und unabhängige Prüfung weiterhin OFFEN. Draft PR #52 und Automatisierungsvariable nicht aktivieren.
+- [ ] OAuth-Audience-Status und dauerhafte Token-Eignung bestätigen.
+
+**Nächster Schritt:** geschützten lokalen Download und Entschlüsselung der echten .dump.age-Datei (siehe docs/PHASE1-RESTORE-GATE-20261030.md), dann frisches isoliertes Restore-Ziel festlegen und dokumentiert importieren. Keinen echten Restore als bestanden markieren, bevor der Test erfolgreich ist. Produktionsdaten, main und bestehende Backupläufe wurden durch diese Arbeiten nicht verändert.
