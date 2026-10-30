@@ -22,7 +22,8 @@
     "test:history:sql": "node tests/sql/current-history.mjs",
     "test:finance:sql": "node tests/sql/v5.mjs --current",
     "test:bank:sql": "node tests/sql/bank-import.mjs",
-    "build:import-parsers": "node scripts/import/build-vendors.mjs"
+    "build:import-parsers": "node scripts/import/build-vendors.mjs",
+    "test:finance:audit:sql": "node tests/sql/current-finance-audit.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.11",

@@ -1,4 +1,12 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Aktuelle Finanz-/Korrekturabnahme – 30.10.2026
+
+31 zusätzliche SQL-Prüfungen mit dem aktuellen relevanten Migrationspaket bestanden: Forderungszeiträume, Teil-/Vollzahlung, Zuordnungswiederholung mit/ohne Guthaben, Ablehnung geänderter Wiederholung und Überzuordnung, Erhalt ursprünglicher Schuldner/Buchungen bei Archivierung, Stornohindernisse, Gegenbuchungen und periodeübergreifender Kassen-/Berichtsabgleich einschließlich Transfers. Entzogene Finanzrechte sperren selbst exakte Wiederholungen und fehlerhafte Payloads, bevor Finanzdetails verarbeitet werden. Ausführung ausschließlich in PGlite mit künstlichen Identitäten. Bestehende ältere Baseline bleibt erhalten. Neuer Befehl test:finance:audit:sql und zusätzliche CI-Ausführung.
+
+Zusammen mit 50 aktuellen V5-Finanzprüfungen, 16 Bankimportprüfungen, nativer PDF-/XLSX-Quellenprüfung und tatsächlicher synthetischer Importbedienung sind Quellenlesen, Saldenkontrolle und anschließende Zuordnung technisch getrennt geprüft. Daraus wird keine neue fachliche Bestätigung oder Korrektur echter Produktivbuchungen abgeleitet. Finanzoriginale unverändert.
+
+Nächster Schritt: Berichts-/Export- und Abschlusslogik in Phase 4 abgleichen, vorhandene PDF-/CSV-Funktionen weiterverwenden und fehlende Excel-/Beleg-/Abschlussregeln gezielt ergänzen. Backup weiterhin übersprungen.
+
 ## Direkter PDF-/XLSX-Import – 30.10.2026
 
 Implementiert und lokal geprüft: unterstützte Yapi-Kredi-Text-PDFs und Excel-Vorlagen werden direkt auf dem Gerät gelesen und an die bestehende CSV-/Saldenvorschau übergeben. Kein externer Konvertierungsdienst und keine neue Buchungslogik. Mehrseitige Beschreibungen und Gebühren bleiben erhalten; mehrere Excel-Blätter verlangen explizite Auswahl mit eigenem Batch-Hash. Nicht lesbare/mehrdeutige Quellen, Formeln und aktive Excel-Inhalte bleiben gesperrt. Grenzen: 2 MB, 2.000 Bewegungen, PDF höchstens 100 Seiten; gescannte/unbekannte PDF-Layouts und nicht unterstützte Tabellenspalten erfordern überprüfte CSV-Aufbereitung. Details: PHASE-3-IMPORT-AUDIT.md.
