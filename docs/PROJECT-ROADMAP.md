@@ -1,8 +1,32 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
 
-## Rollout bestätigt
+## Rollout bestätigt – Kontaktfreigaben und Historie
 
-30.10.2026: PR #57/#58 produktiv. Pages-Läufe 41005590291 und 41005971584 erfolgreich. 269 allgemeine Tests und 84 isolierte SQL-Prüfungen bestanden. Altberechtigungs-Schutz nach Migration live verifiziert. Rollen-/Mitgliedschaftszuweisungen wurden nicht automatisch verändert. Nächster offener Fachpunkt: Kontaktänderungsanträge mit Freigabe; danach vollständige Phase-2-Abnahme.
+30.10.2026: Kontaktfreigaben (#59), Wiederherstellung des persönlichen historischen RLS-Zugriffs (#60) und historische Wohnungsbezeichnungen ohne neue aktuelle Zugriffsrechte (#61) sind produktiv. Pages und zugehörige CI-Läufe jeweils erfolgreich; zuletzt 41017986234/41017982098. Allgemeine Suite 273/273; Kontakt-SQL 23 und aktueller Historien-Vorher-/Nachher-Test 28 erfolgreich. Keine echten Bewohner-, Kontakt-, Auth- oder Finanzdatensätze zu Testzwecken verändert.
+
+Offen bleibt die durchgängige Geräte-/Bedienabnahme und der weitere Finanz-/Bankabgleich. Authentifizierte Browser-/Mail-End-to-End-Tests wurden durch diese isolierten Nachweise nicht ersetzt.
+
+## Historienanzeige vervollständigt – 30.10.2026
+
+Zusätzlicher reproduzierter Frontendfehler: Nach Ende einer aktuellen Wohnungszuordnung konnte die Wohnungsbezeichnung bei einer eigenen historischen Forderung fehlen. API-Mapping behält nun die vom Server erlaubten Metadaten solcher Wohnungen. ownIds und aktuelle Navigation werden nicht erweitert, fremde Schuldner bleiben aus der persönlichen Historie ausgeschlossen. Ein Vorher-/Nachher-Regressionstest belegt Bezeichnung und Zugriffstrennung. Allgemeine Testsuite jetzt 273/273.
+
+Kontaktworkflow (#59) und RLS-Historienkorrektur (#60) sind produktiv, jeweilige Pages- und CI-Läufe erfolgreich. Die neue reine Frontendkorrektur wird als eigener Release nachgeführt. Gesamtroadmap bleibt offen; Phase-2-Geräte-/Bedienabnahme sowie Finanz-/Bankabgleich aus Phase 3 stehen weiterhin aus.
+
+## Historien-RLS korrigiert – 30.10.2026
+
+Die Prüfung mit den relevanten aktuellen Migrationen reproduzierte einen echten Rückschritt: Die Wohnungs-RLS aus dem 29.10. enthielt keinen persönlichen historischen Schuldnerzugriff mehr. Korrektur als restore_personal_charge_history produktiv angewendet (Supabase-Version 20261030065637). Forderungs- und Zahlungszuordnungszugriff erlaubt wieder eigene historische Forderungen, zusätzlich zur unverändert begrenzten aktuellen Wohnungssicht. Fremde Wohnungen, rohe Bankdaten und entzogene Zugänge bleiben gesperrt. Originalschuldner und Buchungsdaten wurden nicht geändert.
+
+28 isolierte Vorher-/Nachher-Prüfungen mit dem relevanten aktuellen Migrationspaket bestanden. Das alte Baseline-Historienskript bleibt zusätzlich erhalten. Tests und aus der tatsächlich vergebenen Provider-Version benannte Migration sind im Repository versioniert (#60). Die CLI wurde wegen blockierter Telemetrie nicht erneut ausgeführt; der geprüfte SQL-Text wurde über den verbundenen Supabase-Migrationsdienst angewendet.
+
+Kontaktänderungsanträge aus PR #59 ebenfalls produktiv; Pages-Deployment 41016521336 und CI-Lauf 41016403144 erfolgreich. 272 allgemeine Tests und 23 Kontakt-SQL-Prüfungen bestanden. Keine produktiven Kontakt-Testanträge erzeugt.
+
+## Kontaktänderungsanträge – 30.10.2026
+
+Eigene Kontaktdaten können in Einstellungen als Antrag eingereicht und vor Entscheidung zurückgezogen werden. Die Superadmin-Freigabeliste zeigt alte/neue Werte und verlangt unabhängige Prüfung sowie Begründung. RLS, eigene Konto-/Anlagenzuordnung, idempotente Einreichung/Entscheidung und ein Konfliktschutz gegen zwischenzeitliche Änderungen werden serverseitig geprüft. Delegierte Verwaltung darf verknüpfte Kontakte nicht über Personenbearbeitung am Freigabeweg vorbei ändern.
+
+Umfang ausdrücklich Personenverzeichnis: Auth-E-Mail/-Telefon, Passwort und Konto-ID bleiben unverändert. Die UI erklärt dies. Änderungen von Login-Adressen benötigen weiterhin den gesonderten Identitäts-/Auth-Prozess. Auditinformationen bleiben erhalten; es werden keine echten Bewohner zu Testzwecken verändert.
+
+23 isolierte SQL-Prüfungen und 272 allgemeine Tests erfolgreich, darunter drei neue UI-Tests. Nächste Phase-2-Abnahme: Wechsel-/Historienfälle und durchgängige mobile/Rollen-Bedienung; keine pauschale Vollabnahme allein aus Unit-/SQL-Tests.
 
 ## Bestätigter Live-Stand 30.10.2026
 
