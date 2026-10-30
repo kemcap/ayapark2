@@ -42,3 +42,6 @@ Backendmigration 20261030221947_budget_plans_cash_forecast_and_reserve_approval 
 
 
 Frontend veröffentlicht: #74, CI 41137806656 erfolgreich, main 0c4476ecf4af87bfe6576ae9b4337008f32d6264, Pages 41138023176 erfolgreich. Fünf relevante Live-Dateien bytegleich bestätigt. Keine echten Pläne/Bankzuordnungen/Rücklagenfreigaben für die Abnahme erzeugt. Frühere Frontend-offen-Vermerke sind überholt. Phase 6 folgt.
+
+
+Zusätzliche Härtung: Der generische Operationsverlauf ist für neue administrative Payloads ausschließlich Superadmin-lesbar, einschließlich älterer Budget-/Rücklagenpayloads ohne Kennzeichen. Damit bleiben private Referenzen nicht nur in der Arbeitsansicht, sondern auch im direkten Tabellenlesepfad verborgen. Bereits protokollierte Requests werden nicht umgeschrieben; Wiederholung bleibt kompatibel. 57 Budget-SQL-Prüfungen erfolgreich, Migration 20261030223550 aktiv. Finanzleser behalten normale Finanzoperationen und vorgesehene Planansichten. Keine echten Daten geändert.
