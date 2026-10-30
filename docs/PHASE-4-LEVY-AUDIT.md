@@ -38,3 +38,6 @@ Backend-Installation, GitHub-CI und tatsächliche Frontend-Auslieferung werden g
 
 
 Backend veröffentlicht: Supabase-Migration 20261030214643_documented_capital_levy_approval erfolgreich installiert. Rein lesend bestätigt: 0 Reviewzeilen, 0 offene echte Kapitalentwürfe, RLS aktiv, kein Client-INSERT, kein Client-EXECUTE auf den internen Finanzkern, keine anonyme Review-Ausführung. Vorhandene Advisor-Sammelgruppen vor/nach Änderung gleich; bestehende Hinweise dadurch nicht pauschal erledigt. Keine realen Bewohner-/Auth-/Finanzzeilen zu Testzwecken verändert. Frontend-CI und Pages-Rollout noch separat zu bestätigen.
+
+
+Frontend veröffentlicht: #72, CI 41133654321 erfolgreich, main d7277a32c851da81f79e00cf23de2b219b809187, Pages 41133899050 erfolgreich. Acht direkt ausgelieferte relevante Anwendungsdateien bytegleich verifiziert. Frühere lokale Vorbereitungs-/Frontend-offen-Vermerke sind überholt. Keine realen Reviews oder Forderungen zur Abnahme erzeugt. Phase 5 bereits isoliert vorbereitet; Backend-/Bedienintegration weiterhin offen.

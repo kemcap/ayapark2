@@ -1,4 +1,26 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Live-Abnahme Phase 4 bestätigt – 31.10.2026
+
+Sonderumlagen (#72) vollständig technisch veröffentlicht und ausgelieferte Dateien geprüft: CI 41133654321, Pages 41133899050 erfolgreich, Backendmigration 20261030214643 aktiv. 55 SQL-, 74 DE/TR-Browser- und 308 allgemeine Tests sowie weitere Regressionen bestanden. Keine echten Forderungen, Reviews oder Auth-/Bewohnerdaten zu Testzwecken erzeugt/verändert. Externer unterschriebener Beschluss und manuelle fachliche Prüfung bleiben erforderlich; private Originaldateiablage folgt in Phase 6.
+
+Anschließende Korrektur #73 ebenfalls veröffentlicht: Hauptzweig 9a8827f8cfa8b2c88fd82b24fcdc47b96b51d585, CI 41134168564 und Pages 41134428061 erfolgreich. Neue Berichtsfreigabe nach Rücknahme erhält eine neue Anfrage-ID; unklare Wiederholung behält ihre ID. 26 native Browserprüfungen bestanden. Frühere „CI-/Live-Nachweis folgt“-Vermerke dieses Fixes sind überholt. app.mjs, index.html und report-release-ui.mjs live bytegleich mit dem geprüften Fix bestätigt.
+
+Der nächste Arbeitsschritt liegt bereits separat als Draft-PR #74 vor: https://github.com/kemcap/ayapark2/pull/74 . Phase-5-Prognosekern mit neun neuen Prüfungen und erfolgreicher GitHub-CI 41134227055 vorbereitet; keine Backend-/UI-Veröffentlichung. Konservative Bankliquidität bleibt von Forderungen und angenommenen Geldeingängen getrennt, auch über Jahresgrenzen und bei überfälligen Kosten. Nächste konkrete Integration: serverseitiger Ist-Stichtag, Erhalt/Abgleich alter Budgetwerte, Monats-/Jahresplanpositionen mit Audit/RLS und echten Bankteilzuordnungen, danach getrennte Rücklagenfreigabe und DE/TR-Oberfläche. Siehe PHASE-5-BUDGET-AUDIT.md.
+
+Noch offen: vollständige Phase 5, private Dokumente/Versammlungen, Aufgaben/Erinnerungen und reale Auth-/Mail-/Gerätegesamtabnahme. Backup weiterhin übersprungen. Keine pauschale Fertigmeldung des Gesamtprojekts.
+
+## Sonderumlagen veröffentlicht, Phase 5 begonnen – 31.10.2026
+
+PR #72 nach erfolgreicher CI 41133654321 gemergt; Hauptzweig d7277a32c851da81f79e00cf23de2b219b809187. Pages 41133899050 erfolgreich. Live ausgelieferte app.mjs, index.html, levy-review-ui.mjs, levy-review.css, finance-forms.mjs, finance-v5.mjs, v3-ui.mjs und forms.mjs bytegleich geprüft. Backendmigration 20261030214643 aktiv; keine echten Reviews/Kapitalentwürfe oder Buchungen für die Abnahme angelegt. Frühere Hinweise „nur vorbereitet/Frontend-Rollout offen“ dieses Schritts sind damit überholt.
+
+Nachweise: 55 isolierte Sonderumlagen-SQL-, 74 native DE/TR-Browserprüfungen, 308 allgemeine Tests und aktuelle Finanz-/Historien-/Abschlussregressionen erfolgreich. Einzelheiten einschließlich externer Beschlussreferenz statt noch ausstehendem privatem Dateiarchiv: PHASE-4-LEVY-AUDIT.md. Keine pauschale juristische oder vollständige Auth-/Mail-/Geräteabnahme.
+
+Zusätzlich gezielt korrigiert: Nach Rücknahme einer Finanzsummenfreigabe muss eine neue Freigabe eine frische Anfrage-ID verwenden; nur die Wiederholung eines unklaren fehlgeschlagenen Versuchs behält dieselbe ID. Sonst konnte das Backend die alte zurückgenommene Freigabe korrekt zurückliefern, während die Oberfläche eine neue Entscheidung vermuten ließ. 26 native Freigabe-Browserprüfungen einschließlich DE/TR-Rücknahme-/Neufreigabe bestanden. Keine Änderung an tatsächlichen Freigabezeilen oder Backend erforderlich. CI-/Live-Nachweis dieser kleinen Frontendkorrektur folgt separat.
+
+Nächster Roadmapschritt bereits sicher vorbereitet: Phase 5 Budget/Rücklagen/Liquidität. Bestandsabgleich in PHASE-5-BUDGET-AUDIT.md und neun reine Prognoseprüfungen im separaten Branch feature/budget-liquidity-preparation-20261031. Noch keine Backend-/UI-Integration oder Veröffentlichung. Offene Forderungen erhöhen niemals den echten Bankbestand; konservative Linie ohne erwartete Geldeingänge, getrenntes Einnahmeszenario, überfällige Kosten sichtbar, bestätigter Rücklageneinsatz und bereits bankgebuchte Teilbeträge getrennt. Alte summarische Budgetwerte müssen bei Integration ausdrücklich abgeglichen werden, damit nichts vergessen oder doppelt abgezogen wird.
+
+Danach offen: privates Dokumenten-/Versammlungsarchiv, Aufgaben/Erinnerungen und restliche reale Auth-/Mail-/Geräteabnahme. Backup weiterhin gemäß Nutzerauftrag übersprungen.
+
 ## Sonderumlagen vollständig lokal geprüft, Backend aktiv – 31.10.2026
 
 Vorhandene Entwurfs-/Restcent-Verteilung und Superadmin-Freigabe gezielt erweitert: eigene Eigentümervorschau, getrennte private Beschlussreferenz und drei explizite Prüfbestätigungen, dokumentierter Verantwortlichkeitszeitpunkt sowie zusätzliche endgültige Buchungsbestätigung. Historische Eigentümer nur ausdrücklich und bei zeitlich belegter Zuordnung, keine Altlastenübertragung auf Nachfolger. Neue Kapital-Sammelforderungen ausschließlich über die dokumentierte bestehende Entwurfsfreigabe; direkter V5-Aufruf gesperrt. Kein zweites Buchungs-/Verteilungssystem.
@@ -260,8 +282,8 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 
 - [x] Aggregierte öffentliche Berichte technisch von persönlichen Details getrennt; explizite Freigabe/Rücknahme je Zielgruppe, 29 SQL-/24 Browserprüfungen, veröffentlicht #70. Keine echten Summen freigegeben.
 - [x] PDF-/Excel-Exporte, persönliche Zahlungsbelege und Monats-/Jahresabschluss-Regeln isoliert und im nativen Browser getestet, veröffentlicht #67/#69; kein echter Abschluss angelegt.
-- [ ] Sonderumlage nach gültiger Beschlussgrundlage und Verteilungsschlüssel umsetzen.
-- [ ] Audit-Trail für Veröffentlichung, Finanzkorrektur und Beschlussnachweise verifizieren.
+- [x] Sonderumlagenablauf mit externer geprüfter Beschlussreferenz, Verteilung, eigener Eigentümereinsicht und historischer Verantwortung umgesetzt, getestet und veröffentlicht #72. Tatsächliche juristische Beschlussprüfung bleibt extern/manuell; private Dateiablage ist Phase 6.
+- [x] Audit-Trail für Summenfreigabe/Rücknahme, Finanzkorrektur und Sonderumlagen-Nachweis/Entscheidung isoliert verifiziert (29 Freigabe-, 31 Korrektur- und 55 Sonderumlagenprüfungen). Keine Prüfung oder Freigabe eines echten Beschlusses behauptet.
 
 ## Phase 5 – Budget, Rücklagen, Liquidität (P2)
 
