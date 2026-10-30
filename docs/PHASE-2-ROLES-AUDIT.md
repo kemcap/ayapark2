@@ -1,4 +1,18 @@
 # Phase 2 – Rollen und Einzelrechte: Ist/Soll-Abgleich
+## Fortsetzung 30.10.2026 – Eigentümerwechsel und Finanzimport
+
+**Backend veröffentlicht:** deduplicate_bank_movements_within_import, Supabase-Version 20261030133658. Neue Funktionsdefinition schreibgeschützt bestätigt (43f8931c425ffbc08f92aa0ebd90746c); anonyme Ausführung weiterhin gesperrt. Repository-/CI-Veröffentlichung wird separat bestätigt.
+
+43 Historienprüfungen bestehen einschließlich echter Assignment-Befehle: Eigentümerwechsel, wiederholte Anfragen, getrennte Wohnungszugänge, Mehrfachzuordnungen und Zutrittsentzug. Sämtliche synthetischen Forderungs-, Bank- und Zuordnungszeilen bleiben beim Wechsel bytegleich; ursprünglicher Schuldner und Konto-ID bleiben erhalten. Zwölf zentrale Funktionsdefinitionen des isolierten Fixtures wurden vor der Korrektur schreibgeschützt mit Produktion abgeglichen: alle identisch.
+
+50 Finanzprüfungen laufen zusätzlich gegen das relevante aktuelle Migrationspaket (test:finance:sql): Teilzahlungen, oldest-first innerhalb derselben Schuldart, Guthaben, unveränderliche Originale, Storno und Freigaben. Die ältere V5-Baseline bleibt separat erhalten. Ein zentraler Fixture-Loader vermeidet auseinanderlaufende Migrationslisten; er ersetzt keinen vollständigen Live-Schemaexport.
+
+Bankimportfehler reproduziert: dieselbe Referenz konnte innerhalb einer Datei bei geänderter Beschreibung oder laufendem Saldo doppelt gebucht werden. Der Import filtert nun vor der Anlage des Batches auch innerhalb der Anfrage anhand der bereits zwischen Dateien geltenden Identität (Datum, Betrag, Referenz; ohne Referenz zusätzlich Beschreibung). Unterschiedliche echte Referenzen bleiben getrennt. 16 CSV-/SQL-Prüfungen belegen Vorher-/Nachher, separate Gebühren, genaue Centbeträge, Überlappungen, Wiederholungen, unveränderte Originalzeilen und atomaren Rollback. Keine automatische Forderungszuordnung. Migration ersetzt ausschließlich die geprüfte command-Funktion mit Ausgangshash-Schutz, ohne bestehende Finanzdaten oder Rechte zu ändern. Rückfall: geprüfte vorige command-Definition aus 20261030044641 wiederherstellen; keine Datenlöschung oder automatische Dublettenbereinigung.
+
+GitHub-CI führt künftig die aktuellen Rechte-, Kontakt-, Historien-, Finanz- und Bankimportprüfungen zusätzlich zu den bisherigen Prüfungen aus. Allgemeine Suite 273/273. Browser-/Mail-/Geräteabnahme bleibt offen: der lokale Chromium-Download lieferte kein gültiges Archiv; kein erfolgreicher Browserlauf wird daraus behauptet.
+
+**Nächster konkreter Fachpunkt:** PDF-/XLSX-Importpfad gegen den vorhandenen CSV-Vorschau-/Prüfablauf abgleichen und die getrennte Bank-/Saldo-/Zuordnungsabnahme vervollständigen. Derzeit akzeptiert die Importmaske ausschließlich CSV; externe Konvertierungsanleitung ist vorhanden, direkter PDF-/XLSX-Import ist noch nicht umgesetzt. Backup weiterhin gemäß Nutzerauftrag übersprungen.
+
 
 ## Historienanzeige vervollständigt – 30.10.2026
 

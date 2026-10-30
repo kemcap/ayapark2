@@ -66,6 +66,15 @@ jobs:
           npm run test:v5:sql
       - name: Personal history and invitations SQL checks
         run: npm run test:people:sql
+      - name: Current task rights, contact approvals and history SQL checks
+        run: |
+          npm run test:rights:sql
+          npm run test:contacts:sql
+          npm run test:history:sql
+      - name: Current financial integration SQL checks
+        run: |
+          npm run test:finance:sql
+          npm run test:bank:sql
       - name: Safe Edge Function smoke checks (no resident data)
         run: node tests/invite-edge-smoke.mjs
       - name: Safe site receivables smoke checks (no resident data)
