@@ -1,0 +1,40 @@
+{
+  "passed": 34,
+  "browser": "153.0.8010.0",
+  "results": [
+    {
+      "lang": "de",
+      "width": 375,
+      "layout": {
+        "width": 341,
+        "scroll": 341
+      }
+    },
+    {
+      "lang": "de",
+      "width": 1440,
+      "layout": {
+        "width": 678,
+        "scroll": 678
+      }
+    },
+    {
+      "lang": "tr",
+      "width": 375,
+      "layout": {
+        "width": 341,
+        "scroll": 341
+      }
+    },
+    {
+      "lang": "tr",
+      "width": 1440,
+      "layout": {
+        "width": 678,
+        "scroll": 678
+      }
+    }
+  ],
+  "errors": [],
+  "external": []
+}

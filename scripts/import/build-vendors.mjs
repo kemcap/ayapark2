@@ -1,0 +1,11 @@
+import {build} from 'esbuild';
+import {readFile,writeFile,mkdir,copyFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+await mkdir('vendor/pdfjs-6.4.299',{recursive:true});await mkdir('vendor/xlsx-9.3.14',{recursive:true});
+for(const name of ['pdf.min.mjs','pdf.worker.min.mjs'])await copyFile('node_modules/pdfjs-dist/build/'+name,'vendor/pdfjs-6.4.299/'+name);
+await copyFile('node_modules/pdfjs-dist/LICENSE','vendor/pdfjs-6.4.299/LICENSE');
+for(const [dependency,name] of [['read-excel-file','LICENSE'],['fflate','FFLATE-LICENSE'],['saxen','SAXEN-LICENSE']])await writeFile('vendor/xlsx-9.3.14/'+name,(await readFile('node_modules/'+dependency+'/LICENSE','utf8')).replaceAll('\r\n','\n'));
+await build({entryPoints:['scripts/import/xlsx-vendor-entry.mjs'],outfile:'vendor/xlsx-9.3.14/reader.mjs',bundle:true,format:'esm',platform:'browser',minify:true,legalComments:'eof',target:'es2022'});
+const paths=['vendor/pdfjs-6.4.299/pdf.min.mjs','vendor/pdfjs-6.4.299/pdf.worker.min.mjs','vendor/xlsx-9.3.14/reader.mjs'];
+const files=await Promise.all(paths.map(async path=>{const bytes=await readFile(path);return {path,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')};}));
+await writeFile('vendor/import-parsers.json',JSON.stringify({pdfjs:'6.4.299',xlsx:'9.3.14',builder:'esbuild 0.28.2',files},null,2)+'\n');console.log(files);
