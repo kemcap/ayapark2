@@ -1,5 +1,5 @@
 import {levyReviews} from './levy-review-ui.mjs?v=5.9.39';
-import {reportReleases} from './report-release-ui.mjs?v=5.9.38';
+import {reportReleases} from './report-release-ui.mjs?v=5.9.40';
 import {periodClosings} from './period-closing-ui.mjs?v=5.9.37';
 import {summaryExport,bankExport,receiptExport} from './report-export-domain.mjs?v=5.9.36';
 import {receiptButtons,downloadWorkbook,openExport} from './report-export-ui.mjs?v=5.9.36';
