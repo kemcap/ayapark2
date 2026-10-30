@@ -1,4 +1,12 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Phase 5 veröffentlicht – 31.10.2026
+
+Budget/Rücklagen/Liquidität aus PR #74 nach erfolgreicher CI 41137806656 veröffentlicht; Hauptzweig 0c4476ecf4af87bfe6576ae9b4337008f32d6264. Pages 41138023176 erfolgreich. app.mjs, index.html, budget-planning.mjs, budget-planning-ui.mjs und budget-planning.css live bytegleich verifiziert. Backendmigration 20261030221947 aktiv; ursprünglicher Budgethash unverändert und keine echten Pläne/Bankzuordnungen/Rücklagenfreigaben zu Testzwecken angelegt.
+
+53 Budget-SQL-, 66 native DE/TR-Browser-, neun reine Prognoseprüfungen und 317 allgemeine Tests bestanden. Alte Planpauschale ausdrücklich abgeglichen, tatsächliche Cash-Daten von Forderungen/Einnahmeannahmen getrennt und Rücklagenverwendung nur dokumentiert durch Superadmin, ohne Zahlung. Vorbereitungsvermerke „keine Backend-/UI-Integration“ aus älteren Zwischenständen sind für diesen veröffentlichten Schritt überholt. Details: PHASE-5-BUDGET-AUDIT.md.
+
+Phase 6 beginnt mit privatem Datei-/Versammlungsarchiv. Bestand geprüft: derzeit keine Storage-Buckets oder Storage-Objektpolicies; vorhandene Rollen und Audits werden weiterverwendet. Upload/Download ausschließlich authentifiziert, Originale ohne öffentliche URLs oder Überschreiben; keine OCR, keine automatische Rechtsgültigkeitsprüfung. Noch keine Archiveinträge/Dateien produktiv erstellt. Danach einfache Aufgabenliste und interne Fälligkeits-/Überfälligkeitsanzeigen, Wiederholungen nur manuell. Reale Auth-/Mail-/Gerätegesamtabnahme bleibt offen. Backup gemäß Nutzerwunsch nicht erneut bearbeitet.
+
 ## Phase 5 integriert und lokal abgenommen – 31.10.2026
 
 Vorhandene Budgetbasis beibehalten; Monats-/Jahrespositionen, Reparaturplanung und getrennte konservative/angenommene 3-/6-Monats-Liquidität ergänzt. Echte Cash-Berechnung zum serverseitigen Ist-Stichtag; offene Forderungen, künftige Bankdaten und bereits im Anfangsbestand enthaltene alte Bewegungen werden nicht als neues heutiges Geld gezählt. Echte Bankteilzuordnungen vermeiden doppelte Kosten; alte Planpauschalen werden ausdrücklich abgeglichen. Gesonderte dokumentierte Superadmin-Rücklagenfreigabe ändert nur Zweckbindung, niemals Bankkonto/Forderungen. Alte direkte Verringerung ohne diese Freigabe serverseitig gesperrt. Keine sechste delegierte Aufgabe.
