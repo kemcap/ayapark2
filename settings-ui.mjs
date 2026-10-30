@@ -1,7 +1,7 @@
 import {contactPanel} from './contact-requests.mjs?v=5.9.30';
 import {taskOptions} from './task-permissions.mjs?v=5.9.28';
-import {previewControls} from './access-preview.mjs?v=5.9.20';
-import {testControls} from './notifications.mjs?v=5.9.0';
+import {previewControls} from './access-preview.mjs?v=5.9.39';
+import {testControls} from './notifications.mjs?v=5.9.39';
 import {t as tr,locale} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e} from './core.mjs?v=5.8.1';
 import {appearanceSettings} from './preferences.mjs?v=5.8.1';

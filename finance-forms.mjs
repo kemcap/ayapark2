@@ -1,7 +1,7 @@
 import {escapeHtml as e,randomId,money} from './core.mjs?v=5.8.1';
-import {t as tr} from './i18n.mjs?v=5.9.28';
+import {t as tr,getLanguage} from './i18n.mjs?v=5.9.28';
 import {activeAt,personName} from './v3-domain.mjs?v=5.9.26';
-import {financeLinkAt,amountCents,batchPreview,paymentPlan,chargeCategories,debtGroup,availableBudget} from './finance-v5.mjs?v=5.8.1';
+import {financeLinkAt,amountCents,batchPreview,paymentPlan,chargeCategories,debtGroup,availableBudget} from './finance-v5.mjs?v=5.9.39';
 const input=(n,label,type='text',value='',attrs='')=>`<label class="field">${tr(label)}<input name="${n}" type="${type}" value="${e(value)}" ${attrs}></label>`;
 const select=(n,label,values,value='')=>`<label class="field">${tr(label)}<select name="${n}">${values.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(tr(l))}</option>`).join('')}</select></label>`;
 const check=(n,label,value='on')=>`<label class="check-field"><input type="checkbox" name="${n}" value="${e(value)}">${tr(label)}</label>`;
@@ -18,7 +18,7 @@ export function buildFinanceForm(s,action,args={}){
    (monthly?'<input name="distribution" type="hidden" value="per_unit">':select('distribution','Dağıtım',[['total','Toplamı paylaştır'],['per_unit','Daire başına sabit tutar'],['shares','Arsa payına göre']],'total'))+
    select('debtor_rule','Sorumlu önerisi',[['occupant','Kiracı varsa kiracı, yoksa ev sahibi'],['owner','Ev sahibi'],['tenant','Kiracı']],'occupant')+
    `<details class="finance-targets"><summary>${tr('Daireler ve sorumlu kişiler')}</summary><p>${tr('Önerileri kontrol edin. Kategori tek başına sorumlu kişiyi belirlemez.')}</p>${d.units.map(u=>`<section class="finance-target" data-finance-unit="${e(u.id)}" data-block-code="${e(u.block)}"><strong>${e(u.code)}</strong>${check('unit_ids',u.code,u.id)}${select('debtor:'+u.id,'Sorumlu kişi',[['','Kişi seçin.'],...d.links.filter(l=>l.unit_id===u.id&&['owner','tenant'].includes(l.role)&&financeLinkAt(l,s.period+'-01')).map(l=>[l.id,personName(d,l.person_id)+' · '+tr(l.role==='owner'?'Ev sahibi':'Kiracı')])])}${check('exclude', 'Hariç tut',u.id)}${input('exclude_reason:'+u.id,'Gerekçe')}${input('weight:'+u.id,'Arsa payı (tam sayı)','number','','min="1" max="1000000000"')}</section>`).join('')}</details>`+
-   select('debt_group','Borç grubu',groups,'general')+input('basis_ref','Karar / dayanak referansı','text','','required minlength="3" maxlength="200"')+
+   select('debt_group','Borç grubu',groups,'general')+(monthly?'':'<div data-levy-date hidden><label class="field">'+(getLanguage()==='de'?'Geprüfter Verantwortlichkeitszeitpunkt':'Kontrol edilen sorumluluk tarihi')+'<input name="liability_on" type="date"></label><p>'+(getLanguage()==='de'?'Bei Sonderumlagen Eigentümer ausdrücklich wählen. Frühere Eigentümer nur mit belegtem Zeitraum; keine automatische Schuldübertragung.':'Ek ödemede malik açıkça seçilir. Eski malik için belgeli dönem gerekir; borç otomatik aktarılmaz.')+'</p></div>')+input('basis_ref','Karar / dayanak referansı','text','','required minlength="3" maxlength="200"')+
    `<details><summary>${tr('Gelişmiş seçenekler')}</summary>${input('period_from','Dönem başlangıcı','date')}${input('period_to','Dönem bitişi','date')}</details>`;
   if(monthly&&(s.mode==='demo'?d.role==='super':d.capabilities?.admin))body+=`<details><summary>${tr('İstisnalar')}</summary>${exceptionList(d)}<p>${tr('Ücret / huzur hakkı aidattan otomatik düşülmez. Ayrı gider veya açıkça onaylanan ayrı işlem gerekir.')}</p><button type="button" class="button" data-action="monthly_exception">${tr('İstisna ekle')}</button></details>`;
   body+=preview();
@@ -40,14 +40,15 @@ export function updateFinanceForm(root,d,changed=''){
  const action=root.dataset.financeAction;if(!action)return;
  const val=n=>root.querySelector(`[name="${n}"]`)?.value||'';
  if(['batch_charge','monthly_v5'].includes(action)){
-  const scope=val('scope'),mode=val('distribution'),rule=val('debtor_rule'),date=val('due_on');
+  const levy=action==='batch_charge'&&val('debt_group')==='capital',scope=val('scope'),mode=val('distribution'),rule=val('debtor_rule'),date=levy?val('liability_on'):val('due_on');
+  const dateBlock=root.querySelector('[data-levy-date]');if(dateBlock){dateBlock.hidden=!levy;dateBlock.querySelector('input').required=levy;}
   for(const section of root.querySelectorAll('[data-finance-unit]')){
    const id=section.dataset.financeUnit,selected=scope==='all'||scope==='selected'||scope===section.dataset.blockCode;section.hidden=!selected;
    section.querySelector('[name="unit_ids"]').closest('label').hidden=scope!=='selected';
    const weights=section.querySelector(`[name="weight:${id}"]`);weights.closest('label').hidden=mode!=='shares';
    const reason=section.querySelector(`[name="exclude_reason:${id}"]`);reason.closest('label').hidden=!section.querySelector('[name="exclude"]').checked;
-   const target=section.querySelector('select');if(!changed||['debtor_rule','due_on'].includes(changed)){
-    const ls=d.links.filter(l=>l.unit_id===id&&financeLinkAt(l,date)&&['owner','tenant'].includes(l.role));const role=rule==='occupant'?(ls.some(l=>l.role==='tenant')?'tenant':'owner'):rule;const eligible=ls.filter(l=>l.role===role);target.innerHTML=`<option value="">${tr('Kişi seçin.')}</option>`+ls.map(l=>`<option value="${e(l.id)}">${e(personName(d,l.person_id))} · ${tr(l.role==='owner'?'Ev sahibi':'Kiracı')}</option>`).join('');target.value=eligible.length===1?eligible[0].id:'';
+   const target=section.querySelector('select');if(!changed||['debtor_rule','due_on','liability_on','debt_group'].includes(changed)){
+    const ls=d.links.filter(l=>l.unit_id===id&&date&&financeLinkAt(l,date,{historical:levy})&&(levy?l.role==='owner':['owner','tenant'].includes(l.role)));const role=rule==='occupant'?(ls.some(l=>l.role==='tenant')?'tenant':'owner'):rule;const eligible=ls.filter(l=>l.role===role);target.innerHTML=`<option value="">${tr('Kişi seçin.')}</option>`+ls.map(l=>`<option value="${e(l.id)}">${e(personName(d,l.person_id))} · ${tr(l.role==='owner'?'Ev sahibi':'Kiracı')}</option>`).join('');target.value=levy?'':eligible.length===1?eligible[0].id:'';
    }
   }
  }else if(action==='monthly_exception'){
@@ -70,6 +71,7 @@ export function financePayload(action,form,ctx,{previewing=false}={}){
   Object.assign(p,{scope:get('scope'),unit_ids:form.getAll('unit_ids'),exclusions:form.getAll('exclude').map(unit_id=>({unit_id,reason:get('exclude_reason:'+unit_id)})),weights:{},debtors:{},distribution:get('distribution'),cents:amountCents(get('amount')),due_on:get('due_on'),label:get('label'),category:get('category'),debt_group:get('debt_group'),basis_ref:get('basis_ref'),period_from:get('period_from')||null,period_to:get('period_to')||null});
   p.exclusions=p.exclusions.filter(x=>p.scope==='all'||p.scope===ctx.unit_scope?.[x.unit_id]||p.scope==='selected'&&p.unit_ids.includes(x.unit_id));
   for(const[k,v]of form)if(k.startsWith('debtor:'))p.debtors[k.slice(7)]=v;else if(k.startsWith('weight:')&&v)p.weights[k.slice(7)]=Number(v);
+  if(action==='batch_charge'&&p.debt_group==='capital'){p.liability_on=get('liability_on');if(!/^\d{4}-\d{2}-\d{2}$/.test(p.liability_on))throw Error(getLanguage()==='de'?'Verantwortlichkeitszeitpunkt wählen.':'Sorumluluk tarihini seçin.');}
   if(!p.label||!p.due_on||p.basis_ref.length<3)throw Error(tr('Açıklama, vade ve dayanak gerekli.'));
   if(p.period_from&&p.period_to&&p.period_to<p.period_from)throw Error(tr('Borç döneminin başlangıç ve bitiş tarihlerini kontrol edin.'));
  }else if(action==='auto_allocate'){

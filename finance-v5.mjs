@@ -1,6 +1,6 @@
 import {activeAt,creditAvailable} from './v3-domain.mjs?v=5.9.26';
-import {remaining,unassigned} from './ledger.mjs?v=5.8.1';
-export const financeLinkAt=(l,day)=>l.active!==false&&!l.archived_at&&(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day);
+import {remaining,unassigned} from './ledger.mjs?v=5.9.39';
+export const financeLinkAt=(l,day,{historical=false}={})=>(historical?((l.active!==false&&!l.archived_at)||!!(l.starts_on&&l.ends_on)):(l.active!==false&&!l.archived_at))&&(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day);
 export const chargeCategories=['Genel Gider / İşletme','Bakım ve Onarım','Demirbaş'];
 export const debtGroup=c=>!c.debt_group||c.debt_group==='legacy'?'legacy:'+c.category:c.debt_group;
 export function amountCents(raw){
@@ -24,7 +24,8 @@ export function selectedUnits(d,p){
 }
 export function batchPreview(d,p){
  const units=selectedUnits(d,p),rows=distribute(p.cents,units.map(u=>u.id),p.distribution,p.weights);
- return rows.map(row=>{const link=d.links.find(l=>l.id===p.debtors?.[row.unit_id]&&l.unit_id===row.unit_id&&['owner','tenant'].includes(l.role)&&financeLinkAt(l,p.due_on));if(!link)throw Error('Her daire için sorumlu kişiyi seçin.');return {...row,link_id:link.id,person_id:link.person_id};});
+ const levy=p.debt_group==='capital'&&p.liability_on;
+ return rows.map(row=>{const link=d.links.find(l=>l.id===p.debtors?.[row.unit_id]&&l.unit_id===row.unit_id&&(levy?l.role==='owner':['owner','tenant'].includes(l.role))&&financeLinkAt(l,levy||p.due_on,{historical:!!levy}));if(!link)throw Error('Her daire için sorumlu kişiyi seçin.');return {...row,link_id:link.id,person_id:link.person_id};});
 }
 export function paymentPlan(d,{entry_id,unit_id,person_id,group}){
  const entry=d.transactions.find(t=>t.id===entry_id);if(!entry||entry.cents<=0||entry.reversal_of||d.transactions.some(t=>t.reversal_of===entry_id))throw Error('Geçerli tahsilat bulunamadı.');
