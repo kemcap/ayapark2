@@ -1,4 +1,4 @@
-import {getLanguage} from './i18n.mjs?v=5.8.1';
+import {getLanguage} from './i18n.mjs?v=5.9.28';
 export const isRegistered=person=>person?.registered===true;
 export function registrationStatus(person){
  const registered=isRegistered(person),de=getLanguage()==='de';

@@ -1,5 +1,5 @@
 import {designSettings,getDesign} from './design.mjs?v=5.8.1';
-import {t as tr,getLanguage,setLanguage} from './i18n.mjs?v=5.8.1';
+import {t as tr,getLanguage,setLanguage} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e} from './core.mjs?v=5.8.1';
 export const preferenceOptions={palette:['classic','ocean','slate','plum','sand','ayapark'],loader:['ring','dots','bar','pulse','wave'],font:['normal','large','xlarge'],contrast:['normal','high'],density:['compact','comfortable'],motion:['system'],language:['tr','de'],theme:['system','light','dark']};
 export const preferenceDefaults={palette:'classic',loader:'ring',font:'normal',contrast:'normal',density:'comfortable',motion:'system',hideAmounts:false,language:'tr',theme:'system'};

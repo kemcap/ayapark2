@@ -1,4 +1,4 @@
-import {t as tr} from './i18n.mjs?v=5.8.1';
+import {t as tr} from './i18n.mjs?v=5.9.28';
 import {money} from './core.mjs?v=5.8.1';
 import {can} from './ui.mjs?v=5.9.25';
 import {remaining,unassigned} from './ledger.mjs?v=5.8.1';

@@ -1,4 +1,4 @@
-import {t as tr,getLanguage} from './i18n.mjs?v=5.8.1';
+import {t as tr,getLanguage} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money} from './core.mjs?v=5.8.1';
 
 const columns=['Su dijital kafa','Aidat','Asansör','Bina kapısı bakımı','Havuz','Demirbaş','Su arıtma bakımı'];

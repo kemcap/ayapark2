@@ -9,7 +9,7 @@ import {settingsPage} from '../settings-ui.mjs?v=5.8.1';
 import {AyaparkApi} from '../api.mjs?v=5.9.0';
 import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.8.1';
 import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {setLanguage} from '../i18n.mjs?v=5.8.1';
+import {setLanguage} from '../i18n.mjs?v=5.9.28';
 const source=f=>readFileSync(new URL('../'+f,import.meta.url),'utf8');
 const s=()=>({mode:'demo',data:fullDemo(),filter:{q:'',block:'all',status:'all'},page:'settings'});
 test('six CSS palettes and five loaders with safe defaults',()=>{assert.equal(preferenceOptions.palette.length,6);assert.equal(preferenceOptions.loader.length,5);assert.equal(cleanPreferences({palette:'<script>',loader:'evil',hideAmounts:'true'}).palette,'classic');assert.equal(cleanPreferences({hideAmounts:true}).hideAmounts,true);for(const loader of preferenceOptions.loader)assert.match(loaderMarkup(loader),new RegExp('loader-'+loader));});

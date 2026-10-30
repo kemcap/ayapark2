@@ -6,7 +6,7 @@ import {activeAt} from '../v3-domain.mjs?v=5.9.0';
 import {unitDetailV3,unitMapV3,unitClarifications} from '../v3-ui.mjs?v=5.9.0';
 import {unitDebtCategory} from '../apartment-info.mjs?v=5.8.1';
 import {removalReasons} from '../assignments.mjs?v=5.9.0';
-import {setLanguage} from '../i18n.mjs?v=5.8.1';
+import {setLanguage} from '../i18n.mjs?v=5.9.28';
 const state=()=>({mode:'demo',data:fullDemo()});let seq=0;
 const command=(s,action,p)=>demoCommand(s.data,action,{request_id:'qa-'+(++seq),...p});
 const dataForm=o=>{const f=new FormData();for(const[k,v]of Object.entries(o))f.set(k,v);return f;};

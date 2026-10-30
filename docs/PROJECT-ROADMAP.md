@@ -1,5 +1,31 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
 
+## Rollout bestätigt
+
+30.10.2026: PR #57/#58 produktiv. Pages-Läufe 41005590291 und 41005971584 erfolgreich. 269 allgemeine Tests und 84 isolierte SQL-Prüfungen bestanden. Altberechtigungs-Schutz nach Migration live verifiziert. Rollen-/Mitgliedschaftszuweisungen wurden nicht automatisch verändert. Nächster offener Fachpunkt: Kontaktänderungsanträge mit Freigabe; danach vollständige Phase-2-Abnahme.
+
+## Bestätigter Live-Stand 30.10.2026
+
+Fünf Aufgabenrechte über PR #57 produktiv (0e23429a0fc06bfc9c0744a88d5b571ce99793a7). Ergänzender Altberechtigungs-Schutz über PR #58 nach main übernommen (dbeb43b4c0efd9fd300ecbd6fbfee716846a5d49), Backendfunktion nach Migration schreibgeschützt verifiziert. Bestehende Grant-Zuweisungen unverändert. 269 allgemeine Tests und 84 isolierte SQL-Prüfungen erfolgreich. Kontaktänderungsanträge bleiben der nächste offene Fachpunkt.
+
+## Zusätzliche Phase-2-Prüfung 30.10.2026
+
+PR #57 mit den fünf Aufgabenrechten ist produktiv; Pages-Lauf 41005590291 erfolgreich, task-permissions/forms/api ausgeliefert und inhaltsgleich geprüft. Recovery blieb nachweislich Superadmin-only; isolierte Wiederherstellung behält die Account-ID.
+
+Die anschließende Übergangsprüfung ergänzt den Superadmin-Schutz für manuelle Buchungen, Kategorie-/Schuldneränderungen, Budgetänderungen und Ausnahmen auch bei noch nicht auf die fünf Rechte umgestellten alten Finanzberechtigungen. Lesen und normale Zahlungszuordnung bleiben erhalten. Entsprechende Buttons und Formulare sind ebenfalls geschützt. 84 SQL-Prüfungen des neuen Gesamtpakets und 269 allgemeine Tests bestanden. Keine Mitgliedschaften, Kontakte oder Finanzoriginale zu Testzwecken verändert.
+
+Offener nächster Punkt: eigener nachvollziehbarer Kontaktänderungsantrag mit Superadmin-Prüfung; bestehende Zugangsanfragen sind davon zu unterscheiden. Weitere Phase-2-Historienabnahme und Phasen 3–6 bleiben offen.
+
+## Maßgeblicher Fortschritt 30.10.2026 – fünf Aufgabenrechte
+
+Die fünf Rechte sind in der Vergabeoberfläche und serverseitig verbunden. Speicherung erfolgt über ay3_set_task_grants, nur durch Superadmin. Keine automatische Übertragung alter breiter Rechte. Bisherige Berechtigungen bleiben bis zur ausdrücklichen Speicherung kompatibel; danach ersetzt der explizite Aufgabensatz die alten Rechte. Leere Auswahl entzieht alle delegierten Aufgaben. Kritische Finanzen, Recovery, Rollenvergabe und Veröffentlichungen von Finanzberichten bleiben Superadmin-Aufgaben.
+
+Personen-/Beziehungsbefehle prüfen die jeweilige Aufgabe, auch bei direkten privaten Aufrufen. Bearbeitung von Rolle oder Zuordnungsdaten benötigt Bewohnerwechselrecht. Bankrecht erlaubt Zuordnung, aber keine Korrektur bestehender Finanzoriginale. Ankündigungsrecht funktioniert getrennt. Einladungen prüfen das neue Recht bei Ausstellung und Einlösung; Entzug sperrt auch offene Einladungen. Forderungsvorbereitung erhält nur die benötigten Personen-/Beziehungs-/Ausnahmedaten, keine Bankbewegungen allein durch dieses Recht.
+
+Nachweise: 269 allgemeine Tests bestanden, 72 isolierte SQL-Prüfungen einschließlich delegierter Einladung, Rechteentzug, einmaliger Einlösung, tatsächlicher Zahlungszuordnung und Ankündigung. Elf Live-Ausgangshashes vor Rollout identisch. Keine produktiven Testpersonen oder Buchungen angelegt. Kandidat 20261030044641_phase2_task_rights_enforcement.sql; Veröffentlichung wird gesondert bestätigt.
+
+Nächste Phase-2-Prüfung: durchgängige Kontaktänderungs-/Recovery-Freigaben und Bewohnerwechselhistorie mit den neuen Aufgabenrechten. Gesamtroadmap noch nicht vollständig abgeschlossen.
+
 ## Aktueller Arbeitsauftrag 30.10.2026 – Phase 2
 
 Der Nutzer hat angewiesen, den Backup-Part zu überspringen und ohne erneute Einrichtung/Tests mit Phase 2 fortzufahren. Historische Backup-Nachweise bleiben unverändert; übersprungene Restore-Punkte werden nicht als neu getestet markiert.
@@ -93,10 +119,10 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 ## Phase 2 – Personen, Rollen, Berechtigungen (P1)
 
 - [x] Repository-Ist/Soll-Abgleich aller drei Rollen und fünf delegierbaren Verwaltungsrechte; vorhandene Module und Überschneidungen geprüft. Siehe `PHASE-2-ROLES-AUDIT.md`; keine Live-Backend-Abnahme.
-- [x] Teilaufgabe Entwicklungsstand: reverse/unallocate/void_charge/void_credit serverseitig und in der UI auf Superadmin begrenzt; 28 isolierte SQL- und 2 UI-Prüfungen bestanden. Keine produktive Anwendung.
+- [x] Teilaufgabe Entwicklungsstand: reverse/unallocate/void_charge/void_credit serverseitig und in der UI auf Superadmin begrenzt; 28 isolierte SQL- und 2 UI-Prüfungen bestanden. Produktiv veröffentlicht über #55.
 - [ ] Übrige kritische Finanzfreigaben und fünf getrennte Aufgabenrechte vollständig umsetzen und integriert abnehmen.
-- [ ] Fünf getrennte Aufgabenrechte und Aidat-/Umlagenentwurf mit Superadmin-Endfreigabe konsistent implementieren.
-- [ ] 13 bestehende allgemeine Testfehler fachlich auflösen; keine pauschale Lockerung von Datenschutztests.
+- [x] Fünf getrennte Aufgabenrechte und Aidat-/Umlagenentwurf mit Superadmin-Endfreigabe umgesetzt und veröffentlicht (#56/#57); bestehende Altzuweisungen werden erst bei ausdrücklichem Speichern umgestellt.
+- [x] 13 bestehende allgemeine Testfehler fachlich aufgelöst und veröffentlicht (#55); allgemeine Suite inzwischen 269/269 erfolgreich.
 - [ ] Registrierung/Einladungen, Wiederherstellung, Kontaktfreigaben, Historie und RLS mit synthetischen Identitäten testen.
 - [ ] Eigentümerwechsel, Mehrfachzuordnungen, Altlasten und Zutrittsentzug mit unveränderter Finanzhistorie testen.
 - [ ] Barrierefreie mobile Bedienung, DE/TR und eindeutige Freigabetexte prüfen.
@@ -195,7 +221,3 @@ Pages-Deployment 40962059631 **erfolgreich abgeschlossen**; zugehöriger CI-Lauf
 Monats-/Sammelforderungen werden im verbundenen Frontend nun über ay3_submit_charge_draft eingereicht. Die DE/TR-Oberfläche erklärt, dass dabei noch keine Forderung entsteht. Freigabeliste zeigt Fälligkeit, Beschlussgrundlage, Gesamtbetrag, Wohnung und Schuldner; Freigabe/Ablehnung nur Superadmin, keine Vorschau-Schreibzugriffe. Die alten direkten Finalisierungswege sind serverseitig für delegierte Verwaltung gesperrt, einschließlich privater command-/command_v2-Aufrufe und V5-Sammel-/Monatsbuchungen. Bestehende Originale werden nicht umgeschrieben.
 
 Nachweise: 266 allgemeine Tests bestanden; 49 isolierte SQL-Prüfungen des Entwurfs-/Buchungsablaufs bestanden. Live-Ausgangshashes aller drei zu ersetzenden Funktionen stimmen mit dem Kandidaten überein. Fünf Aufgabenrechte sind als explizite Grundlage enthalten; vollständige Vergabeoberfläche und Anbindung der übrigen vier Aufgabenrechte bleiben offen. Keine pauschale Phase-2-Abnahme.
-
-## Bestätigter Rollout Forderungsentwürfe
-
-30.10.2026: beide Migrationen produktiv erfolgreich; PR #56 gemergt (24043a087fb07bb9286bcec8873989e9280560fc), Pages-Lauf 40964643251 erfolgreich. RLS auf beiden neuen Tabellen aktiviert; anonyme Entscheidung verboten; keine produktiven Testentwürfe angelegt (0 Zeilen nach Rollout). Allgemeine Tests 266/266 und isolierter Entwurfs-/Finalisierungsschutz 49 bestanden. Übrige Verwaltungsrechte und deren Vergabeoberfläche noch offen, Gesamtroadmap weiterhin in Arbeit.

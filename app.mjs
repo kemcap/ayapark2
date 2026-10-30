@@ -1,8 +1,9 @@
+import {mayUseTaskAction} from './task-permissions.mjs?v=5.9.28';
 import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.9.2';
 import {bindAccessRequests} from './access-request-ui.mjs?v=5.9.0';
 import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.9.20';
 import {prepareV5Demo} from './finance-demo.mjs?v=5.8.1';
-import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.8.1';
+import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.9.29';
 import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.9.0';
 import {bindDesign} from './design.mjs?v=5.8.1';
 import {enhanceTables} from './ui-accessibility.mjs?v=5.8.1';
@@ -11,20 +12,20 @@ import {apartmentInfo} from './apartment-info.mjs?v=5.9.20';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.8.1';
 import {updateAssignmentForm} from './assignments.mjs?v=5.9.4';
 import {personManager} from './people-ui.mjs?v=5.9.18';
-import {bindInvitations} from './invite-ui.mjs?v=5.9.24';
+import {bindInvitations} from './invite-ui.mjs?v=5.9.28';
 import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.20';
 import {bindInstall} from './install.mjs?v=5.8.1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.27';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.29';
 import {selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
 import {template} from './v3-import.mjs?v=5.8.1';
-import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.8.1';
+import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.8.1';
-import {AyaparkApi} from './api.mjs?v=5.9.27';
+import {AyaparkApi} from './api.mjs?v=5.9.28';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.25';
-import {buildForm,payloadFor} from './forms.mjs?v=5.8.6';
+import {buildForm,payloadFor} from './forms.mjs?v=5.9.28';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -184,11 +185,12 @@ async function mutateInner(action,payload){
  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
  return result;
 }
-function permissionFor(action){return ['reverse','unallocate','void_charge','void_credit','user_access','staff_remove','person_lifecycle','person_restore','settings','permissions','publish_report'].includes(action)?'admin':['assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
+function permissionFor(action){return ['entry','classify_entry','bind_charge','budget','monthly_exception','disable_exception','reverse','unallocate','void_charge','void_credit','user_access','staff_remove','person_lifecycle','person_restore','settings','permissions','publish_report'].includes(action)?'admin':['assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
 function showForm(action,args={}){
  if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
  if(writeBusy)throw Error(tr("Önce devam eden işlemin tamamlanmasını bekleyin."));
- if(!can(state,permissionFor(action)))throw Error(tr("Bu işlem için yetkiniz yok."));
+ if(!(['batch_charge','monthly_v5'].includes(action)&&state.data.taskCapabilities?.charges_prepare)&&!can(state,permissionFor(action)))throw Error(tr("Bu işlem için yetkiniz yok."));
+ if(!mayUseTaskAction(state.data,action))throw Error(tr('Bu işlem için yetkiniz yok.'));
  const origin=$('detailDialog').open?detailView:null;
  const built=buildForm(state,action,{period:state.period,...args});
  if($('detailDialog').open)$('detailDialog').close();

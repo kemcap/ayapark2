@@ -4,7 +4,7 @@ import {readDesign,setDesign,getDesign,designKey,designSettings} from '../design
 import {decorateModernPage} from '../modern-ui.mjs?v=5.8.1';
 import {renderPage} from '../ui.mjs?v=5.9.0';
 import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {setLanguage} from '../i18n.mjs?v=5.8.1';
+import {setLanguage} from '../i18n.mjs?v=5.9.28';
 import {cleanPreferences,preferenceDefaults} from '../preferences.mjs?v=5.8.1';
 
 test('design choice tolerates unavailable storage and rejects invalid persisted values',()=>{

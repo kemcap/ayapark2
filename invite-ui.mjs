@@ -1,11 +1,11 @@
 import {escapeHtml as escape} from './core.mjs?v=5.8.1';
 import {today} from './v3-domain.mjs?v=5.9.26';
-import {getLanguage} from './i18n.mjs?v=5.8.1';
+import {getLanguage} from './i18n.mjs?v=5.9.28';
 
 export const invitableRelationship=link=>['owner','tenant','representative'].includes(link.role)
  && (!link.starts_on||link.starts_on<=today()) && link.archive_reason!=='mistake';
 
-export const inviteEligible=(state,person)=>state.mode==='connected' && state.data.role==='super'
+export const inviteEligible=(state,person)=>state.mode==='connected' && (state.data.role==='super'||state.data.taskCapabilities?.occupancy_invite===true)
  && Boolean(person?.id) && person?.registered!==true && (!person?.auth_user_id||person?.provisional===true)
  && (state.data.links||[]).some(link=>link.person_id===person.id && invitableRelationship(link));
 

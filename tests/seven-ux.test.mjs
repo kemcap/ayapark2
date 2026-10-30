@@ -4,7 +4,7 @@ import {apartmentAmounts,popupProgress,installationVisible,closeMenuOnScroll} fr
 import {unitMapV3,unitDetailV3,announcementsV3} from '../v3-ui.mjs?v=5.9.0';
 import {notificationCenter,unreadNotifications,nextPopup} from '../notifications.mjs?v=5.9.0';
 import {previewProjection,previewControls,previewBanner} from '../access-preview.mjs?v=5.9.0';
-import {setLanguage} from '../i18n.mjs?v=5.8.1';
+import {setLanguage} from '../i18n.mjs?v=5.9.28';
 const data=()=>{const d=prepareV5Demo(fullDemo());d.serverRole='manager';return d;};
 const state=d=>({data:d,mode:'demo',filter:{q:'',block:'all',status:'all'},period:'2026-10',page:'units'});
 test('person balances, unassigned claims and total remain separate and cent-exact',()=>{const d=data();d.charges=[{id:'o',unit_id:'B-6',person_id:'demo-person-B-6',cents:750000},{id:'x',unit_id:'B-6',person_id:null,cents:120000},{id:'void',unit_id:'B-6',person_id:'demo-person-B-6',cents:50000,void_reason:'QA'}];d.allocations=[{charge_id:'o',cents:50000}];const before=JSON.stringify(d.charges),a=apartmentAmounts(d,'B-6');assert.equal(a.persons.get('demo-person-B-6'),700000);assert.equal(a.unassigned,120000);assert.equal(a.total,820000);assert.equal(JSON.stringify(d.charges),before);});

@@ -1,6 +1,6 @@
 import {applyAssignmentDemo} from './assignments.mjs?v=5.9.4';
 import {randomId} from './core.mjs?v=5.8.1';
-import {t as tr} from './i18n.mjs?v=5.8.1';
+import {t as tr} from './i18n.mjs?v=5.9.28';
 import {activeAt,personLinks,today,effectivePayer,buildSummaryDays,creditAvailable} from './v3-domain.mjs?v=5.9.26';
 export function enrichDemo(d){
  d.persons=[{id:'demo-owner',first_name:'Deniz',last_name:'Örnek',full_name:'Deniz Örnek',language:'de',phone:'',email:'',notes:''},{id:'demo-tenant',first_name:'Sakin',last_name:'Örnek',full_name:'Sakin Örnek',language:'tr',notes:''},{id:'demo-former',first_name:'Eski',last_name:'Örnek',full_name:'Eski Örnek',language:'tr',notes:''}];
