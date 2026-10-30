@@ -32,6 +32,26 @@ Stand: 29.10.2026 · Projekt: `kemcap/ayapark2` · Produktivbranch: `main`
 - `[ ]` offen; auch vorbereitete, aber nicht getestete Änderungen bleiben offen.
 - `BLOCKIERT` benötigt vorher einen anderen Schritt oder ausdrückliche Freigabe.
 
+## Research-Gate R0 – unabhängige Tiefenrecherche VOR weiterer P1/P2-Umsetzung (P0-Planung; AKTIV)
+
+**Belegordner:** [DEEP-RESEARCH-20261030.md](DEEP-RESEARCH-20261030.md) (strukturiertes Erst-Research mit Primär-/Hersteller-/UX-Quellen und ausdrücklich offenen Validierungen), [UI-UX-COMPETITOR-BENCHMARK.md](UI-UX-COMPETITOR-BENCHMARK.md), die historischen AyaPark-UI/UX-Audits.
+
+**Wichtig:** Die bisherige Roadmap ist ein **prüfpflichtiger Arbeitsentwurf**, keine endgültige Reihenfolge für neue Features und größere UI-/UX-Umbauten. Die 30 verbindlichen Nutzerentscheidungen bleiben bis zur ausdrücklichen Entscheidung erhalten. P0-Sicherheit und Backup-Wiederherstellung werden **parallel** fortgesetzt, nicht zurückgestellt.
+
+- [x] Bestehende AyaPark-Audits und bisherige Roadmap auf Quellenlücken und fehlende Konkurrenzoberflächentests geprüft.
+- [x] Erste **offizielle Desk-Research**: Apsiyon, Yönetimcell, AidatPro, Yönetion; nationale Datenschutz-Aufsichtsentscheidung 2026/348; KMK 634 Art. 20/22; KVKK-Auslandstransfer; Supabase-Backup/-Migration; W3C/WAI und Nielsen-Norman-UX.
+- [x] Risiken und offene Belege als getrennte Recherchedatei erfasst; Anbieter-Marketing nicht als unabhängig getestete UX behandeln.
+- [ ] Aktuelle Live-App/Deploy und `main` auf neue Funktionen, Screens, tatsächliche Rechte und bereits behobene Altbefunde prüfen.
+- [ ] Aus zugänglichen offiziellen Demos, Videos und Screens die **gleichen sechs Kernaufgaben** pro Wettbewerber beobachten. Nicht zugängliche Fälle als ungeprüft markieren.
+- [ ] **Rechts- und Datenschutzmatrix** auf AyaPark anwenden: Schuldner-/Eigentümerinformationen, Umlagebasis, Eigentümerwechsel, Karar Defteri, öffentliche/privat einsehbare Berichte, KVKK bei Offsite-Backups. Bei Zweifeln fachliche Rechtsprüfung statt Vermutungen.
+- [ ] Finanz-/Berechtigungsabläufe anhand synthetischer Testdaten und vorhandener Beschlüsse dokumentieren; persönliche Daten nicht auf öffentliche Testsysteme übertragen.
+- [ ] Echte UX-Tests: drei Rollen, mobile Geräte/Screenreader, DE/TR, Bankabstimmung, Aidat und Besitzerwechsel; Schrittzahl, Fehler und Verständlichkeit messbar prüfen.
+- [ ] 30 getroffene Entscheidungen + sämtliche Phasen als `behalten / ändern / streichen / neu / verschieben` beurteilen, jeweils mit Quelle und Begründung.
+- [ ] **Roadmap V2** mit P0/P1/P2, Abhängigkeiten, Kostenfolgen, Akzeptanzkriterien, Testnachweisen, Designsystem und Release-Gates vorschlagen.
+- [ ] Vor Umsetzung **ausdrückliche Freigabe** für materielle Änderungen an der 30-Lektionen-Zielspezifikation und Roadmap-V2 einholen.
+
+**Nächster Research-Schritt:** Rolle-/Task-basierte Bestands- und Konkurrenzoberflächenanalyse; nicht bloß weitere Funktionslisten. Das in `main` vorhandene tägliche DB-Backup nicht nochmals als neue Aufgabe ausgeben – isolierte **Wiederherstellung** und vollständige Portabilität bleiben offen.
+
 ## Phase 0 – Bestandsaufnahme und Sicherheitsgrundlage (P0)
 
 - [x] GitHub `main` auf Commit `a4a9d8c44b56d32c0aa0ac73aa6eb613ae19b89e` (28.10.) schreibgeschützt geprüft.
