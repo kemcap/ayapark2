@@ -1,4 +1,12 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Bestätigter Rollout und nächster Abschluss-Schritt – 30.10.2026
+
+Direkter PDF-/Excel-Import (#65), aktuelle Finanzabnahme (#66) und eingeschränkte Excel-/PDF-Exporte mit persönlichen Zahlungsnachweisen (#67) sind veröffentlicht. Hauptzweig nach #67: 03a223eb12f0c42d74ee157fd4ee2dcb4cc5a24e. CI 41083523757 und Pages 41084770953 erfolgreich; ausgelieferte app.mjs, index.html, export.html, report-export-domain.mjs, export-page.mjs, xlsx-export.mjs und lokaler XLSX-Schreibbaustein bytegleich geprüft. Frühere Hinweise „Rollout noch offen“ dieser drei Schritte sind damit überholt.
+
+Nächster Schritt implementiert und isoliert geprüft: explizite Monats-/Jahresabschlussvorschau, Quellen-/Bankbestätigung, unveränderliches Abschlussprotokoll, serverseitige Buchungssperren sowie begründete Wiederöffnung. 46 synthetische SQL- und 22 native DE/TR-Browserprüfungen bestanden; vorhandene Finanz-/Rechtefunktionen werden zusätzlich mit installierten, aber noch nicht aktivierten Abschlusssperren geprüft. Technische Details: PHASE-4-REPORTS-AUDIT.md. Backend- und Frontend-Veröffentlichung dieses neuen Schritts werden separat bestätigt. Kein echter Zeitraum automatisch abgeschlossen, keine Bewohner-/Bank-/Authdaten geändert. Backup bleibt gemäß Nutzerauftrag übersprungen.
+
+Danach: ausdrückliche Freigabe rein aggregierter Finanzübersichten, Beschluss-/Sonderumlagenabnahme, Budget/Rücklagen, privates Dokumenten-/Versammlungsarchiv, Aufgaben/Erinnerungen und verbleibende vollständige Rollen-/Auth-/Geräteabnahme. Vor jeder Ergänzung bestehende Funktionen prüfen. Nicht alle Roadmapaufgaben sind abgeschlossen.
+
 ## Berichte und persönliche Exporte – 30.10.2026
 
 Phase-4-Ist/Soll geprüft; bestehende CSV-/Datums-/Diagrammfunktionen weiterverwendet. Ergänzt und lokal getestet: echte Excel-Exporte für Summen und berechtigte Bankdaten, gesonderte PDF-Exportansicht sowie persönliche Zahlungsnachweise nur für eigene Personen-IDs oder tatsächliche Finanzverwaltung. Keine Übernahme fremder Teilbeträge bei gemeinsamer Wohnung/Zahlung. Texte sicher escaped, Excel-Formel-Injection verhindert, Betragstypen centgenau, Vorschau/Demo auch in exportierten Daten gekennzeichnet. Keine echten personenbezogenen oder Finanzdatensätze geändert.
@@ -270,3 +278,6 @@ Pages-Deployment 40962059631 **erfolgreich abgeschlossen**; zugehöriger CI-Lauf
 Monats-/Sammelforderungen werden im verbundenen Frontend nun über ay3_submit_charge_draft eingereicht. Die DE/TR-Oberfläche erklärt, dass dabei noch keine Forderung entsteht. Freigabeliste zeigt Fälligkeit, Beschlussgrundlage, Gesamtbetrag, Wohnung und Schuldner; Freigabe/Ablehnung nur Superadmin, keine Vorschau-Schreibzugriffe. Die alten direkten Finalisierungswege sind serverseitig für delegierte Verwaltung gesperrt, einschließlich privater command-/command_v2-Aufrufe und V5-Sammel-/Monatsbuchungen. Bestehende Originale werden nicht umgeschrieben.
 
 Nachweise: 266 allgemeine Tests bestanden; 49 isolierte SQL-Prüfungen des Entwurfs-/Buchungsablaufs bestanden. Live-Ausgangshashes aller drei zu ersetzenden Funktionen stimmen mit dem Kandidaten überein. Fünf Aufgabenrechte sind als explizite Grundlage enthalten; vollständige Vergabeoberfläche und Anbindung der übrigen vier Aufgabenrechte bleiben offen. Keine pauschale Phase-2-Abnahme.
+
+
+Backend-Veröffentlichung 30.10.2026 bestätigt: Migration 20261030201427_explicit_period_closing_and_reopening aktiv. Rein lesende Prüfung: 0 echte Abschlussdatensätze, RLS aktiv, kein Client-INSERT und keine anonyme Finalisierung. Keine bestehenden Finanz-/Bewohner-/Authdatensätze geändert. 50 aktuelle Finanz-, 31 Finanzabnahme-, 16 Bankimport-, 84 Rechte-, 23 Kontakt- und 43 Historienprüfungen mit installierter neuer Abschlusssicherung erfolgreich; allgemeine Suite 299/299. Frontend-Rollout noch offen.
