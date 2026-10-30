@@ -199,3 +199,19 @@ Aktueller ausführlicher Plan und Sicherheitsgrenzen: `docs/PHASE1-RESTORE-GATE-
 - [ ] Veralteten Draft PR #52 vor Zusammenführung in main mit aktuellem Produktivbranch abgleichen. Draft #68 bleibt zunächst auf #52 gestapelt. **Kein Merge und keine Aktivierung ohne ausdrückliche Freigabe.**
 
 **Nächster Sicherheits-Gate:** Für echten Restore ist die bisher nur auf dem Mac gesicherte private age-Identity notwendig. Die Backups bleiben in Google Drive; Mac ist nicht Backupspeicher. Ein Cloud-Restore mit echten Bewohner-/Auth-/Finanzdaten kann ohne den privaten Schlüssel nicht vollständig durchgeführt werden. Vor Übergabe der Entschlüsselungsfähigkeit an eine Cloud-Testumgebung ist ein gesondertes, ausdrücklich freigegebenes Vorgehen zum Schutz dieser Daten zu definieren.
+
+
+## Echt ausgeführtes separates App-Quellcode-Backup – 30.10.2026
+
+**Status dieser Teilaufgabe: erfolgreich gesichert und Remote-Ciphertext geprüft.** Keine realen Datenbankdaten berührt; kein Live-Deploy und keine Änderung an `main`.
+
+- One-time-Workflow (nur Push des neuen Workflowfiles im bestehenden Entwicklungsbranch): `.github/workflows/phase1-app-source-backup.yml`.
+- Echter GitHub-Actions-Lauf: https://github.com/kemcap/ayapark2/actions/runs/41100797096; Job-Protokoll enthält `Standalone source bundle and isolated mirror restore verified.` sowie `APP SOURCE BACKUP VERIFIED`.
+- Ziel: privater Ordner `AyaPark2-Backups` auf dem bestehenden Google Drive. Echter neuer Datei-Eintrag mit ID `1UZ2EDu-76R3mwh_DLBeLKgTA5HVfQ_JB`: https://drive.google.com/file/d/1UZ2EDu-76R3mwh_DLBeLKgTA5HVfQ_JB/view .
+- Dateiname: `ayapark2-app-source-20261030T174118Z-41100797096.tar.age`.
+- Tatsächliche Größe: **2.673.480 Bytes** (Google-Drive-Metadaten separat geprüft).
+- Verschlüsselt mit demselben bestehenden **öffentlichen age-Empfänger** wie das tägliche Datenbankbackup; kein privater Schlüssel übertragen, keine neuen Geheimnisse erstellt.
+- Gesicherter `origin/main`-Commit: `03a223eb12f0c42d74ee157fd4ee2dcb4cc5a24e`; Live-Hauptbranch vor Backup abgeglichen. Enthalten ist der Git-Bundle-Snapshot mit allen erreichten Referenzen, versioniertem App-Quellcode, Designs, Dateien in `assets/`, Edge-Function-Quellcode, Tags und erreichbarer Versionshistorie. **Nicht** gesichert sind unversionierte lokale Daten, GitHub-Issues/-PRs, Secrets, externe Dokumente oder produktive Datenbank.
+- Verschlüsselter SHA-256-Prüfwert (lokal berechnet und durch unabhängiges `rclone cat` des tatsächlich von Google Drive erneut heruntergeladenen Ciphertexts erfolgreich bestätigt): `f6ad740ee4799892e9545abf3a550ad188851490aa6baee96f447838112d901f`.
+- Das Git-Bundle wurde **vor Verschlüsselung unabhängig rekonstruiert** und `git fsck --full --strict` geprüft. **Nicht** durchgeführt wurde eine wirkliche `age`-Entschlüsselung dieses *realen* Archivs mit der privaten age-Identity (liegt nur beim Benutzer). Dieser letzte Test sowie der echte Datenbank-/Auth-/RLS-/Storage-/App-Restore sind weiterhin offene Phase-1-Gates.
+- Täglicher DB-only-Workflow bleibt unverändert; kein zweiter DB-Workflow oder automatischer App-Sicherungs-Zeitplan aktiviert.
