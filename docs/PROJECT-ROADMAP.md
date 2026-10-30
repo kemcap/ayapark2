@@ -1,5 +1,13 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
 
+## Zusätzliche Phase-2-Prüfung 30.10.2026
+
+PR #57 mit den fünf Aufgabenrechten ist produktiv; Pages-Lauf 41005590291 erfolgreich, task-permissions/forms/api ausgeliefert und inhaltsgleich geprüft. Recovery blieb nachweislich Superadmin-only; isolierte Wiederherstellung behält die Account-ID.
+
+Die anschließende Übergangsprüfung ergänzt den Superadmin-Schutz für manuelle Buchungen, Kategorie-/Schuldneränderungen, Budgetänderungen und Ausnahmen auch bei noch nicht auf die fünf Rechte umgestellten alten Finanzberechtigungen. Lesen und normale Zahlungszuordnung bleiben erhalten. Entsprechende Buttons und Formulare sind ebenfalls geschützt. 84 SQL-Prüfungen des neuen Gesamtpakets und 269 allgemeine Tests bestanden. Keine Mitgliedschaften, Kontakte oder Finanzoriginale zu Testzwecken verändert.
+
+Offener nächster Punkt: eigener nachvollziehbarer Kontaktänderungsantrag mit Superadmin-Prüfung; bestehende Zugangsanfragen sind davon zu unterscheiden. Weitere Phase-2-Historienabnahme und Phasen 3–6 bleiben offen.
+
 ## Maßgeblicher Fortschritt 30.10.2026 – fünf Aufgabenrechte
 
 Die fünf Rechte sind in der Vergabeoberfläche und serverseitig verbunden. Speicherung erfolgt über ay3_set_task_grants, nur durch Superadmin. Keine automatische Übertragung alter breiter Rechte. Bisherige Berechtigungen bleiben bis zur ausdrücklichen Speicherung kompatibel; danach ersetzt der explizite Aufgabensatz die alten Rechte. Leere Auswahl entzieht alle delegierten Aufgaben. Kritische Finanzen, Recovery, Rollenvergabe und Veröffentlichungen von Finanzberichten bleiben Superadmin-Aufgaben.
@@ -103,10 +111,10 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 ## Phase 2 – Personen, Rollen, Berechtigungen (P1)
 
 - [x] Repository-Ist/Soll-Abgleich aller drei Rollen und fünf delegierbaren Verwaltungsrechte; vorhandene Module und Überschneidungen geprüft. Siehe `PHASE-2-ROLES-AUDIT.md`; keine Live-Backend-Abnahme.
-- [x] Teilaufgabe Entwicklungsstand: reverse/unallocate/void_charge/void_credit serverseitig und in der UI auf Superadmin begrenzt; 28 isolierte SQL- und 2 UI-Prüfungen bestanden. Keine produktive Anwendung.
+- [x] Teilaufgabe Entwicklungsstand: reverse/unallocate/void_charge/void_credit serverseitig und in der UI auf Superadmin begrenzt; 28 isolierte SQL- und 2 UI-Prüfungen bestanden. Produktiv veröffentlicht über #55.
 - [ ] Übrige kritische Finanzfreigaben und fünf getrennte Aufgabenrechte vollständig umsetzen und integriert abnehmen.
-- [ ] Fünf getrennte Aufgabenrechte und Aidat-/Umlagenentwurf mit Superadmin-Endfreigabe konsistent implementieren.
-- [ ] 13 bestehende allgemeine Testfehler fachlich auflösen; keine pauschale Lockerung von Datenschutztests.
+- [x] Fünf getrennte Aufgabenrechte und Aidat-/Umlagenentwurf mit Superadmin-Endfreigabe umgesetzt und veröffentlicht (#56/#57); bestehende Altzuweisungen werden erst bei ausdrücklichem Speichern umgestellt.
+- [x] 13 bestehende allgemeine Testfehler fachlich aufgelöst und veröffentlicht (#55); allgemeine Suite inzwischen 269/269 erfolgreich.
 - [ ] Registrierung/Einladungen, Wiederherstellung, Kontaktfreigaben, Historie und RLS mit synthetischen Identitäten testen.
 - [ ] Eigentümerwechsel, Mehrfachzuordnungen, Altlasten und Zutrittsentzug mit unveränderter Finanzhistorie testen.
 - [ ] Barrierefreie mobile Bedienung, DE/TR und eindeutige Freigabetexte prüfen.
