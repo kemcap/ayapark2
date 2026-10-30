@@ -167,3 +167,8 @@ Nächster Schritt: Abschnitt 3 der neuen Anleitung lokal durchführen (OAuth-Sta
 - [ ] OAuth-Audience-Status und dauerhafte Token-Eignung bestätigen.
 
 **Nächster Schritt:** geschützten lokalen Download und Entschlüsselung der echten .dump.age-Datei (siehe docs/PHASE1-RESTORE-GATE-20261030.md), dann frisches isoliertes Restore-Ziel festlegen und dokumentiert importieren. Keinen echten Restore als bestanden markieren, bevor der Test erfolgreich ist. Produktionsdaten, main und bestehende Backupläufe wurden durch diese Arbeiten nicht verändert.
+
+
+### Zusätzliche Inventarlücke (30.10.2026)
+
+- [ ] Verwaltungsoriginale und projektbezogene PDFs außerhalb GitHub/Supabase gesondert inventarisieren und verschlüsselt sichern. Dazu zählen möglicherweise lokale oder in anderen Apps abgelegte Bank-, Abrechnungs- und Karar-Defteri-Dateien. Der aktuelle Backup-Workflow enthält keine solchen externen Dateien. Keine sensiblen Originale in GitHub committen. Siehe docs/BACKUP-RECOVERY-INVENTORY.md.
