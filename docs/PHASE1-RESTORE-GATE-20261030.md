@@ -68,3 +68,17 @@ Auch ein erfolgreicher Offline-Scan beweist keine Datenbank-Wiederherstellung, f
 - docs/BACKUP-RESTORE-PREPARATION.md
 
 **Kein echter Restore wurde durchgeführt. Keine Live-Systemänderung, kein Merge, kein neuer Workflow-Lauf oder neue Aktivierung bei diesem Arbeitsschritt.**
+
+
+## 6. Cloud-first-Ausführung (Fortsetzung 30.10.2026)
+
+**Festlegung:** Beibehaltung des privaten Google-Drive-Ordners AyaPark2-Backups als externes Backupziel. Google-Cloud-Projekt stellt bisher nur OAuth für Drive bereit; weder ein neuer Google-Cloud-Storage-Bucket noch ein kostenpflichtiger Dienst wird eingerichtet. Es gibt **keine Notwendigkeit, den Mac als Backupspeicher zu verwenden**.
+
+**Neuer synthetischer Integrationstest**, nur auf dem Entwicklungsbranch:
+- `scripts/backup/test_synthetic_restore.sh`: erstellt mit einem temporären PostgreSQL-17-Docker-Container ausschließlich künstliche Auth-, Wohnungs-, Buchungs- und RLS-Daten; exportiert im Umfang des aktiven DB-Workflows, verschlüsselt mit einem *frisch erzeugten, nach Test gelöschten* age-Testschlüssel, entschlüsselt, kontrolliert das Archiv und importiert es in eine neue leere Datenbank. Prüft anschließend Beispieldaten und erlaubte/verbotene RLS-Sichten.
+- `.github/workflows/phase1-synthetic-restore.yml`: führt ausschließlich die synthetischen Unit-/Integrationstests bei Pull Requests in den Backup-Entwicklungsbranch aus. Berechtigung nur `contents: read`. **Keine Produktionssecrets, keine Google-Drive-Token, keine Supabase-URLs, keine Einwohnerdaten; keine tägliche Zeitplanung.**
+- Für die zusätzlichen synthetischen Docker-/age-Tests ist bislang **kein erfolgreich abgeschlossener CI-Lauf nachgewiesen**. Sie bleiben *vorbereitet / CI ausstehend*. Die sechs Unit-Tests des Offline-Dump-Skripts wurden in der Entwicklungsumgebung eigenständig erfolgreich ausgeführt.
+
+**Wichtigste Sicherheitsgrenze:** Der tatsächliche produktive .dump.age-Dump kann mit dem in GitHub abgelegten öffentlichen age-Schlüssel **nicht** entschlüsselt werden. Ein echter Cloud-Restore benötigt die Entschlüsselungsfähigkeit in einer gesondert geschützten temporären Umgebung und eine ausdrückliche Freigabe für den Umgang mit sensiblen Auth-/Bewohner-/Finanzdaten dort. Der private Wiederherstellungsschlüssel bleibt nach bisheriger Vereinbarung ausschließlich beim Benutzer; er wird **nicht** in GitHub-Secrets, Drive oder ChatGPT hochgeladen. Ohne eine sichere, ausdrücklich genehmigte Schlüsselübergabe oder lokale Entschlüsselung ist der vollständige *echte* Cloud-Restore technisch nicht durchführbar.
+
+**Nächster Ablauf nach synthetischem CI:** 1) CI-Lauf und Fehler vollständig überprüfen/korrigieren; 2) OAuth-Status prüfen; 3) gesichertes, isoliertes reales Restore-Ziel und sichere Schlüsselverwendung gemeinsam festlegen, ohne Live-Daten zu verändern; 4) echten Restore mit Auth-/RLS-/Storage-/Git-Checks nachweisen; 5) erst dann Gesamtarchiv und Backupautomatisierung nach Freigabe aktivieren. Real-Restore, Gesamtsnapshot und Aktivierung bleiben offen.
