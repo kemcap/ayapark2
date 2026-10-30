@@ -1,0 +1,8 @@
+{
+  "passed": 22,
+  "failed": 0,
+  "browser": "153.0.8010.0",
+  "scope": "synthetic DE/TR closure preview, explicit attestation, retry, escaping, reopen and revoked access",
+  "errors": [],
+  "external": []
+}
