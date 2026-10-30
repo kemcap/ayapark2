@@ -172,3 +172,15 @@ Nächster Schritt: Abschnitt 3 der neuen Anleitung lokal durchführen (OAuth-Sta
 ### Zusätzliche Inventarlücke (30.10.2026)
 
 - [ ] Verwaltungsoriginale und projektbezogene PDFs außerhalb GitHub/Supabase gesondert inventarisieren und verschlüsselt sichern. Dazu zählen möglicherweise lokale oder in anderen Apps abgelegte Bank-, Abrechnungs- und Karar-Defteri-Dateien. Der aktuelle Backup-Workflow enthält keine solchen externen Dateien. Keine sensiblen Originale in GitHub committen. Siehe docs/BACKUP-RECOVERY-INVENTORY.md.
+
+
+### Cloud-first-Abgleich 30.10.2026
+
+- [x] Google Drive (privater Ordner AyaPark2-Backups) bleibt externes Speicherziel, Google Cloud bisher OAuth-Anbindung; kein GCS-Bucket und kein kostenpflichtiger Plan aktiviert.
+- [x] `scripts/backup/test_synthetic_restore.sh` und `.github/workflows/phase1-synthetic-restore.yml` für eine cloudbasierte PostgreSQL-17-/age-/RLS-Wiederherstellungsprobe ausschließlich mit künstlichen Daten in separatem Branch vorbereitet. Keine Produktionssecrets, keine Live-Verbindungen.
+- [x] Sechs Unit-Tests für Offline-Dump-Prüfung tatsächlich lokal erfolgreich durchgelaufen.
+- [ ] GitHub-Actions-Synthetic-Restore-CI: erfolgreicher Lauf **noch nicht nachgewiesen**; Teststatus vor Freigabe prüfen.
+- [ ] Echte Produktiv-.dump.age-Datei sicher entschlüsseln und isoliert wiederherstellen. Privater age-Schlüssel bleibt beim Benutzer; Cloud-Verwendung personenbezogener Daten und Entschlüsselung benötigen ausdrücklich genehmigten Sicherheitsablauf. Kein echter Restore stattgefunden.
+- [ ] Gesamtbackup, externer .tar.age-Rundlauf, Verschlüsselung, Storage/Git/Edge-Function-/Auth- und Migrationstests weiter offen.
+
+Aktueller ausführlicher Plan und Sicherheitsgrenzen: `docs/PHASE1-RESTORE-GATE-20261030.md`. Ältere Mac-only-Anweisungen sind keine Entscheidung für den Backup-Speicher; der Speicherort bleibt Google Drive.
