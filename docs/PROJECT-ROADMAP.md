@@ -1,10 +1,16 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
 
+## Historienanzeige vervollständigt – 30.10.2026
+
+Zusätzlicher reproduzierter Frontendfehler: Nach Ende einer aktuellen Wohnungszuordnung konnte die Wohnungsbezeichnung bei einer eigenen historischen Forderung fehlen. API-Mapping behält nun die vom Server erlaubten Metadaten solcher Wohnungen. ownIds und aktuelle Navigation werden nicht erweitert, fremde Schuldner bleiben aus der persönlichen Historie ausgeschlossen. Ein Vorher-/Nachher-Regressionstest belegt Bezeichnung und Zugriffstrennung. Allgemeine Testsuite jetzt 273/273.
+
+Kontaktworkflow (#59) und RLS-Historienkorrektur (#60) sind produktiv, jeweilige Pages- und CI-Läufe erfolgreich. Die neue reine Frontendkorrektur wird als eigener Release nachgeführt. Gesamtroadmap bleibt offen; Phase-2-Geräte-/Bedienabnahme sowie Finanz-/Bankabgleich aus Phase 3 stehen weiterhin aus.
+
 ## Historien-RLS korrigiert – 30.10.2026
 
 Die Prüfung mit den relevanten aktuellen Migrationen reproduzierte einen echten Rückschritt: Die Wohnungs-RLS aus dem 29.10. enthielt keinen persönlichen historischen Schuldnerzugriff mehr. Korrektur als restore_personal_charge_history produktiv angewendet (Supabase-Version 20261030065637). Forderungs- und Zahlungszuordnungszugriff erlaubt wieder eigene historische Forderungen, zusätzlich zur unverändert begrenzten aktuellen Wohnungssicht. Fremde Wohnungen, rohe Bankdaten und entzogene Zugänge bleiben gesperrt. Originalschuldner und Buchungsdaten wurden nicht geändert.
 
-28 isolierte Vorher-/Nachher-Prüfungen mit dem relevanten aktuellen Migrationspaket bestanden. Das alte Baseline-Historienskript bleibt zusätzlich erhalten. Tests und aus der tatsächlich vergebenen Provider-Version benannte Migration sind im Repository nachzuführen. Die CLI wurde wegen blockierter Telemetrie nicht erneut ausgeführt; der geprüfte SQL-Text wurde über den verbundenen Supabase-Migrationsdienst angewendet.
+28 isolierte Vorher-/Nachher-Prüfungen mit dem relevanten aktuellen Migrationspaket bestanden. Das alte Baseline-Historienskript bleibt zusätzlich erhalten. Tests und aus der tatsächlich vergebenen Provider-Version benannte Migration sind im Repository versioniert (#60). Die CLI wurde wegen blockierter Telemetrie nicht erneut ausgeführt; der geprüfte SQL-Text wurde über den verbundenen Supabase-Migrationsdienst angewendet.
 
 Kontaktänderungsanträge aus PR #59 ebenfalls produktiv; Pages-Deployment 41016521336 und CI-Lauf 41016403144 erfolgreich. 272 allgemeine Tests und 23 Kontakt-SQL-Prüfungen bestanden. Keine produktiven Kontakt-Testanträge erzeugt.
 
