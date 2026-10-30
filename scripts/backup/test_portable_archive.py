@@ -108,6 +108,23 @@ class SyntheticPortableArchiveTest(unittest.TestCase):
                              run("git", "-C", str(restored_git), "ls-tree", "-r", "main"))
             self.assertTrue((extract_to / "db/application.dump").is_file())
 
+            # Removing just one referenced Storage object must invalidate the
+            # archive even when all other manifests and Git objects survive.
+            missing_storage = root / "missing-storage.tar"
+            with tarfile.open(recovered, "r:") as original, tarfile.open(missing_storage, "w") as modified:
+                for member in original:
+                    if member.name.removeprefix("./") == "storage/objects/synthetic.bin":
+                        continue
+                    if member.isfile():
+                        with original.extractfile(member) as fp:
+                            modified.addfile(member, fp)
+                    else:
+                        modified.addfile(member)
+            failed = subprocess.run(["python3", str(checker), str(missing_storage)],
+                                    text=True, capture_output=True, check=False)
+            self.assertNotEqual(failed.returncode, 0)
+            self.assertIn("mismatch", failed.stderr.lower())
+
 
 if __name__ == "__main__":
     unittest.main()
