@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 
 test('each active browser module has one identity across app and recovery entry points',()=>{
  const root=new URL('../',import.meta.url),visited=new Set(),identities=new Map(),queue=[];
- for(const page of ['index.html','reset.html','export.html']){
+ for(const page of ['index.html','reset.html','export.html','public-reports.html']){
   const html=readFileSync(new URL(page,root),'utf8');
   for(const match of html.matchAll(/<script\b[^>]*src="([^"]+)"/g))queue.push(new URL(match[1],root));
  }

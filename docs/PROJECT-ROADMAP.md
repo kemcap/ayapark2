@@ -1,4 +1,14 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Abschlussfunktion veröffentlicht; Summenfreigabe folgt – 30.10.2026
+
+PR #69 nach erfolgreicher CI 41121725509 gemergt; Hauptzweig a3b4a067a5b66101d75aae8ae3cc265de88b02b7. Backend-Abschlüsse (Migration 20261030201427) aktiv, Frontend-Pages-Auslieferung wird separat bestätigt. 46 Abschluss-SQL-, 22 Browser- und 299 allgemeine Prüfungen sowie aktuelle Finanz-/Rechte-/Historienregressionen bestanden. Kein echter Zeitraum abgeschlossen.
+
+Danach unmittelbar umgesetzt und isoliert geprüft: ausdrückliche Summenfreigabe je bestätigtem Abschluss und Zielgruppe „berechtigte aktuelle Gemeinschaft“ oder „öffentlich ohne Anmeldung“. Standardmäßig keine Veröffentlichung. Nur fest erlaubte Datums-/Betragsfelder, keine Roh-Snapshots, Quellenreferenzen, Notizen, Schuldner, Kontodaten oder Akteur-IDs. Rücknahme protokolliert; Wiederöffnung des ursprünglichen Abschlusses blendet bestehende Freigaben automatisch aus. Persönliche Bereiche und alte Zwischenberichte unverändert. 29 synthetische SQL- und 24 native DE/TR-Browserprüfungen; 303 allgemeine Tests einschließlich vier neuer Datenprojektionsprüfungen bestanden.
+
+Backendmigration 20261030202050_opt_in_aggregate_report_releases installiert und rein lesend bestätigt: 0 Freigabezeilen, 0 Abschlusszeilen, kein anonymer Tabellenzugriff/Publikationsaufruf/private Projektionsaufruf. Nur die fest begrenzte öffentliche Summen-RPC ist absichtlich anonym aufrufbar; sie liefert ohne manuell freigegebene aktive Abschlüsse ein leeres Array. Bestehende Advisor-Gruppen unverändert; deren Sammelhinweis auf anonym ausführbare Security-Definer-Funktionen enthält jetzt diese beabsichtigte, geprüfte öffentliche Projektion. Nicht als allgemeine Behebung aller Advisor-Hinweise ausgeben.
+
+Frontend-Veröffentlichung der Summenfreigabe noch offen. Danach als nächster Roadmapschritt: Sonderumlage/Beschlussnachweise und historische Schuldner-/Verteilungsschlüssel gegen vorhandenen Forderungsentwurfs- und Superadmin-Freigabeablauf prüfen und gezielt vervollständigen. Danach Budget/Rücklagen und einfache Verwaltungswerkzeuge. Keine erneute Backupbearbeitung.
+
 ## Bestätigter Rollout und nächster Abschluss-Schritt – 30.10.2026
 
 Direkter PDF-/Excel-Import (#65), aktuelle Finanzabnahme (#66) und eingeschränkte Excel-/PDF-Exporte mit persönlichen Zahlungsnachweisen (#67) sind veröffentlicht. Hauptzweig nach #67: 03a223eb12f0c42d74ee157fd4ee2dcb4cc5a24e. CI 41083523757 und Pages 41084770953 erfolgreich; ausgelieferte app.mjs, index.html, export.html, report-export-domain.mjs, export-page.mjs, xlsx-export.mjs und lokaler XLSX-Schreibbaustein bytegleich geprüft. Frühere Hinweise „Rollout noch offen“ dieser drei Schritte sind damit überholt.

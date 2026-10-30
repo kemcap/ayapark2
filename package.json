@@ -24,7 +24,8 @@
     "test:bank:sql": "node tests/sql/bank-import.mjs",
     "build:import-parsers": "node scripts/import/build-vendors.mjs",
     "test:finance:audit:sql": "node tests/sql/current-finance-audit.mjs",
-    "test:closing:sql": "node tests/sql/period-closing.mjs"
+    "test:closing:sql": "node tests/sql/period-closing.mjs",
+    "test:releases:sql": "node tests/sql/report-releases.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.11",
