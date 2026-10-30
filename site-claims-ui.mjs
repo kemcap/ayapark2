@@ -1,7 +1,7 @@
 import {getLanguage} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as escape,money} from './core.mjs?v=5.8.1';
 import {scopedCharges} from './v3-domain.mjs?v=5.9.26';
-import {remaining} from './ledger.mjs?v=5.8.1';
+import {remaining} from './ledger.mjs?v=5.9.39';
 
 const labels={
  own:['Dairenin açık borçları','Offene Forderungen zur Wohnung'],

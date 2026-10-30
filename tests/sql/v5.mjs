@@ -46,7 +46,12 @@ try{
  await reject('different request cannot duplicate monthly obligations',()=>command('monthly_v5',{...monthly,request_id:request()}));
  const december=batch(all,'per_unit',360000);december.due_on='2026-12-01';check('expired exception no longer excludes apartment',(await command('monthly_v5',december)).charges.length===20);
  const snapshot=await value('select to_jsonb(c) v from public.ay2_charges c where id=$1',[historical.id]);check('historical row remains exactly unchanged',JSON.stringify(snapshot)===JSON.stringify(before));
- async function makeCharge(unit,personLink,cents,due,group){const p=batch([uid(unit)],'per_unit',cents);p.due_on=due;p.debt_group=group;p.debtors[uid(unit)]=personLink;return (await command('batch_charge',p)).charges[0].id;}
+ async function makeCharge(unit,personLink,cents,due,group){const p=batch([uid(unit)],'per_unit',cents);p.due_on=due;p.debt_group=group;p.debtors[uid(unit)]=personLink;if(current&&group==='capital'){
+ const draft=await value('select public.ay3_submit_charge_draft($1,$2,$3,$4) v',[site,request(),'batch_charge',p]);
+ const review=await value('select public.ay3_share_levy_review($1,$2,$3,$4,$5,true) v',[site,draft,request(),'Synthetic capital fixture','Synthetic explanation approved for the affected owners']);
+ await query('select public.ay3_document_levy_review($1,$2,$3,$4,$5,true,true,true)',[site,review,'2026-01-01','Synthetic signed external resolution',due]);
+ return (await value('select public.ay3_decide_charge_draft($1,$2,true) v',[site,draft])).charges[0].id;
+ }return (await command('batch_charge',p)).charges[0].id;}
  const oldest=await makeCharge(2,lid(2),600,'2026-08-01','legal'),newer=await makeCharge(2,lid(2),500,'2026-09-01','legal'),separate=await makeCharge(2,lid(2),900,'2026-07-01','capital');
  const entry=(await legacy('entry',{request_id:request(),date:'2026-10-25',desc:'QA synthetic payment',category:'Diğer',cents:1400})).id;
  const target={request_id:request(),entry_id:entry,unit_id:uid(2),person_id:pid(2),group:'legal'};

@@ -1,4 +1,4 @@
-import {receives} from './notifications.mjs?v=5.9.0';
+import {receives} from './notifications.mjs?v=5.9.39';
 import {escapeHtml as e} from './core.mjs?v=5.8.1';
 import {t as tr} from './i18n.mjs?v=5.9.28';
 import {activeAt} from './v3-domain.mjs?v=5.9.26';

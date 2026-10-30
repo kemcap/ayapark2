@@ -1,3 +1,4 @@
+import {levyReviews} from './levy-review-ui.mjs?v=5.9.39';
 import {reportReleases} from './report-release-ui.mjs?v=5.9.38';
 import {periodClosings} from './period-closing-ui.mjs?v=5.9.37';
 import {summaryExport,bankExport,receiptExport} from './report-export-domain.mjs?v=5.9.36';
@@ -9,31 +10,31 @@ import {contactError} from './contact-requests.mjs?v=5.9.30';
 import {mayUseTaskAction} from './task-permissions.mjs?v=5.9.28';
 import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.9.2';
 import {bindAccessRequests} from './access-request-ui.mjs?v=5.9.0';
-import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.9.20';
-import {prepareV5Demo} from './finance-demo.mjs?v=5.8.1';
-import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.9.29';
-import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.9.0';
+import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.9.39';
+import {prepareV5Demo} from './finance-demo.mjs?v=5.9.39';
+import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.9.39';
+import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.9.39';
 import {bindDesign} from './design.mjs?v=5.8.1';
 import {enhanceTables} from './ui-accessibility.mjs?v=5.8.1';
 import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.9.0';
-import {apartmentInfo} from './apartment-info.mjs?v=5.9.20';
+import {apartmentInfo} from './apartment-info.mjs?v=5.9.39';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.8.1';
 import {updateAssignmentForm} from './assignments.mjs?v=5.9.4';
-import {personManager} from './people-ui.mjs?v=5.9.18';
+import {personManager} from './people-ui.mjs?v=5.9.39';
 import {bindInvitations} from './invite-ui.mjs?v=5.9.28';
-import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.20';
-import {bindInstall} from './install.mjs?v=5.8.1';
+import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.39';
+import {bindInstall} from './install.mjs?v=5.9.39';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.29';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.39';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
 import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
-import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.8.1';
+import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.9.39';
 import {AyaparkApi} from './api.mjs?v=5.9.31';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.25';
-import {buildForm,payloadFor} from './forms.mjs?v=5.9.28';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.39';
+import {buildForm,payloadFor} from './forms.mjs?v=5.9.39';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -119,7 +120,8 @@ function render(focus=false){
 function navigate(page){mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
 const closingUI=periodClosings({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,onSaved:reload});
 const releaseUI=reportReleases({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),community:()=>state.mode==='connected'&&!isAccessPreview()&&(can(state,'finance')||state.data.communityAccess===true),site:()=>state.data.site.id,language:getLanguage});
-function closeDialogs(){closingUI.close();releaseUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
+const levyUI=levyReviews({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),connected:()=>state.mode==='connected'&&!isAccessPreview(),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload});
+function closeDialogs(){closingUI.close();releaseUI.close();levyUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
@@ -221,6 +223,8 @@ function reportExportModel(){const range=selectedRange(state,'report'),error=ran
 function bankExportModel(){return bankExport(filteredTransactions(state),exportOptions());}
 function addExportControls(){
  if(state.mode==='signedout')return;
+ if(state.page==='dues'&&state.mode==='connected'&&!isAccessPreview())$('content').insertAdjacentHTML('beforeend','<section class="card">'+button(getLanguage()==='de'?'Sonderumlagenentwürfe ansehen':'Ek ödeme taslaklarını gör','levy_owner')+(can(state,'admin')?button(getLanguage()==='de'?'Sonderumlagen prüfen':'Ek ödemeleri incele','levy_manage'):'')+'</section>');
+ for(const b of $('content').querySelectorAll('[data-draft-decision=approve]'))if(state.data.chargeDrafts?.find(d=>d.id===b.dataset.id)?.payload?.debt_group==='capital')b.textContent=getLanguage()==='de'?'Beschlussprüfung öffnen':'Karar incelemesini aç';
  if(state.page==='reports'&&(can(state,'finance')||state.data.communityAccess===true)){
   if(state.mode==='connected'&&!isAccessPreview())$('content').insertAdjacentHTML('beforeend','<section class="card">'+button(getLanguage()==='de'?'Freigegebene Gemeinschaftsübersichten':'Site üyelerine paylaşılan özetler','community_releases')+(can(state,'admin')?button(getLanguage()==='de'?'Summenfreigaben verwalten':'Toplam paylaşımlarını yönet','report_releases'):'')+'</section>');
   if(state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'))$('content').insertAdjacentHTML('beforeend','<section class="card">'+button(getLanguage()==='de'?'Monats- / Jahresabschluss prüfen':'Ay / yıl kapanışını kontrol et','period_closings')+'</section>');
@@ -373,6 +377,8 @@ document.addEventListener('click',async event=>{
   if(action==='staged')return staged();
   if(action==='review_import'){$('importDialog').close();navigate('transactions');state.filter.type='unmatched';render();return;}
   if(action==='print')return window.print();
+  if(action==='levy_manage')return await levyUI.openAdmin();
+  if(action==='levy_owner')return await levyUI.openOwner();
   if(action==='report_releases')return await releaseUI.openAdmin();
   if(action==='community_releases')return await releaseUI.openCommunity();
   if(action==='period_closings')return await closingUI.open();
@@ -670,7 +676,7 @@ setInterval(()=>void refreshWhenIdle(),90000);window.addEventListener('focus',()
 
 window.addEventListener('scroll',event=>{if(mobileNavGroup!==null&&closeMenuOnScroll(event,$('nav'))){mobileNavGroup=null;renderNavigation();}},{passive:true,capture:true});
 
-document.addEventListener('click',async event=>{const button=event.target.closest('[data-draft-decision]');if(!button||writeBusy)return;try{writeBusy=true;button.disabled=true;await mutate('draft_decision',{id:button.dataset.id,approve:button.dataset.draftDecision==='approve'});}catch(error){toast(error.message);}finally{writeBusy=false;button.disabled=false;}});
+document.addEventListener('click',async event=>{const button=event.target.closest('[data-draft-decision]');if(!button||writeBusy)return;if(button.dataset.draftDecision==='approve'&&state.data.chargeDrafts?.find(d=>d.id===button.dataset.id)?.payload?.debt_group==='capital'){await levyUI.openAdmin();return;}try{writeBusy=true;button.disabled=true;await mutate('draft_decision',{id:button.dataset.id,approve:button.dataset.draftDecision==='approve'});}catch(error){toast(error.message);}finally{writeBusy=false;button.disabled=false;}});
 
 document.addEventListener('submit',async event=>{
  const form=event.target;if(!form.matches('[data-contact-request],[data-contact-review]'))return;event.preventDefault();if(writeBusy)return;

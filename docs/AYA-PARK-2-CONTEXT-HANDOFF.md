@@ -1,4 +1,14 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Sonderumlagen vollständig lokal geprüft, Backend aktiv – 31.10.2026
+
+Vorhandene Entwurfs-/Restcent-Verteilung und Superadmin-Freigabe gezielt erweitert: eigene Eigentümervorschau, getrennte private Beschlussreferenz und drei explizite Prüfbestätigungen, dokumentierter Verantwortlichkeitszeitpunkt sowie zusätzliche endgültige Buchungsbestätigung. Historische Eigentümer nur ausdrücklich und bei zeitlich belegter Zuordnung, keine Altlastenübertragung auf Nachfolger. Neue Kapital-Sammelforderungen ausschließlich über die dokumentierte bestehende Entwurfsfreigabe; direkter V5-Aufruf gesperrt. Kein zweites Buchungs-/Verteilungssystem.
+
+55 isolierte SQL-, 74 native DE/TR-Browserprüfungen bei 375/1440 Pixeln und 308 allgemeine Tests bestanden; weitere aktuelle Finanz-/Historien-/Import-/Abschlussregressionen erfolgreich. Umfang, Rollen-/Quellengrenzen und Rückfallstrategie: PHASE-4-LEVY-AUDIT.md. Keine automatische juristische Beschluss-/Mehrheitsprüfung. Externer unterschriebener Nachweis bleibt über private Referenz auffindbar; Dateiarchiv ist weiterhin Phase 6.
+
+Backendmigration 20261030214643 aktiv und schreibgeschützt geprüft: 0 Reviewzeilen, 0 offene echte Kapitalentwürfe, RLS aktiv, kein direkter Clientzugriff auf den internen Finanzkern und keine anonyme Review-Ausführung. Keine produktiven Bewohner-/Auth-/Finanzzeilen geändert. GitHub-CI und tatsächliche Frontend-Auslieferung dieses Schritts noch separat bestätigen. Ältere Hinweise „nur Vorbereitung/keine Buchungsintegration“ sind für den jetzt geprüften Entwicklungsstand überholt, bedeuten aber keinen bereits bestätigten Frontend-Livegang.
+
+Nächster Schritt nach Veröffentlichung: Phase 5 Budget/Rücklagen/Liquidität. Bestehende Budgetbasis zuerst prüfen und weiterverwenden; Monats-/Jahresplanung und vorsichtige 3–6-Monats-Vorschau ergänzen. Nur echte Bankmittel als liquide Mittel behandeln, erwartete Forderungseingänge getrennt halten; keine automatische Rücklagenentnahme oder Zahlung. Backup bleibt auf ausdrücklichen Nutzerwunsch übersprungen.
+
 ## Bestätigter Live-Stand und laufende Sonderumlagenvorbereitung – 30.10.2026
 
 Abschlüsse (#69) und getrennte Summenfreigaben (#70) nach erfolgreicher CI veröffentlicht. Hauptzweig 7e7033b83ab57d7364ccd6e97ca8b3c30eb0214d; CI #69: 41121725509, CI #70: 41122681590 jeweils erfolgreich. Pages 41122968436 erfolgreich. Der frühere Pages-Lauf für #69 wurde durch den nachfolgenden #70-Lauf ersetzt; keinen separaten #69-Pages-Erfolg behaupten. Live ausgelieferte app.mjs, index.html, period-closing-ui.mjs, public-reports.html, public-reports.mjs, public-reports.css, report-release-ui.mjs und released-report-model.mjs bytegleich mit dem geprüften Release. Backendmigrationen 20261030201427 und 20261030202050 aktiv, weiterhin 0 echte Abschlüsse/Freigaben. Keine automatisch veröffentlichten Finanzsummen und keine produktiven Testbuchungen.
