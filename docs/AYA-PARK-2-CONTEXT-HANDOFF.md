@@ -124,3 +124,55 @@ Der Benutzer hat ausdrücklich verlangt, dass das Backup nicht nur DB + Dateien,
 - Backup-Entwurf PR: https://github.com/kemcap/ayapark2/pull/52
 - Backup-Anleitung im Entwurfsbranch: https://github.com/kemcap/ayapark2/blob/feature/free-backup-preparation-20261028/docs/FREE-BACKUP-SETUP.md
 - Supabase offizielle Migration zu Self-Hosting: https://supabase.com/docs/guides/self-hosting/restore-from-platform
+
+
+## Fortsetzung 30.10.2026 – aktueller Phase-1-Zwischenstand
+
+Der bisherige Backup-Entwurf aus PR #52 bleibt gesperrt; der aktive DB-Workflow auf main ist davon unabhängig. Ein neuer separater Arbeitsbranch feature/phase1-restore-preflight-20261030 baut auf dem PR-#52-Branch auf. Dort liegen ein ausschließlich lokaler PostgreSQL-17-Dump-Preflight, sechs synthetisch bestandene Unit-Tests und docs/PHASE1-RESTORE-GATE-20261030.md. **Es gab keinen echten Restore, keinen Merge, keine Aktivierung und keine produktive Änderung.**
+
+Read-only am 30.10. live bestätigt: 42 Public-Tabellen mit RLS, 0 Storage-Buckets/Objekte, sieben aktive Edge Functions, PostgreSQL 17.11. Die sieben Live-index.ts-Dateien stimmen mit GitHub main überein, Module benötigen bei Redeployment teilweise angepasste relative Importpfade. In privatem Google Drive liegen vier .dump.age-Archive und eine Testdatei; kein Gesamt-.tar.age-Archiv nachgewiesen.
+
+**Nächstes Gate:** echtes .dump.age lokal mit dem bereits vorhandenen privaten age-Schlüssel auf dem geschützten Gerät entschlüsseln und offline prüfen; anschließend ein ganz neues isoliertes Restore-Ziel und versionsgebundene Auth-/RLS-/Storage-Tests durchführen. Secret-Dateien nicht im Chat teilen. Erfolgreiches Gesamtbackup und vollständiger Restore bleiben zwingende Voraussetzung für Freigabe/Phase-1-Abschluss.
+
+
+### Cloud-first-Abgleich 30.10.2026
+
+- [x] Google Drive (privater Ordner AyaPark2-Backups) bleibt externes Speicherziel, Google Cloud bisher OAuth-Anbindung; kein GCS-Bucket und kein kostenpflichtiger Plan aktiviert.
+- [x] `scripts/backup/test_synthetic_restore.sh` und `.github/workflows/phase1-synthetic-restore.yml` für eine cloudbasierte PostgreSQL-17-/age-/RLS-Wiederherstellungsprobe ausschließlich mit künstlichen Daten in separatem Branch vorbereitet. Keine Produktionssecrets, keine Live-Verbindungen.
+- [x] Sechs Unit-Tests für Offline-Dump-Prüfung tatsächlich lokal erfolgreich durchgelaufen.
+- [ ] GitHub-Actions-Synthetic-Restore-CI: erfolgreicher Lauf **noch nicht nachgewiesen**; Teststatus vor Freigabe prüfen.
+- [ ] Echte Produktiv-.dump.age-Datei sicher entschlüsseln und isoliert wiederherstellen. Privater age-Schlüssel bleibt beim Benutzer; Cloud-Verwendung personenbezogener Daten und Entschlüsselung benötigen ausdrücklich genehmigten Sicherheitsablauf. Kein echter Restore stattgefunden.
+- [ ] Gesamtbackup, externer .tar.age-Rundlauf, Verschlüsselung, Storage/Git/Edge-Function-/Auth- und Migrationstests weiter offen.
+
+Aktueller ausführlicher Plan und Sicherheitsgrenzen: `docs/PHASE1-RESTORE-GATE-20261030.md`. Ältere Mac-only-Anweisungen sind keine Entscheidung für den Backup-Speicher; der Speicherort bleibt Google Drive.
+
+
+## Prüfnachweis 30.10.2026 – erweiterter kompletter SYNTHETISCHER Cloud-Test
+
+- [x] GitHub Actions Lauf **41098709384**, Job synthetic-restore **SUCCESS**: 12 Python-Unit-Tests sowie verschlüsselter PostgreSQL-17-Dump, Entschlüsselung, isolierter DB-Restore und RLS-Positiv-/Negativprüfungen bestanden. Job-Logs tatsächlich überprüft.
+- [x] Zusätzlicher portabler synthetischer Test scripts/backup/test_portable_archive.py ergänzt: eigener Mini-Git-Repo-/Assets-/Edge-Function-Stand; private synthetische Storage-Datei; Manifest mit SHA-256; tar→age, Entschlüsselung, Archiv-Prüfung, Git-Spiegel-Clone ohne Ursprungsrepo; kaputte/fehlende Storage-Datei wird erkannt.
+- [x] Erster erweiterter Lauf **41099538759** meldete FAIL. **Ursache tatsächlich gefunden:** export_storage.py schreibt Storage-Pfade im index.json relativ zum Storage-Ordner (`objects/…`), verify_snapshot.py verglich aber gegen Manifest-Pfade relativ zum Archiv (`storage/objects/…`). Das wurde in verify_snapshot.py korrigiert und die Pfadvalidierung verbessert.
+- [x] GitHub Actions Lauf **41099870196** zum korrigierten Stand **SUCCESS**: synthetischer vollständiger Archivtest und PostgreSQL-17-/RLS-Restore erfolgreich (kein Real-Dump, keine Produktiv-Secrets).
+- [x] scripts/backup/backup.sh: Nach Google-Drive-Upload für vollständige .tar.age-Sicherung wird künftig tatsächlicher Remote-Ciphertext per rclone cat gelesen und SHA-256 mit lokalem Ciphertext verglichen. **Dieser Remote-Schritt wurde noch nicht mit einem echten vollständigen Google-Drive-Backup getestet.**
+- [ ] Echter vollständiger verschlüsselter Projekt-Snapshot (.tar.age) von Produktion nach Google Drive und unabhängige Wiederherstellung weiterhin offen; Gesamtbackup-Workflow bleibt gesperrt.
+- [ ] Echtes vorhandenes .dump.age mit privatem age-Schlüssel in geschützter Umgebung entschlüsseln; DB/Auth/RLS/Storage-/App-Restore auf frischer isolierter Umgebung noch offen.
+- [ ] OAuth-Produktionseinstellung und langfristige rclone-Token-Eignung noch prüfen. Keine neuen Secrets in GitHub abgelegt.
+- [ ] Veralteten Draft PR #52 vor Zusammenführung in main mit aktuellem Produktivbranch abgleichen. Draft #68 bleibt zunächst auf #52 gestapelt. **Kein Merge und keine Aktivierung ohne ausdrückliche Freigabe.**
+
+**Nächster Sicherheits-Gate:** Für echten Restore ist die bisher nur auf dem Mac gesicherte private age-Identity notwendig. Die Backups bleiben in Google Drive; Mac ist nicht Backupspeicher. Ein Cloud-Restore mit echten Bewohner-/Auth-/Finanzdaten kann ohne den privaten Schlüssel nicht vollständig durchgeführt werden. Vor Übergabe der Entschlüsselungsfähigkeit an eine Cloud-Testumgebung ist ein gesondertes, ausdrücklich freigegebenes Vorgehen zum Schutz dieser Daten zu definieren.
+
+
+## Echt ausgeführtes separates App-Quellcode-Backup – 30.10.2026
+
+**Status dieser Teilaufgabe: erfolgreich gesichert und Remote-Ciphertext geprüft.** Keine realen Datenbankdaten berührt; kein Live-Deploy und keine Änderung an `main`.
+
+- One-time-Workflow (nur Push des neuen Workflowfiles im bestehenden Entwicklungsbranch): `.github/workflows/phase1-app-source-backup.yml`.
+- Echter GitHub-Actions-Lauf: https://github.com/kemcap/ayapark2/actions/runs/41100797096; Job-Protokoll enthält `Standalone source bundle and isolated mirror restore verified.` sowie `APP SOURCE BACKUP VERIFIED`.
+- Ziel: privater Ordner `AyaPark2-Backups` auf dem bestehenden Google Drive. Echter neuer Datei-Eintrag mit ID `1UZ2EDu-76R3mwh_DLBeLKgTA5HVfQ_JB`: https://drive.google.com/file/d/1UZ2EDu-76R3mwh_DLBeLKgTA5HVfQ_JB/view .
+- Dateiname: `ayapark2-app-source-20261030T174118Z-41100797096.tar.age`.
+- Tatsächliche Größe: **2.673.480 Bytes** (Google-Drive-Metadaten separat geprüft).
+- Verschlüsselt mit demselben bestehenden **öffentlichen age-Empfänger** wie das tägliche Datenbankbackup; kein privater Schlüssel übertragen, keine neuen Geheimnisse erstellt.
+- Gesicherter `origin/main`-Commit: `03a223eb12f0c42d74ee157fd4ee2dcb4cc5a24e`; Live-Hauptbranch vor Backup abgeglichen. Enthalten ist der Git-Bundle-Snapshot mit allen erreichten Referenzen, versioniertem App-Quellcode, Designs, Dateien in `assets/`, Edge-Function-Quellcode, Tags und erreichbarer Versionshistorie. **Nicht** gesichert sind unversionierte lokale Daten, GitHub-Issues/-PRs, Secrets, externe Dokumente oder produktive Datenbank.
+- Verschlüsselter SHA-256-Prüfwert (lokal berechnet und durch unabhängiges `rclone cat` des tatsächlich von Google Drive erneut heruntergeladenen Ciphertexts erfolgreich bestätigt): `f6ad740ee4799892e9545abf3a550ad188851490aa6baee96f447838112d901f`.
+- Das Git-Bundle wurde **vor Verschlüsselung unabhängig rekonstruiert** und `git fsck --full --strict` geprüft. **Nicht** durchgeführt wurde eine wirkliche `age`-Entschlüsselung dieses *realen* Archivs mit der privaten age-Identity (liegt nur beim Benutzer). Dieser letzte Test sowie der echte Datenbank-/Auth-/RLS-/Storage-/App-Restore sind weiterhin offene Phase-1-Gates.
+- Täglicher DB-only-Workflow bleibt unverändert; kein zweiter DB-Workflow oder automatischer App-Sicherungs-Zeitplan aktiviert.

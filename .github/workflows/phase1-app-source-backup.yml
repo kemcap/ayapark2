@@ -1,0 +1,112 @@
+name: AyaPark 2 - One-time encrypted app source backup to Google Drive
+
+on:
+  push:
+    branches:
+      - feature/phase1-restore-preflight-20261030
+    paths:
+      - .github/workflows/phase1-app-source-backup.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ayapark2-onetime-app-source-backup
+  cancel-in-progress: false
+
+jobs:
+  backup-source:
+    if: github.repository == 'kemcap/ayapark2' && github.ref == 'refs/heads/feature/phase1-restore-preflight-20261030'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Full repository checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Install encryption and Google Drive tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends age rclone python3
+
+      - name: Independently restore, encrypt, upload and re-read entire app source
+        shell: bash
+        env:
+          RCLONE_CONFIG_B64: ${{ secrets.AY_BACKUP_RCLONE_CONFIG_B64 }}
+        run: |
+          set -Eeuo pipefail
+          umask 077
+          if [[ -z "${RCLONE_CONFIG_B64:-}" ]]; then
+            echo "::error::Existing AY_BACKUP_RCLONE_CONFIG_B64 GitHub secret is missing."
+            exit 1
+          fi
+
+          scratch="$(mktemp -d)"
+          trap 'rm -rf "$scratch"' EXIT
+          chmod 700 "$scratch"
+          export RCLONE_CONFIG="$scratch/rclone.conf"
+          printf '%s' "$RCLONE_CONFIG_B64" | base64 --decode > "$RCLONE_CONFIG"
+          unset RCLONE_CONFIG_B64
+          chmod 600 "$RCLONE_CONFIG"
+
+          # Include the CURRENT main, all remote branches and tags, not just
+          # the (older) backup-development branch's local commit history.
+          git fetch --force --prune origin \
+            '+refs/heads/*:refs/remotes/origin/*' \
+            '+refs/tags/*:refs/tags/*'
+          test "$(git rev-parse --is-shallow-repository)" = false
+          remote_main="$(git ls-remote --heads origin main | awk '{print $1}')"
+          saved_main="$(git rev-parse refs/remotes/origin/main)"
+          test -n "$remote_main"
+          if [[ "$remote_main" != "$saved_main" ]]; then
+            echo "::error::Origin main changed during fetch. Retry source backup."
+            exit 1
+          fi
+
+          python3 scripts/backup/export_source.py . "$scratch/source"
+
+          # The exporter already verified Git bundle restoration in a new
+          # independent mirror and checked tags/refs/history and Git objects.
+          python3 - "$scratch" "$saved_main" <<'PY'
+          import hashlib, json, pathlib, sys
+          root, main = pathlib.Path(sys.argv[1]), sys.argv[2]
+          index = json.loads((root / "source/refs.json").read_text())
+          assert index["standalone_mirror_verified"] is True
+          assert index["refs"]["refs/remotes/origin/main"] == main
+          files = {}
+          for file in sorted((root / "source").iterdir()):
+              if file.is_file():
+                  data = file.read_bytes()
+                  files[file.name] = {"bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+          assert all(name in files for name in ("repository.bundle", "refs.json", "head-tree.txt"))
+          (root / "manifest.json").write_text(json.dumps({
+              "format": "ayapark-app-source-1", "repository": "kemcap/ayapark2",
+              "live_main_sha": main, "files": files,
+              "scope": "Git versioned source, tracked assets, Edge Functions, branches, tags and reachable history",
+              "excludes": "Production database, credentials, untracked files, externally hosted media and platform configuration"
+          }, indent=2, sort_keys=True) + "\n")
+          PY
+
+          timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+          name="ayapark2-app-source-${timestamp}-${GITHUB_RUN_ID}.tar.age"
+          output="$scratch/$name"
+          tar -C "$scratch" -cf - source manifest.json | \
+            age -r 'age1amttspnqe7l3sdk3g4c725qgr0ta5a7x4as5fjd782wlkvvpjvmselx87p' -o "$output"
+          test -s "$output"
+          target="drive:AyaPark2-Backups/$name"
+
+          # Never upload plaintext, a secret key, or the rclone config.
+          rclone copyto "$output" "$target" --retries 3 --low-level-retries 5
+          local_hash="$(sha256sum "$output" | awk '{print $1}')"
+          remote_hash="$(rclone cat "$target" | sha256sum | awk '{print $1}')"
+          if [[ "$local_hash" != "$remote_hash" ]]; then
+            echo "::error::Google Drive backup ciphertext SHA-256 mismatch."
+            exit 1
+          fi
+
+          echo "APP SOURCE BACKUP VERIFIED: $target"
+          echo "CURRENT LIVE MAIN INCLUDED: $saved_main"
+          echo "ENCRYPTED ARCHIVE BYTES: $(stat -c %s "$output")"
+          echo "CIPHERTEXT SHA-256: $local_hash"

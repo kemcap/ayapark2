@@ -83,4 +83,12 @@ tar -C "$TEMP/export" -cf - . | age -r "$BACKUP_AGE_RECIPIENT" -o "$OUT"
 test -s "$OUT"
 rclone --config "$TEMP/rclone.conf" copyto "$OUT" "$RCLONE_REMOTE_DEST/$NAME" --retries 3 --low-level-retries 5
 rclone --config "$TEMP/rclone.conf" lsf "$RCLONE_REMOTE_DEST" --files-only | grep -Fxq "$NAME"
-echo "Encrypted offsite backup uploaded and listed successfully: $NAME"
+# Check the actual remote ciphertext, not only the filename listing. No key or
+# plaintext is sent to Google Drive; hashes are over encrypted bytes.
+local_hash="$(sha256sum "$OUT" | awk '{print $1}')"
+remote_hash="$(rclone --config "$TEMP/rclone.conf" cat "$RCLONE_REMOTE_DEST/$NAME" | sha256sum | awk '{print $1}')"
+if [[ "$local_hash" != "$remote_hash" ]]; then
+  echo "Backup upload verification failed: ciphertext checksum mismatch." >&2
+  exit 1
+fi
+echo "Encrypted offsite backup uploaded and SHA-256 verified: $NAME"
