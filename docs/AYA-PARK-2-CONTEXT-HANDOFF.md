@@ -1,4 +1,14 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Bestätigter Live-Stand und laufende Sonderumlagenvorbereitung – 30.10.2026
+
+Abschlüsse (#69) und getrennte Summenfreigaben (#70) nach erfolgreicher CI veröffentlicht. Hauptzweig 7e7033b83ab57d7364ccd6e97ca8b3c30eb0214d; CI #69: 41121725509, CI #70: 41122681590 jeweils erfolgreich. Pages 41122968436 erfolgreich. Der frühere Pages-Lauf für #69 wurde durch den nachfolgenden #70-Lauf ersetzt; keinen separaten #69-Pages-Erfolg behaupten. Live ausgelieferte app.mjs, index.html, period-closing-ui.mjs, public-reports.html, public-reports.mjs, public-reports.css, report-release-ui.mjs und released-report-model.mjs bytegleich mit dem geprüften Release. Backendmigrationen 20261030201427 und 20261030202050 aktiv, weiterhin 0 echte Abschlüsse/Freigaben. Keine automatisch veröffentlichten Finanzsummen und keine produktiven Testbuchungen.
+
+303 allgemeine Tests, 46 Abschluss-SQL-, 29 Freigabe-SQL-, 22 Abschluss-Browser- und 24 Freigabe-Browserprüfungen bestanden. Frühere Hinweise „Frontend noch offen“ dieser abgeschlossenen Schritte sind überholt. Pflichtbestätigungen für echte Bankabschlüsse und tatsächliche Summenfreigaben bleiben bewusste Bedienhandlungen des Superadmins.
+
+Nächster Roadmapschritt bereits begonnen: Sonderumlagen-/Beschlussnachweise. Bestandsabgleich in PHASE-4-LEVY-AUDIT.md; vorhandene Verteilungs- und Entwurfsfreigabe wird weiterverwendet. Im separaten Branch feature/levy-review-preparation-20261030: neuer Entwicklungskandidat levy-review.sql mit 28 isolierten Prüfungen für private Beschlussdokumentation, explizite eigene Eigentümervorschau, historischen Verantwortlichkeitszeitpunkt, Entwurfsbindung, Widerruf und Audit. **Nur vorbereitet und getestet, nicht produktiv installiert.** UI, Bindung an endgültige Buchungsfreigabe, historische Auswahl in diesem Buchungsweg und Gesamtabnahme bleiben offen. Kein neuer produktiver Schuldner-/Beschlussdatensatz und keine echte Forderung erzeugt. Nicht als fertige Sonderumlagenfunktion markieren.
+
+Danach weiterhin offen: Budget/Rücklagen/Liquidität, private Dokumente/Versammlungen, Aufgaben/Erinnerungen sowie restliche Auth-/Mail-/Gerätegesamtabnahme. Backup gemäß ausdrücklichem Nutzerauftrag nicht erneut bearbeitet.
+
 ## Abschlussfunktion veröffentlicht; Summenfreigabe folgt – 30.10.2026
 
 PR #69 nach erfolgreicher CI 41121725509 gemergt; Hauptzweig a3b4a067a5b66101d75aae8ae3cc265de88b02b7. Backend-Abschlüsse (Migration 20261030201427) aktiv, Frontend-Pages-Auslieferung wird separat bestätigt. 46 Abschluss-SQL-, 22 Browser- und 299 allgemeine Prüfungen sowie aktuelle Finanz-/Rechte-/Historienregressionen bestanden. Kein echter Zeitraum abgeschlossen.
