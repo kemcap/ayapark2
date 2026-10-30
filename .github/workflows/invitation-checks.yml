@@ -8,6 +8,7 @@ on:
       - '**/*.css'
       - '**/*.html'
       - 'tests/**'
+      - 'scripts/import/**'
       - 'package*.json'
       - '.github/workflows/invitation-checks.yml'
   push:
@@ -71,6 +72,8 @@ jobs:
           npm run test:rights:sql
           npm run test:contacts:sql
           npm run test:history:sql
+      - name: Read-only bank statement inspection checks
+        run: python3 -m unittest discover -s tests -p test_bank_statement_inspection.py
       - name: Current financial integration SQL checks
         run: |
           npm run test:finance:sql
