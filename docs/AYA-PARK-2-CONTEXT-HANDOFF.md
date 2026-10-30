@@ -133,3 +133,15 @@ Der bisherige Backup-Entwurf aus PR #52 bleibt gesperrt; der aktive DB-Workflow 
 Read-only am 30.10. live bestätigt: 42 Public-Tabellen mit RLS, 0 Storage-Buckets/Objekte, sieben aktive Edge Functions, PostgreSQL 17.11. Die sieben Live-index.ts-Dateien stimmen mit GitHub main überein, Module benötigen bei Redeployment teilweise angepasste relative Importpfade. In privatem Google Drive liegen vier .dump.age-Archive und eine Testdatei; kein Gesamt-.tar.age-Archiv nachgewiesen.
 
 **Nächstes Gate:** echtes .dump.age lokal mit dem bereits vorhandenen privaten age-Schlüssel auf dem geschützten Gerät entschlüsseln und offline prüfen; anschließend ein ganz neues isoliertes Restore-Ziel und versionsgebundene Auth-/RLS-/Storage-Tests durchführen. Secret-Dateien nicht im Chat teilen. Erfolgreiches Gesamtbackup und vollständiger Restore bleiben zwingende Voraussetzung für Freigabe/Phase-1-Abschluss.
+
+
+### Cloud-first-Abgleich 30.10.2026
+
+- [x] Google Drive (privater Ordner AyaPark2-Backups) bleibt externes Speicherziel, Google Cloud bisher OAuth-Anbindung; kein GCS-Bucket und kein kostenpflichtiger Plan aktiviert.
+- [x] `scripts/backup/test_synthetic_restore.sh` und `.github/workflows/phase1-synthetic-restore.yml` für eine cloudbasierte PostgreSQL-17-/age-/RLS-Wiederherstellungsprobe ausschließlich mit künstlichen Daten in separatem Branch vorbereitet. Keine Produktionssecrets, keine Live-Verbindungen.
+- [x] Sechs Unit-Tests für Offline-Dump-Prüfung tatsächlich lokal erfolgreich durchgelaufen.
+- [ ] GitHub-Actions-Synthetic-Restore-CI: erfolgreicher Lauf **noch nicht nachgewiesen**; Teststatus vor Freigabe prüfen.
+- [ ] Echte Produktiv-.dump.age-Datei sicher entschlüsseln und isoliert wiederherstellen. Privater age-Schlüssel bleibt beim Benutzer; Cloud-Verwendung personenbezogener Daten und Entschlüsselung benötigen ausdrücklich genehmigten Sicherheitsablauf. Kein echter Restore stattgefunden.
+- [ ] Gesamtbackup, externer .tar.age-Rundlauf, Verschlüsselung, Storage/Git/Edge-Function-/Auth- und Migrationstests weiter offen.
+
+Aktueller ausführlicher Plan und Sicherheitsgrenzen: `docs/PHASE1-RESTORE-GATE-20261030.md`. Ältere Mac-only-Anweisungen sind keine Entscheidung für den Backup-Speicher; der Speicherort bleibt Google Drive.
