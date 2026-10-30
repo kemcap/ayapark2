@@ -1,0 +1,34 @@
+import {PGlite} from '@electric-sql/pglite';
+import {readFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const db=new PGlite(),site='20000000-0000-0000-0000-000000000001',id=n=>'aa000000-0000-0000-0000-'+String(n).padStart(12,'0'),user=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');let passed=0;
+const q=async(sql,args=[])=>Object.values((await db.query(sql,args)).rows[0]||{})[0];
+const check=(name,value)=>{assert(value,name);passed++;};
+const as=async n=>{await db.exec('reset role;set role authenticated');await q("select set_config('request.jwt.claims',$1,false)",[JSON.stringify({sub:user(n),role:'authenticated'})]);};
+const deny=async f=>{await assert.rejects(f,{code:'42501'});passed++;};
+const request=(pid,r,email,phone)=>q('select public.ay3_request_contact_change($1,$2,$3,$4,$5)',[site,pid,r,email,phone]);
+const decide=(r,yes=true,verified=true)=>q('select public.ay3_decide_contact_change($1,$2,$3,$4,$5)',[site,r,yes,verified,'Synthetic verification performed']);
+try{
+ for(const file of ['schema.sql','../../supabase/migrations/20261030063848_phase2_contact_change_requests.sql'])await db.exec(await readFile(new URL(file,import.meta.url),'utf8'));
+ await db.exec(`insert into public.site_blocks(id,site_id,code) values('${id(1)}','${site}','A');insert into public.site_units(id,site_id,block_id,number,code) values('${id(2)}','${site}','${id(1)}',1,'A-1');insert into public.site_resident_units(unit_id,user_id,role,active) values('${id(2)}','${user(3)}','tenant',true);insert into public.ay3_persons(id,site_id,full_name,email,phone,auth_user_id) values('${id(3)}','${site}','Synthetic resident','old@example.invalid','+905551234567','${user(3)}'),('${id(4)}','${site}','Other person','other@example.invalid','','${user(2)}');insert into public.site_staff_memberships(site_id,user_id,role) values('${site}','${user(2)}','deputy');insert into public.ay2_permissions(site_id,user_id,capabilities) values('${site}','${user(2)}',array['people']);`);
+ await as(3);await assert.rejects(()=>request(id(3),id(22),'valid@example.invalid','--- ---'));passed++;await assert.rejects(()=>request(id(3),id(20),'invalid email',''));passed++;await assert.rejects(()=>request(id(3),id(21),'valid@example.invalid','invalid letters'));passed++;await deny(()=>request(id(4),id(5),'attack@example.invalid',''));
+ const r=await request(id(3),id(6),'new@example.invalid','+905559999999');check('idempotent submission',r===await request(id(3),id(6),'new@example.invalid','+905559999999'));
+ await assert.rejects(()=>request(id(3),id(7),'another@example.invalid',''));passed++;
+ await deny(()=>db.query("update public.ay3_contact_requests set status='approved' where id=$1",[r]));
+ check('request cannot expose someone else',((await q('select public.ay3_contact_workspace($1)',[site])).persons).every(p=>p.id===id(3)));
+ await deny(()=>decide(r));await as(2);check('unrelated management cannot read contact requests',await q('select count(*)::int from public.ay3_contact_requests')===0);await deny(()=>decide(r));await db.exec('reset role');
+ await deny(()=>db.query('update public.ay3_persons set email=$1 where id=$2',['bypass@example.invalid',id(3)]));
+ await as(1);check('request leaves current contacts unchanged',await q('select email from public.ay3_persons where id=$1',[id(3)])==='old@example.invalid');
+ await assert.rejects(()=>decide(r,true,false));passed++;
+ check('verified admin approval succeeds',(await decide(r)).status==='approved');
+ check('approval retry stable',(await decide(r)).already_decided===true);
+ check('directory changed',await q('select email from public.ay3_persons where id=$1',[id(3)])==='new@example.invalid');
+ await db.exec('reset role');check('Auth email and account id untouched',await q('select email from auth.users where id=$1',[user(3)])==='qa-resident@example.invalid'&&await q('select auth_user_id from public.ay3_persons where id=$1',[id(3)])===user(3));
+ await as(3);const stale=await request(id(3),id(8),'later@example.invalid','');await as(1);await db.exec('reset role');await db.query('update public.ay3_persons set phone=$1 where id=$2',['+905558888888',id(3)]);
+ await assert.rejects(()=>decide(stale));passed++;
+ check('stale approval leaves request pending',await q('select status from public.ay3_contact_requests where id=$1',[stale])==='pending');
+ await decide(stale,false,false);check('rejection does not overwrite contacts',await q('select email from public.ay3_persons where id=$1',[id(3)])==='new@example.invalid');
+ await as(3);const withdraw=await request(id(3),id(9),'withdraw@example.invalid','');await q('select public.ay3_withdraw_contact_change($1,$2)',[site,withdraw]);check('withdraw own pending request',await q('select status from public.ay3_contact_requests where id=$1',[withdraw])==='withdrawn');
+ await db.exec('reset role;set role anon');await deny(()=>request(id(3),id(10),'anon@example.invalid',''));
+ console.log(JSON.stringify({passed,failed:0,scope:'synthetic isolated contact request lifecycle; no Auth writes'}));
+}catch(e){console.error(e.message);process.exitCode=1;}finally{await db.close();}

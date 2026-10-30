@@ -1,6 +1,6 @@
 import {lawPage} from './law-info.mjs?v=5.8.1';
 import {decorateModernPage} from './modern-ui.mjs?v=5.8.1';
-import {settingsPage} from './settings-ui.mjs?v=5.9.28';
+import {settingsPage} from './settings-ui.mjs?v=5.9.30';
 import {effectiveOccupancy} from './relationships.mjs?v=5.8.1';
 import {peoplePage} from './people-ui.mjs?v=5.9.18';
 import {charges,duesV3,directoryV3,overviewV3,bankV3,reportV3,announcementsV3,providersV3,filteredUnitsV3,unitDetailV3,transactionDetailV3,transactionTableV3} from './v3-ui.mjs?v=5.9.29';

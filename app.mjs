@@ -1,3 +1,4 @@
+import {contactError} from './contact-requests.mjs?v=5.9.30';
 import {mayUseTaskAction} from './task-permissions.mjs?v=5.9.28';
 import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.9.2';
 import {bindAccessRequests} from './access-request-ui.mjs?v=5.9.0';
@@ -23,7 +24,7 @@ import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.8.1';
-import {AyaparkApi} from './api.mjs?v=5.9.28';
+import {AyaparkApi} from './api.mjs?v=5.9.30';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.25';
 import {buildForm,payloadFor} from './forms.mjs?v=5.9.28';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
@@ -113,6 +114,14 @@ async function reload(){const stop=beginLoading($('contextText'));try{const atte
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
  if(action==='person_link')action='link';
+ if(action.startsWith('contact_')){
+  if(isAccessPreview()||state.mode!=='connected')throw Error('Access denied');
+  const p_site=state.data.site.id;
+  const result=action==='contact_request'?await api.rpc('ay3_request_contact_change',{p_site,p_person:payload.person_id,p_request:payload.request_id,p_email:payload.email,p_phone:payload.phone}):action==='contact_decide'?await api.rpc('ay3_decide_contact_change',{p_site,p_id:payload.id,p_approve:payload.approve,p_verified:payload.verified,p_reason:payload.reason}):action==='contact_withdraw'?await api.rpc('ay3_withdraw_contact_change',{p_site,p_id:payload.id}):null;
+  if(result===null&&action!=='contact_withdraw')throw Error('Unknown contact action');
+  await reload();return result;
+ }
+
  if(action==='draft_decision'){if(isAccessPreview()||state.mode!=='connected'||!can(state,'admin'))throw Error('Access denied');const r=await api.rpc('ay3_decide_charge_draft',{p_site:state.data.site.id,p_id:payload.id,p_approve:payload.approve});await reload();return r;}
  if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
  if(state.mode==='demo'&&action==='user_access')return {ok:true};
@@ -616,3 +625,14 @@ setInterval(()=>void refreshWhenIdle(),90000);window.addEventListener('focus',()
 window.addEventListener('scroll',event=>{if(mobileNavGroup!==null&&closeMenuOnScroll(event,$('nav'))){mobileNavGroup=null;renderNavigation();}},{passive:true,capture:true});
 
 document.addEventListener('click',async event=>{const button=event.target.closest('[data-draft-decision]');if(!button||writeBusy)return;try{writeBusy=true;button.disabled=true;await mutate('draft_decision',{id:button.dataset.id,approve:button.dataset.draftDecision==='approve'});}catch(error){toast(error.message);}finally{writeBusy=false;button.disabled=false;}});
+
+document.addEventListener('submit',async event=>{
+ const form=event.target;if(!form.matches('[data-contact-request],[data-contact-review]'))return;event.preventDefault();if(writeBusy)return;
+ const values=new FormData(form),review=form.matches('[data-contact-review]'),approve=event.submitter?.value==='approve',status=form.querySelector('[data-contact-status]');
+ if(review&&approve&&!values.has('verified')){status.textContent=getLanguage()==='de'?'Bitte bestätigen Sie die unabhängige Prüfung.':'Lütfen bağımsız doğrulamayı onaylayın.';return;}
+ try{writeBusy=true;for(const b of form.querySelectorAll('button'))b.disabled=true;
+ await mutate(review?'contact_decide':'contact_request',review?{id:form.dataset.id,approve,verified:values.has('verified'),reason:String(values.get('reason')||'')}:{person_id:values.get('person_id'),request_id:values.get('request_id'),email:values.get('email'),phone:values.get('phone')});
+ toast(getLanguage()==='de'?'Antrag gespeichert.':'Talep kaydedildi.');
+ }catch(error){status.textContent=contactError(error.message);}finally{writeBusy=false;for(const b of form.querySelectorAll('button'))b.disabled=false;}
+});
+document.addEventListener('click',async event=>{const b=event.target.closest('[data-contact-withdraw]');if(!b||writeBusy)return;try{writeBusy=true;b.disabled=true;await mutate('contact_withdraw',{id:b.dataset.contactWithdraw});}catch(error){toast(error.message);}finally{writeBusy=false;b.disabled=false;}});
