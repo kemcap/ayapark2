@@ -1,26 +1,41 @@
-# Budget, Rücklagen und Liquidität – Vorbereitung 31.10.2026
+# Budget, Rücklagen und Liquidität – Integration 31.10.2026
 
-## Bestand geprüft
+## Bestand erhalten
 
-`ay5_budget` und der vorhandene `budget`-Befehl enthalten zweckgebundene Rücklagen, geplante Ausgaben, Begründung, Akteur und Zeitpunkt. `availableBudget` berechnet bereits Bankbestand minus gebundene und geplante Mittel. Finanzleserechte schützen Details, Änderungen sind Superadmin vorbehalten; vorhandene Änderungsaudits werden weiterverwendet.
+`ay5_budget`, der bestehende `budget`-Befehl und `availableBudget` bleiben die Grundlage. Zweckgebundene Rücklagen, alte Planpauschale, Begründungen und bisherige Audits werden nicht konvertiert oder gelöscht. Neue Planpositionen sind Budgetmetadaten, keine Bewohnerforderungen oder Bankbuchungen. Es gibt keine neue delegierte Berechtigung: tatsächliche Finanzleser lesen, nur Superadmin verändert Budgetdaten.
 
-Noch keine eigenständigen Monats-/Jahresplanpositionen, Reparaturplanung, nachvollziehbare Teilverbuchungen gegen Planpositionen, serverseitig bestätigte Rücklagenentnahme oder 3–6-Monats-Szenarien. Keine doppelte Budget-/Bankbuchhaltung anlegen.
+## Monats-/Jahresplanung und Szenarien
 
-## Isoliert vorbereiteter Rechenkern
+Monatspositionen für Ausgaben, Reparaturen und erwartete Einnahmen mit Entwurf/Planbestätigung/Stornierung. Versionsprüfung und idempotente Anfragen verhindern verlorene Änderungen und doppelte Wiederholungen; vorher/nachher, Akteur und Begründung sind auditiert. Bereits zugeordnete Bankbeträge schützen Betrag, Art und Stornierung gegen stillschweigende Änderungen. Für Korrekturen erst die Zuordnung nachvollziehbar zurücknehmen.
 
-`budget-planning.mjs` und neun reine Prüfungen: tatsächlicher Bankbestand wird getrennt von offenen Forderungen behandelt. Konservative Linie enthält keine angenommenen Geldeingänge; eine getrennte Szenariolinie darf ausdrücklich geplante Einnahmen enthalten. Alle noch nicht stornierten Ausgaben/Reparaturen, auch noch nicht freigegebene Pläne, belasten die vorsichtige Planung. Überfällige ungezahlte Plankosten werden in den ersten Vorschaumonat übernommen und verschwinden nicht durch Wechsel des Kalendermonats.
+Serverseitiger Ist-Stichtag ist das aktuelle Datum Europe/Istanbul. Bankbestand = bestätigter Anfangsbestand plus echte gebuchte Bewegungen seit Anfangsdatum bis Stichtag. Bewegungen vor dem Anfangsbestand werden nicht doppelt gezählt; zukünftige Buchungen und offene Forderungen erhöhen den heutigen Bankbestand nicht. Gegenbuchungen wirken nur über tatsächliche Buchungen. Unbekannter Anfangsbestand bleibt unbekannt, kein erfundener Nullsaldo.
 
-Bereits tatsächlich bankgebuchte Teilbeträge werden nicht erneut abgezogen. Zweckbindung verändert sich in der Simulation ausschließlich bei ausdrücklich freigegebenem Rücklageneinsatz; eine unbestätigte Planposition löst keine Reservefreigabe aus. Negative Bank-/freie Mittel bleiben als Unterdeckung sichtbar. Unbekannter Bankbestand ergibt keine erfundene Null-Liquidität. Exakte Centwerte, Grenzen, 3/6 Monate über Jahresgrenzen, Kalenderjahresbudget mit getrennten Reparaturen/Ausgaben/Einnahmen geprüft.
+3-/6-Monats-Vorschau mit zwei getrennten Linien: ohne weitere Einnahmen, sowie mit ausdrücklich geplanten Einnahmen als Annahme. Offene Forderungen werden separat angezeigt und niemals automatisch als Cash behandelt. Alle nicht stornierten Restkosten, auch Entwürfe, belasten die vorsichtige Planung. Überfällige ungezahlte Kosten erscheinen im ersten Vorschaumonat. Negative Liquidität und freie Mittel bleiben negativ sichtbar. Jahresplan trennt Einnahmen, laufende Ausgaben und Reparaturen; keine Vermischung mit tatsächlichen Bankberichten.
 
-Dies ist nur eine Prognoseberechnung, keine Zahlung, Finanzbuchung, Rücklagenentnahme oder rechtliche Beschlussprüfung. Nicht mit der produktiven Anwendung verbunden und noch nicht veröffentlicht.
+## Bereits gebuchte Teilbeträge
 
-## Nächste Integration
+Eine Zuordnung verweist auf eine echte passende Bankbewegung derselben Anlage. Keine künftige, stornierte, Transfer- oder falsche Vorzeichenbuchung. Summe aller aktiven Budgetzuordnungen je Bankbewegung überschreitet deren Betrag nicht; Summe je Plan überschreitet dessen Planbetrag nicht. Dies erzeugt weder eine zweite Bankbuchung noch eine Bewohnerzahlung/-forderung. Eine spätere Gegenbuchung entfernt den ursprünglichen Betrag aus der als bezahlt berücksichtigten Plansumme; Originale und Zuordnungsprotokoll bleiben erhalten. Zuordnungsrücknahme braucht Begründung.
 
-1. Vorhandene Budgetwerte erhalten. Alte summarische „geplante Ausgaben“ müssen ausdrücklich gegen neue Detailpositionen abgeglichen werden; nicht stillschweigend vergessen oder zusätzlich doppelt abziehen.
-2. Echten Bankbestand mit klarem Ist-Stichtag und nur tatsächlich gebuchten Bewegungen serverseitig berechnen. Zukünftige Buchungsdaten/offene Forderungen dürfen den heutigen Bankbestand nicht erhöhen.
-3. Planpositionen mit Monat, Kategorie, Reparaturstatus, Priorität und manueller Freigabe speichern; Originale/Audit bei Änderungen erhalten. Rollen-/RLS-Prüfung serverseitig, keine sechste delegierte Berechtigung erfinden.
-4. Bereits gebuchte Teilbeträge ausschließlich durch überprüfte Verknüpfung auf echte Bankbewegungen erfassen. Kein frei im Browser behaupteter „bezahlt“-Status als Ist-Nachweis. Auch dieselbe Bankbewegung nicht mehrfach budgetwirksam zuordnen.
-5. Separaten Superadmin-/Beschlussnachweis für Rücklagenverwendung vorsehen. Die reine Prognoseflagge ist noch keine sichere serverseitige Freigabe. Keine automatische Zahlung.
-6. DE/TR-Oberfläche mit Jahres-/Monatsplanung und klar beschrifteten 3-/6-Monats-Szenarien; Rechte, Salden, Planänderungen und mobile Bedienung isoliert sowie im Browser abnehmen.
+## Alte Pauschale ausdrücklich abgleichen
 
-Kein Produktivschema und keine echten Plan-/Finanzdaten für diese Vorbereitung verändert. Die bestehende Gesamtbudgetfunktion bleibt unverändert.
+Bei vorhandener alter Planpauschale wird die Detailprognose bis zum expliziten Abgleich gesperrt. Superadmin wählt entweder eine zusätzliche übernommene Kostenposition oder bestätigt, dass die alte Bruttosumme in vorhandenen Detailplänen abgebildet ist. Bereits echt bankgebuchte Teilbeträge solcher Detailpositionen werden anschließend nicht nochmals als künftiger Abfluss gezählt. Die Zuordnung der fachlich richtigen Kosten prüft der Administrator; Software beweist keine semantische Gleichheit unterschiedlicher Bezeichnungen.
+
+Ursprüngliche Pauschale bleibt erhalten. Eine neue manuelle Gesamtbudgetversion – auch bei identischen Zahlen – bekommt eine neue Planungsrevision und benötigt neuen Abgleich; idempotente Wiederholung erzeugt keine neue Revision. Eine reine dokumentierte Rücklagenfreigabe ändert diese Planungsrevision nicht. Nach Übernahme sind weitere Änderungen/Stornierungen der Detailpläne bewusste, auditiert begründete Planentscheidungen.
+
+## Rücklagenverwendung ohne Zahlung
+
+Eigene Superadmin-Freigabe mit Betrag, externer Beschluss-/Nachweisreferenz, Begründung, optional dokumentiertem Notfall und standardmäßig leerer Pflichtbestätigung. Betrag darf tatsächlichen Bankbestand und bestehende Zweckbindung nicht überschreiten. Reduziert ausschließlich die aktuelle Zweckbindung; keine Überweisung, Bankbuchung oder Forderung. Keine automatische juristische Prüfung der Beschluss-/Notfallgrundlage. Diese ist tatsächlich extern zu prüfen. Unveränderliches Freigabeprotokoll bewahrt vorher/nachher und Referenz; erneute gleiche Anfrage gibt dieselbe Entscheidung zurück.
+
+Auch der bisherige Budgetaufruf kann Zweckbindung nicht ohne diesen Ablauf reduzieren. Neue/erhöhte Zweckbindung bleibt über den bestehenden geprüften Befehl möglich. Die Prognose verwendet die bereits bestätigte aktuelle Zweckbindung und reduziert sie nicht ein zweites Mal. Private Nachweisreferenzen bleiben Superadmin vorbehalten; allgemeine Finanzleser sehen die Plansummen, nicht diese privaten Freigabequellen.
+
+## Oberfläche und Datenerhalt
+
+DE/TR, Monats-/Jahresauswahl, 3-/6-Monatskarten, klar getrennte erwartete Einnahmen, tatsächliche Bankteile, Rücklagenbindung und -freigabe. Alte pauschale Freisaldoanzeige führt im verbundenen Modus zur Detailplanung, damit alte und neue Kosten nicht als widersprüchliche Gesamtsumme dargestellt werden. Betragsverbergen wird über die vorhandene Maskierung auch auf die neuen Anzeigebeträge angewendet. Keine versteckten Beträge aus URL/Dauerspeicher. Dialogdaten beim Schließen entfernt, laufende Antwort bei Standort-/Sitzungswechsel verworfen.
+
+Neue Tabellen haben RLS; Clients können nicht direkt schreiben. Interne Cash-/Request-Helfer ohne Client-EXECUTE, alle öffentlichen Zugriffe mit tatsächlicher Rolle. Exakte Ausgangshashprüfung des Finanz-Wrappers verhindert Installation auf abweichendem Backend. Rollback ohne Datenverlust: vorherige Oberfläche wiederherstellbar, neue Serverfreigabe und Budget-/Auditmetadaten behalten. Nicht automatisch Rücklagenwerte, Zuordnungen oder Planhistorie löschen oder den alten ungeschützten Reduktionsweg wieder öffnen.
+
+## Nachweise und Veröffentlichung
+
+Neun reine Rechenkernprüfungen, 53 isolierte Datenbankprüfungen und 66 native DE/TR-Browserprüfungen bei 375/1440 Pixeln erfolgreich. Abgedeckt: echte Cash-Abgrenzung inklusive Voröffnung/Future, alte Pauschale und Bruttoteilzahlung, Versions-/Wiederholungskonflikte, doppelte Bankzuordnung, Rücknahmen, Bankgegenbuchung, keine automatische Zahlung, fehlender Bankbestand, dokumentierte Rücklagenfreigabe, Umgehungsversuche, Rechte und Audit. Zusätzlich allgemeine Suite 317 sowie aktuelle Finanz-/Historien-/Import-/Sonderumlagen-/Abschlussregressionen erfolgreich. Ausschließlich künstliche Testdaten; keine pauschale reale Auth-/Mail-/Gerätegesamtabnahme.
+
+Backendmigration 20261030221947_budget_plans_cash_forecast_and_reserve_approval erfolgreich installiert. Rein lesend bestätigt: 0 echte Planpositionen, 0 Budgetbankzuordnungen, 0 Rücklagenfreigaben; bisherige Budgetwerte per Hash unverändert. Keine anonymen Budgetaufrufe, kein direkter Clientzugriff auf private Cash-Funktion oder Tabellenänderungen. Frontend-CI/Live-Auslieferung separat zu bestätigen. Danach Phase 6: privates Datei-/Versammlungsarchiv und einfache Aufgaben/Erinnerungen, keine erneute Budget-/Bankbuchhaltung.
