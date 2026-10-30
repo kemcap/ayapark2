@@ -53,12 +53,32 @@ with tarfile.open(sys.argv[1], "r:") as archive:
     index = json.load(archive.extractfile(files["storage/index.json"]))
     if index.get("format") != 1:
         raise SystemExit("Invalid Storage index")
+    if not isinstance(index.get("objects"), list):
+        raise SystemExit("Invalid Storage object list")
+    seen_objects = set()
     for obj in index["objects"]:
-        if obj["file"] not in expected:
-            raise SystemExit("Missing stored object: " + obj["path"])
-        info = expected[obj["file"]]
-        if info["sha256"] != obj["sha256"] or info["bytes"] != obj["bytes"]:
-            raise SystemExit("Storage file mismatch: " + obj["path"])
+        if not isinstance(obj, dict):
+            raise SystemExit("Invalid Storage object entry")
+        relative = obj.get("file")
+        if not isinstance(relative, str):
+            raise SystemExit("Invalid Storage object path")
+        path = PurePosixPath(relative)
+        if (path.is_absolute() or len(path.parts) != 2
+                or path.parts[0] != "objects" or path.parts[1] in ("", ".", "..")
+                or "\\" in relative):
+            raise SystemExit("Unsafe Storage object path")
+        # export_storage.py creates file names relative to the storage directory,
+        # while manifest.json records paths relative to the overall export root.
+        key = "storage/" + path.as_posix()
+        if key in seen_objects:
+            raise SystemExit("Duplicate Storage file reference")
+        seen_objects.add(key)
+        if key not in expected:
+            raise SystemExit("Missing stored object: " + key)
+        info = expected[key]
+        if (info["sha256"] != obj.get("sha256")
+                or info["bytes"] != obj.get("bytes")):
+            raise SystemExit("Storage file mismatch: " + key)
 print("Archive integrity VERIFIED; actual Supabase RESTORE is NOT yet tested.")
 if manifest["format"] == 1:
     print("Legacy format 1: source-code backup is NOT required or verified by this format.")
