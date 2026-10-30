@@ -62,3 +62,8 @@ Separate statische Ansicht public-reports.html?site=… fragt ausschließlich di
 
 
 Gezielte Folgekorrektur 31.10.2026: Nach bestätigter Freigabe verwirft der Browser deren Wiederholungs-ID. Nach späterer Rücknahme erhält eine erneute bewusste Freigabe damit eine neue ID; bei unklarem fehlgeschlagenem Versuch bleibt sie unverändert. Bisher konnte eine neue Freigabe nach Rücknahme mit der alten ID lediglich das frühere zurückgenommene Ergebnis zurückliefern. 26 tatsächliche Browserprüfungen einschließlich dieser DE/TR-Regressionsfälle bestanden. Keine Backend-/Datensatzänderung; Veröffentlichung separat bestätigen.
+
+
+Folgekorrektur veröffentlicht: #73, CI 41134168564 und Pages 41134428061 erfolgreich, main 9a8827f8cfa8b2c88fd82b24fcdc47b96b51d585. Neue bestätigte Freigabe verwirft ihre Wiederholungs-ID; spätere Neufreigabe nach Rücknahme funktioniert. 26 Browserprüfungen bestanden. Früherer Veröffentlichung-offen-Vermerk damit überholt.
+
+Live-Auslieferung der drei betroffenen Dateien app.mjs, index.html und report-release-ui.mjs bytegleich mit #73 bestätigt.
