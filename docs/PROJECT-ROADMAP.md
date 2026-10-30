@@ -184,3 +184,18 @@ Nächster Schritt: Abschnitt 3 der neuen Anleitung lokal durchführen (OAuth-Sta
 - [ ] Gesamtbackup, externer .tar.age-Rundlauf, Verschlüsselung, Storage/Git/Edge-Function-/Auth- und Migrationstests weiter offen.
 
 Aktueller ausführlicher Plan und Sicherheitsgrenzen: `docs/PHASE1-RESTORE-GATE-20261030.md`. Ältere Mac-only-Anweisungen sind keine Entscheidung für den Backup-Speicher; der Speicherort bleibt Google Drive.
+
+
+## Prüfnachweis 30.10.2026 – erweiterter kompletter SYNTHETISCHER Cloud-Test
+
+- [x] GitHub Actions Lauf **41098709384**, Job synthetic-restore **SUCCESS**: 12 Python-Unit-Tests sowie verschlüsselter PostgreSQL-17-Dump, Entschlüsselung, isolierter DB-Restore und RLS-Positiv-/Negativprüfungen bestanden. Job-Logs tatsächlich überprüft.
+- [x] Zusätzlicher portabler synthetischer Test scripts/backup/test_portable_archive.py ergänzt: eigener Mini-Git-Repo-/Assets-/Edge-Function-Stand; private synthetische Storage-Datei; Manifest mit SHA-256; tar→age, Entschlüsselung, Archiv-Prüfung, Git-Spiegel-Clone ohne Ursprungsrepo; kaputte/fehlende Storage-Datei wird erkannt.
+- [x] Erster erweiterter Lauf **41099538759** meldete FAIL. **Ursache tatsächlich gefunden:** export_storage.py schreibt Storage-Pfade im index.json relativ zum Storage-Ordner (`objects/…`), verify_snapshot.py verglich aber gegen Manifest-Pfade relativ zum Archiv (`storage/objects/…`). Das wurde in verify_snapshot.py korrigiert und die Pfadvalidierung verbessert.
+- [x] GitHub Actions Lauf **41099870196** zum korrigierten Stand **SUCCESS**: synthetischer vollständiger Archivtest und PostgreSQL-17-/RLS-Restore erfolgreich (kein Real-Dump, keine Produktiv-Secrets).
+- [x] scripts/backup/backup.sh: Nach Google-Drive-Upload für vollständige .tar.age-Sicherung wird künftig tatsächlicher Remote-Ciphertext per rclone cat gelesen und SHA-256 mit lokalem Ciphertext verglichen. **Dieser Remote-Schritt wurde noch nicht mit einem echten vollständigen Google-Drive-Backup getestet.**
+- [ ] Echter vollständiger verschlüsselter Projekt-Snapshot (.tar.age) von Produktion nach Google Drive und unabhängige Wiederherstellung weiterhin offen; Gesamtbackup-Workflow bleibt gesperrt.
+- [ ] Echtes vorhandenes .dump.age mit privatem age-Schlüssel in geschützter Umgebung entschlüsseln; DB/Auth/RLS/Storage-/App-Restore auf frischer isolierter Umgebung noch offen.
+- [ ] OAuth-Produktionseinstellung und langfristige rclone-Token-Eignung noch prüfen. Keine neuen Secrets in GitHub abgelegt.
+- [ ] Veralteten Draft PR #52 vor Zusammenführung in main mit aktuellem Produktivbranch abgleichen. Draft #68 bleibt zunächst auf #52 gestapelt. **Kein Merge und keine Aktivierung ohne ausdrückliche Freigabe.**
+
+**Nächster Sicherheits-Gate:** Für echten Restore ist die bisher nur auf dem Mac gesicherte private age-Identity notwendig. Die Backups bleiben in Google Drive; Mac ist nicht Backupspeicher. Ein Cloud-Restore mit echten Bewohner-/Auth-/Finanzdaten kann ohne den privaten Schlüssel nicht vollständig durchgeführt werden. Vor Übergabe der Entschlüsselungsfähigkeit an eine Cloud-Testumgebung ist ein gesondertes, ausdrücklich freigegebenes Vorgehen zum Schutz dieser Daten zu definieren.
