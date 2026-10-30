@@ -1,0 +1,7 @@
+// Fixed display allowlist: ignore all extra fields from any response.
+export function releasedReportModel(input,language='tr'){
+ if(!Array.isArray(input)||input.length>100||!['de','tr'].includes(language))throw Error('Invalid released reports');
+ const de=language==='de',amounts=['opening_cents','income_cents','expense_cents','cash_adjustment_cents','closing_cents'];
+ const rows=input.map(r=>{if(!r||!['month','year'].includes(r.kind)||!/^\d{4}-\d{2}-\d{2}$/.test(r.period)||!/^\d{4}-\d{2}-\d{2}$/.test(r.ends_on)||amounts.some(k=>!Number.isSafeInteger(r[k])||Math.abs(r[k])>900000000000)||r.closing_cents!==r.opening_cents+r.income_cents-r.expense_cents+r.cash_adjustment_cents)throw Error('Invalid released report');return [de?(r.kind==='year'?'Jahr':'Monat'):(r.kind==='year'?'Yıl':'Ay'),r.period+' – '+r.ends_on,...amounts.map(k=>({moneyCents:r[k]}))];});
+ return {language,demo:false,title:de?'Freigegebene Finanzübersichten':'Paylaşılan mali özetler',columns:de?['Art','Zeitraum','Anfang TL','Einnahmen TL','Ausgaben TL','Sonstige Bewegungen TL','Endsaldo TL']:['Tür','Dönem','Açılış TL','Gelir TL','Gider TL','Diğer hareketler TL','Son bakiye TL'],rows,notes:[de?'Nur ausdrücklich freigegebene Summen bestätigter Abschlüsse. Monats- und Jahreszeilen überschneiden sich; nicht zusammenaddieren.':'Yalnızca onaylı kapanışların açıkça paylaşılan toplamları. Ay ve yıl satırları örtüşür; birlikte toplanmamalıdır.']};
+}

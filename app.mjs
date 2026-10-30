@@ -1,3 +1,4 @@
+import {reportReleases} from './report-release-ui.mjs?v=5.9.38';
 import {periodClosings} from './period-closing-ui.mjs?v=5.9.37';
 import {summaryExport,bankExport,receiptExport} from './report-export-domain.mjs?v=5.9.36';
 import {receiptButtons,downloadWorkbook,openExport} from './report-export-ui.mjs?v=5.9.36';
@@ -117,7 +118,8 @@ function render(focus=false){
 }
 function navigate(page){mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
 const closingUI=periodClosings({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,onSaved:reload});
-function closeDialogs(){closingUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
+const releaseUI=reportReleases({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),community:()=>state.mode==='connected'&&!isAccessPreview()&&(can(state,'finance')||state.data.communityAccess===true),site:()=>state.data.site.id,language:getLanguage});
+function closeDialogs(){closingUI.close();releaseUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
@@ -220,6 +222,7 @@ function bankExportModel(){return bankExport(filteredTransactions(state),exportO
 function addExportControls(){
  if(state.mode==='signedout')return;
  if(state.page==='reports'&&(can(state,'finance')||state.data.communityAccess===true)){
+  if(state.mode==='connected'&&!isAccessPreview())$('content').insertAdjacentHTML('beforeend','<section class="card">'+button(getLanguage()==='de'?'Freigegebene Gemeinschaftsübersichten':'Site üyelerine paylaşılan özetler','community_releases')+(can(state,'admin')?button(getLanguage()==='de'?'Summenfreigaben verwalten':'Toplam paylaşımlarını yönet','report_releases'):'')+'</section>');
   if(state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'))$('content').insertAdjacentHTML('beforeend','<section class="card">'+button(getLanguage()==='de'?'Monats- / Jahresabschluss prüfen':'Ay / yıl kapanışını kontrol et','period_closings')+'</section>');
   const print=$('content').querySelector('[data-action="print"]');if(print)print.dataset.action='export_report_pdf';
   const csv=$('content').querySelector('[data-action="export_report"]');if(csv)csv.insertAdjacentHTML('afterend',button(getLanguage()==='de'?'Excel herunterladen':'Excel indir','export_report_xlsx'));
@@ -370,6 +373,8 @@ document.addEventListener('click',async event=>{
   if(action==='staged')return staged();
   if(action==='review_import'){$('importDialog').close();navigate('transactions');state.filter.type='unmatched';render();return;}
   if(action==='print')return window.print();
+  if(action==='report_releases')return await releaseUI.openAdmin();
+  if(action==='community_releases')return await releaseUI.openCommunity();
   if(action==='period_closings')return await closingUI.open();
   if(action==='export_report')return exportReport();
   if(action==='export_report_pdf')return openExport(reportExportModel());

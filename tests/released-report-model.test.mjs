@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {releasedReportModel} from '../released-report-model.mjs';
+const row={kind:'month',period:'2026-09-01',ends_on:'2026-09-30',opening_cents:10000,income_cents:3456,expense_cents:100,cash_adjustment_cents:-11,closing_cents:13345};
+test('released report display and export ignore all personal and private source fields',()=>{const model=releasedReportModel([{...row,source_reference:'PRIVATE BANK',review_note:'PRIVATE NAME',created_by:'PRIVATE ACTOR',snapshot:{private:'PRIVATE DEBT'}}],'de');assert.equal(model.rows[0][6].moneyCents,13345);assert(!JSON.stringify(model).includes('PRIVATE'));assert.equal(model.rows[0][0],'Monat');});
+test('released reports fail closed on nonintegral or inconsistent financial totals',()=>{for(const patch of [{income_cents:1.1},{closing_cents:13346},{opening_cents:NaN},{closing_cents:900000000001},{kind:'arbitrary'},{period:'invalid'}])assert.throws(()=>releasedReportModel([{...row,...patch}]),/Invalid/);});
+test('monthly and annual report rows are distinct and never summed together',()=>{const model=releasedReportModel([row,{...row,kind:'year',period:'2026-01-01',ends_on:'2026-12-31'}],'tr');assert.equal(model.rows.length,2);assert.deepEqual(model.rows.map(r=>r[0]),['Ay','Yıl']);assert(model.notes[0].includes('birlikte toplanmamalıdır'));});
+test('empty releases contain no fabricated report and bounds are enforced',()=>{assert.deepEqual(releasedReportModel([]).rows,[]);assert.throws(()=>releasedReportModel(Array(101).fill(row)));assert.throws(()=>releasedReportModel([row],'en'));});
