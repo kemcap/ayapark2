@@ -1,4 +1,14 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Live-Abnahme Phase 4 bestätigt – 31.10.2026
+
+Sonderumlagen (#72) vollständig technisch veröffentlicht und ausgelieferte Dateien geprüft: CI 41133654321, Pages 41133899050 erfolgreich, Backendmigration 20261030214643 aktiv. 55 SQL-, 74 DE/TR-Browser- und 308 allgemeine Tests sowie weitere Regressionen bestanden. Keine echten Forderungen, Reviews oder Auth-/Bewohnerdaten zu Testzwecken erzeugt/verändert. Externer unterschriebener Beschluss und manuelle fachliche Prüfung bleiben erforderlich; private Originaldateiablage folgt in Phase 6.
+
+Anschließende Korrektur #73 ebenfalls veröffentlicht: Hauptzweig 9a8827f8cfa8b2c88fd82b24fcdc47b96b51d585, CI 41134168564 und Pages 41134428061 erfolgreich. Neue Berichtsfreigabe nach Rücknahme erhält eine neue Anfrage-ID; unklare Wiederholung behält ihre ID. 26 native Browserprüfungen bestanden. Frühere „CI-/Live-Nachweis folgt“-Vermerke dieses Fixes sind überholt. app.mjs, index.html und report-release-ui.mjs live bytegleich mit dem geprüften Fix bestätigt.
+
+Der nächste Arbeitsschritt liegt bereits separat als Draft-PR #74 vor: https://github.com/kemcap/ayapark2/pull/74 . Phase-5-Prognosekern mit neun neuen Prüfungen und erfolgreicher GitHub-CI 41134227055 vorbereitet; keine Backend-/UI-Veröffentlichung. Konservative Bankliquidität bleibt von Forderungen und angenommenen Geldeingängen getrennt, auch über Jahresgrenzen und bei überfälligen Kosten. Nächste konkrete Integration: serverseitiger Ist-Stichtag, Erhalt/Abgleich alter Budgetwerte, Monats-/Jahresplanpositionen mit Audit/RLS und echten Bankteilzuordnungen, danach getrennte Rücklagenfreigabe und DE/TR-Oberfläche. Siehe PHASE-5-BUDGET-AUDIT.md.
+
+Noch offen: vollständige Phase 5, private Dokumente/Versammlungen, Aufgaben/Erinnerungen und reale Auth-/Mail-/Gerätegesamtabnahme. Backup weiterhin übersprungen. Keine pauschale Fertigmeldung des Gesamtprojekts.
+
 ## Sonderumlagen veröffentlicht, Phase 5 begonnen – 31.10.2026
 
 PR #72 nach erfolgreicher CI 41133654321 gemergt; Hauptzweig d7277a32c851da81f79e00cf23de2b219b809187. Pages 41133899050 erfolgreich. Live ausgelieferte app.mjs, index.html, levy-review-ui.mjs, levy-review.css, finance-forms.mjs, finance-v5.mjs, v3-ui.mjs und forms.mjs bytegleich geprüft. Backendmigration 20261030214643 aktiv; keine echten Reviews/Kapitalentwürfe oder Buchungen für die Abnahme angelegt. Frühere Hinweise „nur vorbereitet/Frontend-Rollout offen“ dieses Schritts sind damit überholt.
