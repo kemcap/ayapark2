@@ -3,7 +3,7 @@ import {fullDemo,demoCommand} from '../ledger.mjs?v=5.8.1';
 import {prepareV5Demo} from '../finance-demo.mjs?v=5.8.1';
 import {distribute,batchPreview,paymentPlan,amountCents,availableBudget,financeLinkAt} from '../finance-v5.mjs?v=5.8.1';
 import {unreadNotifications,nextPopup,hasRead,receives,testAnnouncement} from '../notifications.mjs?v=5.9.0';
-import {setLanguage} from '../i18n.mjs?v=5.8.1';import {money,randomId} from '../core.mjs?v=5.8.1';
+import {setLanguage} from '../i18n.mjs?v=5.9.28';import {money,randomId} from '../core.mjs?v=5.8.1';
 import {financePayload,localFinancePreview} from '../finance-forms.mjs?v=5.8.1';
 const data=()=>prepareV5Demo(fullDemo());
 function proposal(d,ids=d.units.map(u=>u.id),amount=10001){return {request_id:randomId(),scope:'selected',unit_ids:ids,exclusions:[],distribution:'total',cents:amount,due_on:'2026-11-01',label:'Synthetic charge',category:'Genel Gider / İşletme',debt_group:'general',basis_ref:'Synthetic decision',debtors:Object.fromEntries(ids.map(id=>[id,d.links.find(l=>l.unit_id===id&&l.role==='owner').id]))};}

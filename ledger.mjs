@@ -1,7 +1,7 @@
 import {isFinanceV5,demoFinanceCommand} from './finance-demo.mjs?v=5.8.1';
 import {enrichDemo,demoV3,bindDemoCharge} from './v3-ledger.mjs?v=5.8.1';
 import {creditAvailable,buildSummaryDays,withPaymentIndex} from './v3-domain.mjs?v=5.9.26';
-import {t as tr} from './i18n.mjs?v=5.8.1';
+import {t as tr} from './i18n.mjs?v=5.9.28';
 import {demoData as base,summarize,randomId} from './core.mjs?v=5.8.1';
 let computation=null;
 // Cache only within one synchronous rendering pass. Mutations never share this cache.

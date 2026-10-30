@@ -1,4 +1,4 @@
-import {t as tr,locale} from './i18n.mjs?v=5.8.1';
+import {t as tr,locale} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e} from './core.mjs?v=5.8.1';
 export const requestStatuses={new:'Yeni',review:'İnceleniyor',approved:'Onaylandı',sent:'Davet gönderildi',activated:'Etkinleştirildi',rejected:'Reddedildi'};
 export {accessRequestPayload} from './access-request-policy.mjs?v=5.8.1';

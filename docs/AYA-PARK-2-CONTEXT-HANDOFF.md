@@ -1,5 +1,15 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
 
+## Maßgeblicher Fortschritt 30.10.2026 – fünf Aufgabenrechte
+
+Die fünf Rechte sind in der Vergabeoberfläche und serverseitig verbunden. Speicherung erfolgt über ay3_set_task_grants, nur durch Superadmin. Keine automatische Übertragung alter breiter Rechte. Bisherige Berechtigungen bleiben bis zur ausdrücklichen Speicherung kompatibel; danach ersetzt der explizite Aufgabensatz die alten Rechte. Leere Auswahl entzieht alle delegierten Aufgaben. Kritische Finanzen, Recovery, Rollenvergabe und Veröffentlichungen von Finanzberichten bleiben Superadmin-Aufgaben.
+
+Personen-/Beziehungsbefehle prüfen die jeweilige Aufgabe, auch bei direkten privaten Aufrufen. Bearbeitung von Rolle oder Zuordnungsdaten benötigt Bewohnerwechselrecht. Bankrecht erlaubt Zuordnung, aber keine Korrektur bestehender Finanzoriginale. Ankündigungsrecht funktioniert getrennt. Einladungen prüfen das neue Recht bei Ausstellung und Einlösung; Entzug sperrt auch offene Einladungen. Forderungsvorbereitung erhält nur die benötigten Personen-/Beziehungs-/Ausnahmedaten, keine Bankbewegungen allein durch dieses Recht.
+
+Nachweise: 269 allgemeine Tests bestanden, 72 isolierte SQL-Prüfungen einschließlich delegierter Einladung, Rechteentzug, einmaliger Einlösung, tatsächlicher Zahlungszuordnung und Ankündigung. Elf Live-Ausgangshashes vor Rollout identisch. Keine produktiven Testpersonen oder Buchungen angelegt. Kandidat 20261030044641_phase2_task_rights_enforcement.sql; Veröffentlichung wird gesondert bestätigt.
+
+Nächste Phase-2-Prüfung: durchgängige Kontaktänderungs-/Recovery-Freigaben und Bewohnerwechselhistorie mit den neuen Aufgabenrechten. Gesamtroadmap noch nicht vollständig abgeschlossen.
+
 ## Aktueller Arbeitsauftrag 30.10.2026 – Phase 2
 
 Der Nutzer hat angewiesen, den Backup-Part zu überspringen und ohne erneute Einrichtung/Tests mit Phase 2 fortzufahren. Historische Backup-Nachweise bleiben unverändert; übersprungene Restore-Punkte werden nicht als neu getestet markiert.

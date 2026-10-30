@@ -1,5 +1,5 @@
 import {ENABLE_ADMIN_RECOVERY} from './auth-features.mjs?v=5.8.1';
-import {getLanguage} from './i18n.mjs?v=5.8.1';
+import {getLanguage} from './i18n.mjs?v=5.9.28';
 export const recoveryEligible=(s,p)=>ENABLE_ADMIN_RECOVERY&&s.mode==='connected'&&s.data.role==='super'&&Boolean(p?.auth_user_id);
 const tx=(tr,de)=>getLanguage()==='de'?de:tr;
 

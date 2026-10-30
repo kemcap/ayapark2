@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {AyaparkApi} from '../api.mjs?v=5.9.0';
-import {t,setLanguage} from '../i18n.mjs?v=5.8.1';
+import {t,setLanguage} from '../i18n.mjs?v=5.9.28';
 
 test('recovery callback at root goes to reset page with credentials preserved',()=>{
  const script=readFileSync(new URL('../recovery-redirect.js',import.meta.url),'utf8');
