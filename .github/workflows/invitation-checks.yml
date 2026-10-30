@@ -35,6 +35,9 @@ jobs:
           node --check bank-file-reader.mjs
           node --check bank-file-adapters.mjs
           node --check bank-xlsx-worker.mjs
+          node --check export-page.mjs
+          node --check report-export-domain.mjs
+          node --check report-export-ui.mjs
           node --check api.mjs
           node --check people-ui.mjs
           node --check invite-ui.mjs

@@ -1,4 +1,10 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Berichte und persönliche Exporte – 30.10.2026
+
+Phase-4-Ist/Soll geprüft; bestehende CSV-/Datums-/Diagrammfunktionen weiterverwendet. Ergänzt und lokal getestet: echte Excel-Exporte für Summen und berechtigte Bankdaten, gesonderte PDF-Exportansicht sowie persönliche Zahlungsnachweise nur für eigene Personen-IDs oder tatsächliche Finanzverwaltung. Keine Übernahme fremder Teilbeträge bei gemeinsamer Wohnung/Zahlung. Texte sicher escaped, Excel-Formel-Injection verhindert, Betragstypen centgenau, Vorschau/Demo auch in exportierten Daten gekennzeichnet. Keine echten personenbezogenen oder Finanzdatensätze geändert.
+
+299 allgemeine Tests und 22 tatsächliche DE/TR-Browserprüfungen erfolgreich; Excel mit unabhängiger Anwendung lesbar, PDF-Drucklayout visuell geprüft. Details und genaue Nachweisgrenzen: PHASE-4-REPORTS-AUDIT.md. GitHub-Rollout wird separat bestätigt. Weiter offen: endgültige Monats-/Jahresabschlüsse, ausdrückliche öffentliche Summenfreigabe und Beschluss-/Sonderumlagenabnahme. Nächster Schritt ist die dokumentierte Abschlussfinalisierung mit nachvollziehbarer Wiederöffnung, nicht eine Neuerstellung bereits vorhandener Berichte.
+
 ## Aktuelle Finanz-/Korrekturabnahme – 30.10.2026
 
 31 zusätzliche SQL-Prüfungen mit dem aktuellen relevanten Migrationspaket bestanden: Forderungszeiträume, Teil-/Vollzahlung, Zuordnungswiederholung mit/ohne Guthaben, Ablehnung geänderter Wiederholung und Überzuordnung, Erhalt ursprünglicher Schuldner/Buchungen bei Archivierung, Stornohindernisse, Gegenbuchungen und periodeübergreifender Kassen-/Berichtsabgleich einschließlich Transfers. Entzogene Finanzrechte sperren selbst exakte Wiederholungen und fehlerhafte Payloads, bevor Finanzdetails verarbeitet werden. Ausführung ausschließlich in PGlite mit künstlichen Identitäten. Bestehende ältere Baseline bleibt erhalten. Neuer Befehl test:finance:audit:sql und zusätzliche CI-Ausführung.
