@@ -106,7 +106,7 @@ Stand: 29.10.2026 · Projekt: `kemcap/ayapark2` · Produktivbranch: `main`
 - Die **30 verbindlichen Produktentscheidungen** stehen ausführlich in `docs/AYA-PARK-2-CONTEXT-HANDOFF.md`. Diese Roadmap ist die *Abarbeitungsliste*, nicht ein Ersatz für die Spezifikation.
 - Schritt für Schritt; nach jeder Aufgabe Status, Ergebnis, Nachweise, offene Fragen und **den nächsten konkreten Schritt** eintragen.
 - Nur nach echten Nachweisen ein Kästchen abhaken. Code im Entwurfsbranch bedeutet **nicht**, dass etwas produktiv eingerichtet oder getestet ist.
-- Keine produktive Datenbankänderung, RLS-Freigabe, Auth-/Storage-Einstellung, Veröffentlichung oder Backup-Aktivierung ohne Freigabe des Benutzers.
+- Der Nutzer hat die fortlaufende Abarbeitung und direkte Veröffentlichung erfolgreich geprüfter Änderungen ausdrücklich freigegeben. Keine erneute Rückfrage pro Release. Produktive Bewohner-, Finanz- oder Auth-Datensätze dürfen nicht zu Testzwecken verändert werden. Fachliche Änderungen an diesen Daten benötigen weiterhin ausdrückliche Freigabe. Backup bleibt übersprungen; keine neue Aktivierung.
 - Vor kritischen Schritten: geprüfte Sicherung und isolierte Wiederherstellungsprobe.
 - **Supabase Free behalten**; keinen kostenpflichtigen Dienst ohne gesonderte Entscheidung aktivieren.
 - Bei Chatwechsel zuerst beide Dateien lesen, den tatsächlichen GitHub-/Supabase-Stand neu prüfen und beim nächsten offenen Punkt fortfahren.
@@ -128,7 +128,7 @@ Stand: 29.10.2026 · Projekt: `kemcap/ayapark2` · Produktivbranch: `main`
 - [ ] Supabase-Advisor-Hinweise zu `SECURITY DEFINER`, Auth-Passwortschutz und drei RLS-Tabellen ohne Policy fachlich prüfen; nicht pauschal Zugriffsrechte erweitern.
 - [ ] Verbindliche Backupprozedur inklusive Restore-Ziel, maximal tolerierbarem Datenverlust, Betreiberkontakten und Prüfkriterien festhalten.
 
-## Phase 1 – Vollständige portable Backups (P0; AKTIV)
+## Phase 1 – Vollständige portable Backups (auf Nutzerwunsch übersprungen; historischer Nachweisstand)
 
 Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**: https://github.com/kemcap/ayapark2/pull/52
 
@@ -141,7 +141,7 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [x] Sicherheits-/Einrichtungsanleitung `docs/FREE-BACKUP-SETUP.md` erstellen.
 - [x] Shell-Syntax und sechs synthetische Offline-Quellcode-/Archivtests laut PR #52 geprüft. Keine vollständige DB-/Storage-Integration daraus ableiten.
 
-### 1.2 Portabilität vollständig machen – **NÄCHSTE TECHNISCHE AUFGABE**
+### 1.2 Portabilität – historischer, derzeit übersprungener Arbeitsstand
 
 - [x] Git-Bundle aller im vollständigen Checkout vorhandenen Referenzen und erreichbaren Historie in den **verschlüsselten** Sicherungsprozess integriert; isolierter Git-Restore getestet. Verschlüsselungs-/Offsite-Rundlauf bleibt in 1.4 offen.
 - [x] Versionierte Website, HTML, CSS, JS, Assets, Design und Edge-Function-Code im Git-Bundle erfasst; Ref-/Tree-Inventar und unabhängige Wiederherstellung geprüft.
@@ -175,15 +175,15 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [ ] Übrige kritische Finanzfreigaben und fünf getrennte Aufgabenrechte vollständig umsetzen und integriert abnehmen.
 - [x] Fünf getrennte Aufgabenrechte und Aidat-/Umlagenentwurf mit Superadmin-Endfreigabe umgesetzt und veröffentlicht (#56/#57); bestehende Altzuweisungen werden erst bei ausdrücklichem Speichern umgestellt.
 - [x] 13 bestehende allgemeine Testfehler fachlich aufgelöst und veröffentlicht (#55); allgemeine Suite inzwischen 269/269 erfolgreich.
-- [ ] Registrierung/Einladungen, Wiederherstellung, Kontaktfreigaben, Historie und RLS mit synthetischen Identitäten testen.
+- [x] Registrierung/Einladungen, administrative Wiederherstellung, Kontaktfreigaben, Historie und RLS mit synthetischen Identitäten geprüft (84 aktuelle Rechte-/Einladungs-/Recovery-, 23 Kontakt- und 43 Historienprüfungen; kein echter Mail-/Auth-Browser-E2E).
 - [x] Eigentümerwechsel, Mehrfachzuordnungen, Altlasten und Zutrittsentzug isoliert mit unveränderter Finanzhistorie getestet (43 aktuelle Historienprüfungen; kein Geräte-/Mail-E2E).
 - [ ] Barrierefreie mobile Bedienung, DE/TR und eindeutige Freigabetexte prüfen.
-- [ ] Isolierter Release-Gate; keine Live-Freigabe ohne Zustimmung.
+- [ ] Durchgängige Phase-2-Gesamtabnahme vervollständigen. Grundsätzliche Live-Freigabe liegt vor; offene Geräte-/Mail-/Auth-E2E-Prüfungen nicht als bestanden behaupten.
 
 ## Phase 3 – Finanzkern und Bankimporte (P1)
 
 - [x] Teilzahlungen, oldest-first-Zuordnung, Stornos und Schuldartgetrenntheit im aktuellen relevanten Migrationspaket isoliert geprüft (50 Finanzprüfungen).
-- [ ] Aidat-/Umlagen-Entwurf und Superadmin-Endfreigabe prüfen.
+- [x] Aidat-/Umlagen-Entwurf und Superadmin-Endfreigabe isoliert geprüft und produktiv (#56–#58); tatsächliche Buchung, Wiederholung und Ablehnung ohne Finanzwirkung getestet.
 - [ ] PDF/CSV/XLSX-Import, Bankgebühren und Mehrfachimport-Dubletten testen.
 - [ ] Abstimmung der Bankbewegungen, Salden und Zuordnung in drei getrennten Prüfschritten durchspielen.
 - [ ] Finanzkorrekturen nachvollziehbar und ohne Löschen historischer Buchungen absichern.
@@ -215,12 +215,12 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [ ] Tests in isolierter Umgebung erfolgreich; keine Live-Testbuchungen.
 - [ ] RLS-/Auth-/Finanz-Regressionssuite bestanden; DE/TR und Mobilansichten geprüft.
 - [ ] Migrations- und Rückfallplan dokumentiert; Datenerhalt nach Rollback gewährleistet.
-- [ ] **Nutzerfreigabe erteilt**.
+- [x] Grundsätzliche Nutzerfreigabe für fortlaufende geprüfte Releases erteilt; keine wiederholte Bestätigung pro Release erforderlich.
 - [ ] Rollout kontrolliert durchgeführt und tatsächliche Ergebnisse protokolliert.
 
 ## Nächster Schritt – Übergabe an nächsten Chat
 
-**Nächste Aufgabe: echtes Backup isoliert wiederherstellen.** Aktive DB-Sicherung nicht erneut einrichten. Zunächst OAuth-Dauerbetrieb bestätigen und einen realen verschlüsselten Dump lokal herunterladen/entschlüsseln, danach ausschließlich in einem isolierten Restore-Ziel Datenbank, Auth und Berechtigungen prüfen. Privater Schlüssel bleibt beim Nutzer. Parallel Plattforminventar und fehlenden Storage-/Git-Umfang vervollständigen. PR #52 mit main abgleichen, bevor ein zweiter Workflow aktiviert oder ein alter Entwurf gemergt wird.
+**Aktuelle nächste Aufgabe: direkten PDF-/XLSX-Lesepfad vor die bestehende Importvorschau integrieren.** Die Quellenprüfung und die exakte CSV-Saldenprüfung sind umgesetzt; direkte Dateiformate bleiben offen. Mehrseiten-, Beschreibungs- und Spaltenadapter zunächst mit synthetischen Daten absichern. Details: `docs/PHASE-3-IMPORT-AUDIT.md`. Backup ausdrücklich übersprungen; nicht erneut einrichten oder auf einen Restore umschwenken. Aktuellen Hauptzweig und neueste Fortschrittsnotiz prüfen; ältere Zwischenstände darunter sind historische Nachweise.
 
 **Projektkontext:** `docs/AYA-PARK-2-CONTEXT-HANDOFF.md`
 **Backup-Anleitung:** `docs/FREE-BACKUP-SETUP.md`

@@ -1,4 +1,7 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+
+**Aktuelle Arbeitsfreigabe:** Roadmap fortlaufend abarbeiten und erfolgreich geprüfte Änderungen direkt veröffentlichen; nicht nach jedem Teilschritt neue Zustimmung verlangen. Keine echten Bewohner-, Finanz- oder Auth-Datensätze zu Testzwecken ändern. Backup ausdrücklich übersprungen. Ältere Aufforderungen weiter unten zu Backup/erneuter Releasefreigabe dokumentieren frühere Zwischenstände und sind durch diesen Nutzerauftrag ersetzt.
+
 ## Importvorschau und mobile Kontaktfreigabe – 30.10.2026
 
 PR #63 (PDF-Strukturprüfung) nach erfolgreicher CI 41065619848 veröffentlicht; Pages-Lauf 41065968751 erfolgreich. Der nächste umgesetzte Schritt ergänzt die bestehende CSV-Vorschau um Einnahmen, Ausgaben, Netto und eine exakte Prüfung vorhandener laufender Salden. Beide Druckreihenfolgen und fehlende Zwischenangaben werden berücksichtigt. Widersprüchliche Salden sperren den Importbutton vor Erstellung des Importpayloads; Beträge werden niemals passend gerechnet. Ohne ausreichende Saldoangaben bleibt die Quelle ausdrücklich ungeprüft; Anfangssaldo und Seitenvollständigkeit benötigen weiterhin separate Bestätigung. Dies ist eine zusätzliche Eingabeprüfung der Oberfläche, keine neue Buchungslogik oder Ersatz für serverseitige Rechte.
