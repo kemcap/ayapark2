@@ -1,5 +1,17 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
 
+## Kontaktänderungsanträge – 30.10.2026
+
+Eigene Kontaktdaten können in Einstellungen als Antrag eingereicht und vor Entscheidung zurückgezogen werden. Die Superadmin-Freigabeliste zeigt alte/neue Werte und verlangt unabhängige Prüfung sowie Begründung. RLS, eigene Konto-/Anlagenzuordnung, idempotente Einreichung/Entscheidung und ein Konfliktschutz gegen zwischenzeitliche Änderungen werden serverseitig geprüft. Delegierte Verwaltung darf verknüpfte Kontakte nicht über Personenbearbeitung am Freigabeweg vorbei ändern.
+
+Umfang ausdrücklich Personenverzeichnis: Auth-E-Mail/-Telefon, Passwort und Konto-ID bleiben unverändert. Die UI erklärt dies. Änderungen von Login-Adressen benötigen weiterhin den gesonderten Identitäts-/Auth-Prozess. Auditinformationen bleiben erhalten; es werden keine echten Bewohner zu Testzwecken verändert.
+
+23 isolierte SQL-Prüfungen und 272 allgemeine Tests erfolgreich, darunter drei neue UI-Tests. Nächste Phase-2-Abnahme: Wechsel-/Historienfälle und durchgängige mobile/Rollen-Bedienung; keine pauschale Vollabnahme allein aus Unit-/SQL-Tests.
+
+## Bestätigter Live-Stand 30.10.2026
+
+Fünf Aufgabenrechte über PR #57 produktiv (0e23429a0fc06bfc9c0744a88d5b571ce99793a7). Ergänzender Altberechtigungs-Schutz über PR #58 nach main übernommen (dbeb43b4c0efd9fd300ecbd6fbfee716846a5d49), Backendfunktion nach Migration schreibgeschützt verifiziert. Bestehende Grant-Zuweisungen unverändert. 269 allgemeine Tests und 84 isolierte SQL-Prüfungen erfolgreich. Kontaktänderungsanträge bleiben der nächste offene Fachpunkt.
+
 ## Zusätzliche Phase-2-Prüfung 30.10.2026
 
 PR #57 mit den fünf Aufgabenrechten ist produktiv; Pages-Lauf 41005590291 erfolgreich, task-permissions/forms/api ausgeliefert und inhaltsgleich geprüft. Recovery blieb nachweislich Superadmin-only; isolierte Wiederherstellung behält die Account-ID.

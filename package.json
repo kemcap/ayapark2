@@ -17,7 +17,8 @@
     "test:roles:sql": "node tests/sql/roles.mjs",
     "test:corrections:sql": "node tests/sql/finance-corrections.mjs",
     "test:tasks:sql": "node tests/sql/task-drafts.mjs",
-    "test:rights:sql": "node tests/sql/task-rights.mjs"
+    "test:rights:sql": "node tests/sql/task-rights.mjs",
+    "test:contacts:sql": "node tests/sql/contact-requests.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.11",
