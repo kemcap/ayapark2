@@ -1,0 +1,90 @@
+{
+  "passed": 17,
+  "browser": "153.0.8010.0",
+  "reports": [
+    {
+      "kind": "synthetic-pdf",
+      "ok": true,
+      "metadata": {
+        "format": "pdf",
+        "layout": "modern",
+        "pages": 2,
+        "rows": 2,
+        "missingReferences": 2,
+        "identifiersRemoved": 0
+      },
+      "rows": 2,
+      "amounts": [
+        10000,
+        -250
+      ],
+      "descriptionLengths": [
+        17,
+        13
+      ],
+      "digest": true,
+      "balanced": true
+    },
+    {
+      "kind": "synthetic-xlsx",
+      "ok": true,
+      "metadata": {
+        "format": "xlsx",
+        "sheet": "First",
+        "rows": 2
+      },
+      "rows": 2,
+      "amounts": [
+        10000,
+        -250
+      ],
+      "descriptionLengths": [
+        17,
+        13
+      ],
+      "digest": true,
+      "balanced": true
+    },
+    {
+      "kind": "provided-source-1",
+      "rows": 1714,
+      "metadata": {
+        "format": "pdf",
+        "layout": "legacy",
+        "pages": 59,
+        "rows": 1714,
+        "missingReferences": 0,
+        "identifiersRemoved": 4
+      },
+      "maxDescription": 82
+    },
+    {
+      "kind": "provided-source-2",
+      "rows": 16,
+      "metadata": {
+        "format": "pdf",
+        "layout": "modern",
+        "pages": 1,
+        "rows": 16,
+        "missingReferences": 16,
+        "identifiersRemoved": 0
+      },
+      "maxDescription": 93
+    },
+    {
+      "kind": "provided-source-3",
+      "rows": 51,
+      "metadata": {
+        "format": "pdf",
+        "layout": "modern",
+        "pages": 3,
+        "rows": 51,
+        "missingReferences": 51,
+        "identifiersRemoved": 0
+      },
+      "maxDescription": 93
+    }
+  ],
+  "errors": [],
+  "external": []
+}

@@ -1,4 +1,20 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Direkter PDF-/XLSX-Import – 30.10.2026
+
+Implementiert und lokal geprüft: unterstützte Yapi-Kredi-Text-PDFs und Excel-Vorlagen werden direkt auf dem Gerät gelesen und an die bestehende CSV-/Saldenvorschau übergeben. Kein externer Konvertierungsdienst und keine neue Buchungslogik. Mehrseitige Beschreibungen und Gebühren bleiben erhalten; mehrere Excel-Blätter verlangen explizite Auswahl mit eigenem Batch-Hash. Nicht lesbare/mehrdeutige Quellen, Formeln und aktive Excel-Inhalte bleiben gesperrt. Grenzen: 2 MB, 2.000 Bewegungen, PDF höchstens 100 Seiten; gescannte/unbekannte PDF-Layouts und nicht unterstützte Tabellenspalten erfordern überprüfte CSV-Aufbereitung. Details: PHASE-3-IMPORT-AUDIT.md.
+
+293 allgemeine Tests, 17 native Dateiextraktionsprüfungen, 34 neue tatsächliche DE/TR-Importformularprüfungen und 58 bestehende Browserregressionen erfolgreich. Drei vorhandene Auszüge mit insgesamt 63 Seiten durch den nativen Browser-Lesepfad geprüft; keine produktiven Datensätze geschrieben. Vendor-Quellen/Lizenzen/Hashes und reproduzierbarer Build versioniert; Abhängigkeitsscan ohne bekannte Schwachstelle. Rollout wird nach GitHub-CI separat bestätigt.
+
+Nächster Schritt: aktuelle Finanz-/Korrekturabnahme vollständig durchspielen und danach Berichte/Abschlüsse bearbeiten. Fortlaufende geprüfte Veröffentlichung ist freigegeben; Backup bleibt übersprungen.
+
+## Bestätigter Rollout 30.10.2026 – Releases #62 bis #64
+
+Bankimport-Dublettenschutz (#62), rein lesende PDF-Quellenprüfung (#63) und CSV-Saldenvorschau mit Sperre widersprüchlicher Angaben (#64) sind nach main übernommen. Aktueller Hauptzweig: 23489cfd649efa8c81d87f4a3fd822fa1a698bd4. CI für den letzten PR-Head: 41067609710 erfolgreich; Pages-Deployment: 41067714654 erfolgreich. Live ausgelieferte app.mjs, index.html und import-review.mjs sind bytegleich mit dem geprüften Stand. Backendmigration 20261030133658 aktiv und schreibgeschützt bestätigt; Advisor-Gruppen vor/nach Änderung unverändert. Keine produktiven Bewohner-, Auth- oder Finanzdatensätze zu Testzwecken geändert.
+
+Nachweise: 281 allgemeine Tests, 84 aktuelle Aufgabenrechteprüfungen, 23 Kontakt-, 43 Historien-, 50 aktuelle Finanz-, 16 Bankimport- und 11 PDF-Strukturprüfungen erfolgreich. 58 lokale tatsächliche Browserprüfungen der Import-/Kontaktoberflächen in DE/TR bei 320–1440 px erfolgreich; ausschließlich synthetische Daten, keine externen Anfragen. Keine pauschale Gesamtgeräte-/Mail-/Auth-E2E-Abnahme.
+
+Nächster offener Fachpunkt: direkte PDF-/XLSX-Parser mit vollständigen Beschreibungen, Mehrseiten- und Spaltenzuordnung vor die vorhandene Vorschau integrieren; aktuell weiterhin nur CSV in der Live-Importmaske. Fortlaufende Abarbeitung und direkte Veröffentlichung geprüfter Änderungen sind ausdrücklich freigegeben. Backup bleibt übersprungen.
+
 ## Importvorschau und mobile Kontaktfreigabe – 30.10.2026
 
 PR #63 (PDF-Strukturprüfung) nach erfolgreicher CI 41065619848 veröffentlicht; Pages-Lauf 41065968751 erfolgreich. Der nächste umgesetzte Schritt ergänzt die bestehende CSV-Vorschau um Einnahmen, Ausgaben, Netto und eine exakte Prüfung vorhandener laufender Salden. Beide Druckreihenfolgen und fehlende Zwischenangaben werden berücksichtigt. Widersprüchliche Salden sperren den Importbutton vor Erstellung des Importpayloads; Beträge werden niemals passend gerechnet. Ohne ausreichende Saldoangaben bleibt die Quelle ausdrücklich ungeprüft; Anfangssaldo und Seitenvollständigkeit benötigen weiterhin separate Bestätigung. Dies ist eine zusätzliche Eingabeprüfung der Oberfläche, keine neue Buchungslogik oder Ersatz für serverseitige Rechte.
@@ -184,7 +200,7 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 
 - [x] Teilzahlungen, oldest-first-Zuordnung, Stornos und Schuldartgetrenntheit im aktuellen relevanten Migrationspaket isoliert geprüft (50 Finanzprüfungen).
 - [x] Aidat-/Umlagen-Entwurf und Superadmin-Endfreigabe isoliert geprüft und produktiv (#56–#58); tatsächliche Buchung, Wiederholung und Ablehnung ohne Finanzwirkung getestet.
-- [ ] PDF/CSV/XLSX-Import, Bankgebühren und Mehrfachimport-Dubletten testen.
+- [x] Unterstützte PDF-/CSV-/XLSX-Importpfade, Gebühren und Mehrfachimport-Dubletten isoliert und im nativen Browser geprüft; nicht unterstützte Formate bleiben gesperrt. Veröffentlichung separat bestätigen.
 - [ ] Abstimmung der Bankbewegungen, Salden und Zuordnung in drei getrennten Prüfschritten durchspielen.
 - [ ] Finanzkorrekturen nachvollziehbar und ohne Löschen historischer Buchungen absichern.
 

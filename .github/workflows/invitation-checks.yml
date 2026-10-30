@@ -9,6 +9,7 @@ on:
       - '**/*.html'
       - 'tests/**'
       - 'scripts/import/**'
+      - 'vendor/**'
       - 'package*.json'
       - '.github/workflows/invitation-checks.yml'
   push:
@@ -27,15 +28,22 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - name: Syntax validation
         run: |
           node --check app.mjs
+          node --check bank-file-reader.mjs
+          node --check bank-file-adapters.mjs
+          node --check bank-xlsx-worker.mjs
           node --check api.mjs
           node --check people-ui.mjs
           node --check invite-ui.mjs
           node --check site-claims-ui.mjs
           node --check supabase/functions/ay3-site-open-claims/math.mjs
+      - name: Verify pinned local import parsers
+        run: |
+          npm run build:import-parsers
+          git diff --exit-code -- vendor
       - name: Full JavaScript regression suite
         run: npm test
       - uses: denoland/setup-deno@v2

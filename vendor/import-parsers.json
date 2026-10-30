@@ -1,0 +1,22 @@
+{
+  "pdfjs": "6.4.299",
+  "xlsx": "9.3.14",
+  "builder": "esbuild 0.28.2",
+  "files": [
+    {
+      "path": "vendor/pdfjs-6.4.299/pdf.min.mjs",
+      "bytes": 458904,
+      "sha256": "57456c8e0c81e46be31174b499ef77f2b9f5ee46d04412ba627320a36755d4c2"
+    },
+    {
+      "path": "vendor/pdfjs-6.4.299/pdf.worker.min.mjs",
+      "bytes": 1264342,
+      "sha256": "9536359f1b8367850d485731ca1d5e45c159a7b7a0912325e539937aa21ceb18"
+    },
+    {
+      "path": "vendor/xlsx-9.3.14/reader.mjs",
+      "bytes": 38339,
+      "sha256": "b0877306afe1d6284308de5e7c755e8bb2b1b7a139d30d01170ffedf217dc289"
+    }
+  ]
+}
