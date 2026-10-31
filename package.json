@@ -30,7 +30,8 @@
     "test:budget:sql": "node tests/sql/budget-planning.mjs",
     "test:archive:sql": "node tests/sql/private-archive.mjs",
     "test:management:sql": "node tests/sql/management-tasks.mjs",
-    "test:holds:sql": "node tests/sql/claim-review-holds.mjs"
+    "test:holds:sql": "node tests/sql/claim-review-holds.mjs",
+    "test:ddl:sql": "node tests/sql/client-ddl-hardening.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.11",
