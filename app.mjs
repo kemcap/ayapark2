@@ -16,6 +16,7 @@ import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.9.2';
 import {bindAccessRequests} from './access-request-ui.mjs?v=5.9.0';
 import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.9.39';
 import {installSmartHeader} from './smart-header.mjs?v=5.9.49';
+import {expenseDistributionPanel} from './expense-distribution-ui.mjs?v=5.9.57';
 import {prepareV5Demo} from './finance-demo.mjs?v=5.9.39';
 import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.9.39';
 import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.9.39';
@@ -31,14 +32,14 @@ import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,
 import {bindInstall} from './install.mjs?v=5.9.39';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.54';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.57';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
 import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.9.39';
 import {AyaparkApi} from './api.mjs?v=5.9.54';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.54';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.57';
 import {buildForm,payloadFor} from './forms.mjs?v=5.9.56';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
@@ -49,7 +50,7 @@ let detailView=null,personUnitReturn=null,loginMethod='password';
 bindInstall();
 initializePreferences();
 const updateDesignControl=bindDesign(()=>render());
-const state={data:prepareV5Demo(fullDemo()),mode:IS_PREVIEW||new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},stale:false};
+const state={data:prepareV5Demo(fullDemo()),mode:IS_PREVIEW||new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},expenseDistributionYear:'report',stale:false};
 let peopleSearchTimer;
 const invitationUi=bindInvitations({
  api,getState:()=>state,rerender:()=>render(),
@@ -494,6 +495,12 @@ document.addEventListener('change',event=>{
  if(event.target.dataset.range){const kind=event.target.dataset.range,f=kind==='report'?state.reportFilter:state.filter;f[event.target.dataset.rangeField]=event.target.value;state.bankPage=0;render();return;}
  if(id==='reportGroup'){state.reportGroup=event.target.value;render();}
  if(id==='reportYear'){state.reportFilter=event.target.value==='all'?{preset:'all'}:{preset:'custom',from:event.target.value+'-01-01',to:event.target.value+'-12-31'};state.reportGroup=event.target.value==='all'?'year':'month';render();}
+ if(id==='expenseDistributionYear'){
+  state.expenseDistributionYear=event.target.value;
+  const panel=$('expenseDistributionPanel');
+  if(panel){panel.outerHTML=expenseDistributionPanel(state,selectedRange(state,'report'));$('expenseDistributionYear')?.focus({preventScroll:true});}
+  return;
+ }
  if(id==='peopleFilter'){state.peopleFilter=event.target.value;render();}
  if(id==='providerCategory'){state.providerCategory=event.target.value;render();}
  if(id==='reportPeriod'&&/^\d{4}-\d{2}$/.test(event.target.value)){state.period=event.target.value;render();}
