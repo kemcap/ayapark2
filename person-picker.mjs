@@ -1,7 +1,8 @@
-import {norm} from './v3-domain.mjs?v=5.9.26';
-import {escapeHtml as e} from './core.mjs?v=5.8.1';
-import {getLanguage} from './i18n.mjs?v=5.9.28';
-const text=(tr,de)=>getLanguage()==='de'?de:tr;
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {norm} from './v3-domain.mjs?v=5.10.0';
+import {escapeHtml as e} from './core.mjs?v=5.10.0';
+import {getLanguage} from './i18n.mjs?v=5.10.0';
+const text=(tr,de)=>(getLanguage()==='tr'?(tr):(uiText(de,getLanguage())));
 const phone=value=>{let n=String(value||'').replace(/\D/g,'').replace(/^00/,'');return n.replace(/^90(?=5\d{9}$)/,'').replace(/^0(?=5\d{9}$)/,'');};
 export function matchingPeople(people,query){
  const q=norm(query),digits=phone(query);

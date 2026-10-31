@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {summaryExport,bankExport,receiptExport,receiptIds} from '../report-export-domain.mjs';
-import {exportMarkup,validateExportModel} from '../report-export-view.mjs';
-import {workbookBytes} from '../xlsx-export.mjs';
+import {summaryExport,bankExport,receiptExport,receiptIds} from '../report-export-domain.mjs?v=5.10.0';
+import {exportMarkup,validateExportModel} from '../report-export-view.mjs?v=5.10.0';
+import {workbookBytes} from '../xlsx-export.mjs?v=5.10.0';
 import {unzipSync,readWorkbook} from '../vendor/xlsx-9.3.14/reader.mjs';
 const data=()=>({ownPersonIds:['own'],persons:[{id:'own',full_name:'Own Person'},{id:'other',full_name:'PRIVATE OTHER PERSON'}],units:[{id:'u',code:'A-1'}],charges:[{id:'c1',unit_id:'u',person_id:'own',label:'Aidat'},{id:'c2',unit_id:'u',person_id:'other',label:'PRIVATE OTHER DEBT'}],allocations:[{id:'a1',charge_id:'c1',entry_id:'e',cents:500,created_at:'2026-10-01'},{id:'a2',charge_id:'c2',entry_id:'e',cents:900,created_at:'2026-10-01'}],transactions:[{id:'e',date:'2026-10-01',cents:1400,desc:'PRIVATE BANK PURPOSE',sender_iban:'PRIVATE IBAN'}]});
 test('personal receipt exposes only own allocation even in a shared apartment/payment',()=>{

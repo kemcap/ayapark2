@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {scopedCharges} from '../v3-domain.mjs?v=5.9.20';
+import {scopedCharges} from '../v3-domain.mjs?v=5.10.0';
 import {calculateClaims} from '../supabase/functions/ay3-site-open-claims/math.mjs?v=5.8.1';
 
 const charges=[

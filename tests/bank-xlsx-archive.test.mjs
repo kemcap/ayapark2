@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {zipSync,strToU8} from 'fflate';
-import {validateXlsxArchive} from '../bank-file-adapters.mjs';
+import {validateXlsxArchive} from '../bank-file-adapters.mjs?v=5.10.0';
 const archive=extra=>zipSync({'[Content_Types].xml':strToU8('<Types/>'),'xl/workbook.xml':strToU8('<workbook/>'),...extra});
 test('supported bounded XLSX archives pass the size and structure gate',()=>{
  const result=validateXlsxArchive(archive());assert.equal(result.entries,2);assert(result.expandedBytes<100);

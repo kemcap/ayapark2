@@ -1,7 +1,7 @@
-import {designSettings,getDesign} from './design.mjs?v=5.8.1';
-import {t as tr,getLanguage,setLanguage} from './i18n.mjs?v=5.9.28';
-import {escapeHtml as e} from './core.mjs?v=5.8.1';
-export const preferenceOptions={palette:['classic','ocean','slate','plum','sand','ayapark'],loader:['ring','dots','bar','pulse','wave'],font:['normal','large','xlarge'],contrast:['normal','high'],density:['compact','comfortable'],motion:['system'],language:['tr','de'],theme:['system','light','dark']};
+import {designSettings,getDesign} from './design.mjs?v=5.10.0';
+import {t as tr,getLanguage,setLanguage} from './i18n.mjs?v=5.10.0';
+import {escapeHtml as e} from './core.mjs?v=5.10.0';
+export const preferenceOptions={palette:['classic','ocean','slate','plum','sand','ayapark'],loader:['ring','dots','bar','pulse','wave'],font:['normal','large','xlarge'],contrast:['normal','high'],density:['compact','comfortable'],motion:['system'],language:['tr','de','en'],theme:['system','light','dark']};
 export const preferenceDefaults={palette:'classic',loader:'ring',font:'normal',contrast:'normal',density:'comfortable',motion:'system',hideAmounts:false,language:'tr',theme:'system'};
 export function cleanPreferences(value={}){const out={...preferenceDefaults};for(const[k,options]of Object.entries(preferenceOptions))if(options.includes(value[k]))out[k]=value[k];out.hideAmounts=value.hideAmounts===true;return out;}
 const key='ayapark2-preferences-v1';let owner=null,current=cleanPreferences(),saveTimer,syncVersion=0;
@@ -38,7 +38,7 @@ function queuePreferenceSave(api,onStatus){
  saveTimer=setTimeout(async()=>{if(api.session?.user?.id!==uid)return;try{await api.rpc('ay3_preferences',{p_settings:payload});try{const saved=cached(uid);if(JSON.stringify(saved)===JSON.stringify(payload))localStorage.removeItem(key+':pending:'+uid);}catch{}onStatus(tr('Tercihler kaydedildi.'));}catch{onStatus(tr('Tercihler bu cihazda kaydedildi. Hesap eşitlemesi başarısız; yeniden deneyin.'));}},500);
 }
 
-const names={classic:'Klasik (standart)',ocean:'Okyanus',slate:'Arduvaz',plum:'Mürdüm',sand:'Kum',ayapark:'Ayapark 2',ring:'Halka',dots:'Noktalar',bar:'Çizgi',pulse:'Nabız',wave:'Dalga',normal:'Standart',large:'Büyük',xlarge:'Çok büyük',high:'Yüksek',compact:'Sıkı',comfortable:'Rahat',system:'Cihaz ayarı',reduce:'Azalt',tr:'Türkçe',de:'Deutsch'};
+const names={classic:'Klasik (standart)',ocean:'Okyanus',slate:'Arduvaz',plum:'Mürdüm',sand:'Kum',ayapark:'Ayapark 2',ring:'Halka',dots:'Noktalar',bar:'Çizgi',pulse:'Nabız',wave:'Dalga',normal:'Standart',large:'Büyük',xlarge:'Çok büyük',high:'Yüksek',compact:'Sıkı',comfortable:'Rahat',system:'Cihaz ayarı',reduce:'Azalt',tr:'Türkçe',de:'Deutsch',en:'English'};
 export function loaderMarkup(style=current.loader){return `<span class="preloader loader-${preferenceOptions.loader.includes(style)?style:'ring'}" aria-hidden="true"><i></i><i></i><i></i></span>`;}
 export function appearanceSettings(){const select=(k,label)=>`<label class="field">${tr(label)}<select data-preference="${k}" aria-label="${e(tr(label))}">${preferenceOptions[k].map(v=>`<option value="${v}" ${current[k]===v?'selected':''}>${e(tr(names[v]||v))}</option>`).join('')}</select></label>`;
  return `<details class="card appearance-settings"><summary>${tr('Görünüm ve kullanım')}</summary><p class="appearance-intro">${tr('Tercihler hesabınızla eşitlenir ve bu cihazda da saklanır.')}</p>

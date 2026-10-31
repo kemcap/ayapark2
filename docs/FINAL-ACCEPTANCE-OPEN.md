@@ -1,5 +1,14 @@
 # Verbleibende reale Abnahme – 31.10.2026
 
+## Englisch als dritte Sprache – geprüft, Veröffentlichung läuft – 31.10.2026
+
+Englisch ergänzt Deutsch/Türkisch, ohne bestehende Spracheinstellungen oder private Inhalte umzustellen. 1.279 zentrale Quelltexte vollständig abgedeckt, insgesamt 1.873 englische Texte/Fragmente. Anmeldung, Wiederherstellung, Dialoge, Berichte, PDF/Excel und Konto-Sprache berücksichtigt. Begriffe auf einfache, eindeutige Formulierungen geprüft; türkisches „Guthaben“ verständlich als „Alacak bakiyesi“ dargestellt. Daten und Finanzregeln unverändert.
+
+399 JavaScript-, zehn isolierte SQL- und 100 synthetische Browserprüfungen erfolgreich. Backend-Migration `20261031170253` erweitert nur die erlaubte Einstellung um Englisch; vorhandene Einstellungen vor/nach Änderung identisch. Frontend noch nicht als live bestätigt. Details: [Sprachprüfung](ENGLISH-LANGUAGE-AUDIT.md).
+
+Nächster Schritt: CI, autorisierte Veröffentlichung und bytegleiche Pages-Prüfung; anschließend reale Geräte-/PWA-/Sitzungs-/Mailabnahme fortführen, ohne produktive Testdaten zu verändern. Backup weiterhin übersprungen.
+
+
 ## Veröffentlicht und live geprüft – 31.10.2026
 
 Verwaltungs-Leseeinsicht und Bewohnerlayout aus PR #94 sind veröffentlicht: main `1b656615798e1fda0903aa9b2ce3986da85ce230`. Vollständige GitHub-CI `41210069004` erfolgreich, einschließlich der 27 neuen SQL-Leserechteprüfungen. Pages `41210205720` erfolgreich. Elf ausgelieferte Dateien (Index, API, App, Formulare, Einstellungen, V3-UI, Forderungsübersicht/-CSS, Kategorien-CSS, UI, V3-Formulare) mit dem geprüften Stand bytegleich bestätigt. Cachegraph einheitlich aktualisiert; die parallel ergänzten Dienstleister-Kategorien/Notizfunktionen erhalten.

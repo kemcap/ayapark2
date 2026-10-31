@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {inviteEligible,inviteText,whatsappNumber,whatsappShareUrl} from '../invite-ui.mjs?v=5.9.0';
-import {AyaparkApi,loginIdentifier} from '../api.mjs?v=5.9.0';
+import {inviteEligible,inviteText,whatsappNumber,whatsappShareUrl} from '../invite-ui.mjs?v=5.10.0';
+import {AyaparkApi,loginIdentifier} from '../api.mjs?v=5.10.0';
 
 const person={id:'p1',full_name:'Test Resident',phone:'0542 111 22 33',email:''};
 const base={mode:'connected',data:{role:'super',persons:[person],links:[{person_id:'p1',role:'tenant',starts_on:'2024-01-01',ends_on:null}],units:[]}};
@@ -77,8 +77,8 @@ test('backend stores hash-only one-time tokens and atomically claims access',asy
 });
 test('invite activation UI has no mandatory email and requires password twice',async()=>{
  const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
- const app=await readFile(new URL('../app.mjs',import.meta.url),'utf8');
- const client=await readFile(new URL('../invite-ui.mjs',import.meta.url),'utf8');
+ const app=await readFile(new URL('../app.mjs?v=5.10.0',import.meta.url),'utf8');
+ const client=await readFile(new URL('../invite-ui.mjs?v=5.10.0',import.meta.url),'utf8');
  assert.match(html,/id="inviteActivationPassword"/);
  assert.match(html,/id="inviteActivationConfirm"/);
  assert.match(html,/id="inviteConfirm"/);

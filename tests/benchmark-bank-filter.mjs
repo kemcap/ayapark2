@@ -1,7 +1,7 @@
 import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import {performance} from 'node:perf_hooks';
-import {filteredTransactions,assertRange,selectedRange,norm,creditAvailable} from '../v3-domain.mjs';
+import {filteredTransactions,assertRange,selectedRange,norm,creditAvailable} from '../v3-domain.mjs?v=5.10.0';
 // Compare the exact reviewed starting implementation, never another live checkout.
 const ref='deef766bbc22f2aa7b7bb4d6bf8b2ffc64e74c4c';
 const source=execFileSync('git',['show',ref+':v3-domain.mjs'],{encoding:'utf8'});

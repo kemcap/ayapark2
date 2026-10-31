@@ -1,7 +1,8 @@
+import {uiText} from './language-text.mjs?v=5.10.0';
 const denied=()=>{throw Error('Export access denied');};
 const cents=n=>{n=Number(n);if(!Number.isSafeInteger(n))throw Error('Invalid export amount');return {moneyCents:n};};
-const text=(language,de,tr)=>language==='de'?de:tr;
-function base(language,demo,title,columns,rows,notes=[]){return {language:language==='de'?'de':'tr',demo:!!demo,title,columns,rows,notes};}
+const text=(language,de,tr)=>(language==='tr'?(tr):(uiText(de,language)));
+function base(language,demo,title,columns,rows,notes=[]){return {language:['de','en','tr'].includes(language)?language:'tr',demo:!!demo,title,columns,rows,notes};}
 export function summaryExport(data,series,{language='tr',demo=false,canFinance=false,range={}}={}){
  if(!canFinance&&data.communityAccess!==true)denied();
  return base(language,demo,text(language,'Finanzübersicht','Mali özet'),[text(language,'Zeitraum','Dönem'),text(language,'Einnahmen','Gelir'),text(language,'Ausgaben','Gider'),text(language,'Differenz','Fark')],series.buckets.map(b=>[String(b.period),cents(b.income),cents(b.expense),cents(b.income-b.expense)]),[text(language,'Aggregierte Übersicht ohne persönliche Schuldnerdetails. Kein bestätigter Monats-/Jahresabschluss.','Kişisel borçlu bilgileri içermeyen toplu özet. Onaylı aylık/yıllık kapanış değildir.'),text(language,'Zeitraum: ','Dönem: ')+(range.from||text(language,'verfügbarer Beginn','mevcut başlangıç'))+' – '+(range.to||text(language,'verfügbares Ende','mevcut bitiş'))]);

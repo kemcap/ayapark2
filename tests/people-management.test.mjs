@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {matchingPeople} from '../person-picker.mjs?v=5.9.0';
-import {registrationStatus} from '../person-status.mjs?v=5.9.0';
-import {inviteEligible} from '../invite-ui.mjs?v=5.9.0';
-import {scopedCharges} from '../v3-domain.mjs?v=5.9.0';
-import {setLanguage} from '../i18n.mjs?v=5.9.28';
+import {matchingPeople} from '../person-picker.mjs?v=5.10.0';
+import {registrationStatus} from '../person-status.mjs?v=5.10.0';
+import {inviteEligible} from '../invite-ui.mjs?v=5.10.0';
+import {scopedCharges} from '../v3-domain.mjs?v=5.10.0';
+import {setLanguage} from '../i18n.mjs?v=5.10.0';
 const people=[{id:'a',first_name:'Ayşe',last_name:'Işık',full_name:'Ayşe Işık',phone:'+90 (532) 123-45-67',email:'ayse@gmail.com'},{id:'b',full_name:'İlker Çelik',phone:'0542 999 88 77'},{id:'c',full_name:'Archived',archived_at:'2020-01-01'}];
 test('picker searches Turkish names, partial names, email and normalized phone locally',()=>{
  for(const q of ['A','AYSE','Ayşe IŞIK','isik','0532','+90 532','532123','gmail'])assert(matchingPeople(people,q).some(p=>p.id==='a'),q);

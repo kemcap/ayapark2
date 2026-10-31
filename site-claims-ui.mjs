@@ -1,7 +1,8 @@
-import {getLanguage} from './i18n.mjs?v=5.9.28';
-import {escapeHtml as escape,money} from './core.mjs?v=5.8.1';
-import {scopedCharges} from './v3-domain.mjs?v=5.9.26';
-import {remaining} from './ledger.mjs?v=5.9.39';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {getLanguage} from './i18n.mjs?v=5.10.0';
+import {escapeHtml as escape,money} from './core.mjs?v=5.10.0';
+import {scopedCharges} from './v3-domain.mjs?v=5.10.0';
+import {remaining} from './ledger.mjs?v=5.10.0';
 
 const labels={
  own:['Dairenin açık borçları','Offene Forderungen zur Wohnung'],
@@ -32,11 +33,11 @@ const labels={
  itemDetail:['Borç detayları','Forderungsdetails'],
  none:['Bu dairede açık borç yok.','Keine offenen Forderungen für diese Wohnung.']
 };
-const text=(id)=>labels[id]?.[getLanguage()==='de'?1:0]||id;
+const text=(id)=>getLanguage()==='tr'?(labels[id]?.[0]||id):uiText(labels[id]?.[1]||id,getLanguage());
 const valid=value=>Number.isSafeInteger(value)&&value>=0;
 
 const roleText=role=>text(({owner:'roleOwner',tenant:'roleTenant',representative:'roleRepresentative',debtor:'roleDebtor'})[role]||'');
-const dueText=day=>{if(!day)return '—';const value=new Date(day+'T12:00:00Z');return Number.isNaN(value.getTime())?escape(day):new Intl.DateTimeFormat(getLanguage()==='de'?'de-DE':'tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'Europe/Istanbul'}).format(value);};
+const dueText=day=>{if(!day)return '—';const value=new Date(day+'T12:00:00Z');return Number.isNaN(value.getTime())?escape(day):new Intl.DateTimeFormat((getLanguage()==='tr'?('tr-TR'):(uiText("de-DE",getLanguage()))),{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'Europe/Istanbul'}).format(value);};
 const debtorLabel=(d,c)=>{
  const person=d.persons?.find(p=>p.id===c.person_id);
  const role=person?.unit_roles?.find(x=>x.unit_id===c.unit_id&&['owner','tenant','representative'].includes(x.role))?.role||(['owner','tenant','representative','debtor'].includes(c.payer)?c.payer:'');

@@ -1,5 +1,14 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
 
+## Englisch als dritte Sprache – geprüft, Veröffentlichung läuft – 31.10.2026
+
+Englisch ergänzt Deutsch/Türkisch, ohne bestehende Spracheinstellungen oder private Inhalte umzustellen. 1.279 zentrale Quelltexte vollständig abgedeckt, insgesamt 1.873 englische Texte/Fragmente. Anmeldung, Wiederherstellung, Dialoge, Berichte, PDF/Excel und Konto-Sprache berücksichtigt. Begriffe auf einfache, eindeutige Formulierungen geprüft; türkisches „Guthaben“ verständlich als „Alacak bakiyesi“ dargestellt. Daten und Finanzregeln unverändert.
+
+399 JavaScript-, zehn isolierte SQL- und 100 synthetische Browserprüfungen erfolgreich. Backend-Migration `20261031170253` erweitert nur die erlaubte Einstellung um Englisch; vorhandene Einstellungen vor/nach Änderung identisch. Frontend noch nicht als live bestätigt. Details: [Sprachprüfung](ENGLISH-LANGUAGE-AUDIT.md).
+
+Nächster Schritt: CI, autorisierte Veröffentlichung und bytegleiche Pages-Prüfung; anschließend reale Geräte-/PWA-/Sitzungs-/Mailabnahme fortführen, ohne produktive Testdaten zu verändern. Backup weiterhin übersprungen.
+
+
 ## Freigegebene Ausgabenkategorien korrigiert – 31.10.2026
 
 Nach ausdrücklicher konkreter Nutzerfreigabe wurden die 49 zuvor einzeln mit dem Originalkontoauszug abgeglichenen Vidanjör-Ausgaben aus „Diğer“ nach „Vidanjör“ umkategorisiert. Ausschließlich diese festgelegten Datensätze und ausschließlich die Kategorie wurden geändert. Ausführung in einer atomaren Transaktion mit Mengen-/Summen-/Originalfeldprüfung und bestehendem Abschluss-Sperrtrigger; keine gesperrten Zeiträume betroffen.

@@ -1,12 +1,13 @@
-import {taskOptions} from './task-permissions.mjs?v=5.9.28';
-import {buildFinanceForm,financePayload} from './finance-forms.mjs?v=5.9.39';
-import {buildV3Form,payloadV3} from './v3-forms.mjs?v=5.9.56';
-import {t as tr,getLanguage} from './i18n.mjs?v=5.9.28';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {taskOptions} from './task-permissions.mjs?v=5.10.0';
+import {buildFinanceForm,financePayload} from './finance-forms.mjs?v=5.10.0';
+import {buildV3Form,payloadV3} from './v3-forms.mjs?v=5.10.0';
+import {t as tr,getLanguage} from './i18n.mjs?v=5.10.0';
 
-import {escapeHtml as e,money,randomId} from './core.mjs?v=5.8.1';
-import {remaining,unassigned} from './ledger.mjs?v=5.9.39';
-import {personName,creditAvailable} from './v3-domain.mjs?v=5.9.26';
-import {analyzeStage} from './reconcile.mjs?v=5.8.1';
+import {escapeHtml as e,money,randomId} from './core.mjs?v=5.10.0';
+import {remaining,unassigned} from './ledger.mjs?v=5.10.0';
+import {personName,creditAvailable} from './v3-domain.mjs?v=5.10.0';
+import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 export const field=(name,label,type='text',value='',attrs='')=>`<label class="field">${tr(label)}<input name="${name}" type="${type}" value="${e(value)}" ${attrs}></label>`;
 const select=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}">${options.map(([v,l])=>`<option value="${e(v)}" ${String(v)===String(value)?'selected':''}>${e(tr(l))}</option>`).join('')}</select></label>`;
 const check=(name,label,checked=false)=>`<label class="check-field"><input type="checkbox" name="${name}" ${checked?'checked':''}>${tr(label)}</label>`;
@@ -33,7 +34,7 @@ export function buildLegacyForm(s,action,args={}){
   const p=d.people.find(p=>p.id===args.id);title=p?tr("Kişi bilgilerini düzenle"):tr("Kişi ekle");body=(p?'':select('unit_id',tr("Daire"),unitOptions,args.unit))+field('full_name',tr("Ad soyad"),'text',p?.full_name||'','required maxlength="150"')+select('relation',tr("İlişki"),[['owner',tr("Kat maliki")],['tenant',tr("Kiracı")]],p?.relation||'owner')+field('email',tr("E-posta"),'email',p?.email||'','maxlength="254"')+field('phone',tr("Telefon"),'tel',p?.phone||'','maxlength="60"')+(p?check('active',tr("Aktif kişi"),p.active):'');
  }
  else if(action==='announcement'){const a=d.announcements.find(a=>a.id===args.id);title=a?tr("Duyuruyu düzenle"):tr("Duyuru oluştur");body=field('title',tr("Başlık"),'text',a?.title||'','required maxlength="150"')+text('body',tr("Duyuru metni"),a?.body||'')+check('published',tr("Site sakinlerine yayımla"),a?.published||false);}
- else if(action==='permissions'){title=tr("Yönetim yetkileri");const taskMode=Array.isArray(d.taskGrants),caps=taskMode?(d.taskGrants.find(p=>p.user_id===args.id)?.tasks||[]):d.permissions.find(p=>p.user_id===args.id)?.capabilities||[];body=`<p class="muted">${tr("Bu yetkiler yalnızca V3 alanı içindir. Süper Admin yetkisi vermez.")}</p>`+(taskMode?check('management_read',getLanguage()==='de'?'Alle Wohnungen, zugeordnete Namen und Forderungen einsehen':'Tüm daireleri, bağlı kişileri ve borçları görüntüle',d.taskGrants.find(p=>p.user_id===args.id)?.management_read!==false)+'<p class="fine">'+(getLanguage()==='de'?'Nur Einsicht. Bearbeiten wird separat erlaubt. Abwahl entzieht keine separat vergebenen Aufgabenrechte.':'Yalnız görüntüleme. Düzenleme ayrı yetkilere bağlıdır. Kapatmak diğer görev yetkilerini kaldırmaz.')+'</p>':'')+(taskMode?taskOptions():[['finance',tr("Mali kayıtlar ve ödeme eşleştirme")],['import',tr("Banka dosyası içe aktarma")],['people',tr("Kişi kayıtları")],['announcements',tr("Duyuru oluşturma ve yayımlama")]]).map(([k,l])=>check(k,l,caps.includes(k))).join('')+(taskMode?'<input type="hidden" name="task_mode" value="1"><p class="fine">'+tr('Kaydetmek eski yetkileri bu beş görevle değiştirir. Seçilmeyen görevler kapalı kalır.')+'</p>':'');}
+ else if(action==='permissions'){title=tr("Yönetim yetkileri");const taskMode=Array.isArray(d.taskGrants),caps=taskMode?(d.taskGrants.find(p=>p.user_id===args.id)?.tasks||[]):d.permissions.find(p=>p.user_id===args.id)?.capabilities||[];body=`<p class="muted">${tr("Bu yetkiler yalnızca V3 alanı içindir. Süper Admin yetkisi vermez.")}</p>`+(taskMode?check('management_read',(getLanguage()==='tr'?('Tüm daireleri, bağlı kişileri ve borçları görüntüle'):(uiText("Alle Wohnungen, zugeordnete Namen und Forderungen einsehen",getLanguage()))),d.taskGrants.find(p=>p.user_id===args.id)?.management_read!==false)+'<p class="fine">'+((getLanguage()==='tr'?('Yalnız görüntüleme. Düzenleme ayrı yetkilere bağlıdır. Kapatmak diğer görev yetkilerini kaldırmaz.'):(uiText("Nur Einsicht. Bearbeiten wird separat erlaubt. Abwahl entzieht keine separat vergebenen Aufgabenrechte.",getLanguage()))))+'</p>':'')+(taskMode?taskOptions():[['finance',tr("Mali kayıtlar ve ödeme eşleştirme")],['import',tr("Banka dosyası içe aktarma")],['people',tr("Kişi kayıtları")],['announcements',tr("Duyuru oluşturma ve yayımlama")]]).map(([k,l])=>check(k,l,caps.includes(k))).join('')+(taskMode?'<input type="hidden" name="task_mode" value="1"><p class="fine">'+tr('Kaydetmek eski yetkileri bu beş görevle değiştirir. Seçilmeyen görevler kapalı kalır.')+'</p>':'');}
  else if(action==='settings'){title=tr("Defter açılışı");body=field('opening_date',tr("Açılış tarihi"),'date',today(),'required')+amount(tr("Açılış bakiyesi (TL)"),'0,00');}
  else if(action==='publish_report'){title=tr("Aylık mali raporu yayımla");body=`<p>${e(s.period)}${tr(" döneminin ortak toplamları site sakinlerine açılacak. Kişisel banka açıklamaları rapora dahil edilmez.")}</p><p class="fine">${tr("Aynı döneme ait önceki rapor güncellenir. Verilerin tamlığını kontrol edin.")}</p>`+check('confirmation',tr("Tutarları kontrol ettim, raporu yayımla."));}
  else if(action==='confirm_staged'){

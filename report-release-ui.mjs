@@ -1,9 +1,10 @@
-import {escapeHtml as e,randomId} from './core.mjs?v=5.8.1';
-import {releasedReportModel} from './released-report-model.mjs?v=5.9.38';
-import {exportMarkup} from './report-export-view.mjs?v=5.9.36';
-import {downloadWorkbook,openExport} from './report-export-ui.mjs?v=5.9.36';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=5.10.0';
+import {releasedReportModel} from './released-report-model.mjs?v=5.10.0';
+import {exportMarkup} from './report-export-view.mjs?v=5.10.0';
+import {downloadWorkbook,openExport} from './report-export-ui.mjs?v=5.10.0';
 export function reportReleases({rpc,admin,community,site,language}){
- let dialog,busy=false,generation=0,model,requests=new Map();const t=(de,tr)=>language()==='de'?de:tr;
+ let dialog,busy=false,generation=0,model,requests=new Map();const t=(de,tr)=>(language()==='tr'?(tr):(uiText(de,language())));
  const clear=()=>{generation++;model=null;requests.clear();if(dialog)dialog.textContent='';};
  const close=()=>{dialog?.close();clear();};
  const active=token=>dialog?.open&&generation===token.generation&&site()===token.site&&(token.admin?admin():community());

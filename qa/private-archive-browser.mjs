@@ -12,7 +12,7 @@ try{
   await page.setViewportSize({width,height:1000});await page.goto(base+'/export.html?archive='+language+width);
   await page.evaluate(async language=>{
    const css=document.createElement('link');css.rel='stylesheet';css.href='/archive.css?v=5.9.42';document.head.append(css);
-   const {privateArchive}=await import('/archive-ui.mjs?v=5.9.42');window.calls=[];window.transfers=[];window.downloads=[];window.isAdmin=true;window.permitted=true;window.rows=[];window.meetings=[];window.files={};window.failConfirm=false;window.corrupt=false;window.id=0;
+   const {privateArchive}=await import('/archive-ui.mjs?v=5.10.0');window.calls=[];window.transfers=[];window.downloads=[];window.isAdmin=true;window.permitted=true;window.rows=[];window.meetings=[];window.files={};window.failConfirm=false;window.corrupt=false;window.id=0;
    const uuid=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
    window.ui=privateArchive({allowed:()=>permitted,admin:()=>isAdmin,site:()=>uuid(100),siteName:()=>'<synthetic site>',language:()=>language,download:async(meta,bytes)=>downloads.push({meta,bytes:[...bytes]}),storage:async(path,args={})=>{transfers.push({path,upload:!!args.bytes});if(args.bytes){if(files[path])return {already_uploaded:true};files[path]=new Uint8Array(args.bytes);return {uploaded:true};}return corrupt?new Uint8Array([0]):new Uint8Array(files[path]);},rpc:async(name,args)=>{
     calls.push({name,args});if(name==='ay6_document_workspace')return {admin:isAdmin,rows:structuredClone(rows.filter(d=>(isAdmin||d.status==='ready')&&(!args.p_category||d.category===args.p_category)&&(!args.p_query||(d.title+' '+d.filename).toLowerCase().includes(args.p_query.toLowerCase()))))};

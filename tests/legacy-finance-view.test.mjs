@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {legacyFinance,isLegacyCharge} from '../legacy-finance.mjs?v=5.9.50';
-import {unitDetailV3,former} from '../v3-ui.mjs?v=5.9.50';
-import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {money} from '../core.mjs?v=5.8.1';
-import {setLanguage} from '../i18n.mjs?v=5.9.28';
+import {unitDetailV3,former} from '../v3-ui.mjs?v=5.10.0';
+import {fullDemo} from '../ledger.mjs?v=5.10.0';
+import {money} from '../core.mjs?v=5.10.0';
+import {setLanguage} from '../i18n.mjs?v=5.10.0';
 
 const A2='A-2';
 const categories={'Aidat':662300,'Havuz':210000,'Asansör':38000,'Demirbaş':105000,'Su dijital kafa':110000,'Su arıtma bakımı':125000,'Bina kapısı bakımı':410000};

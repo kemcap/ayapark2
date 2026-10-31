@@ -1,0 +1,260 @@
+{
+  "passed": 100,
+  "errors": [],
+  "external": [],
+  "results": [
+    {
+      "lang": "tr",
+      "width": 375,
+      "view": "overview",
+      "heading": "Siteniz bugün nasıl?"
+    },
+    {
+      "lang": "tr",
+      "width": 375,
+      "view": "units",
+      "heading": "Daireler"
+    },
+    {
+      "lang": "tr",
+      "width": 375,
+      "view": "dues",
+      "heading": "Aidat & borçlar"
+    },
+    {
+      "lang": "tr",
+      "width": 375,
+      "view": "reports",
+      "heading": "Mali raporlar"
+    },
+    {
+      "lang": "tr",
+      "width": 375,
+      "view": "providers",
+      "heading": "Hizmet rehberi"
+    },
+    {
+      "lang": "tr",
+      "width": 375,
+      "view": "law",
+      "heading": "Bilgi & Mevzuat"
+    },
+    {
+      "lang": "tr",
+      "width": 375,
+      "view": "settings",
+      "heading": "Erişim & ayarlar"
+    },
+    {
+      "lang": "tr",
+      "width": 1440,
+      "view": "overview",
+      "heading": "Siteniz bugün nasıl?"
+    },
+    {
+      "lang": "tr",
+      "width": 1440,
+      "view": "units",
+      "heading": "Daireler"
+    },
+    {
+      "lang": "tr",
+      "width": 1440,
+      "view": "dues",
+      "heading": "Aidat & borçlar"
+    },
+    {
+      "lang": "tr",
+      "width": 1440,
+      "view": "reports",
+      "heading": "Mali raporlar"
+    },
+    {
+      "lang": "tr",
+      "width": 1440,
+      "view": "providers",
+      "heading": "Hizmet rehberi"
+    },
+    {
+      "lang": "tr",
+      "width": 1440,
+      "view": "law",
+      "heading": "Bilgi & Mevzuat"
+    },
+    {
+      "lang": "tr",
+      "width": 1440,
+      "view": "settings",
+      "heading": "Erişim & ayarlar"
+    },
+    {
+      "lang": "de",
+      "width": 375,
+      "view": "overview",
+      "heading": "Ihre Wohnanlage im Überblick"
+    },
+    {
+      "lang": "de",
+      "width": 375,
+      "view": "units",
+      "heading": "Wohnungen"
+    },
+    {
+      "lang": "de",
+      "width": 375,
+      "view": "dues",
+      "heading": "Hausgeld & Forderungen"
+    },
+    {
+      "lang": "de",
+      "width": 375,
+      "view": "reports",
+      "heading": "Finanzberichte"
+    },
+    {
+      "lang": "de",
+      "width": 375,
+      "view": "providers",
+      "heading": "Dienstleister"
+    },
+    {
+      "lang": "de",
+      "width": 375,
+      "view": "law",
+      "heading": "Recht & Informationen"
+    },
+    {
+      "lang": "de",
+      "width": 375,
+      "view": "settings",
+      "heading": "Zugriff & Einstellungen"
+    },
+    {
+      "lang": "de",
+      "width": 1440,
+      "view": "overview",
+      "heading": "Ihre Wohnanlage im Überblick"
+    },
+    {
+      "lang": "de",
+      "width": 1440,
+      "view": "units",
+      "heading": "Wohnungen"
+    },
+    {
+      "lang": "de",
+      "width": 1440,
+      "view": "dues",
+      "heading": "Hausgeld & Forderungen"
+    },
+    {
+      "lang": "de",
+      "width": 1440,
+      "view": "reports",
+      "heading": "Finanzberichte"
+    },
+    {
+      "lang": "de",
+      "width": 1440,
+      "view": "providers",
+      "heading": "Dienstleister"
+    },
+    {
+      "lang": "de",
+      "width": 1440,
+      "view": "law",
+      "heading": "Recht & Informationen"
+    },
+    {
+      "lang": "de",
+      "width": 1440,
+      "view": "settings",
+      "heading": "Zugriff & Einstellungen"
+    },
+    {
+      "lang": "en",
+      "width": 375,
+      "view": "overview",
+      "heading": "Your community at a glance"
+    },
+    {
+      "lang": "en",
+      "width": 375,
+      "view": "units",
+      "heading": "Apartments"
+    },
+    {
+      "lang": "en",
+      "width": 375,
+      "view": "dues",
+      "heading": "Maintenance fees & charges"
+    },
+    {
+      "lang": "en",
+      "width": 375,
+      "view": "reports",
+      "heading": "Financial reports"
+    },
+    {
+      "lang": "en",
+      "width": 375,
+      "view": "providers",
+      "heading": "Service providers"
+    },
+    {
+      "lang": "en",
+      "width": 375,
+      "view": "law",
+      "heading": "Rules & information"
+    },
+    {
+      "lang": "en",
+      "width": 375,
+      "view": "settings",
+      "heading": "Access & settings"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "view": "overview",
+      "heading": "Your community at a glance"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "view": "units",
+      "heading": "Apartments"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "view": "dues",
+      "heading": "Maintenance fees & charges"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "view": "reports",
+      "heading": "Financial reports"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "view": "providers",
+      "heading": "Service providers"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "view": "law",
+      "heading": "Rules & information"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "view": "settings",
+      "heading": "Access & settings"
+    }
+  ],
+  "productionRequests": 0
+}

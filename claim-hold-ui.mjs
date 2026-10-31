@@ -1,5 +1,6 @@
-import {escapeHtml as e,randomId} from './core.mjs?v=5.8.1';
-export function claimHoldReview({rpc,allowed,site,language,data,onSaved=async()=>{}}){let dialog,charge,workspace,generation=0,busy=false;const requests=new Map(),t=(de,tr)=>language()==='de'?de:tr;
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=5.10.0';
+export function claimHoldReview({rpc,allowed,site,language,data,onSaved=async()=>{}}){let dialog,charge,workspace,generation=0,busy=false;const requests=new Map(),t=(de,tr)=>(language()==='tr'?(tr):(uiText(de,language())));
  function close(){generation++;charge=null;workspace=null;requests.clear();busy=false;dialog?.close();if(dialog)dialog.textContent='';}
  const scope=()=>({generation,site:site()}),valid=s=>dialog?.open&&allowed()&&s.generation===generation&&s.site===site();
  async function call(name,args,s){if(!valid(s))throw Error('Claim review access denied');const result=await rpc(name,{p_site:s.site,...args});if(!valid(s))throw Error('Claim review session changed');return result;}

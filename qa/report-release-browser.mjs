@@ -22,7 +22,7 @@ try{
  for(const lang of ['de','tr']){
   await page.goto(base+'/export.html?admin='+lang);
   await page.evaluate(async({lang,row,site})=>{
-   const {reportReleases}=await import('/report-release-ui.mjs?v=5.9.40');window.calls=[];window.permitted=true;window.releaseRows=[];window.failOnce=false;
+   const {reportReleases}=await import('/report-release-ui.mjs?v=5.10.0');window.calls=[];window.permitted=true;window.releaseRows=[];window.failOnce=false;
    window.releaseUI=reportReleases({admin:()=>window.permitted,community:()=>true,site:()=>site,language:()=>lang,rpc:async(name,args)=>{calls.push({name,args});if(name==='ay3_closing_workspace')return {admin:true,rows:[{id:'synthetic-closing',kind:'month',period:row.period,status:'closed'}]};if(name==='ay3_report_release_workspace')return window.releaseRows;if(name==='ay3_community_report_summaries')return [row];if(name==='ay3_release_report'){if(window.failOnce){window.failOnce=false;throw Error('Synthetic lost response');}window.releaseRows=[{id:'synthetic-release',closing_id:'synthetic-closing',audience:args.p_audience,created_at:'2026-10-30'}];return {id:'synthetic-release'};}if(name==='ay3_revoke_report_release'){window.releaseRows[0].revoked_at='2026-10-30';return {revoked:true};}throw Error(name);}});await window.releaseUI.openAdmin();
   },{lang,row,site});
   const dialog=page.locator('dialog');await dialog.locator('[data-release=publish]').waitFor();check(lang+' no default audience or approval',await dialog.locator('[name=audience]').inputValue()===''&&!(await dialog.locator('[name=confirm]').isChecked()));

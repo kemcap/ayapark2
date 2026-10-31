@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {AyaparkApi} from '../api.mjs';
-import {visible} from '../ui.mjs';
-import {scopedCharges} from '../v3-domain.mjs';
+import {AyaparkApi} from '../api.mjs?v=5.10.0';
+import {visible} from '../ui.mjs?v=5.10.0';
+import {scopedCharges} from '../v3-domain.mjs?v=5.10.0';
 test('own historical charge retains its apartment label without granting current apartment access',async()=>{
  const api=new AyaparkApi(undefined,{storage:null});api.session={user:{id:'own-user'}};
  const units=[{id:'current',code:'A-1',block_id:'b'},{id:'old',code:'A-2',block_id:'b'},{id:'foreign',code:'B-1',block_id:'b'}];

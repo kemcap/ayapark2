@@ -2,7 +2,7 @@ import {PGlite} from '@electric-sql/pglite';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {loadCurrentSchema} from './current-schema.mjs';
-import {parseImport,templateHeader} from '../../v3-import.mjs?v=5.8.1';
+import {parseImport,templateHeader} from '../../v3-import.mjs?v=5.10.0';
 const db=new PGlite(),site='20000000-0000-0000-0000-000000000001',admin='10000000-0000-0000-0000-000000000001';let passed=0;
 const q=async(sql,args=[])=>Object.values((await db.query(sql,args)).rows[0])[0];
 const check=(name,ok)=>{assert(ok,name);passed++;};

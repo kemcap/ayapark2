@@ -14,7 +14,7 @@ try{
  for(const lang of ['de','tr']){
   await page.goto(base+'/export.html?qa='+lang);
   await page.evaluate(async lang=>{
-   const {periodClosings}=await import('/period-closing-ui.mjs?v=5.9.37');window.calls=[];window.permitted=true;window.failNext=false;window.rows=[];
+   const {periodClosings}=await import('/period-closing-ui.mjs?v=5.10.0');window.calls=[];window.permitted=true;window.failNext=false;window.rows=[];
    const snap={kind:'month',period:'2026-09-01',ends_on:'2026-09-30',opening_cents:10000,income_cents:2345,expense_cents:0,cash_adjustment_cents:0,closing_cents:12345,unresolved_count:1,unreviewed_staged_count:0,fingerprint:'synthetic-fingerprint',period_complete:true};
    window.ui=periodClosings({allowed:()=>window.permitted,site:()=> 'synthetic-site',language:()=>lang,rpc:async(name,args)=>{window.calls.push({name,args});if(name==='ay3_closing_workspace')return {admin:true,rows:window.rows};if(name==='ay3_closing_preview')return snap;if(name==='ay3_finalize_period'){if(window.failNext){window.failNext=false;throw Error('Synthetic network failure');}window.rows=[{id:'closing-one',...snap,snapshot:snap,status:'closed',source_reference:args.p_source_reference,review_note:args.p_note}];return {id:'closing-one',status:'closed'};}if(name==='ay3_reopen_period'){window.rows[0]={...window.rows[0],status:'reopened',reopen_reason:args.p_reason};return {status:'reopened'};}throw Error('Unexpected RPC');}});await window.ui.open();
   },lang);

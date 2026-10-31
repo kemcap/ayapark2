@@ -1,7 +1,7 @@
 import {archivePath,MAX_DOCUMENT_BYTES} from './archive-files.mjs?v=5.9.42';
 import {classifyIdentifier,newPasswordError} from './auth-policy.mjs?v=5.8.1';
 import {ENABLE_VERIFIED_PHONE_LOGIN} from './auth-features.mjs?v=5.8.1';
-import {t as tr} from './i18n.mjs?v=5.9.28';
+import {t as tr} from './i18n.mjs?v=5.10.0';
 // Existing site tables are read-only; V2 mutations use a checked transactional RPC.
 const URL='https://eisozwhhinqszfikemot.supabase.co';
 const KEY='sb_publishable_KGkvInvbdFRRF0716v9AuQ_fZjwkkBc';

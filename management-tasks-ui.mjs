@@ -1,6 +1,7 @@
-import {escapeHtml as e,randomId} from './core.mjs?v=5.8.1';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=5.10.0';
 export function managementTasks({rpc,allowed,admin,site,language,onSaved=async()=>{},onDocument=()=>{}}){
- let dialog,workspace,docs=[],busy=false,generation=0;const requests=new Map(),t=(de,tr)=>language()==='de'?de:tr;
+ let dialog,workspace,docs=[],busy=false,generation=0;const requests=new Map(),t=(de,tr)=>(language()==='tr'?(tr):(uiText(de,language())));
  const statuses=()=>[['open',t('Offen','Açık')],['in_progress',t('In Arbeit','Devam ediyor')],['done',t('Erledigt','Tamamlandı')],['cancelled',t('Abgebrochen','İptal')]];
  const priorities=()=>[['low',t('Niedrig','Düşük')],['normal',t('Normal','Normal')],['high',t('Hoch','Yüksek')]];
  const reminders=()=>({overdue:t('Überfällig','Gecikmiş'),today:t('Heute fällig','Bugün vadeli'),soon:t('In den nächsten 7 Tagen','Gelecek 7 gün içinde')});

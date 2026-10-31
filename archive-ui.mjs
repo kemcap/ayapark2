@@ -1,10 +1,11 @@
-import {escapeHtml as e,randomId} from './core.mjs?v=5.8.1';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=5.10.0';
 import {inspectDocument,verifiedDocument,downloadOriginal} from './archive-files.mjs?v=5.9.42';
 
 // No public links, previews, automatic mail or browser persistence of file contents.
 export function privateArchive({rpc,storage,allowed,admin,site,language,siteName=()=>'',download=downloadOriginal}){
  let dialog,documents=[],meetings=[],generation=0,busy=false,controller,query='',category='',archived=false;
- const requests=new Map(),t=(de,tr)=>language()==='de'?de:tr;
+ const requests=new Map(),t=(de,tr)=>(language()==='tr'?(tr):(uiText(de,language())));
  const audiences=()=>[['management',t('Nur Verwaltung','Yalnız yönetim')],['finance',t('Finanzberechtigte','Mali yetkililer')],['owners',t('Aktuelle Eigentümer','Güncel malikler')],['community',t('Aktuelle Eigentümer und Mieter','Güncel malikler ve kiracılar')]];
  const categories=()=>[['general',t('Allgemein','Genel')],['bank',t('Bankbeleg','Banka belgesi')],['invoice',t('Rechnung','Fatura')],['meeting',t('Versammlungsprotokoll','Toplantı tutanağı')],['decision',t('Beschluss / Karar Defteri','Karar / Karar Defteri')],['contract',t('Vertrag','Sözleşme')],['maintenance',t('Wartung','Bakım')]];
  const states=()=>[['planned',t('Geplant','Planlandı')],['held',t('Durchgeführt – Nachweis offen','Yapıldı – belge bekleniyor')],['documented',t('Externer Nachweis geprüft','Dış belge kontrol edildi')],['cancelled',t('Abgesagt','İptal')]];

@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {overviewAccountCard,overviewV3,reportV3} from '../v3-ui.mjs?v=5.9.61';
-import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {money} from '../core.mjs?v=5.8.1';
-import {setLanguage,getLanguage} from '../i18n.mjs?v=5.9.28';
-import {financialSeries} from '../v3-domain.mjs?v=5.9.26';
+import {overviewAccountCard,overviewV3,reportV3} from '../v3-ui.mjs?v=5.10.0';
+import {fullDemo} from '../ledger.mjs?v=5.10.0';
+import {money} from '../core.mjs?v=5.10.0';
+import {setLanguage,getLanguage} from '../i18n.mjs?v=5.10.0';
+import {financialSeries} from '../v3-domain.mjs?v=5.10.0';
 
 const example={
  summaryBalance:970000,
@@ -79,7 +79,7 @@ test('new overview explanatory content is styled and loaded without affecting ba
  const [css,html,source]=await Promise.all([
   readFile(new URL('../overview-account-summary.css',import.meta.url),'utf8'),
   readFile(new URL('../index.html',import.meta.url),'utf8'),
-  readFile(new URL('../v3-ui.mjs',import.meta.url),'utf8')
+  readFile(new URL('../v3-ui.mjs?v=5.10.0',import.meta.url),'utf8')
  ]);
  assert.match(css,/\.overview-account-movements/);
  assert.match(css,/@media\(max-width:470px\)/);

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {archivePath,documentMime,documentSignature,inspectDocument,verifiedDocument} from '../archive-files.mjs';
-import {AyaparkApi} from '../api.mjs';
+import {AyaparkApi} from '../api.mjs?v=5.10.0';
 const path='20000000-0000-0000-0000-000000000001/10000000-0000-0000-0000-000000000001/source.pdf',bytes=new TextEncoder().encode('%PDF-1.7\nSynthetic archive original');
 test('archive digest is SHA-256 of original bytes, with unchanged Turkish filename',async()=>{const file=new File([bytes],'İmzalı karar.pdf',{type:'application/pdf'}),r=await inspectDocument(file);assert.equal(r.sha256,createHash('sha256').update(bytes).digest('hex'));assert.equal(r.filename,'İmzalı karar.pdf');assert.deepEqual(r.bytes,bytes);});
 test('unsupported active files, path injection and content mismatch fail closed',()=>{for(const name of ['../record.pdf','private\\record.pdf','active.svg','page.html','macro.xlsm','record.pdf\n'])assert.throws(()=>documentMime(name));assert.throws(()=>documentSignature(new TextEncoder().encode('<html>not a PDF</html>'),'pdf'));assert.throws(()=>archivePath(path+'?token=anything'));assert.throws(()=>archivePath('../other'));

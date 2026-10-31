@@ -1,4 +1,5 @@
-import {getLanguage} from './i18n.mjs?v=5.9.28';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {getLanguage} from './i18n.mjs?v=5.10.0';
 export const designKey='ayapark2-design-v1';
 export const designOptions=['classic','modern'];
 let current='modern';
@@ -10,7 +11,7 @@ export function setDesign(value,{storage,persist=true}={}){
  if(persist)try{storage?.setItem(designKey,value);}catch{}
  return value;
 }
-export function modernText(tr,de){return getLanguage()==='de'?de:tr;}
+export function modernText(tr,de){return (getLanguage()==='tr'?(tr):(uiText(de,getLanguage())));}
 export function designSettings(){return `<section class="design-settings"><div><h3>${modernText('Tasarım','Design')}</h3><p>${modernText('Bu cihaz için bir tasarım seçin.','Wähle die Gestaltung für dieses Gerät.')}</p></div><div class="design-choices" role="group" aria-label="${modernText('Tasarım seçin','Design wählen')}">${designOptions.map(v=>`<button type="button" class="button" data-design-choice="${v}" aria-pressed="${getDesign()===v}">${v==='modern'?'Modern':modernText('Klasik','Klassisch')}</button>`).join('')}</div><p class="modern-palette-note">${modernText('Modern, kendine ait renkleri kullanır. Klasik renk seçenekleriniz korunur.','Modern verwendet eine eigene Farbwelt. Deine bisherigen Farbwelten bleiben erhalten.')}</p></section>`;}
 export function bindDesign(onChange=()=>{}){
  const update=()=>{

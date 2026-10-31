@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {unitDetailV3} from '../v3-ui.mjs?v=5.9.50';
-import {setLanguage} from '../i18n.mjs?v=5.9.28';
-import {money} from '../core.mjs?v=5.8.1';
+import {fullDemo} from '../ledger.mjs?v=5.10.0';
+import {unitDetailV3} from '../v3-ui.mjs?v=5.10.0';
+import {setLanguage} from '../i18n.mjs?v=5.10.0';
+import {money} from '../core.mjs?v=5.10.0';
 
 function state(role='super') {
  const d=fullDemo();d.role=role;d.v5=true;

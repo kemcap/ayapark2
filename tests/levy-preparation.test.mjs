@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {batchPreview,financeLinkAt} from '../finance-v5.mjs';
-import {financePayload} from '../finance-forms.mjs';
+import {batchPreview,financeLinkAt} from '../finance-v5.mjs?v=5.10.0';
+import {financePayload} from '../finance-forms.mjs?v=5.10.0';
 const former={id:'former',unit_id:'unit',person_id:'old-person',role:'owner',active:false,archived_at:'2026-01-01',starts_on:'2020-01-01',ends_on:'2025-12-31'},current={id:'current',unit_id:'unit',person_id:'new-person',role:'owner',active:true,starts_on:'2026-01-01'},data={units:[{id:'unit',block:'A'}],links:[former,current]},payload={scope:'all',cents:12345,distribution:'total',due_on:'2026-11-01',liability_on:'2025-06-01',debt_group:'capital',debtors:{unit:'former'}};
 test('historical levy preview preserves explicitly selected former owner despite later due date',()=>{const rows=batchPreview(data,payload);assert.equal(rows[0].person_id,'old-person');assert.equal(rows[0].cents,12345);assert.equal(former.active,false);});
 test('ordinary monthly finance and notification eligibility do not gain historical assignments',()=>{assert.equal(financeLinkAt(former,'2025-06-01'),false);assert.throws(()=>batchPreview(data,{...payload,liability_on:undefined}));assert.equal(financeLinkAt(former,'2025-06-01',{historical:true}),true);});

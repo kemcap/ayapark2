@@ -1,7 +1,7 @@
-import {BankFileError,pdfPagesToCsv} from './bank-file-adapters.mjs?v=5.9.35';
+import {BankFileError,pdfPagesToCsv} from './bank-file-adapters.mjs?v=5.10.0';
 const cancelled=()=>new DOMException('Cancelled','AbortError');
 function readXlsx(buffer,{sheet,signal}){return new Promise((resolve,reject)=>{
- const worker=new Worker(new URL('./bank-xlsx-worker.mjs?v=5.9.35',import.meta.url),{type:'module'});
+ const worker=new Worker(new URL('./bank-xlsx-worker.mjs?v=5.10.0',import.meta.url),{type:'module'});
  const finish=(error,value)=>{clearTimeout(timer);signal?.removeEventListener('abort',abort);worker.terminate();error?reject(error):resolve(value);};
  const abort=()=>finish(cancelled()),timer=setTimeout(()=>finish(new BankFileError('timeout')),20000);signal?.addEventListener('abort',abort,{once:true});
  worker.onmessage=({data})=>data.ok?finish(null,data.result):finish(new BankFileError(data.error.code,data.error.location));

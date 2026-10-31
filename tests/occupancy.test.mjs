@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {buildForm,payloadFor} from '../forms.mjs?v=5.8.1';import {fullDemo,demoCommand} from '../ledger.mjs?v=5.8.1';import {effectivePayer,activeAt} from '../v3-domain.mjs?v=5.9.0';import {unitDetailV3} from '../v3-ui.mjs?v=5.9.0';
+import {buildForm,payloadFor} from '../forms.mjs?v=5.10.0';import {fullDemo,demoCommand} from '../ledger.mjs?v=5.10.0';import {effectivePayer,activeAt} from '../v3-domain.mjs?v=5.10.0';import {unitDetailV3} from '../v3-ui.mjs?v=5.10.0';
 const state=()=>({data:fullDemo(),mode:'demo'});
 test('occupancy changes do not change charges or owner',()=>{const s=state(),before=JSON.stringify(s.data.charges),owner=JSON.stringify(s.data.links.find(l=>l.role==='owner'));demoCommand(s.data,'occupancy',{unit_id:'A-4',status:'vacant'});assert.equal(s.data.units.find(u=>u.id==='A-4').occupancy_status,'vacant');assert.equal(JSON.stringify(s.data.charges),before);assert.equal(JSON.stringify(s.data.links.find(l=>l.role==='owner')),owner);});
 test('unknown start does not automatically assign historic monthly charges',()=>{const s=state(),l=s.data.links.find(l=>l.id==='demo-tenant-link');l.starts_on=null;assert.equal(activeAt(l),true);assert.equal(effectivePayer(s.data,'A-4','tenant','2024-01-01'),null);});

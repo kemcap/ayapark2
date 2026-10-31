@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PGlite} from '@electric-sql/pglite';
 import {readFile} from 'node:fs/promises';
-import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.9.52';
+import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.10.0';
 const uid=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
 const person={id:uid(11),full_name:'Existing Resident',email:'',auth_user_id:null,archived_at:null};
 const s={data:{persons:[person],role:'super',staff:[],units:[],links:[],permissions:[],userId:uid(1)}};

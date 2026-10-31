@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-import {AyaparkApi} from '../api.mjs?v=5.9.0';
-import {t,setLanguage} from '../i18n.mjs?v=5.9.28';
+import {AyaparkApi} from '../api.mjs?v=5.10.0';
+import {t,setLanguage} from '../i18n.mjs?v=5.10.0';
 
 test('recovery callback at root goes to reset page with credentials preserved',()=>{
  const script=readFileSync(new URL('../recovery-redirect.js',import.meta.url),'utf8');
@@ -43,7 +43,7 @@ test('setting a first password uses only the authenticated Supabase user endpoin
  assert.deepEqual(JSON.parse(calls[0].body),{password:'example-password'});
  assert.equal(api.session.user.id,'sample-user');
 });
-const source=readFileSync(new URL('../app.mjs',import.meta.url),'utf8');
+const source=readFileSync(new URL('../app.mjs?v=5.10.0',import.meta.url),'utf8');
 const handlers=source.slice(source.indexOf("$('cancelLogin').addEventListener"),source.indexOf("$('refreshButton').addEventListener"));
 function harness(){
  const elements=new Map(),calls={verify:0,login:0,password:0,load:0,logout:0};

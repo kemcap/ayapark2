@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {overviewV3} from '../v3-ui.mjs?v=5.9.61';
-import {setLanguage,getLanguage} from '../i18n.mjs?v=5.9.28';
+import {fullDemo} from '../ledger.mjs?v=5.10.0';
+import {overviewV3} from '../v3-ui.mjs?v=5.10.0';
+import {setLanguage,getLanguage} from '../i18n.mjs?v=5.10.0';
 
 test('overview keeps all 20 apartment cards and shows B block before A block',()=>{
  const previous=getLanguage();
@@ -53,7 +53,7 @@ test('only truly narrow dashboard stacks blocks, and layout override loads after
  const [css,html,v3]=await Promise.all([
   readFile(new URL('../overview-block-layout.css',import.meta.url),'utf8'),
   readFile(new URL('../index.html',import.meta.url),'utf8'),
-  readFile(new URL('../v3-ui.mjs',import.meta.url),'utf8')
+  readFile(new URL('../v3-ui.mjs?v=5.10.0',import.meta.url),'utf8')
  ]);
  assert.match(css,/@container apartment-overview \(max-width:400px\)\s*\{[\s\S]*?grid-template-columns:minmax\(0,1fr\)/);
  assert(html.indexOf('overview-block-layout.css?v=5.9.62')>html.indexOf('large-screens.css?v='));

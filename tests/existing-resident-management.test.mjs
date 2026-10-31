@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PGlite} from '@electric-sql/pglite';
 import {readFile} from 'node:fs/promises';
-import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.9.51';
-import {peoplePage,personManager} from '../people-ui.mjs?v=5.9.51';
+import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.10.0';
+import {peoplePage,personManager} from '../people-ui.mjs?v=5.10.0';
 
 const person={id:'00000000-0000-0000-0000-000000000101',full_name:'Existing Resident',auth_user_id:'00000000-0000-0000-0000-000000000201',email:'',phone:'',archived_at:null};
 const existingStaff={user_id:'00000000-0000-0000-0000-000000000201',role:'deputy',name:'Existing Resident'};

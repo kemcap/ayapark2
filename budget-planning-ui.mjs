@@ -1,8 +1,9 @@
-import {escapeHtml as e,money,randomId} from './core.mjs?v=5.8.1';
-import {amountCents} from './finance-v5.mjs?v=5.9.39';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {escapeHtml as e,money,randomId} from './core.mjs?v=5.10.0';
+import {amountCents} from './finance-v5.mjs?v=5.10.0';
 import {cashForecast,annualPlan} from './budget-planning.mjs?v=5.9.41';
 export function budgetPlanning({rpc,allowed,admin,site,language,onSaved=async()=>{},data,onRender=()=>{}}){
- let dialog,workspace,busy=false,generation=0,horizon=6,year,requests=new Map();const t=(de,tr)=>language()==='de'?de:tr;
+ let dialog,workspace,busy=false,generation=0,horizon=6,year,requests=new Map();const t=(de,tr)=>(language()==='tr'?(tr):(uiText(de,language())));
  const cash=value=>'<span class="amount">'+e(money(value))+'</span>';
  const amount=value=>{const n=BigInt(value||0);return (n/100n)+','+String(n%100n).padStart(2,'0');};
  const clear=()=>{generation++;workspace=null;requests.clear();if(dialog)dialog.textContent='';};const close=()=>{dialog?.close();clear();};

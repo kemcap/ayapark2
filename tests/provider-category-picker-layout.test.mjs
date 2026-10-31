@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.9.56';
-import {getLanguage,setLanguage} from '../i18n.mjs?v=5.9.28';
+import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.10.0';
+import {getLanguage,setLanguage} from '../i18n.mjs?v=5.10.0';
 
 const existing={
  data:{
@@ -51,7 +51,7 @@ test('existing multiple selection submits unchanged; maximum eight categories re
 
 test('layout is responsive and keyboard-focus accessible without altering unrelated checkboxes',async()=>{
  const css=await readFile(new URL('../provider-categories.css',import.meta.url),'utf8');
- const app=await readFile(new URL('../app.mjs',import.meta.url),'utf8');
+ const app=await readFile(new URL('../app.mjs?v=5.10.0',import.meta.url),'utf8');
  const index=await readFile(new URL('../index.html',import.meta.url),'utf8');
  assert.match(css,/\.provider-category-grid\s*\{[\s\S]*?display:grid;[\s\S]*?grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.match(css,/@container provider-categories \(max-width:410px\)/);

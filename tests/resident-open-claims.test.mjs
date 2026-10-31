@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {calculateClaims} from '../supabase/functions/ay3-site-open-claims/math.mjs';
-import {residentClaimsCards,residentClaimsPanel} from '../site-claims-ui.mjs';
-import {scopedCharges} from '../v3-domain.mjs?v=5.9.0';
-import {AyaparkApi} from '../api.mjs?v=5.9.0';
+import {residentClaimsCards,residentClaimsPanel} from '../site-claims-ui.mjs?v=5.10.0';
+import {scopedCharges} from '../v3-domain.mjs?v=5.10.0';
+import {AyaparkApi} from '../api.mjs?v=5.10.0';
 
 const units=Array.from({length:20},(_,i)=>({id:'u'+i,code:(i<10?'A-':'B-')+(i%10+1)}));
 const fixture={
@@ -84,7 +84,7 @@ test('both resident dashboard and apartment page show separate claims, with no a
  assert.match(html,/A-1/);
  assert.match(html,/B-6/);
  assert.doesNotMatch(html,/A-2/);
- const view=await readFile(new URL('../v3-ui.mjs',import.meta.url),'utf8');
+ const view=await readFile(new URL('../v3-ui.mjs?v=5.10.0',import.meta.url),'utf8');
  assert.match(view,/directoryV3\(s\).*residentClaimsPanel\(s\)/);
  assert.match(view,/overviewV3\(s\)/);
  assert.match(view,/residentClaimsPanel\(s\)/);
