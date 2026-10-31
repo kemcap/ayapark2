@@ -5,7 +5,7 @@ import {t as tr,getLanguage} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,randomId,money} from './core.mjs?v=5.8.1';
 import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.9.56';
 import {today,personName,personLinks,activeAt,dateValid} from './v3-domain.mjs?v=5.9.26';
-import {roleLabel} from './v3-ui.mjs?v=5.9.58';
+import {roleLabel} from './v3-ui.mjs?v=5.9.59';
 import {providerCategoryChoices,providerServices} from './provider-categories.mjs?v=5.9.53';
 
 const loc=(de,trText)=>getLanguage()==='de'?de:trText;
