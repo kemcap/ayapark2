@@ -38,10 +38,12 @@ test('1000–1070px desktop keeps four apartment cards by stacking narrow blocks
  assert.match(css,/@container\s*\(min-width:580px\)\s*\{[\s\S]*?grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
  assert.match(css,/@container\s*\(max-width:389px\)/);
  // At laptop sizes, the full-width block (not two half-width blocks) contains the four-card grid.
- const width=1070,sidebar=250,gutters=84,innerCard=32;
- const available=width-sidebar-gutters-innerCard;
- assert(available>=580,'each stacked block should have enough width at 1070px');
- assert(1000-available<580,'two side-by-side half-width blocks would force two cards');
+ for(const viewport of [1000,1035,1070]){
+  const sidebar=250,gutters=84,cardPadding=32;
+  const available=viewport-sidebar-gutters-cardPadding;
+  assert(available>=580,'stacked block supports four cards at '+viewport+'px');
+  assert(available/2<580,'two half-width blocks would cause two cards at '+viewport+'px');
+ }
 });
 
 test('dashboard CSS is last after modern and wide-screen overrides and scope excludes Daireler page',async()=>{
