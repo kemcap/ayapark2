@@ -81,7 +81,7 @@ test('advance credits remain visible and are not subtracted again from claim bal
  setLanguage('de');
  try {
   const html=unitDetailV3(s,'A-4');
-  assert.match(html,/Noch nicht mit Forderungen verrechnetes Guthaben/);
+  assert.match(html,/Nicht verrechnetes Guthaben/);
   assert.match(html,/Guthaben/);
   assert(html.includes(money(940000))); // prior debt unchanged: credit is unallocated
   assert(html.includes(money(360000)));
