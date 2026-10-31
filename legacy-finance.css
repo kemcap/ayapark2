@@ -1,0 +1,39 @@
+
+/* Source-first legacy balance ledger. Do not recalculate individual legacy dues in the UI. */
+.uf-legacy{display:grid;gap:15px;border:1px solid var(--line);border-radius:16px;background:var(--paper);padding:17px;min-width:0}
+.uf-legacy-title{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.uf-legacy-title h3{font-size:17px;line-height:1.4;margin:0 0 5px;color:var(--ink)}
+.uf-legacy-title small{color:var(--muted);font-size:11px}
+.uf-legacy-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.uf-legacy-metrics>div{background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:12px;display:grid;align-content:start;gap:7px;min-width:0}
+.uf-legacy-metrics small{font-size:11px;line-height:1.35;color:var(--muted)}
+.uf-legacy-metrics strong{font-size:clamp(14px,1.5vw,19px);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.uf-legacy-metrics>div:last-child{background:var(--paper);border-color:var(--primary)}
+.uf-legacy-breakdown,.uf-current-paid,.uf-history>details{border-top:1px solid var(--line)}
+.uf-legacy-breakdown summary,.uf-current-paid summary,.uf-history>details>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;padding:14px 0;min-height:44px;font-size:13px;font-weight:650;color:var(--ink)}
+.uf-legacy-breakdown summary::-webkit-details-marker,.uf-current-paid summary::-webkit-details-marker,.uf-history>details>summary::-webkit-details-marker{display:none}
+.uf-legacy-breakdown summary:after,.uf-current-paid summary:after,.uf-history>details>summary:after{content:"⌄";font-size:17px;color:var(--muted);flex:none}
+.uf-legacy-breakdown[open] summary:after,.uf-current-paid[open] summary:after,.uf-history>details[open]>summary:after{transform:rotate(180deg)}
+.uf-legacy-rows,.uf-legacy-assignment{display:grid;gap:9px;padding:12px 0;min-width:0}
+.uf-legacy-rows h4,.uf-legacy-assignment h4{margin:0 0 4px;font-size:13px}
+.uf-legacy-row{display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:12px}
+.uf-legacy-row span{min-width:0;overflow-wrap:anywhere}
+.uf-legacy-row strong{white-space:nowrap;font-variant-numeric:tabular-nums}
+.uf-legacy-total{border-top:1px solid var(--line);padding-top:10px;font-weight:700}
+.uf-legacy-assignment{border-top:1px solid var(--line);margin-top:8px}
+.uf-legacy-person{display:grid;grid-template-columns:minmax(110px,1fr) repeat(3,minmax(70px,auto));gap:9px;align-items:center;font-size:11px;line-height:1.55}
+.uf-legacy-person>span:not(:first-child),.uf-legacy-person>strong:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.uf-legacy-person-head{font-size:10px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:7px}
+.uf-current-summary{display:flex;justify-content:space-between;gap:12px;align-items:center;background:var(--soft);border-radius:10px;padding:12px;font-size:12px}
+.uf-current-summary strong{font-variant-numeric:tabular-nums;text-align:right}
+.uf-current-row{display:flex;align-items:start;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid var(--line)}
+.uf-current-row>div:first-child{display:grid;gap:5px;min-width:0}
+.uf-current-row strong{font-size:13px}
+.uf-current-row small{color:var(--muted);font-size:11px;line-height:1.55}
+.uf-current-row>div:last-child{display:grid;gap:5px;justify-items:end;flex-shrink:0;font-variant-numeric:tabular-nums}
+.uf-history>details>summary{display:flex;gap:8px;flex-wrap:wrap}
+.uf-history>details>summary strong{font-size:15px}
+.uf-history>details>summary small{color:var(--muted);font-size:11px;margin-left:auto}
+.uf-history-items{display:grid;gap:12px;padding:10px 0 0}
+#unitPaymentHistory{scroll-margin-top:80px}
+@media(max-width:600px){.uf-legacy{padding:13px}.uf-legacy-metrics{gap:5px}.uf-legacy-metrics>div{padding:9px 6px}.uf-legacy-metrics strong{font-size:clamp(12px,3.5vw,17px)}.uf-legacy-metrics small{font-size:10px}.uf-legacy-person{grid-template-columns:minmax(80px,1fr) repeat(3,minmax(52px,auto));gap:5px;font-size:10px}.uf-legacy-person-head{font-size:9px}.uf-current-summary{flex-wrap:wrap}.uf-current-row>div:last-child{max-width:42%}}
