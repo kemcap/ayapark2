@@ -1,8 +1,149 @@
-.provider-category-choices{display:flex;flex-wrap:wrap;gap:9px 13px;margin:12px 0;border:1px solid var(--line);border-radius:12px;padding:14px}
-.provider-category-choices legend{font-weight:650;padding:0 6px;font-size:13px}
-.provider-category-choices label{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--soft);padding:9px 12px;border-radius:9px;min-height:42px;cursor:pointer;font-size:13px}
-.provider-category-choices label:has(input:checked){border-color:var(--primary);background:var(--paper)}
-.provider-category-choices small{flex-basis:100%;font-size:11px;color:var(--muted)}
+/* Accessible service multi-select: consistent tiles in a responsive grid.
+   Styles use the selected Ayapark palette in both light and dark themes. */
+.provider-category-choices {
+ display:block;
+ min-inline-size:0;
+ margin:16px 0 20px;
+ padding:18px;
+ border:1px solid var(--line);
+ border-radius:16px;
+ background:var(--paper);
+ container:provider-categories / inline-size;
+}
+.provider-category-choices legend {
+ padding:0 7px;
+ font-size:13px;
+ line-height:1.45;
+ font-weight:750;
+ letter-spacing:0;
+ color:var(--ink);
+}
+.provider-category-intro {
+ display:flex;
+ justify-content:space-between;
+ align-items:baseline;
+ flex-wrap:wrap;
+ gap:6px 14px;
+ margin:0 0 14px;
+}
+.provider-category-intro p {
+ margin:0;
+ font-size:12px;
+ line-height:1.5;
+ color:var(--muted);
+}
+.provider-category-count {
+ display:inline-block;
+ flex-shrink:0;
+ font-size:12px;
+ font-weight:700;
+ font-variant-numeric:tabular-nums;
+ color:var(--muted);
+}
+.provider-category-count[data-invalid="true"] {
+ color:var(--red, #a33f32);
+}
+.provider-category-grid {
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ grid-auto-rows:minmax(50px,auto);
+ gap:9px;
+ min-inline-size:0;
+}
+.provider-category-option {
+ position:relative;
+ display:flex;
+ align-items:center;
+ gap:10px;
+ inline-size:100%;
+ min-inline-size:0;
+ min-block-size:50px;
+ margin:0;
+ padding:11px 12px;
+ border:1px solid var(--line);
+ border-radius:11px;
+ background:var(--tile-bg, var(--soft));
+ color:var(--ink);
+ font-size:13px;
+ line-height:1.4;
+ font-weight:600;
+ text-align:start;
+ box-sizing:border-box;
+ cursor:pointer;
+ transition:border-color .16s ease, background-color .16s ease, box-shadow .16s ease;
+}
+.provider-category-option input[type="checkbox"] {
+ position:absolute;
+ inline-size:1px;
+ block-size:1px;
+ margin:0;
+ opacity:0;
+ pointer-events:none;
+}
+.provider-category-option-name {
+ flex:1;
+ min-inline-size:0;
+ overflow-wrap:anywhere;
+}
+.provider-category-check {
+ position:relative;
+ flex:0 0 20px;
+ inline-size:20px;
+ block-size:20px;
+ margin-inline-start:auto;
+ border:1.5px solid var(--muted);
+ border-radius:6px;
+ background:var(--paper);
+ box-sizing:border-box;
+}
+.provider-category-option:has(input:checked) {
+ border-color:var(--primary);
+ background:var(--soft);
+ box-shadow:inset 0 0 0 1px var(--primary);
+ color:var(--ink);
+}
+.provider-category-option:has(input:checked) .provider-category-check {
+ border-color:var(--primary);
+ background:var(--primary);
+}
+.provider-category-option:has(input:checked) .provider-category-check::after {
+ content:"";
+ position:absolute;
+ inline-size:5px;
+ block-size:9px;
+ inset-block-start:2px;
+ inset-inline-start:6px;
+ border:solid var(--paper);
+ border-width:0 2px 2px 0;
+ transform:rotate(45deg);
+}
+.provider-category-option:has(input:focus-visible) {
+ outline:3px solid var(--focus);
+ outline-offset:3px;
+}
+@media(hover:hover) {
+ .provider-category-option:hover {
+  border-color:var(--primary);
+  background:var(--soft);
+ }
+}
+.provider-category-help {
+ margin:13px 0 0;
+ font-size:11px;
+ line-height:1.55;
+ color:var(--muted);
+}
+@container provider-categories (max-width:410px) {
+ .provider-category-grid {grid-template-columns:minmax(0,1fr);}
+ .provider-category-option {min-block-size:48px;}
+}
+@media(max-width:560px) {
+ .provider-category-choices{padding:13px;}
+ .provider-category-intro{margin-bottom:12px;}
+}
+@media(prefers-reduced-motion:reduce) {
+ .provider-category-option{transition:none;}
+}
 .provider-service-tags{display:flex;gap:6px;flex-wrap:wrap}
 .provider-service-tag{display:inline-flex;font-size:11px;font-weight:650;padding:5px 9px;border-radius:999px;border:1px solid var(--line);background:var(--soft);max-width:100%;overflow-wrap:anywhere}
 #providerCategoryExisting[hidden],#providerCategoryName[hidden]{display:none!important}
