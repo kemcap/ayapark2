@@ -1,4 +1,10 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Prüfpause übernommen; Advisor-Abgleich konkretisiert – 31.10.2026
+
+PR #82 nach CI41179670915 gemergt: mainf993c20a2f94ca26c3c3d9f7e2327c33c91d15f1. Backend20261031071132 aktiv,0 echte Prüfpausen, RLS/geschützte Gründe/Clientgrenzen bestätigt. Vor-/Nachher-Fingerprints aller vorhandenen Forderungen/Bankzeilen/Zuordnungen identisch. 27 SQL-/38 native Dialog-/34 Startseiten- und337 allgemeine Tests bestanden. Pages/Live dieses Schritts separat bestätigen. #81-Auslieferung anhand fünf Dateien mit exakt gemergtem Stand bytegleich geprüft.
+
+Nächster P0-Abgleich: fünf policyfreie Tabellen sind bewusst vollständig clientgesperrt. Leak-Passwortschutz laut aktueller offizieller Dokumentation nur Pro+, daher wegen Free-Vorgabe unverändert. Beabsichtigte öffentliche Summenprojektion nicht abschalten. Unnötiges Client-EXECUTE auf drei Audittriggern und DDL-Rechte auf zehn Anwendungstabellen gezielt zur Entfernung vorbereitet;14 isolierte Prüfungen erhalten Lese-/DML-/RLS-Matrix und tatsächliche Triggerfunktion. Keine produktive Testmutation. Details SECURITY-ADVISORS-20261031.md. Migration/CI noch offen. Reale Auth-/Mail-/Geräte-/Storageabnahme bleibt offen, Backup übersprungen.
+
 ## Hinweise veröffentlicht; private Prüfpause lokal abgenommen – 31.10.2026
 
 Forderungshinweise #81 nach CI41179128934 gemergt: main86d95d9549b1ba19ec10115c56c94e322824a41e; Pages41179300237 erfolgreich. Acht Regel-/26 native Renderer-/334 allgemeine Tests. Read-time-Stufen7/21 für eigene Schuldner und35 ausschließlich intern, keine Nachrichten/Rechtsverfolgung. Alt-Einstiege #80 über Pages41179037572 veröffentlicht; vier Live-Dateien bytegleich geprüft. Keine alte Loginoberfläche mehr über diese vier aktuellen Adressen; historische Git-Versionen bleiben erhalten.
