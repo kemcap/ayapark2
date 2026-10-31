@@ -31,7 +31,7 @@ test('one apartment dashboard groups by actual debtors and uses its own allocate
   assert.match(html,/Ada Tenant/);
   assert.match(html,/Ali Owner/);
   assert.match(html,/Altbestand/);
-  assert.match(html,/15\.10\.2026/);
+  assert.match(html,/15\. Okt\. 2026/);
   assert.match(html,/Halil Kantarcı/);
   assert.match(html,/Shared October A-4 and A-5 payment/);
   assert.match(html,/Gesamtüberweisung/);
@@ -50,7 +50,7 @@ test('resident uses the same financial component but not admin actions or cross-
   assert.match(html,/class="uf-finance"/);
   assert.match(html,/Ada Tenant/);
   assert.match(html,/Ali Owner/);
-  assert.match(html,/15\.10\.2026/);
+  assert.match(html,/15\. Okt\. 2026/);
   assert(html.includes(money(940000)));
   assert(!html.includes('Shared October A-4 and A-5 payment'));
   assert(!html.includes('Gesamtüberweisung'));
