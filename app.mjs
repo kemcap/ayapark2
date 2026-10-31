@@ -25,20 +25,20 @@ import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.9.
 import {apartmentInfo} from './apartment-info.mjs?v=5.9.45';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.8.1';
 import {updateAssignmentForm} from './assignments.mjs?v=5.9.4';
-import {personManager} from './people-ui.mjs?v=5.9.48';
+import {personManager} from './people-ui.mjs?v=5.9.50';
 import {bindInvitations} from './invite-ui.mjs?v=5.9.28';
 import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.45';
 import {bindInstall} from './install.mjs?v=5.9.39';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.48';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.50';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
 import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.9.39';
 import {AyaparkApi} from './api.mjs?v=5.9.45';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.48';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.50';
 import {buildForm,payloadFor} from './forms.mjs?v=5.9.45';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
@@ -321,7 +321,7 @@ document.addEventListener('click',async event=>{
   returnFromPersonUnit();
   return;
  }
- if(event.target.closest('.unit-history-link')){event.preventDefault();$('unitPaymentHistory')?.scrollIntoView({block:'start'});$('unitPaymentHistory')?.focus({preventScroll:true});return;}
+ if(event.target.closest('.unit-history-link')){event.preventDefault();if($('unitPaymentHistory')){$('unitPaymentHistory').open=true;$('unitPaymentHistory').scrollIntoView({block:'start'});$('unitPaymentHistory').focus({preventScroll:true});}return;}
  if(event.target.closest('[data-preview-return]')){changePreviewRole(nativePreviewRole(state.fullData));return;}
  if(event.target.closest('[data-reset-appearance]')){resetPreferences(state.mode==='connected'?api:null,message=>{const el=$('preferenceStatus');if(el)el.textContent=message;});applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));const panel=document.querySelector('.appearance-settings');if(panel)panel.open=true;document.querySelector('[data-reset-appearance]')?.focus();return;}
  const navToggle=event.target.closest('#nav [data-nav-group]');
