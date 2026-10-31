@@ -1,0 +1,105 @@
+/* Finance report: period + graph grouping + year form ONE compact surface.
+   Changes only reporting controls; banking period toolbar remains untouched. */
+.report-filter-surface{
+ margin:0 0 12px;
+ min-width:0;
+}
+.report-filter-surface .toolbar.date-toolbar,
+:root[data-design="modern"] .report-filter-surface .toolbar.date-toolbar{
+ display:flex;
+ flex-wrap:wrap;
+ align-items:flex-end;
+ justify-content:flex-start;
+ gap:9px 13px;
+ margin:0;
+ padding:12px 15px;
+ background:var(--paper);
+ border:1px solid var(--line);
+ border-radius:14px;
+}
+.report-filter-surface .date-toolbar>label,
+:root[data-design="modern"] .report-filter-surface .date-toolbar>label{
+ display:grid;
+ flex:0 1 175px;
+ width:auto;
+ max-width:100%;
+ min-width:145px;
+ gap:5px;
+ font-size:11px;
+ line-height:1.35;
+ font-weight:700;
+ color:var(--muted);
+}
+.report-filter-surface .date-toolbar>label.report-filter-field{flex-basis:155px}
+.report-filter-surface .date-toolbar>label>select,
+.report-filter-surface .date-toolbar>label>input,
+:root[data-design="modern"] .report-filter-surface .date-toolbar>label>select,
+:root[data-design="modern"] .report-filter-surface .date-toolbar>label>input{
+ box-sizing:border-box;
+ display:block;
+ margin:0;
+ width:100%;
+ min-width:0;
+ max-width:100%;
+ min-height:40px;
+ height:40px;
+ padding:7px 11px;
+ border:1px solid var(--line);
+ border-radius:9px;
+ background:var(--tile-bg,var(--paper));
+ color:var(--ink);
+ font:inherit;
+ font-size:13px;
+ font-weight:650;
+}
+.report-filter-surface .date-toolbar>label>select:focus-visible,
+.report-filter-surface .date-toolbar>label>input:focus-visible{
+ outline:3px solid var(--focus);
+ outline-offset:2px;
+}
+.report-filter-surface .date-toolbar>.fine,
+:root[data-design="modern"] .report-filter-surface .date-toolbar>.fine{
+ flex:1 1 190px;
+ margin:0 0 2px auto;
+ padding:9px 12px;
+ min-width:0;
+ border:1px solid var(--line);
+ border-radius:9px;
+ background:var(--soft);
+ font-size:11px;
+ font-variant-numeric:tabular-nums;
+ color:var(--muted);
+ text-align:center;
+ white-space:normal;
+ overflow-wrap:anywhere;
+}
+@media(max-width:760px){
+ .report-filter-surface .toolbar.date-toolbar,
+ :root[data-design="modern"] .report-filter-surface .toolbar.date-toolbar{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  padding:12px;
+ }
+ .report-filter-surface .date-toolbar>label,
+ .report-filter-surface .date-toolbar>label.report-filter-field,
+ :root[data-design="modern"] .report-filter-surface .date-toolbar>label{
+  min-width:0;
+  width:100%;
+  max-width:none;
+ }
+ .report-filter-surface .date-toolbar>.fine,
+ :root[data-design="modern"] .report-filter-surface .date-toolbar>.fine{
+  grid-column:1 / -1;
+  margin:0;
+ }
+}
+@media(max-width:390px){
+ .report-filter-surface .toolbar.date-toolbar,
+ :root[data-design="modern"] .report-filter-surface .toolbar.date-toolbar{
+  grid-template-columns:minmax(0,1fr);
+ }
+}
+@media print{
+ .report-filter-surface{display:none}
+}
