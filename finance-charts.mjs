@@ -97,11 +97,11 @@ export function incomeExpenseChart(s,summary){
   :cartesianViz(summary.buckets,{type:view});
  const periods=[...new Set(summary.buckets.map(b=>String(b.period).slice(0,4)))].filter(y=>/^\d{4}$/.test(y));
  const quickYears=periods.length>1?'<div class="fch-year-jump"><span>'+t('Jahr genauer ansehen','Yılı ayrıntılı göster')+':</span>'+periods.map(y=>'<button type="button" data-year="'+e(y)+'">'+e(y)+'</button>').join('')+'</div>':'';
- return '<section id="incomeExpenseViz" class="fch-income-expense" aria-label="'+t('Interaktives Einnahmen-Ausgaben-Diagramm','Etkileşimli gelir gider grafiği')+'">'+
+ return '<section id="incomeExpenseViz" class="fch-income-expense" data-chart-root="cashflow" aria-label="'+t('Interaktives Einnahmen-Ausgaben-Diagramm','Etkileşimli gelir gider grafiği')+'">'+
   '<div class="fch-viz-head"><div class="fch-viz-kicker">'+t('FINANZÜBERSICHT','MALİ GÖRÜNÜM')+'</div>'+segmented+'</div>'+
   '<div class="fch-legend-bar"><span class="fch-legend-key fch-legend-income">'+t('Einnahmen','Gelir')+'</span><span class="fch-legend-key fch-legend-expense">'+t('Ausgaben','Gider')+'</span></div>'+
-  '<div class="fch-chart-frame" data-chart-root="cashflow">'+content+'</div>'+
-  '<div class="fch-inspector" aria-live="polite"><span data-inspector-label>'+t('Datenpunkt wählen oder berühren','Veri noktasını seç veya dokun')+'</span><strong data-inspector-value>'+e(currency(num(summary.income)-num(summary.expense)))+'</strong><small data-inspector-extra>'+t('Differenz Einnahmen − Ausgaben','Gelir ve gider farkı')+'</small></div>'+
+  '<div class="fch-chart-frame">'+content+'</div>'+
+  '<div class="fch-inspector" aria-live="polite" data-default-label="'+t('Datenpunkt wählen oder berühren','Veri noktasını seç veya dokun')+'" data-default-value="'+e(currency(num(summary.income)-num(summary.expense)))+'" data-default-extra="'+t('Differenz Einnahmen − Ausgaben','Gelir ve gider farkı')+'"><span data-inspector-label>'+t('Datenpunkt wählen oder berühren','Veri noktasını seç veya dokun')+'</span><strong data-inspector-value>'+e(currency(num(summary.income)-num(summary.expense)))+'</strong><small data-inspector-extra>'+t('Differenz Einnahmen − Ausgaben','Gelir ve gider farkı')+'</small></div>'+
   quickYears+'</section>';
 }
 export function expenseDonutChart(model){
@@ -111,5 +111,5 @@ export function expenseDonutChart(model){
  if(rest>0)entries.push({label:t('Weitere / nicht zugeordnet','Diğer / sınıflandırılmamış'),value:rest});
  return '<div class="fch-expense-chart" data-chart-root="expense">'+
   donutViz(entries,{id:'expense',centerLabel:t('Gesamtausgaben','Toplam gider'),centerAmount:num(model.total),subtitle:t('Nach Kategorien','Kategorilere göre'),compact:true})+
-  '<div class="fch-inspector" aria-live="polite"><span data-inspector-label>'+t('Kategorie auswählen','Kategori seç')+'</span><strong data-inspector-value>'+e(currency(num(model.total)))+'</strong><small data-inspector-extra>'+t('Summe des gewählten Zeitraums','Seçilen dönemin toplamı')+'</small></div></div>';
+  '<div class="fch-inspector" aria-live="polite" data-default-label="'+t('Kategorie auswählen','Kategori seç')+'" data-default-value="'+e(currency(num(model.total)))+'" data-default-extra="'+t('Summe des gewählten Zeitraums','Seçilen dönemin toplamı')+'"><span data-inspector-label>'+t('Kategorie auswählen','Kategori seç')+'</span><strong data-inspector-value>'+e(currency(num(model.total)))+'</strong><small data-inspector-extra>'+t('Summe des gewählten Zeitraums','Seçilen dönemin toplamı')+'</small></div></div>';
 }
