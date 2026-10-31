@@ -13,7 +13,7 @@ import {t as tr,locale} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money} from './core.mjs?v=5.8.1';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 import {remaining,paid,unassigned} from './ledger.mjs?v=5.9.39';
-import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs?v=5.9.45';
+import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs?v=5.9.48';
 import {residentClaimsPanel,residentClaimsDetail} from './site-claims-ui.mjs?v=5.9.39';
 export {residentClaimsDetail};
 import {norm,today,activeAt,personLinks,personName,scopedCharges,filteredTransactions,selectedRange,rangeError,financialSeries,buildSummaryDays,announcementActive,announcementStatus,suggestUnits,creditAvailable,isReversed,acknowledgementKey,unitSearchMatches} from './v3-domain.mjs?v=5.9.26';
