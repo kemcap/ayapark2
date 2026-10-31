@@ -1,3 +1,4 @@
+import {claimHoldReview} from './claim-hold-ui.mjs?v=5.9.45';
 import {managementTasks} from './management-tasks-ui.mjs?v=5.9.43';
 import {privateArchive} from './archive-ui.mjs?v=5.9.43';
 import {budgetPlanning} from './budget-planning-ui.mjs?v=5.9.41';
@@ -20,24 +21,24 @@ import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,not
 import {bindDesign} from './design.mjs?v=5.8.1';
 import {enhanceTables} from './ui-accessibility.mjs?v=5.8.1';
 import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.9.0';
-import {apartmentInfo} from './apartment-info.mjs?v=5.9.44';
+import {apartmentInfo} from './apartment-info.mjs?v=5.9.45';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.8.1';
 import {updateAssignmentForm} from './assignments.mjs?v=5.9.4';
-import {personManager} from './people-ui.mjs?v=5.9.44';
+import {personManager} from './people-ui.mjs?v=5.9.45';
 import {bindInvitations} from './invite-ui.mjs?v=5.9.28';
-import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.43';
+import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.45';
 import {bindInstall} from './install.mjs?v=5.9.39';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.44';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.45';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
 import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.9.39';
-import {AyaparkApi} from './api.mjs?v=5.9.43';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.44';
-import {buildForm,payloadFor} from './forms.mjs?v=5.9.44';
+import {AyaparkApi} from './api.mjs?v=5.9.45';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.45';
+import {buildForm,payloadFor} from './forms.mjs?v=5.9.45';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -129,7 +130,8 @@ const levyUI=levyReviews({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mo
 const budgetUI=budgetPlanning({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'finance'),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload,onRender:applyAmountPrivacy});
 const archiveUI=privateArchive({rpc:(name,args)=>api.rpc(name,args),storage:(path,args)=>api.storageDocument(path,args),allowed:()=>state.mode==='connected'&&!isAccessPreview(),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,siteName:()=>state.data.site.name||'AyaPark 2',language:getLanguage});
 const tasksUI=managementTasks({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&['super','staff'].includes(state.data.role),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,onSaved:reload,onDocument:id=>void archiveUI.open({documentId:id})});
-function closeDialogs(){tasksUI.close();archiveUI.close();closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
+const holdUI=claimHoldReview({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:async()=>{await reload();if(detailView?.action==='charge_detail'&&$('detailDialog').open)showDetail(chargeWithReceipts(detailView.id));}});
+function closeDialogs(){holdUI.close();tasksUI.close();archiveUI.close();closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
@@ -244,7 +246,7 @@ function addExportControls(){
   const csv=$('content').querySelector('[data-action="export_bank"]');if(csv)csv.insertAdjacentHTML('afterend',button(getLanguage()==='de'?'Excel herunterladen':'Excel indir','export_bank_xlsx')+button(getLanguage()==='de'?'Drucken / PDF':'Yazdır / PDF','export_bank_pdf'));
  }
 }
-function chargeWithReceipts(id){const html=chargeDetail(state,id);return html?html+receiptButtons(state.data,id,exportOptions()):null;}
+function chargeWithReceipts(id){const html=chargeDetail(state,id);const hold=state.data.claimHoldWorkspace?.rows?.find(x=>x.charge_id===id);return html?html+(hold?.active?'<p class="info-strip">'+(getLanguage()==='de'?'In Prüfung: automatische Zahlungshinweise pausiert. Die ursprüngliche Forderung bleibt bestehen.':'İncelemede: otomatik ödeme hatırlatmaları duraklatıldı. Asıl borç korunur.')+'</p>':'')+(state.mode==='connected'&&!isAccessPreview()&&can(state,'admin')?'<button class="button" data-action="claim_hold_review" data-id="'+e(id)+'">'+(getLanguage()==='de'?'Prüfpause verwalten':'İnceleme arasını yönet')+'</button>':'')+receiptButtons(state.data,id,exportOptions()):null;}
 function showDetail(html){
  if(!html)return;
  const dialog=$('detailDialog');$('detailContent').innerHTML=html;
@@ -380,6 +382,7 @@ document.addEventListener('click',async event=>{
   if(action==='person_manage'){personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');detailView={action,id:b.dataset.id};return showDetail(personManager(state,b.dataset.id));}
   if(action==='unit'){personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');detailView={action,id:b.dataset.id};return showDetail(unitDetail(state,b.dataset.id));}
   if(action==='transaction'){if(can(state,'finance')){detailView={action,id:b.dataset.id};showDetail(transactionDetail(state,b.dataset.id));}return;}
+  if(action==='claim_hold_review')return await holdUI.open(b.dataset.id);
   if(action==='charge_detail'){detailView={action,id:b.dataset.id};return showDetail(chargeWithReceipts(b.dataset.id));}
   if(action==='provider_detail'){detailView={action,id:b.dataset.id};return showDetail(providerDetail(state,b.dataset.id));}
   if(action==='bank_previous'||action==='bank_next'){state.bankPage=Math.max(0,(state.bankPage||0)+(action==='bank_next'?1:-1));return render();}

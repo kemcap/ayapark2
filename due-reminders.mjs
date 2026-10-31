@@ -1,7 +1,7 @@
 // Read-time reminders only. No writes, external delivery, fees or legal escalation.
 const dateValue=value=>{if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return null;const ms=Date.parse(value+'T00:00:00Z');return Number.isFinite(ms)&&new Date(ms).toISOString().slice(0,10)===value?ms:null;};
-export function claimReminders(data,{asOf=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}),finance=false,personIds=[],holdIds=[]}={}){
- const day=dateValue(asOf);if(day===null)throw Error('Invalid reminder date');const own=new Set(personIds),held=new Set(holdIds),paid=new Map();
+export function claimReminders(data,{asOf=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}),finance=false,personIds=[],holdIds}={}){
+ const day=dateValue(asOf);if(day===null)throw Error('Invalid reminder date');if(data.claimHoldWorkspace?.unavailable)return [];const own=new Set(personIds),held=new Set(holdIds||(data.claimHoldWorkspace?.rows||[]).filter(h=>h.active).map(h=>h.charge_id)),paid=new Map();
  for(const a of data.allocations||[])if(!a.void_reason&&Number.isSafeInteger(a.cents)&&a.cents>0)paid.set(a.charge_id,(paid.get(a.charge_id)||0)+a.cents);
  return (data.charges||[]).flatMap(c=>{const due=dateValue(c.due_on);if(c.void_reason||!c.person_id||!finance&&!own.has(c.person_id)||c.reference?.startsWith('staged:')||held.has(c.id)||due===null||!Number.isSafeInteger(c.cents)||c.cents-(paid.get(c.id)||0)<=0)return [];const days=Math.floor((day-due)/86400000);if(days<7)return [];return [{id:c.id,unit_id:c.unit_id,days,stage:finance&&days>=35?'internal_review':days>=21?'friendly_followup':'friendly_first'}];}).sort((a,b)=>b.days-a.days||String(a.id).localeCompare(String(b.id)));
 }
