@@ -1,7 +1,7 @@
 -- Remove unused client DDL privileges. Preserve all SELECT/INSERT/UPDATE/DELETE/RLS.
 begin;
 set local lock_timeout='5s';
-revoke all on function public.site_person_audit_trigger(),public.site_portal_audit_trigger(),public.site_unit_person_audit_trigger() from public,anon,authenticated;
+revoke all on function public.site_person_audit_trigger(),public.site_portal_audit_trigger(),public.site_unit_person_audit_trigger(),public.site_unit_status_audit_trigger() from public,anon,authenticated;
 DO $client_ddl$
 declare target record;
 begin
