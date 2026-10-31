@@ -6,6 +6,7 @@ import {escapeHtml as e,randomId,money} from './core.mjs?v=5.8.1';
 import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.9.52';
 import {today,personName,personLinks,activeAt,dateValid} from './v3-domain.mjs?v=5.9.26';
 import {roleLabel} from './v3-ui.mjs?v=5.9.51';
+import {providerCategoryChoices,providerServices} from './provider-categories.mjs?v=5.9.53';
 const loc=(de,trText)=>getLanguage()==='de'?de:trText;
 const sel=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}">${options.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(l)}</option>`).join('')}</select></label>`;
 const text=(name,label,value='')=>`<label class="field">${tr(label)}<textarea name="${name}" maxlength="5000" rows="3">${e(value)}</textarea></label>`;
@@ -85,7 +86,29 @@ export function buildV3Form(s,action,args={}){
 
  }
  else if(action==='provider'){
-  const p=d.providers.find(p=>p.id===args.id);title=tr(p?'Hizmeti düzenle':'Hizmet ekle');body=field('name',tr('Firma / kişi'),'text',p?.name||'','required maxlength="150"')+sel('category','Alan',['Temizlik','Peyzaj','Elektrik','Asansör','Havuz','Tesisat','Diğer'].map(c=>[c,tr(c)]),p?.category||'Temizlik')+field('contact',tr('Yetkili'),'text',p?.contact||'','maxlength="150"')+field('phone',tr('Telefon'),'tel',p?.phone||'','maxlength="60"')+field('email',tr('E-posta'),'email',p?.email||'','maxlength="254"')+sel('status','Durum',[['preferred',tr('Tercih edilen')],['backup',tr('Alternatif')],['avoid',tr('Tekrar çalışılmasın')]],p?.status||'preferred');
+  const p=d.providers.find(p=>p.id===args.id),selected=new Set(p?providerServices(p):[]),choices=providerCategoryChoices(d);
+  const notes=(d.providerNotes||[]).filter(n=>n.provider_id===p?.id).sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+  const latest=notes[0];
+  title=loc(p?'Dienstleister bearbeiten':'Dienstleister hinzufügen',p?'Hizmet veren düzenle':'Hizmet veren ekle');
+  body=field('name',tr('Firma / kişi'),'text',p?.name||'','required maxlength="150"')
+    +'<fieldset class="provider-category-choices"><legend>'+loc('Dienstleistungen (mehrere auswählbar)','Hizmet kategorileri (çoklu seçim)')+'</legend>'
+    +choices.map(x=>'<label class="check-field"><input type="checkbox" name="categories" value="'+e(x.name)+'" '+(selected.has(x.name)||!p&&!selected.size&&x.name==='Temizlik'?'checked':'')+'>'+e(tr(x.name))+'</label>').join('')
+    +'<small>'+loc('Mindestens eine Kategorie auswählen. Neue Kategorien über „Kategorien verwalten“ anlegen.','En az bir kategori seçin. Yeni kategorileri „Kategorileri yönet“ bölümünden ekleyin.')+'</small></fieldset>'
+    +field('contact',tr('Yetkili'),'text',p?.contact||'','maxlength="150"')
+    +field('phone',tr('Telefon'),'tel',p?.phone||'','maxlength="60"')
+    +field('email',tr('E-posta'),'email',p?.email||'','maxlength="254"')
+    +sel('status','Durum',[['preferred',tr('Tercih edilen')],['backup',tr('Alternatif')],['avoid',tr('Tekrar çalışılmasın')]],p?.status||'preferred')
+    +(latest?'<input type="hidden" name="edit_note_id" value="'+e(latest.id)+'">'+text('edit_note_body',loc('Angezeigte Notiz bearbeiten','Görünen notu düzenle'),latest.body):
+      text('new_note_body',loc('Notiz (optional)','Not (isteğe bağlı)')))
+    +(latest?'<p class="fine">'+loc('Die vorhandene Notiz wird geändert, nicht dupliziert. Frühere Notizen bleiben erhalten.','Mevcut not güncellenir, kopyası oluşturulmaz. Önceki notlar korunur.')+'</p>':'');
+ }
+ else if(action==='provider_category'){
+  title=loc('Dienstleister-Kategorien verwalten','Hizmet kategorilerini yönet');
+  const cats=providerCategoryChoices(d).filter(c=>c.id);
+  body=sel('operation',loc('Aktion','İşlem'),[['add',loc('Neue Kategorie','Yeni kategori')],['rename',loc('Umbenennen','Yeniden adlandır')],['delete',loc('Unbenutzte Kategorie löschen','Kullanılmayan kategoriyi sil')]],'add')
+   +'<div id="providerCategoryExisting" hidden>'+sel('category_id',loc('Bestehende Kategorie','Mevcut kategori'),cats.map(c=>[c.id,c.name]))+'</div>'
+   +'<div id="providerCategoryName">'+field('category_name',loc('Kategoriename','Kategori adı'),'text','','maxlength="60" required')+'</div>'
+   +'<p class="fine">'+loc('Bei Umbenennung werden alle zugeordneten Dienstleister aktualisiert. Kategorien, die noch benutzt werden, können nicht gelöscht werden.','Adı değiştirilen kategori tüm hizmet verenlerde güncellenir. Kullanılan kategoriler silinemez.')+'</p>';
  }
  else if(action==='provider_note'){context.provider_id=args.id;title=tr('Deneyim notu');body=field('visit_on',tr('Hizmet tarihi'),'date',today())+text('body','Deneyim / Not');}
  else {
@@ -102,7 +125,7 @@ export function buildV3Form(s,action,args={}){
 }
 export function payloadV3(action,form,ctx){
  if(action.startsWith('assignment_'))return assignmentPayload(action,form,ctx);
- const special=['person_lifecycle','person_restore','person_link','occupancy','edit_link','user_access','staff_remove','person','link','end_link','unlink','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_note','classify_entry'];
+ const special=['person_lifecycle','person_restore','person_link','occupancy','edit_link','user_access','staff_remove','person','link','end_link','unlink','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_category','provider_note','classify_entry'];
  if(!special.includes(action)){const p=payloadLegacy(action,form,ctx);if(action==='charge'&&(p.period_from||p.period_to)&&(!dateValid(p.period_from)||!dateValid(p.period_to)||p.period_to<p.period_from))throw Error(tr('Borç döneminin başlangıç ve bitiş tarihlerini kontrol edin.'));if(action==='entry'&&p.category==='Diğer'&&!p.desc)throw Error(tr('Açıklama gerekli.'));return p;}
  if(['person_lifecycle','person_restore'].includes(action)){
   if(!form.has('confirmation')||!ctx.person_id)throw Error(loc('Bestätigung erforderlich.','Onay gerekli.'));
@@ -138,6 +161,17 @@ export function payloadV3(action,form,ctx){
   for(const k of ['starts_at','ends_at'])p[k]=announcementTime(get(k));
   p.popup_on_login=form.has('popup_on_login');p.target_units=form.getAll('target_units');p.target_blocks=form.getAll('target_blocks');
   validateAnnouncement(p);
+ }
+ if(action==='provider'){
+  p.categories=[...new Set(form.getAll('categories').map(x=>String(x).trim()).filter(Boolean))];
+  if(p.categories.length<1||p.categories.length>8)throw Error(loc('Bitte 1 bis 8 Dienstleistungen auswählen.','Lütfen 1 ila 8 hizmet seçin.'));
+  delete p.category;
+  if(get('edit_note_id')&&get('edit_note_body').length===0)throw Error(loc('Eine vorhandene Notiz darf nicht leer sein.','Var olan not boş bırakılamaz.'));
+ }
+ if(action==='provider_category'){
+  p.operation=get('operation');
+  p.name=get('category_name');p.category_id=get('category_id');
+  if(!['add','rename','delete'].includes(p.operation)||p.operation!=='add'&&!p.category_id||p.operation!=='delete'&&!p.name)throw Error(loc('Bitte eine Kategorie und einen gültigen Namen angeben.','Kategori ve geçerli bir ad girin.'));
  }
  if(action==='provider_note'&&!get('body'))throw Error(tr('Not yazın.'));
  return p;
