@@ -1,4 +1,12 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Aktueller Übergabestand – 31.10.2026
+
+Fortlaufende Nutzerfreigabe für geprüfte Code-Releases gilt. Alle technischen Schritte dieser Fortsetzung #78–#84 veröffentlicht: privates Archiv/Versammlungen und echte API-Anbindung, Aufgaben/Termine/manuelle Wiederholung, alte Einstiegspfade, Forderungshinweise7/21/interne Prüfung35, private Prüfpause, gezielte Clientprivileg-Härtung und Theme-/Großschriftfix. #84 main37d69403bb7fd33eb2bea6ef730547714c1c9101, CI41180568814/Pages41180701638 erfolgreich; ausgelieferte CSS/Indexdatei bytegleich.337 allgemeine Tests ohne Fehler; produktive Finanzoriginale nicht zu Testzwecken verändert. #83-Backendrechte aktiv, keine Client-DDL-Rechte; vier Audittrigger erhalten und RLS/DML-Rechte unverändert.
+
+Letzter semantischer Dialogfix separat geprüft: eindeutige lokalisierte Bildschirmlesernamen,110 native Stil-/Layout-/axe-Prüfungen in24 Dialog-/Theme-/Breitenkombinationen; keine gemeldete Verletzung im untersuchten Dialogbereich. Keine Behauptung vollständiger realer Geräte-/Barrierefreiheitsabnahme. Dieser kleine Controller-Rollout wird separat bestätigt.
+
+**Nächster echter Schritt benötigt eine reguläre vorhandene Benutzersitzung:** privater Storage-Upload und authentifizierter Originaldownload; danach reale Konten-/Mail-/Geräte- und fachliche Bank-/Zuordnungsabnahme. Vollständige genaue Anleitung: FINAL-ACCEPTANCE-OPEN.md. Keine Passwörter/Tokens teilen, keine künstlichen produktiven Authkonten/Buchungen und keine tatsächlichen Finanz-/Authänderungen ohne konkreten Fachauftrag. Backup auf Nutzerwunsch ausdrücklich nicht erneut bearbeiten. Darunterliegende alte „Nächster Schritt“-Abschnitte sind historische Nachweise und setzen diesen aktuellen Stand nicht außer Kraft.
+
 ## Technische Pakete veröffentlicht; echte Abnahme präzisiert – 31.10.2026
 
 Archiv #78, Aufgaben #79, Alt-Einstiege #80, Forderungshinweise #81 und private Prüfpause #82 sind veröffentlicht und anhand ausgelieferter Quellen bestätigt. Prüfpause-Pages41179801684 erfolgreich; sieben Dateien bytegleich. Privileghärtung #83 nach CI41180113451 gemergt: maine87fc07bb6cdb2f63bbb185bf19495d6233b6143. Tatsächliche Migrationen20261031071623/20261031071802 aktiv: keine unnötigen Client-DDL-Rechte, vier Audittrigger erhalten; Lese-/DML-/RLS-Fingerprint unverändert.17 isolierte Prüfungen. Anonym ausführbar bleibt nur die beabsichtigte begrenzte Summen-RPC. Free-Vorgabe/Passwörter unverändert; verbleibende Advisor-Hinweise fachlich dokumentiert.

@@ -6,7 +6,7 @@ Dieser Stand trennt technische Veröffentlichung von tatsächlich mit realen Kon
 
 Private Originaldateien/Versammlungen #78, Aufgaben mit manueller Wiederholung/interner Fälligkeit #79, stillgelegte alte Einstiegspfade #80, eigene freundliche Forderungshinweise7/21 und interne Prüfung35 #81, begründete private Prüfpause #82 sowie gezielter Clientprivileg-/Advisor-Abgleich #83. Vorher bereits Rollen/Fünfrechte/Entwurfsfreigaben, persönliche Historie, PDF-/CSV-/XLSX-Import, Exporte, Abschlüsse, manuelle Summenfreigaben, Sonderumlagen und Budget ergänzt. Beim Anschluss wurde die echte API-Aufrufliste für mehrere frühere Pakete repariert (#78); frühere UI-Mocks hatten diese Lücke nicht erfasst.
 
-337 allgemeine Tests ohne Fehler. Zusätzlich isolierte fachliche SQL-Suiten und native synthetische DE/TR-Browserprüfungen mit tatsächlichen Controllern/API-Client/Modulgraph. Das beweist keine Zustellung echter E-Mails oder vollständige Auth-/Geräte-/Storage-E2E-Abnahme.
+337 allgemeine Tests ohne Fehler. Gemeinsame neue Dialoge zusätzlich in110 Stil-/Layout-/axe-Prüfungen untersucht; keine gemeldete Verletzung im gescannten Dialogbereich. Zusätzlich isolierte fachliche SQL-Suiten und native synthetische DE/TR-Browserprüfungen mit tatsächlichen Controllern/API-Client/Modulgraph. Das beweist keine Zustellung echter E-Mails oder vollständige Auth-/Geräte-/Storage-E2E-Abnahme.
 
 ## Erster noch nötiger realer Schritt: privater Storage-Transport
 
