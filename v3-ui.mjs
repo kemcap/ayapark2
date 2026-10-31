@@ -9,7 +9,7 @@ import {compactReview,reviewPanel} from './review-ui.mjs?v=5.8.1';
 import {apartmentInfo,unitDebtCategory} from './apartment-info.mjs?v=5.9.54';
 import {assignmentCard,invitationButton} from './people-ui.mjs?v=5.9.54';
 import {legacyFinance} from './legacy-finance.mjs?v=5.9.50';
-import {expenseDistributionPanel} from './expense-distribution-ui.mjs?v=5.9.57';
+import {expenseDistributionPanel} from './expense-distribution-ui.mjs?v=5.9.58';
 import {incomeExpenseChart} from './finance-charts.mjs?v=5.9.58';
 import {providerCategoryChoices,providerServices,providerMatchesCategory} from './provider-categories.mjs?v=5.9.53';
 import {effectiveOccupancy} from './relationships.mjs?v=5.8.1';
@@ -17,7 +17,7 @@ import {t as tr,locale} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money} from './core.mjs?v=5.8.1';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 import {remaining,paid,unassigned} from './ledger.mjs?v=5.9.39';
-import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs?v=5.9.57';
+import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs?v=5.9.58';
 import {residentClaimsPanel,residentClaimsDetail} from './site-claims-ui.mjs?v=5.9.54';
 
 export {residentClaimsDetail};
