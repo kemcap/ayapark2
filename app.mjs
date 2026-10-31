@@ -549,9 +549,9 @@ function resetFinanceChart(element){
  const label=inspector.querySelector('[data-inspector-label]');
  const value=inspector.querySelector('[data-inspector-value]');
  const extra=inspector.querySelector('[data-inspector-extra]');
- if(label)label.textContent=locale().startsWith('de')?'Datenpunkt wählen oder berühren':'Veri noktasını seç veya dokun';
- if(value)value.textContent='—';
- if(extra)extra.textContent='';
+ if(label)label.textContent=inspector.dataset.defaultLabel||'';
+ if(value)value.textContent=inspector.dataset.defaultValue||'—';
+ if(extra)extra.textContent=inspector.dataset.defaultExtra||'';
 }
 document.addEventListener('pointerover',ev=>{inspectFinanceChart(ev.target);});
 document.addEventListener('focusin',ev=>{inspectFinanceChart(ev.target);});
