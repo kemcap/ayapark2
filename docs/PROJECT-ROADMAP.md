@@ -1,4 +1,12 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Technische Pakete veröffentlicht; echte Abnahme präzisiert – 31.10.2026
+
+Archiv #78, Aufgaben #79, Alt-Einstiege #80, Forderungshinweise #81 und private Prüfpause #82 sind veröffentlicht und anhand ausgelieferter Quellen bestätigt. Prüfpause-Pages41179801684 erfolgreich; sieben Dateien bytegleich. Privileghärtung #83 nach CI41180113451 gemergt: maine87fc07bb6cdb2f63bbb185bf19495d6233b6143. Tatsächliche Migrationen20261031071623/20261031071802 aktiv: keine unnötigen Client-DDL-Rechte, vier Audittrigger erhalten; Lese-/DML-/RLS-Fingerprint unverändert.17 isolierte Prüfungen. Anonym ausführbar bleibt nur die beabsichtigte begrenzte Summen-RPC. Free-Vorgabe/Passwörter unverändert; verbleibende Advisor-Hinweise fachlich dokumentiert.
+
+Abschließender Darstellungsfix separat vorbereitet: gemeinsame Archiv-/Aufgaben-/Prüfpausendialoge verwenden echte Themevariablen und skalierende Formlabels;86 native Stil-/Kontrast-/Geometrieprüfungen für Classic/Modern, Hell/Dunkel,375px große Schrift/1440px bestanden.337 allgemeine Tests ohne Fehler. Details SHARED-DIALOG-VISUAL-QA.md. Dieser CSS-Rollout noch separat bestätigen.
+
+Konkrete verbleibende reale Nachweise und verständliche Anleitung: FINAL-ACCEPTANCE-OPEN.md. Erster echter Blocker ist authentifizierter Storage-Dateitransfer mit vorhandener Benutzersitzung; SQL-/Mocktests ersetzen ihn nicht. Danach reale getrennte Konten-/Mail-/Geräteabnahme und fachliche Bestätigung der drei Bank-/Zuordnungsebenen. Keine Testkonten/-buchungen produktiv erzeugen. Backup auf Nutzerwunsch nicht erneut bearbeitet; kein neuer Restore-/Bucket-Backupnachweis behauptet.
+
 ## Prüfpause übernommen; Advisor-Abgleich konkretisiert – 31.10.2026
 
 PR #82 nach CI41179670915 gemergt: mainf993c20a2f94ca26c3c3d9f7e2327c33c91d15f1. Backend20261031071132 aktiv,0 echte Prüfpausen, RLS/geschützte Gründe/Clientgrenzen bestätigt. Vor-/Nachher-Fingerprints aller vorhandenen Forderungen/Bankzeilen/Zuordnungen identisch. 27 SQL-/38 native Dialog-/34 Startseiten- und337 allgemeine Tests bestanden. Pages/Live dieses Schritts separat bestätigen. #81-Auslieferung anhand fünf Dateien mit exakt gemergtem Stand bytegleich geprüft.
@@ -276,7 +284,7 @@ Stand: 29.10.2026 · Projekt: `kemcap/ayapark2` · Produktivbranch: `main`
 - [x] Vorhandene Finanz-/Anmelde-Module und vorhandenen CI-Workflow im Code identifiziert.
 - [x] Zum Prüfzeitpunkt: keine Storage-Buckets/Storage-Dateien; kein täglicher Backup-Workflow in `main`.
 - [x] Aktuelle Live-Deployments und alle vier alten Einstiegspfade geprüft; verbleibende Altoberflächen durch Weiterleitungen ersetzt #80, Pages/live bestätigt. Historische Git-Versionen bleiben erhalten.
-- [ ] Supabase-Advisor-Hinweise zu `SECURITY DEFINER`, Auth-Passwortschutz und drei RLS-Tabellen ohne Policy fachlich prüfen; nicht pauschal Zugriffsrechte erweitern.
+- [x] Advisor-Gruppen fachlich eingeordnet und Clientprivilegien gezielt gehärtet #83. Fünf bewusst geschlossene policyfreie Tabellen; öffentliche feste Summenprojektion beabsichtigt, Leak-Passwortschutz wegen Free-Vorgabe nicht aktiviert. Kein pauschales „alle Hinweise behoben“.
 - [ ] Verbindliche Backupprozedur inklusive Restore-Ziel, maximal tolerierbarem Datenverlust, Betreiberkontakten und Prüfkriterien festhalten.
 
 ## Phase 1 – Vollständige portable Backups (auf Nutzerwunsch übersprungen; historischer Nachweisstand)
@@ -323,7 +331,7 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 
 - [x] Repository-Ist/Soll-Abgleich aller drei Rollen und fünf delegierbaren Verwaltungsrechte; vorhandene Module und Überschneidungen geprüft. Siehe `PHASE-2-ROLES-AUDIT.md`; keine Live-Backend-Abnahme.
 - [x] Teilaufgabe Entwicklungsstand: reverse/unallocate/void_charge/void_credit serverseitig und in der UI auf Superadmin begrenzt; 28 isolierte SQL- und 2 UI-Prüfungen bestanden. Produktiv veröffentlicht über #55.
-- [ ] Übrige kritische Finanzfreigaben und fünf getrennte Aufgabenrechte vollständig umsetzen und integriert abnehmen.
+- [x] Kritische Finanzfreigaben und fünf getrennte Aufgabenrechte technisch umgesetzt und isoliert integriert geprüft; echte Client-Aufrufliste in #78 korrigiert. Reale Konten-/Gerätegesamtabnahme bleibt eigener offener Punkt.
 - [x] Fünf getrennte Aufgabenrechte und Aidat-/Umlagenentwurf mit Superadmin-Endfreigabe umgesetzt und veröffentlicht (#56/#57); bestehende Altzuweisungen werden erst bei ausdrücklichem Speichern umgestellt.
 - [x] 13 bestehende allgemeine Testfehler fachlich aufgelöst und veröffentlicht (#55); allgemeine Suite inzwischen 269/269 erfolgreich.
 - [x] Registrierung/Einladungen, administrative Wiederherstellung, Kontaktfreigaben, Historie und RLS mit synthetischen Identitäten geprüft (84 aktuelle Rechte-/Einladungs-/Recovery-, 23 Kontakt- und 43 Historienprüfungen; kein echter Mail-/Auth-Browser-E2E).
