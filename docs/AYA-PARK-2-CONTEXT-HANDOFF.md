@@ -1,4 +1,12 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Verifizierter Live-Abschluss dieser technischen Fortsetzung – 31.10.2026
+
+Auch #85 veröffentlicht: mainb638239a7146f7128982137d0946f1ad43ff8f66, CI41181057628/Pages41181382787 erfolgreich. App/Index/Archiv-/Aufgaben-/Prüfpausencontroller/CSS live in sechs Dateien bytegleich bestätigt.337 allgemeine Tests und110 neue Stil-/Layout-/axe-Prüfungen erfolgreich. Alle technischen Pakete #78–#85 dieser Fortsetzung sind veröffentlicht; keine pauschale reale Gesamtfertigmeldung.
+
+Roadmap-Nächster-Schritt aktualisiert: realer authentifizierter Dateitransfer, danach echte Auth-/Mail-/Geräte- und fachliche Bankabnahme gemäß FINAL-ACCEPTANCE-OPEN.md. Live-Anwendung im verfügbaren Browser geöffnet und tatsächliche fehlende Benutzersitzung beobachtet; reguläre Anmeldeform mit Passwort oder E-Mail-Code vorhanden. Kein Passwort/Token ausgelesen, keine Zugangsdaten erfunden und kein produktives Testkonto erzeugt. Nächste Aktion benötigt eine sichere Benutzeranmeldung; Metadaten-/Mocktests sind kein Ersatz.
+
+Unverfängliche optionale Storage-Prüfdatei konkret vorbereitet unter qa/fixtures/ayapark2-storage-funktionstest-20261031.txt (136 Bytes, SHA-256bd51446a634bccb1461f94a6436467d19c6b58758ddf5a7030b50c4b10b3f22a). Noch nicht hochgeladen. Ein echter Upload erzeugt einen auch nach Zugriffs-Rücknahme aufbewahrten Archiveintrag; keine automatische physische Löschung. Keine Bewohner-/Finanz-/Authinhalte. Für tatsächlichen Testupload konkrete Freigabe/Sitzung erforderlich. Backup unverändert übersprungen.
+
 ## Aktueller Übergabestand – 31.10.2026
 
 Fortlaufende Nutzerfreigabe für geprüfte Code-Releases gilt. Alle technischen Schritte dieser Fortsetzung #78–#84 veröffentlicht: privates Archiv/Versammlungen und echte API-Anbindung, Aufgaben/Termine/manuelle Wiederholung, alte Einstiegspfade, Forderungshinweise7/21/interne Prüfung35, private Prüfpause, gezielte Clientprivileg-Härtung und Theme-/Großschriftfix. #84 main37d69403bb7fd33eb2bea6ef730547714c1c9101, CI41180568814/Pages41180701638 erfolgreich; ausgelieferte CSS/Indexdatei bytegleich.337 allgemeine Tests ohne Fehler; produktive Finanzoriginale nicht zu Testzwecken verändert. #83-Backendrechte aktiv, keine Client-DDL-Rechte; vier Audittrigger erhalten und RLS/DML-Rechte unverändert.

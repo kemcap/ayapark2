@@ -38,3 +38,7 @@ Supabase Free bleibt. Leak-Passwortschutz nur Pro+, daher transparent verbleiben
 Backup gemäß ausdrücklichem Nutzerauftrag nicht erneut bearbeitet/aktiviert/getestet; Nutzer meldet bereits vorhandenes Backup. In diesem Arbeitsgang kein neuer realer Restore-/Migrationstest und keine Behauptung, dass die vorhandene Automatisierung bereits jeden neu hinzugefügten Bucketumfang verifiziert sichert. Neue Originale/Metadaten gehören zum Wiederherstellungsinventar; dies als Betreiberaufgabe getrennt halten.
 
 Der nächste vom Eigentümer abhängige Schritt ist der oben beschriebene reale Storage-/Login-Nachweis. Unabhängige Codearbeit wird nicht als Ersatz für fehlende echte Sitzung ausgegeben.
+
+Verifizierter technischer Live-Endstand #85: CI41181057628, Pages41181382787 erfolgreich; sechs Dateien bytegleich. Im verfügbaren tatsächlichen Browser ist die Live-Anwendung abgemeldet; vorhandene Methode Passwort bzw. E-Mail-Code. Auth kann ausschließlich über reguläre sichere Anmeldung fortgesetzt werden, keine Rekonstruktion/Weitergabe von Tokens.
+
+Optionale konkrete Prüfdatei: qa/fixtures/ayapark2-storage-funktionstest-20261031.txt,136 Bytes, SHA-256bd51446a634bccb1461f94a6436467d19c6b58758ddf5a7030b50c4b10b3f22a. Inhalt ist ausschließlich eine unverfängliche technische Notiz. Noch nicht hochgeladen; tatsächlicher Eintrag würde gemäß Archivregel auch nach Rücknahme erhalten bleiben.
