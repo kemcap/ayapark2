@@ -126,7 +126,7 @@ export function payloadV3(action,form,ctx){
   if(!['owner','tenant','representative'].includes(get('role')))throw Error(tr('Yeni kişi için rol seçin.'));
  }
  if(action==='staff_remove'){p.user_id=ctx.user_id;p.confirmation=true;}
- p.primary_contact=form.has('primary_contact');if(action==='user_access'){p.confirmation=true;p.new_person=get('person_mode')==='new';if(p.new_person&&(!get('first_name')||!get('last_name')||!get('email')))throw Error(tr('Ad, soyad ve geçerli e-posta gerekli.'));if(!p.new_person&&get('access_email')&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(get('access_email')))throw fieldError(loc('Bitte eine gültige E-Mail-Adresse eingeben.','Lütfen geçerli bir e-posta adresi yazın.'),'access_email');}
+ p.primary_contact=form.has('primary_contact');if(action==='user_access'){p.confirmation=true;p.new_person=get('person_mode')==='new';if(p.new_person&&(!get('first_name')||!get('last_name')||!get('email')))throw Error(tr('Ad, soyad ve geçerli e-posta gerekli.'));if(!p.new_person&&get('access_email')&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(get('access_email')))throw Error(loc('Bitte eine gültige E-Mail-Adresse eingeben.','Lütfen geçerli bir e-posta adresi yazın.'));}
  if(action==='bind_charge'&&!get('link_id'))throw Error(tr('Kişi seçin.'));
  if(action==='void_credit'&&get('reason').length<3)throw Error(tr('Gerekçe gerekli.'));
  if(['credit','match_rule'].includes(action)){const l=ctx.targets.find(l=>l.id===get('target'));if(!l)throw Error(tr('Kişi seçin.'));p.unit_id=l.unit_id;p.person_id=l.person_id;delete p.targets;
