@@ -17,9 +17,13 @@ export function legacyFinance(d,unitId,claims){
  const gross=old.reduce((n,c)=>n+numeric(c.cents),0);
  const paid=[...payByCharge.values()].reduce((n,c)=>n+c,0);
  const open=gross-paid;
- const snapshot=(d.devirSnapshot||[]).find(row=>row.unit_id===unitId);
- const categories=Object.entries(snapshot?.categories||{}).map(([name,cents])=>({name,cents:numeric(cents)}));
- const sourceVerified=!!snapshot&&numeric(snapshot.total_cents)===gross&&categories.reduce((n,c)=>n+c.cents,0)===gross;
+ const snapshots=(d.devirSnapshot||[]).filter(row=>row.unit_id===unitId);
+ const sourceTotals=new Map();
+ for(const row of snapshots)for(const [name,cents] of Object.entries(row.categories||{}))sourceTotals.set(name,(sourceTotals.get(name)||0)+numeric(cents));
+ const categories=[...sourceTotals.entries()].map(([name,cents])=>({name,cents}));
+ const sourceGross=snapshots.reduce((n,row)=>n+numeric(row.total_cents),0);
+ const sourceVerified=snapshots.length>0&&sourceGross===gross&&categories.reduce((n,c)=>n+c.cents,0)===gross;
+ const sourceDates=[...new Set(snapshots.map(row=>row.source_date).filter(Boolean))];
  // No silent reconciliation: when exact source/category sum differs, present entered charges instead.
  const fallbackGroups=new Map();
  for(const c of old){
@@ -37,6 +41,6 @@ export function legacyFinance(d,unitId,claims){
   g.gross+=numeric(c.cents);g.paid+=payByCharge.get(c.id)||0;g.open+=numeric(c.cents)-(payByCharge.get(c.id)||0);g.count++;byPerson.set(id,g);
  }
  return {old,current,gross,paid,open,categories:sourceVerified?categories:fallback,
-  sourceVerified,sourceDate:sourceVerified?snapshot.source_date:null,
+  sourceVerified,sourceDate:sourceVerified&&sourceDates.length===1?sourceDates[0]:null,
   persons:[...byPerson.values()],paidChargeIds:new Set([...payByCharge.keys()])};
 }
