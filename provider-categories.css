@@ -1,0 +1,8 @@
+.provider-category-choices{display:flex;flex-wrap:wrap;gap:9px 13px;margin:12px 0;border:1px solid var(--line);border-radius:12px;padding:14px}
+.provider-category-choices legend{font-weight:650;padding:0 6px;font-size:13px}
+.provider-category-choices label{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--soft);padding:9px 12px;border-radius:9px;min-height:42px;cursor:pointer;font-size:13px}
+.provider-category-choices label:has(input:checked){border-color:var(--primary);background:var(--paper)}
+.provider-category-choices small{flex-basis:100%;font-size:11px;color:var(--muted)}
+.provider-service-tags{display:flex;gap:6px;flex-wrap:wrap}
+.provider-service-tag{display:inline-flex;font-size:11px;font-weight:650;padding:5px 9px;border-radius:999px;border:1px solid var(--line);background:var(--soft);max-width:100%;overflow-wrap:anywhere}
+#providerCategoryExisting[hidden],#providerCategoryName[hidden]{display:none!important}
