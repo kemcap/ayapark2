@@ -73,7 +73,7 @@
 }
 /* Only genuinely narrow content stacks B and A. Sidebar width, window zoom,
    and tablet/mobile layout are handled by the actual dashboard container. */
-@container apartment-overview (max-width:520px){
+@container apartment-overview (max-width:400px){
  .overview-main-grid .building-plan,
  :root[data-design="modern"] .overview-main-grid .building-plan{
   grid-template-columns:minmax(0,1fr);
