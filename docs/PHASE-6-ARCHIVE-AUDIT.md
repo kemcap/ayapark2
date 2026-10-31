@@ -1,5 +1,16 @@
 # Phase 6 – Privates Dokumenten- und Versammlungsarchiv
 
+## Reale Storage-Abnahme bestanden – 31.10.2026
+
+Der Nutzer hat die Testübernahme ausdrücklich beauftragt und eine vorhandene reguläre Sitzung bereitgestellt. In der tatsächlichen Superadmin-Ansicht der Live-Anwendung (Cloud Chrome, keine Rollen-Vorschau) wurde die unverfängliche TXT-Prüfdatei erfolgreich hochgeladen und anschließend über „Aslı kontrol et ve indir“ authentifiziert heruntergeladen. Zielgruppe blieb „Yalnız yönetim“ (Nur Verwaltung), Kategorie „Genel“. App bestätigt „Hazır“ und „Asıl kontrol edildi ve tarayıcı indirmesine verildi.“.
+
+Original und tatsächlicher Browserdownload sind außerhalb der App bytegenau verglichen: **136 Bytes**, SHA-256 **bd51446a634bccb1461f94a6436467d19c6b58758ddf5a7030b50c4b10b3f22a**. Nachweise: [Prüfprotokoll](../qa/results/private-archive-live-20261031.json), [Dialogbild](../qa/results/private-archive-live-20261031.jpg). Genau ein unverfänglicher Testeintrag samt Original verbleibt privat als Nachweis; keine physische Löschung oder Freigabe an Bewohner. Keine Bewohner-, Finanz- oder Authstammdaten für den Test verändert und keine künstlichen Konten erzeugt.
+
+**Nächster offener Abnahmeschritt:** echte getrennte Verwaltungs-/Bewohnersitzungen und ihre tatsächlichen Zugriffsgrenzen. Eine Superadmin-Sitzung oder Rollen-Vorschau ersetzt diese Nachweise nicht. Danach Mailzustellung, tatsächliche Geräte/PWA und fachliche Bank-/Zuordnungsabnahme gemäß FINAL-ACCEPTANCE-OPEN.md. Keine Passwörter/Tokens im Chat; keine automatischen Auth-/Finanzmutationen oder Nachrichten an Dritte. Backup bleibt auf Nutzerwunsch übersprungen.
+
+Der zuvor dokumentierte Blocker „keine angemeldete Sitzung / noch nicht hochgeladen“ ist erledigt. Darunterliegende ältere Abschnitte sind historische Arbeitsstände. Zwischenzeitliche andere main-Änderungen bleiben erhalten; dieser Abschluss ändert nur Dokumentation und Testnachweise, keinen Laufzeitcode.
+
+
 Stand 31.10.2026: implementiert, isoliert getestet; Backend-/Frontend-Veröffentlichung separat nachweisen. Keine produktiven Originaldateien, Bewohner, Konten oder Buchungen für Tests angelegt/verändert.
 
 ## Bestand und Umfang

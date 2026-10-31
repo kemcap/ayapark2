@@ -8,18 +8,15 @@ Private Originaldateien/Versammlungen #78, Aufgaben mit manueller Wiederholung/i
 
 337 allgemeine Tests ohne Fehler. Gemeinsame neue Dialoge zusätzlich in110 Stil-/Layout-/axe-Prüfungen untersucht; keine gemeldete Verletzung im gescannten Dialogbereich. Zusätzlich isolierte fachliche SQL-Suiten und native synthetische DE/TR-Browserprüfungen mit tatsächlichen Controllern/API-Client/Modulgraph. Das beweist keine Zustellung echter E-Mails oder vollständige Auth-/Geräte-/Storage-E2E-Abnahme.
 
-## Erster noch nötiger realer Schritt: privater Storage-Transport
+## Reale Storage-Abnahme bestanden – 31.10.2026
 
-Dafür ist eine tatsächliche autorisierte Anwendungssitzung erforderlich. Management-SQL-Zugriff ersetzt den Benutzer-JWT der Storage-API nicht. Der Agent erzeugt dafür keine produktiven Authkonten oder Sessions und übernimmt keine vorhandenen Tokens.
+Der Nutzer hat die Testübernahme ausdrücklich beauftragt und eine vorhandene reguläre Sitzung bereitgestellt. In der tatsächlichen Superadmin-Ansicht der Live-Anwendung (Cloud Chrome, keine Rollen-Vorschau) wurde die unverfängliche TXT-Prüfdatei erfolgreich hochgeladen und anschließend über „Aslı kontrol et ve indir“ authentifiziert heruntergeladen. Zielgruppe blieb „Yalnız yönetim“ (Nur Verwaltung), Kategorie „Genel“. App bestätigt „Hazır“ und „Asıl kontrol edildi ve tarayıcı indirmesine verildi.“.
 
-1. https://kemcap.github.io/ayapark2/ öffnen und regulär mit dem vorhandenen Superadmin-Zugang anmelden. Native Superadmin-Ansicht verwenden, keine Rollen-Vorschau.
-2. Auf Startseite „Dokumente & Versammlungen“ öffnen. „Originaldatei hinzufügen“ ausklappen.
-3. Eine kleine unverfängliche eigene Datei wählen, beispielsweise TXT mit einer normalen Betriebsnotiz. Titel mindestens drei Zeichen, Kategorie „Allgemein“, Zielgruppe „Nur Verwaltung“ belassen. Diese Datei ist für vorhandene Verwaltungsmitglieder lesbar; keine privaten Passwort-/Bank-/Personendaten für diese Abnahme verwenden.
-4. Bestätigung nach tatsächlicher Inhaltsprüfung setzen und „Privates Original hochladen“ wählen. Erfolg bedeutet Upload und authentifizierte Rücklese/Größen-/Hashprüfung durch die App. Unklaren Versuch unverändert wiederholen; bestehende Datei wird nicht überschrieben.
-5. Bei diesem Eintrag „Original prüfen & herunterladen“ wählen und heruntergeladene Datei öffnen. Originalnamen/Inhalt kontrollieren. Bei Hashfehler bietet die App keine Datei an.
-6. Falls der Eintrag nicht weiter gebraucht wird: Zugriff mit einer nachvollziehbaren Begründung zurücknehmen. Das Original bleibt gemäß Archivkonzept erhalten; keine physische Löschung behaupten.
+Original und tatsächlicher Browserdownload sind außerhalb der App bytegenau verglichen: **136 Bytes**, SHA-256 **bd51446a634bccb1461f94a6436467d19c6b58758ddf5a7030b50c4b10b3f22a**. Nachweise: [Prüfprotokoll](../qa/results/private-archive-live-20261031.json), [Dialogbild](../qa/results/private-archive-live-20261031.jpg). Genau ein unverfänglicher Testeintrag samt Original verbleibt privat als Nachweis; keine physische Löschung oder Freigabe an Bewohner. Keine Bewohner-, Finanz- oder Authstammdaten für den Test verändert und keine künstlichen Konten erzeugt.
 
-Exakte Rückmeldung für Nachweis: Gerät/Browser, Upload bestätigt ja/nein, Download erfolgreich ja/nein, sichtbare Fehlermeldung ohne Geheimnisse. Ein solcher tatsächlicher Nachweis wird gesondert dokumentiert; synthetische Checks oder erfolgreiche Metadatenmigration ersetzen ihn nicht.
+**Nächster offener Abnahmeschritt:** echte getrennte Verwaltungs-/Bewohnersitzungen und ihre tatsächlichen Zugriffsgrenzen. Eine Superadmin-Sitzung oder Rollen-Vorschau ersetzt diese Nachweise nicht. Danach Mailzustellung, tatsächliche Geräte/PWA und fachliche Bank-/Zuordnungsabnahme gemäß FINAL-ACCEPTANCE-OPEN.md. Keine Passwörter/Tokens im Chat; keine automatischen Auth-/Finanzmutationen oder Nachrichten an Dritte. Backup bleibt auf Nutzerwunsch übersprungen.
+
+Der zuvor dokumentierte Blocker „keine angemeldete Sitzung / noch nicht hochgeladen“ ist erledigt. Darunterliegende ältere Abschnitte sind historische Arbeitsstände. Zwischenzeitliche andere main-Änderungen bleiben erhalten; dieser Abschluss ändert nur Dokumentation und Testnachweise, keinen Laufzeitcode.
 
 ## Auth, E-Mail, Geräte
 
@@ -37,8 +34,4 @@ Supabase Free bleibt. Leak-Passwortschutz nur Pro+, daher transparent verbleiben
 
 Backup gemäß ausdrücklichem Nutzerauftrag nicht erneut bearbeitet/aktiviert/getestet; Nutzer meldet bereits vorhandenes Backup. In diesem Arbeitsgang kein neuer realer Restore-/Migrationstest und keine Behauptung, dass die vorhandene Automatisierung bereits jeden neu hinzugefügten Bucketumfang verifiziert sichert. Neue Originale/Metadaten gehören zum Wiederherstellungsinventar; dies als Betreiberaufgabe getrennt halten.
 
-Der nächste vom Eigentümer abhängige Schritt ist der oben beschriebene reale Storage-/Login-Nachweis. Unabhängige Codearbeit wird nicht als Ersatz für fehlende echte Sitzung ausgegeben.
-
-Verifizierter technischer Live-Endstand #85: CI41181057628, Pages41181382787 erfolgreich; sechs Dateien bytegleich. Im verfügbaren tatsächlichen Browser ist die Live-Anwendung abgemeldet; vorhandene Methode Passwort bzw. E-Mail-Code. Auth kann ausschließlich über reguläre sichere Anmeldung fortgesetzt werden, keine Rekonstruktion/Weitergabe von Tokens.
-
-Optionale konkrete Prüfdatei: qa/fixtures/ayapark2-storage-funktionstest-20261031.txt,136 Bytes, SHA-256bd51446a634bccb1461f94a6436467d19c6b58758ddf5a7030b50c4b10b3f22a. Inhalt ist ausschließlich eine unverfängliche technische Notiz. Noch nicht hochgeladen; tatsächlicher Eintrag würde gemäß Archivregel auch nach Rücknahme erhalten bleiben.
+Der erste Storage-/Superadmin-Sitzungsnachweis ist abgeschlossen. Offen bleiben die oben ausdrücklich getrennten Konten-, Mail-, Geräte- und Finanznachweise. Kein erneuter Storage-Upload nötig.

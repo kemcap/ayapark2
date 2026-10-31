@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-31",
+  "environment": "production",
+  "site": "https://kemcap.github.io/ayapark2/",
+  "browser": "Cloud Chrome",
+  "session": "actual existing superadmin; native view",
+  "fixture": "qa/fixtures/ayapark2-storage-funktionstest-20261031.txt",
+  "title": "AyaPark 2 – Storage-Funktionstest 31.10.2026",
+  "audience": "management only",
+  "bytes": 136,
+  "sha256": "bd51446a634bccb1461f94a6436467d19c6b58758ddf5a7030b50c4b10b3f22a",
+  "upload_confirmed": true,
+  "authenticated_download_completed": true,
+  "download_byte_equal": true,
+  "ui_download_status": "Asıl kontrol edildi ve tarayıcı indirmesine verildi.",
+  "evidence": "qa/results/private-archive-live-20261031.jpg",
+  "retention": "test original remains private in archive; no physical deletion",
+  "limits": [
+    "not a separate resident/management session test",
+    "not real email/reset delivery",
+    "not physical Android/iOS or PWA acceptance",
+    "not financial original acceptance",
+    "not backup/restore acceptance"
+  ]
+}
