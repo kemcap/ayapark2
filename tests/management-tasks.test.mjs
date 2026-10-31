@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {fullDemo} from '../ledger.mjs';import {previewProjection,residentPreviewOptions} from '../access-preview.mjs';
+test('resident preview removes private management tasks while native management retains them',()=>{const d=fullDemo();d.serverRole='manager';d.role='super';d.capabilities.admin=true;d.taskWorkspace={rows:[{id:'private-task',description:'PRIVATE MANAGEMENT NOTE'}],admin:true};const option=residentPreviewOptions(d)[0];const projected=previewProjection(d,'resident',option?.id);assert.equal(projected.taskWorkspace,null);assert.equal(previewProjection(d,'super').taskWorkspace.rows[0].description,'PRIVATE MANAGEMENT NOTE');assert.equal(d.taskWorkspace.rows.length,1);});
