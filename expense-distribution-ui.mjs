@@ -1,6 +1,7 @@
 import {expenseDistributionModel} from './expense-distribution.mjs?v=5.9.57';
 import {escapeHtml as esc,money} from './core.mjs?v=5.8.1';
 import {locale,t as tr} from './i18n.mjs?v=5.9.28';
+import {expenseDonutChart} from './finance-charts.mjs?v=5.9.58';
 
 export function expenseDistributionPanel(s,reportRange={}){
  const de=locale().startsWith('de'),t=(a,b)=>de?a:b;
@@ -27,7 +28,8 @@ export function expenseDistributionPanel(s,reportRange={}){
   '<div id="expenseDistributionResults" class="expense-distribution-results">'+
    '<div class="expense-distribution-summary"><div><span>'+t('Ausgaben im ausgewählten Zeitraum','Seçilen dönemdeki giderler')+'</span>'+
    '<strong>'+money(model.total)+'</strong></div><div class="expense-distribution-meta"><span>'+esc(periodLabel)+'</span><span>'+count+' '+t(count===1?'Kategorie':'Kategorien','kategori')+'</span></div></div>'+
-   (items?'<div class="expense-distribution-items">'+items+'</div>':
+   (items?expenseDonutChart(model):'')+
+   (items?'<details class="fch-expense-details"><summary>'+t('Alle Kategorien mit Beträgen anzeigen','Tüm kategorilerin tutarlarını göster')+'</summary><div class="expense-distribution-items">'+items+'</div></details>':
     '<p class="expense-distribution-empty">'+t('Für diesen Zeitraum sind keine Ausgaben erfasst. Wähle ein anderes Jahr.','Bu döneme ait kayıtlı gider yok. Başka bir yıl seç.')+'</p>')+
   '</div></section>';
 }

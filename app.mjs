@@ -16,7 +16,8 @@ import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.9.2';
 import {bindAccessRequests} from './access-request-ui.mjs?v=5.9.0';
 import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.9.39';
 import {installSmartHeader} from './smart-header.mjs?v=5.9.49';
-import {expenseDistributionPanel} from './expense-distribution-ui.mjs?v=5.9.57';
+import {expenseDistributionPanel} from './expense-distribution-ui.mjs?v=5.9.58';
+import {incomeExpenseChart} from './finance-charts.mjs?v=5.9.58';
 import {prepareV5Demo} from './finance-demo.mjs?v=5.9.39';
 import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.9.39';
 import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.9.39';
@@ -32,14 +33,14 @@ import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,
 import {bindInstall} from './install.mjs?v=5.9.39';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.57';
-import {rangeError,selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.58';
+import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
 import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.9.39';
 import {AyaparkApi} from './api.mjs?v=5.9.54';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.57';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.58';
 import {buildForm,payloadFor} from './forms.mjs?v=5.9.56';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
@@ -50,7 +51,7 @@ let detailView=null,personUnitReturn=null,loginMethod='password';
 bindInstall();
 initializePreferences();
 const updateDesignControl=bindDesign(()=>render());
-const state={data:prepareV5Demo(fullDemo()),mode:IS_PREVIEW||new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},expenseDistributionYear:'report',stale:false};
+const state={data:prepareV5Demo(fullDemo()),mode:IS_PREVIEW||new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},expenseDistributionYear:'report',financeChartView:'bar',stale:false};
 let peopleSearchTimer;
 const invitationUi=bindInvitations({
  api,getState:()=>state,rerender:()=>render(),
@@ -387,6 +388,20 @@ document.addEventListener('click',async event=>{
   return;
  }
  const tab=event.target.closest('[data-tab]');if(tab){const history=tab.dataset.tab==='history';$('unitCurrent').hidden=history;$('unitHistory').hidden=!history;for(const node of document.querySelectorAll('[data-tab]'))node.setAttribute('aria-pressed',String(node===tab));return;}
+ const changeChart=event.target.closest('[data-finance-chart-view]');
+ if(changeChart){
+  const view=changeChart.dataset.financeChartView;
+  if(!['donut','bar','line'].includes(view))return;
+  state.financeChartView=view;
+  const current=$('incomeExpenseViz');
+  if(current){
+   const d=state.data,range=selectedRange(state,'report');
+   const summary=financialSeries({...d,summaryDays:d.summaryDays||buildSummaryDays(d)},range,state.reportGroup||'year');
+   current.outerHTML=incomeExpenseChart(state,summary);
+   document.querySelector('[data-finance-chart-view="'+view+'"]')?.focus({preventScroll:true});
+  }
+  return;
+ }
  const yr=event.target.closest('[data-year]');if(yr){state.reportFilter={preset:'custom',from:yr.dataset.year+'-01-01',to:yr.dataset.year+'-12-31'};state.reportGroup='month';render();return;}
  const hiddenAmount=event.target.closest('.amount-private');if(hiddenAmount){hiddenAmount.classList.remove('amount-private');hiddenAmount.removeAttribute('aria-label');return;}
  const testButton=event.target.closest('[data-notification-test]');
@@ -505,6 +520,43 @@ document.addEventListener('change',event=>{
  if(id==='providerCategory'){state.providerCategory=event.target.value;render();}
  if(id==='reportPeriod'&&/^\d{4}-\d{2}$/.test(event.target.value)){state.period=event.target.value;render();}
 });
+// Lightweight native SVG inspection, shared between chart types and touch/keyboard.
+// Inspectors display existing values only; no network, data update or analytics events.
+function inspectFinanceChart(element){
+ const target=element?.closest?.('[data-chart-label]');
+ if(!target)return;
+ const root=target.closest('[data-chart-root]');
+ const inspector=root?.querySelector('.fch-inspector');
+ if(!inspector)return;
+ const label=inspector.querySelector('[data-inspector-label]');
+ const value=inspector.querySelector('[data-inspector-value]');
+ const extra=inspector.querySelector('[data-inspector-extra]');
+ if(label)label.textContent=target.dataset.chartLabel||'';
+ if(value)value.textContent=target.dataset.chartValue||'';
+ if(extra)extra.textContent=target.dataset.chartPercent||'';
+ for(const el of root.querySelectorAll('.fch-selected'))el.classList.remove('fch-selected');
+ target.classList.add('fch-selected');
+ const selected=target.dataset.chartLabel;
+ for(const el of root.querySelectorAll('.fch-donut-arc'))if(el.dataset.chartLabel===selected)el.classList.add('fch-selected');
+}
+function resetFinanceChart(element){
+ const root=element?.closest?.('[data-chart-root]');
+ if(!root)return;
+ if(root.contains(document.activeElement))return;
+ for(const el of root.querySelectorAll('.fch-selected'))el.classList.remove('fch-selected');
+ const inspector=root.querySelector('.fch-inspector');
+ if(!inspector)return;
+ const label=inspector.querySelector('[data-inspector-label]');
+ const value=inspector.querySelector('[data-inspector-value]');
+ const extra=inspector.querySelector('[data-inspector-extra]');
+ if(label)label.textContent=inspector.dataset.defaultLabel||'';
+ if(value)value.textContent=inspector.dataset.defaultValue||'—';
+ if(extra)extra.textContent=inspector.dataset.defaultExtra||'';
+}
+document.addEventListener('pointerover',ev=>{inspectFinanceChart(ev.target);});
+document.addEventListener('focusin',ev=>{inspectFinanceChart(ev.target);});
+document.addEventListener('pointerout',ev=>{if(!ev.relatedTarget?.closest?.('[data-chart-label]'))resetFinanceChart(ev.target);});
+document.addEventListener('focusout',ev=>{if(!ev.relatedTarget?.closest?.('[data-chart-label]'))resetFinanceChart(ev.target);});
 function restoreParentForm(back){showForm(back.action,back.args);for(const node of $('actionFields').querySelectorAll('[name]')){const values=back.values.filter(([k])=>k===node.name).map(([,v])=>v);if(node.type==='checkbox'||node.type==='radio')node.checked=values.includes(node.value);else if(values.length)node.value=values[0];}updateFinanceForm($('actionFields'),state.data,'restored');}
 function cancelActionForm(){if(writeBusy)return;const back=formAction?.back;$('actionDialog').close();if(back){restoreParentForm(back);return;}const origin=formAction?.origin;if(origin?.action==='unit')showDetail(linkedUnitDetail(origin.id));else if(origin?.action==='person_manage')showDetail(personManager(state,origin.id));}
 $('cancelAction').addEventListener('click',cancelActionForm);
