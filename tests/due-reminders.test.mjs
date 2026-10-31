@@ -1,4 +1,4 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {claimReminders,reminderCounts} from '../due-reminders.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';import {claimReminders,reminderCounts} from '../due-reminders.mjs?v=5.10.0';
 const charge=(id,due,patch={})=>({id,unit_id:'same-unit',person_id:'own',due_on:due,cents:1000,...patch});
 const d={charges:[charge('day6','2026-10-25'),charge('day7','2026-10-24'),charge('day20','2026-10-11'),charge('day21','2026-10-10'),charge('day34','2026-09-27'),charge('day35','2026-09-26')],allocations:[]},asOf='2026-10-31';
 test('friendly stages start at days 7 and 21; internal review starts at 35 only for finance',()=>{const r=claimReminders(d,{asOf,finance:true});assert.deepEqual(reminderCounts(r),{first:2,followup:2,review:1});assert.equal(r[0].id,'day35');});

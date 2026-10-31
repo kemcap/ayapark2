@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {fullDemo,demoCommand} from '../ledger.mjs?v=5.8.1';
-import {buildForm,payloadFor} from '../forms.mjs?v=5.8.1';
-import {setLanguage} from '../i18n.mjs?v=5.9.28';
+import {fullDemo,demoCommand} from '../ledger.mjs?v=5.10.0';
+import {buildForm,payloadFor} from '../forms.mjs?v=5.10.0';
+import {setLanguage} from '../i18n.mjs?v=5.10.0';
 
 const state=()=>({mode:'demo',data:fullDemo()});
 const form=fields=>{

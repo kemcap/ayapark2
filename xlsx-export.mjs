@@ -1,10 +1,11 @@
+import {uiText} from './language-text.mjs?v=5.10.0';
 import {zipSync,strToU8} from './vendor/xlsx-writer-fflate-0.8.3.mjs';
 const xml=v=>String(v??'').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
 const column=n=>{let s='';for(n++;n;n=Math.floor((n-1)/26))s=String.fromCharCode(65+(n-1)%26)+s;return s;};
 function number(n){if(!Number.isSafeInteger(n))throw Error('Invalid export amount');const big=BigInt(n),absolute=big<0n?-big:big;return (big<0n?'-':'')+(absolute/100n)+'.'+String(absolute%100n).padStart(2,'0');}
 export function workbookBytes(model){
  if(!model.columns?.length||model.columns.length>32||!Array.isArray(model.rows)||model.rows.length>5000)throw Error('Export too large');
- const rows=[model.columns,...model.rows,[],[model.title],...(model.demo?[[model.language==='de'?'Beispieldaten – kein Nachweis einer echten Zahlung.':'Örnek veriler – gerçek bir ödeme belgesi değildir.']]:[]),...(model.notes||[]).map(n=>[n])];
+ const rows=[model.columns,...model.rows,[],[model.title],...(model.demo?[[(model.language==='tr'?('Örnek veriler – gerçek bir ödeme belgesi değildir.'):(uiText("Beispieldaten – kein Nachweis einer echten Zahlung.",model.language)))]]:[]),...(model.notes||[]).map(n=>[n])];
  const body=rows.map((row,i)=>'<row r="'+(i+1)+'">'+row.map((value,j)=>{const ref=column(j)+(i+1);return value&&typeof value==='object'&&Object.hasOwn(value,'moneyCents')?'<c r="'+ref+'" s="1"><v>'+number(value.moneyCents)+'</v></c>':'<c r="'+ref+'" t="inlineStr"'+(i===0?' s="2"':'')+'><is><t xml:space="preserve">'+xml(value)+'</t></is></c>';}).join('')+'</row>').join('');
  const sheet='<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>'+model.columns.map((_,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+(i===0?22:28)+'" customWidth="1"/>').join('')+'</cols><sheetData>'+body+'</sheetData></worksheet>';
  const files={

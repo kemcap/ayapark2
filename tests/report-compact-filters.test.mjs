@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {reportControls,reportV3,dateFilters} from '../v3-ui.mjs?v=5.9.59';
-import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {selectedRange} from '../v3-domain.mjs?v=5.9.26';
-import {setLanguage,getLanguage} from '../i18n.mjs?v=5.9.28';
+import {reportControls,reportV3,dateFilters} from '../v3-ui.mjs?v=5.10.0';
+import {fullDemo} from '../ledger.mjs?v=5.10.0';
+import {selectedRange} from '../v3-domain.mjs?v=5.10.0';
+import {setLanguage,getLanguage} from '../i18n.mjs?v=5.10.0';
 
 const makeState=()=>({mode:'demo',data:fullDemo(),page:'reports',reportFilter:{preset:'all'},filter:{preset:'all'},reportGroup:'year',expenseDistributionYear:'report',financeChartView:'bar'});
 

@@ -1,7 +1,8 @@
-import {escapeHtml as e,money,randomId} from './core.mjs?v=5.8.1';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {escapeHtml as e,money,randomId} from './core.mjs?v=5.10.0';
 export function levyReviews({rpc,admin,connected,site,language,data,onSaved=async()=>{}}){
  let dialog,busy=false,generation=0,workspace={drafts:[],reviews:[]},requests=new Map();
- const t=(de,tr)=>language()==='de'?de:tr;
+ const t=(de,tr)=>(language()==='tr'?(tr):(uiText(de,language())));
  const clear=()=>{generation++;workspace={drafts:[],reviews:[]};requests.clear();if(dialog)dialog.textContent='';};
  const close=()=>{dialog?.close();clear();};
  const valid=scope=>dialog?.open&&scope.generation===generation&&scope.site===site()&&(scope.admin?admin():connected());

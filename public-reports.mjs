@@ -1,9 +1,11 @@
-import {releasedReportModel} from './released-report-model.mjs?v=5.9.38';
-import {exportMarkup} from './report-export-view.mjs?v=5.9.36';
-import {downloadWorkbook} from './report-export-ui.mjs?v=5.9.36';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {releasedReportModel} from './released-report-model.mjs?v=5.10.0';
+import {exportMarkup} from './report-export-view.mjs?v=5.10.0';
+import {downloadWorkbook} from './report-export-ui.mjs?v=5.10.0';
 const $=id=>document.getElementById(id),site=new URL(location.href).searchParams.get('site');let model=null,controller=null;
-const t=(de,tr)=>$('language').value==='de'?de:tr;
+const t=(de,tr)=>($('language').value==='tr'?(tr):(uiText(de,$('language').value)));
 async function load(){
+ $('refresh').textContent=t('Aktualisieren','Yenile');document.title=t('Finanzübersicht','Mali özet')+' · AyaPark 2';
  controller?.abort();controller=new AbortController();const current=controller;model=null;$('document').textContent='';$('print').hidden=true;$('excel').hidden=true;document.documentElement.lang=$('language').value;
  if(!/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i.test(site||'')){$('status').textContent=t('Kein gültiger Freigabelink.','Geçerli paylaşım bağlantısı yok.');return;}
  $('status').textContent=t('Freigaben werden geladen …','Paylaşımlar yükleniyor …');

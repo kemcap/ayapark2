@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {donutModel,donutViz,cartesianViz,incomeExpenseChart,expenseDonutChart} from '../finance-charts.mjs?v=5.9.58';
-import {expenseDistributionModel} from '../expense-distribution.mjs?v=5.9.57';
-import {expenseDistributionPanel} from '../expense-distribution-ui.mjs?v=5.9.58';
-import {reportV3} from '../v3-ui.mjs?v=5.9.58';
-import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {setLanguage,getLanguage} from '../i18n.mjs?v=5.9.28';
+import {donutModel,donutViz,cartesianViz,incomeExpenseChart,expenseDonutChart} from '../finance-charts.mjs?v=5.10.0';
+import {expenseDistributionModel} from '../expense-distribution.mjs?v=5.10.0';
+import {expenseDistributionPanel} from '../expense-distribution-ui.mjs?v=5.10.0';
+import {reportV3} from '../v3-ui.mjs?v=5.10.0';
+import {fullDemo} from '../ledger.mjs?v=5.10.0';
+import {setLanguage,getLanguage} from '../i18n.mjs?v=5.10.0';
 const summary={income:2400000,expense:1500000,buckets:[
  {period:'2025',income:800000,expense:300000},
  {period:'2026',income:1600000,expense:1200000}
@@ -115,7 +115,7 @@ test('empty datasets render safe empty state, encoded labels and still expose ch
 });
 
 test('UI uses one chart module, local re-render, accessible keyboard and reduced motion styles',async()=>{
- const files=['../v3-ui.mjs','../app.mjs','../expense-distribution-ui.mjs','../finance-charts.css','../index.html'];
+ const files=['../v3-ui.mjs?v=5.10.0','../app.mjs?v=5.10.0','../expense-distribution-ui.mjs?v=5.10.0','../finance-charts.css','../index.html'];
  const [view,app,expense,css,index]=await Promise.all(files.map(f=>readFile(new URL(f,import.meta.url),'utf8')));
  assert.match(view,/incomeExpenseChart\(s,summary\)/);
  assert.match(expense,/expenseDonutChart\(model\)/);

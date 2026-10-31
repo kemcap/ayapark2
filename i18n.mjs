@@ -1,3 +1,4 @@
+import {english} from './english.mjs?v=5.10.0';
 // Only authored interface text is translated. Stored content is never sent to a service.
 export const german = {
  "Kaydetmek eski yetkileri bu beş görevle değiştirir. Seçilmeyen görevler kapalı kalır.": "Beim Speichern werden die bisherigen Rechte durch diese fünf Aufgaben ersetzt. Nicht ausgewählte Aufgaben bleiben gesperrt.",
@@ -777,12 +778,13 @@ Object.assign(german,{'Eski şablonda gideri eksi yazın. PDF veya Excel dosyas�
 Object.assign(german,{'Yayımla':'Veröffentlichen'});
 const storageKey='ayapark2-v2-language';
 let language='tr';
-try{if(globalThis.localStorage?.getItem(storageKey)==='de')language='de';}catch{}
+try{const saved=globalThis.localStorage?.getItem(storageKey);if(['tr','de','en'].includes(saved))language=saved;}catch{}
 export const getLanguage=()=>language;
-export const locale=()=>language==='de'?'de-DE':'tr-TR';
-export const t=source=>language==='de'&&Object.hasOwn(german,source)?german[source]:source;
+export const locale=()=>({de:'de-DE',en:'en-GB',tr:'tr-TR'}[language]);
+const turkishPlain={'Guthaben':'Alacak bakiyesi','Guthaben bulunamadı.':'Alacak bakiyesi bulunamadı.'};
+export const t=source=>language==='tr'?(turkishPlain[source]??source):language==='de'?(german[source]??source):(english[german[source]]??source);
 export function setLanguage(next){
- if(!['tr','de'].includes(next))return;
+ if(!['tr','de','en'].includes(next))return;
  language=next;
  try{globalThis.localStorage?.setItem(storageKey,next);}catch{}
 }
@@ -1310,4 +1312,21 @@ Object.assign(german,{
  'Yeni kişi için daire seçin.':'Bitte eine Wohnung für die neue Person auswählen.',
  'Yeni kişi için rol seçin.':'Bitte eine Rolle für die neue Person auswählen.',
  'Kişi kaydedildiğinde daire ve rolü de aynı anda atanır.':'Beim Speichern werden die Person und ihre Wohnungsrolle gemeinsam angelegt.'
+});
+
+Object.assign(german,{
+ "Not bulunamadı.": "Notiz nicht gefunden.",
+ "Kategori zaten var.": "Kategorie bereits vorhanden.",
+ "Kategori bulunamadı.": "Kategorie nicht gefunden.",
+ "Kategori halen kullanılıyor.": "Kategorie wird noch verwendet.",
+ "Daire bulunamadı.": "Wohnung nicht gefunden.",
+ "Bu kişinin aynı dairede güncel rolü var.": "Diese Person hat bereits diese Rolle in der Wohnung.",
+ "Kategori Detaylı Bakiye Listesi": "Offene Beträge nach Kategorie",
+ "Eski yönetimden devralınan borçlar ve bugüne kadarki güncel açık bakiyeler": "Offene Beträge aus der früheren und aktuellen Verwaltung",
+ "Eski yönetim devir bakiyeleri 09.10.2026 tarihli kaynak listeye dayanır. Gösterilen açık tutarlar bugüne kadar kaydedilen ödemeler düşülerek hesaplanır; yeni tahakkuklar da dahil olabilir. Kaynak PDF değişmez.": "Die übernommenen Beträge stammen aus der Quellliste vom 09.10.2026. Erfasste Zahlungen sind abgezogen; neue Forderungen können enthalten sein. Die Quell-PDF bleibt unverändert.",
+ "Toplam açık bakiye": "Offener Gesamtbetrag",
+ "Açık borç bulunamadı.": "Keine offenen Forderungen.",
+ "Tür": "Art",
+ "Rapor filtreleri": "Berichtsfilter",
+ "Gelir ve giderleri farklı grafiklerde karşılaştırın.": "Einnahmen und Ausgaben in getrennten Diagrammen vergleichen."
 });

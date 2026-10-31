@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {workbookToCsv,pdfPagesToCsv,sourceDate,bankFileMessage} from '../bank-file-adapters.mjs';
-import {parseImport} from '../v3-import.mjs?v=5.8.1';
+import {workbookToCsv,pdfPagesToCsv,sourceDate,bankFileMessage} from '../bank-file-adapters.mjs?v=5.10.0';
+import {parseImport} from '../v3-import.mjs?v=5.10.0';
 const header='date;reference;counterparty;description;income;expense;unit;iban;balance'.split(';');
 const item=(str,x,y)=>({str,transform:[1,0,0,1,x,-y],width:str.length*4});
 const modernHead=[item('Tarih',28,10),item('Saat',100,10),item('Açıklama',276,10),item('İşlem Tutarı',451,10),item('Bakiye',542,10)];

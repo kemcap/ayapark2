@@ -1,17 +1,18 @@
-import {expenseDistributionModel} from './expense-distribution.mjs?v=5.9.57';
-import {escapeHtml as esc,money} from './core.mjs?v=5.8.1';
-import {locale,t as tr} from './i18n.mjs?v=5.9.28';
-import {expenseDonutChart} from './finance-charts.mjs?v=5.9.58';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {expenseDistributionModel} from './expense-distribution.mjs?v=5.10.0';
+import {escapeHtml as esc,money} from './core.mjs?v=5.10.0';
+import {locale,t as tr} from './i18n.mjs?v=5.10.0';
+import {expenseDonutChart} from './finance-charts.mjs?v=5.10.0';
 
 export function expenseDistributionPanel(s,reportRange={}){
- const de=locale().startsWith('de'),t=(a,b)=>de?a:b;
+ const de=locale().startsWith('de'),t=(a,b)=>(locale().slice(0,2)==='tr'?(b):(uiText(a,locale().slice(0,2))));
  const model=expenseDistributionModel(s.data,reportRange,s.expenseDistributionYear||'report');
  const yearOptions=[['report',t('Berichtszeitraum','Rapor dönemi')],['all',t('Alle Jahre','Tüm yıllar')],...model.years.map(y=>[y,y])];
  const periodLabel=model.selected==='report'
   ?(reportRange.from||reportRange.to)?[reportRange.from||'…',reportRange.to||'…'].join(' – '):t('Gesamter Berichtszeitraum','Tüm rapor dönemi')
   :model.selected==='all'?t('Alle erfassten Jahre','Kayıtlı tüm yıllar'):model.selected;
  const count=model.categories.length;
- const formatPercent=new Intl.NumberFormat(de?'de-DE':'tr-TR',{maximumFractionDigits:1,minimumFractionDigits:0});
+ const formatPercent=new Intl.NumberFormat((locale().slice(0,2)==='tr'?('tr-TR'):(uiText("de-DE",locale().slice(0,2)))),{maximumFractionDigits:1,minimumFractionDigits:0});
  const items=model.categories.map(([category,value])=>{
   const percentage=model.total>0?value/model.total*100:0;
   const percentLabel=formatPercent.format(percentage)+' %';

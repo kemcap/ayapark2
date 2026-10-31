@@ -1,6 +1,7 @@
-import {escapeHtml as e,randomId} from './core.mjs?v=5.8.1';
-import {getLanguage} from './i18n.mjs?v=5.9.28';
-const text=(de,tr)=>getLanguage()==='de'?de:tr;
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=5.10.0';
+import {getLanguage} from './i18n.mjs?v=5.10.0';
+const text=(de,tr)=>(getLanguage()==='tr'?(tr):(uiText(de,getLanguage())));
 export function contactPanel(s){
  if(s.mode!=='connected'||!s.data.contactWorkspace)return '';
  const w=s.data.contactWorkspace,persons=w.persons||[],requests=w.requests||[],admin=s.data.capabilities?.admin===true;
@@ -21,5 +22,5 @@ export function contactError(message){
  'Access denied':['Für diese Aktion fehlt die Berechtigung.','Bu işlem için yetkiniz yok.'],
  'Contact changes require Superadmin approval':['Kontaktänderungen benötigen eine Superadmin-Freigabe.','İletişim değişiklikleri Süper Admin onayı gerektirir.']
  };
- const found=Object.entries(labels).find(([key])=>String(message).includes(key));return found?found[1][getLanguage()==='de'?0:1]:String(message);
+ const found=Object.entries(labels).find(([key])=>String(message).includes(key));return found?getLanguage()==='tr'?found[1][1]:uiText(found[1][0],getLanguage()):String(message);
 }

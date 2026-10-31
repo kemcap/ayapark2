@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readDesign,setDesign,getDesign,designKey,designSettings} from '../design.mjs?v=5.8.1';
-import {decorateModernPage} from '../modern-ui.mjs?v=5.8.1';
-import {renderPage} from '../ui.mjs?v=5.9.0';
-import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {setLanguage} from '../i18n.mjs?v=5.9.28';
-import {cleanPreferences,preferenceDefaults} from '../preferences.mjs?v=5.8.1';
+import {readDesign,setDesign,getDesign,designKey,designSettings} from '../design.mjs?v=5.10.0';
+import {decorateModernPage} from '../modern-ui.mjs?v=5.10.0';
+import {renderPage} from '../ui.mjs?v=5.10.0';
+import {fullDemo} from '../ledger.mjs?v=5.10.0';
+import {setLanguage} from '../i18n.mjs?v=5.10.0';
+import {cleanPreferences,preferenceDefaults} from '../preferences.mjs?v=5.10.0';
 
 test('design choice tolerates unavailable storage and rejects invalid persisted values',()=>{
  assert.equal(readDesign({getItem:()=>{throw Error('blocked');}}),'modern');

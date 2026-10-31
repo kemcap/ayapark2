@@ -1,48 +1,50 @@
-import {claimHoldReview} from './claim-hold-ui.mjs?v=5.9.47';
-import {managementTasks} from './management-tasks-ui.mjs?v=5.9.47';
-import {privateArchive} from './archive-ui.mjs?v=5.9.47';
-import {budgetPlanning} from './budget-planning-ui.mjs?v=5.9.41';
-import {levyReviews} from './levy-review-ui.mjs?v=5.9.39';
-import {reportReleases} from './report-release-ui.mjs?v=5.9.40';
-import {periodClosings} from './period-closing-ui.mjs?v=5.9.37';
-import {summaryExport,bankExport,receiptExport} from './report-export-domain.mjs?v=5.9.36';
-import {receiptButtons,downloadWorkbook,openExport} from './report-export-ui.mjs?v=5.9.36';
-import {readBankFile} from './bank-file-reader.mjs?v=5.9.35';
-import {bankFileMessage} from './bank-file-adapters.mjs?v=5.9.35';
+import {nextLanguage} from './language-text.mjs?v=5.10.0';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {claimHoldReview} from './claim-hold-ui.mjs?v=5.10.0';
+import {managementTasks} from './management-tasks-ui.mjs?v=5.10.0';
+import {privateArchive} from './archive-ui.mjs?v=5.10.0';
+import {budgetPlanning} from './budget-planning-ui.mjs?v=5.10.0';
+import {levyReviews} from './levy-review-ui.mjs?v=5.10.0';
+import {reportReleases} from './report-release-ui.mjs?v=5.10.0';
+import {periodClosings} from './period-closing-ui.mjs?v=5.10.0';
+import {summaryExport,bankExport,receiptExport} from './report-export-domain.mjs?v=5.10.0';
+import {receiptButtons,downloadWorkbook,openExport} from './report-export-ui.mjs?v=5.10.0';
+import {readBankFile} from './bank-file-reader.mjs?v=5.10.0';
+import {bankFileMessage} from './bank-file-adapters.mjs?v=5.10.0';
 import {reviewImport} from './import-review.mjs?v=5.9.33';
-import {contactError} from './contact-requests.mjs?v=5.9.30';
-import {mayUseTaskAction} from './task-permissions.mjs?v=5.9.28';
-import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.9.2';
-import {bindAccessRequests} from './access-request-ui.mjs?v=5.9.0';
-import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.9.39';
+import {contactError} from './contact-requests.mjs?v=5.10.0';
+import {mayUseTaskAction} from './task-permissions.mjs?v=5.10.0';
+import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.10.0';
+import {bindAccessRequests} from './access-request-ui.mjs?v=5.10.0';
+import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.10.0';
 import {installSmartHeader} from './smart-header.mjs?v=5.9.49';
-import {expenseDistributionPanel} from './expense-distribution-ui.mjs?v=5.9.58';
-import {incomeExpenseChart} from './finance-charts.mjs?v=5.9.58';
-import {prepareV5Demo} from './finance-demo.mjs?v=5.9.39';
-import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.9.39';
-import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.9.39';
-import {bindDesign} from './design.mjs?v=5.8.1';
+import {expenseDistributionPanel} from './expense-distribution-ui.mjs?v=5.10.0';
+import {incomeExpenseChart} from './finance-charts.mjs?v=5.10.0';
+import {prepareV5Demo} from './finance-demo.mjs?v=5.10.0';
+import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.10.0';
+import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.10.0';
+import {bindDesign} from './design.mjs?v=5.10.0';
 import {enhanceTables} from './ui-accessibility.mjs?v=5.8.1';
 import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.9.0';
-import {apartmentInfo} from './apartment-info.mjs?v=5.9.54';
-import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.8.1';
-import {updateAssignmentForm} from './assignments.mjs?v=5.9.4';
-import {personManager} from './people-ui.mjs?v=5.9.54';
-import {bindInvitations} from './invite-ui.mjs?v=5.9.28';
-import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.45';
-import {bindInstall} from './install.mjs?v=5.9.39';
-import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
+import {apartmentInfo} from './apartment-info.mjs?v=5.10.0';
+import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.10.0';
+import {updateAssignmentForm} from './assignments.mjs?v=5.10.0';
+import {personManager} from './people-ui.mjs?v=5.10.0';
+import {bindInvitations} from './invite-ui.mjs?v=5.10.0';
+import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.10.0';
+import {bindInstall} from './install.mjs?v=5.10.0';
+import {bindPasswordEyes} from './password-eye.mjs?v=5.10.0';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.61';
-import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
-import {template} from './v3-import.mjs?v=5.8.1';
-import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
-import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
-import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.9.39';
-import {AyaparkApi} from './api.mjs?v=5.9.54';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.61';
-import {buildForm,payloadFor} from './forms.mjs?v=5.9.56';
-import {analyzeStage} from './reconcile.mjs?v=5.8.1';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.10.0';
+import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.10.0';
+import {template} from './v3-import.mjs?v=5.10.0';
+import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
+import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.10.0';
+import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.10.0';
+import {AyaparkApi} from './api.mjs?v=5.10.0';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.10.0';
+import {buildForm,payloadFor} from './forms.mjs?v=5.10.0';
+import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
 const applyStaticLanguage=bindStaticText(document.body);
@@ -72,7 +74,7 @@ function render(focus=false){
  }else if(state.mode==='demo'){if(!state.demoFullData||state.data.role==='super'){state.demoFullData=state.data;state.demoFullData.serverRole='manager';}state.fullData=state.demoFullData;state.data=previewProjection(state.fullData,state.viewRole||'super',state.previewSelection||'');}else{state.fullData=null;state.demoFullData=null;state.viewRole='super';state.previewSelection='';}
 
  document.documentElement.lang=getLanguage();
- $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> <span class="language-code">'+getLanguage().toUpperCase()+'</span>';$('languageToggle').title=getLanguage()==='tr'?'Deutsch':'Türkçe';
+ $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> <span class="language-code">'+getLanguage().toUpperCase()+'</span>';$('languageToggle').title=tr('Dili değiştir')+' · Türkçe → Deutsch → English';$('languageToggle').setAttribute('aria-label',$('languageToggle').title);
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
  const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V5.1'+(IS_PREVIEW?' · '+tr('Önizleme'):'');
@@ -87,9 +89,9 @@ function render(focus=false){
  const narrowRoleLabels=window.matchMedia('(max-width:440px)').matches;
  const deutsch=getLanguage()==='de';
  const roleLabels={
-  super:narrowRoleLabels?(deutsch?'Super':'Süper'):tr('Süper Admin'),
-  staff:narrowRoleLabels?(deutsch?'Verw.':'Yönetim'):tr('Yönetim'),
-  resident:narrowRoleLabels?(deutsch?'Bewohner':'Sakin'):tr('Site Sakini')
+  super:narrowRoleLabels?((getLanguage()==='tr'?('Süper'):(uiText("Super",getLanguage())))):tr('Süper Admin'),
+  staff:narrowRoleLabels?((getLanguage()==='tr'?('Yönetim'):(uiText("Verw.",getLanguage())))):tr('Yönetim'),
+  resident:narrowRoleLabels?((getLanguage()==='tr'?('Sakin'):(uiText("Bewohner",getLanguage())))):tr('Site Sakini')
  };
  for(const option of $('roleSelect').options)option.textContent=roleLabels[option.value]||option.textContent;
  $('roleSelect').setAttribute('aria-label',tr('Görünümü dene'));
@@ -114,9 +116,9 @@ function render(focus=false){
  $('modeBadge').hidden=state.mode!=='demo';$('refreshButton').hidden=state.mode!=='connected';
  $('connectionButton').textContent=IS_PREVIEW?tr('Giriş ekranını incele'):state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/buildings.svg" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>${invitationUi.landing()}`:renderPage(state);
- if(state.mode!=='signedout'&&state.page==='reports'&&!can(state,'finance')&&state.data.communityAccess!==true)$('content').innerHTML='<section class="card"><h1>'+(getLanguage()==='de'?'Finanzübersicht nicht freigegeben':'Mali özet erişime açık değil')+'</h1><p>'+(getLanguage()==='de'?'Für diesen Zugang sind keine gemeinsamen Finanzübersichten freigegeben. Eigene Forderungen und Zahlungen bleiben im persönlichen Bereich verfügbar.':'Bu erişim için ortak mali özetler açık değil. Kendi borç ve ödemeleriniz kişisel alanda kullanılabilir.')+'</p></section>';
- if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview')$('content').insertAdjacentHTML('afterbegin','<div class="archive-toolbar"><button class="button" type="button" data-action="private_archive">'+(getLanguage()==='de'?'Dokumente & Versammlungen':'Belgeler ve toplantılar')+'</button></div>');
- if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview'&&['super','staff'].includes(d.role)){const tasks=d.taskWorkspace,c=tasks?.counts;document.querySelector('.archive-toolbar')?.insertAdjacentHTML('beforeend','<button class="button" type="button" data-action="management_tasks">'+(getLanguage()==='de'?'Aufgaben & Termine':'Görevler ve tarihler')+'</button><span role="status">'+(c?(getLanguage()==='de'?'Überfällig: '+c.overdue+' · Heute: '+c.today+' · Nächste 7 Tage: '+c.soon:'Gecikmiş: '+c.overdue+' · Bugün: '+c.today+' · Gelecek 7 gün: '+c.soon):(getLanguage()==='de'?'Aufgabenstand nicht verfügbar – Liste öffnen.':'Görev durumu yok – listeyi açın.'))+'</span>');}
+ if(state.mode!=='signedout'&&state.page==='reports'&&!can(state,'finance')&&state.data.communityAccess!==true)$('content').innerHTML='<section class="card"><h1>'+((getLanguage()==='tr'?('Mali özet erişime açık değil'):(uiText("Finanzübersicht nicht freigegeben",getLanguage()))))+'</h1><p>'+((getLanguage()==='tr'?('Bu erişim için ortak mali özetler açık değil. Kendi borç ve ödemeleriniz kişisel alanda kullanılabilir.'):(uiText("Für diesen Zugang sind keine gemeinsamen Finanzübersichten freigegeben. Eigene Forderungen und Zahlungen bleiben im persönlichen Bereich verfügbar.",getLanguage()))))+'</p></section>';
+ if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview')$('content').insertAdjacentHTML('afterbegin','<div class="archive-toolbar"><button class="button" type="button" data-action="private_archive">'+((getLanguage()==='tr'?('Belgeler ve toplantılar'):(uiText("Dokumente & Versammlungen",getLanguage()))))+'</button></div>');
+ if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview'&&['super','staff'].includes(d.role)){const tasks=d.taskWorkspace,c=tasks?.counts;document.querySelector('.archive-toolbar')?.insertAdjacentHTML('beforeend','<button class="button" type="button" data-action="management_tasks">'+((getLanguage()==='tr'?('Görevler ve tarihler'):(uiText("Aufgaben & Termine",getLanguage()))))+'</button><span role="status">'+(c?((getLanguage()==='tr'?('Gecikmiş: '+c.overdue+' · Bugün: '+c.today+' · Gelecek 7 gün: '+c.soon):(uiText("Überfällig: ",getLanguage())+c.overdue+uiText(" · Heute: ",getLanguage())+c.today+uiText(" · Nächste 7 Tage: ",getLanguage())+c.soon))):((getLanguage()==='tr'?('Görev durumu yok – listeyi açın.'):(uiText("Aufgabenstand nicht verfügbar – Liste öffnen.",getLanguage())))))+'</span>');}
  if(appearanceWasOpen&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;
  addExportControls();const previewBar=$('accessPreviewBanner');previewBar.innerHTML=previewBanner(state);previewBar.hidden=!isAccessPreview();labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
  document.dispatchEvent(new CustomEvent('ay5:view',{detail:{resident:own,page:state.page,mode:state.mode}}));
@@ -268,27 +270,27 @@ function showForm(action,args={}){
  const built=buildForm(state,action,{period:state.period,...args});
  if($('detailDialog').open)$('detailDialog').close();
  formAction={action,args,context:built.context,origin};$('actionFields').dataset.financeAction=financeActions.includes(action)?action:'';
- $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(action)?'<p class="info-strip">'+(getLanguage()==='de'?'Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.':'Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.')+'</p>':'')+built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=action==='person_lifecycle'?(getLanguage()==='de'?'Aktion bestätigen':'İşlemi onayla'):action==='person_restore'?(getLanguage()==='de'?'Wiederherstellen':'Arşivden çıkar'):tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');if(['batch_charge','monthly_v5'].includes(action))$('saveAction').textContent=getLanguage()==='de'?'Entwurf einreichen':'Taslağı gönder';$('actionDialog').showModal();updateConditionalForm();if(action==='provider')updateProviderCategorySelection();if(financeActions.includes(action))updateFinanceForm($('actionFields'),state.data);updateAnnouncementTargets();
+ $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(action)?'<p class="info-strip">'+((getLanguage()==='tr'?('Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.'):(uiText("Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.",getLanguage()))))+'</p>':'')+built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=action==='person_lifecycle'?((getLanguage()==='tr'?('İşlemi onayla'):(uiText("Aktion bestätigen",getLanguage())))):action==='person_restore'?((getLanguage()==='tr'?('Arşivden çıkar'):(uiText("Wiederherstellen",getLanguage())))):tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');if(['batch_charge','monthly_v5'].includes(action))$('saveAction').textContent=(getLanguage()==='tr'?('Taslağı gönder'):(uiText("Entwurf einreichen",getLanguage())));$('actionDialog').showModal();updateConditionalForm();if(action==='provider')updateProviderCategorySelection();if(financeActions.includes(action))updateFinanceForm($('actionFields'),state.data);updateAnnouncementTargets();
 }
 function exportOptions(){return {language:getLanguage(),demo:state.mode==='demo'||isAccessPreview(),canFinance:can(state,'finance')};}
 function reportExportModel(){const range=selectedRange(state,'report'),error=rangeError(range);if(error)throw Error(error);return summaryExport(state.data,financialSeries(state.data,range,state.reportGroup||'year'),{...exportOptions(),range});}
 function bankExportModel(){return bankExport(filteredTransactions(state),exportOptions());}
 function addExportControls(){
  if(state.mode==='signedout')return;
- if(state.mode==='connected'&&!isAccessPreview()){const b=$('content').querySelector('[data-action=budget]');if(b){b.textContent=getLanguage()==='de'?'Budget & Liquidität':'Bütçe ve nakit planı';const p=b.closest('section')?.querySelector('p');if(p)p.textContent=getLanguage()==='de'?'Den aktuellen Detailplan und die Liquiditätsvorschau findest du in der Budgetplanung.':'Güncel ayrıntılı planı ve nakit öngörüsünü bütçe planında görebilirsiniz.';}else if(state.page==='dues'&&can(state,'finance'))$('content').insertAdjacentHTML('beforeend','<section class="card">'+button(getLanguage()==='de'?'Budget & Liquidität':'Bütçe ve nakit planı','budget_plan')+'</section>');}
- if(state.page==='dues'&&state.mode==='connected'&&!isAccessPreview())$('content').insertAdjacentHTML('beforeend','<section class="card">'+button(getLanguage()==='de'?'Sonderumlagenentwürfe ansehen':'Ek ödeme taslaklarını gör','levy_owner')+(can(state,'admin')?button(getLanguage()==='de'?'Sonderumlagen prüfen':'Ek ödemeleri incele','levy_manage'):'')+'</section>');
- for(const b of $('content').querySelectorAll('[data-draft-decision=approve]'))if(state.data.chargeDrafts?.find(d=>d.id===b.dataset.id)?.payload?.debt_group==='capital')b.textContent=getLanguage()==='de'?'Beschlussprüfung öffnen':'Karar incelemesini aç';
+ if(state.mode==='connected'&&!isAccessPreview()){const b=$('content').querySelector('[data-action=budget]');if(b){b.textContent=(getLanguage()==='tr'?('Bütçe ve nakit planı'):(uiText("Budget & Liquidität",getLanguage())));const p=b.closest('section')?.querySelector('p');if(p)p.textContent=(getLanguage()==='tr'?('Güncel ayrıntılı planı ve nakit öngörüsünü bütçe planında görebilirsiniz.'):(uiText("Den aktuellen Detailplan und die Liquiditätsvorschau findest du in der Budgetplanung.",getLanguage())));}else if(state.page==='dues'&&can(state,'finance'))$('content').insertAdjacentHTML('beforeend','<section class="card">'+button((getLanguage()==='tr'?('Bütçe ve nakit planı'):(uiText("Budget & Liquidität",getLanguage()))),'budget_plan')+'</section>');}
+ if(state.page==='dues'&&state.mode==='connected'&&!isAccessPreview())$('content').insertAdjacentHTML('beforeend','<section class="card">'+button((getLanguage()==='tr'?('Ek ödeme taslaklarını gör'):(uiText("Sonderumlagenentwürfe ansehen",getLanguage()))),'levy_owner')+(can(state,'admin')?button((getLanguage()==='tr'?('Ek ödemeleri incele'):(uiText("Sonderumlagen prüfen",getLanguage()))),'levy_manage'):'')+'</section>');
+ for(const b of $('content').querySelectorAll('[data-draft-decision=approve]'))if(state.data.chargeDrafts?.find(d=>d.id===b.dataset.id)?.payload?.debt_group==='capital')b.textContent=(getLanguage()==='tr'?('Karar incelemesini aç'):(uiText("Beschlussprüfung öffnen",getLanguage())));
  if(state.page==='reports'&&(can(state,'finance')||state.data.communityAccess===true)){
-  if(state.mode==='connected'&&!isAccessPreview())$('content').insertAdjacentHTML('beforeend','<section class="card">'+button(getLanguage()==='de'?'Freigegebene Gemeinschaftsübersichten':'Site üyelerine paylaşılan özetler','community_releases')+(can(state,'admin')?button(getLanguage()==='de'?'Summenfreigaben verwalten':'Toplam paylaşımlarını yönet','report_releases'):'')+'</section>');
-  if(state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'))$('content').insertAdjacentHTML('beforeend','<section class="card">'+button(getLanguage()==='de'?'Monats- / Jahresabschluss prüfen':'Ay / yıl kapanışını kontrol et','period_closings')+'</section>');
+  if(state.mode==='connected'&&!isAccessPreview())$('content').insertAdjacentHTML('beforeend','<section class="card">'+button((getLanguage()==='tr'?('Site üyelerine paylaşılan özetler'):(uiText("Freigegebene Gemeinschaftsübersichten",getLanguage()))),'community_releases')+(can(state,'admin')?button((getLanguage()==='tr'?('Toplam paylaşımlarını yönet'):(uiText("Summenfreigaben verwalten",getLanguage()))),'report_releases'):'')+'</section>');
+  if(state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'))$('content').insertAdjacentHTML('beforeend','<section class="card">'+button((getLanguage()==='tr'?('Ay / yıl kapanışını kontrol et'):(uiText("Monats- / Jahresabschluss prüfen",getLanguage()))),'period_closings')+'</section>');
   const print=$('content').querySelector('[data-action="print"]');if(print)print.dataset.action='export_report_pdf';
-  const csv=$('content').querySelector('[data-action="export_report"]');if(csv)csv.insertAdjacentHTML('afterend',button(getLanguage()==='de'?'Excel herunterladen':'Excel indir','export_report_xlsx'));
+  const csv=$('content').querySelector('[data-action="export_report"]');if(csv)csv.insertAdjacentHTML('afterend',button((getLanguage()==='tr'?('Excel indir'):(uiText("Excel herunterladen",getLanguage()))),'export_report_xlsx'));
  }
  if(state.page==='transactions'&&can(state,'finance')){
-  const csv=$('content').querySelector('[data-action="export_bank"]');if(csv)csv.insertAdjacentHTML('afterend',button(getLanguage()==='de'?'Excel herunterladen':'Excel indir','export_bank_xlsx')+button(getLanguage()==='de'?'Drucken / PDF':'Yazdır / PDF','export_bank_pdf'));
+  const csv=$('content').querySelector('[data-action="export_bank"]');if(csv)csv.insertAdjacentHTML('afterend',button((getLanguage()==='tr'?('Excel indir'):(uiText("Excel herunterladen",getLanguage()))),'export_bank_xlsx')+button((getLanguage()==='tr'?('Yazdır / PDF'):(uiText("Drucken / PDF",getLanguage()))),'export_bank_pdf'));
  }
 }
-function chargeWithReceipts(id){const html=chargeDetail(state,id);const hold=state.data.claimHoldWorkspace?.rows?.find(x=>x.charge_id===id);return html?html+(hold?.active?'<p class="info-strip">'+(getLanguage()==='de'?'In Prüfung: automatische Zahlungshinweise pausiert. Die ursprüngliche Forderung bleibt bestehen.':'İncelemede: otomatik ödeme hatırlatmaları duraklatıldı. Asıl borç korunur.')+'</p>':'')+(state.mode==='connected'&&!isAccessPreview()&&can(state,'admin')?'<button class="button" data-action="claim_hold_review" data-id="'+e(id)+'">'+(getLanguage()==='de'?'Prüfpause verwalten':'İnceleme arasını yönet')+'</button>':'')+receiptButtons(state.data,id,exportOptions()):null;}
+function chargeWithReceipts(id){const html=chargeDetail(state,id);const hold=state.data.claimHoldWorkspace?.rows?.find(x=>x.charge_id===id);return html?html+(hold?.active?'<p class="info-strip">'+((getLanguage()==='tr'?('İncelemede: otomatik ödeme hatırlatmaları duraklatıldı. Asıl borç korunur.'):(uiText("In Prüfung: automatische Zahlungshinweise pausiert. Die ursprüngliche Forderung bleibt bestehen.",getLanguage()))))+'</p>':'')+(state.mode==='connected'&&!isAccessPreview()&&can(state,'admin')?'<button class="button" data-action="claim_hold_review" data-id="'+e(id)+'">'+((getLanguage()==='tr'?('İnceleme arasını yönet'):(uiText("Prüfpause verwalten",getLanguage()))))+'</button>':'')+receiptButtons(state.data,id,exportOptions()):null;}
 function showDetail(html){
  if(!html)return;
  const dialog=$('detailDialog');$('detailContent').innerHTML=html;
@@ -301,7 +303,7 @@ function linkedUnitDetail(id){
  const html=unitDetail(state,id);
  if(!html)return null;
  if(!personUnitReturn)return html;
- const back=getLanguage()==='de'?'Zur Personenkarte':'Kişi kartına dön';
+ const back=(getLanguage()==='tr'?('Kişi kartına dön'):(uiText("Zur Personenkarte",getLanguage())));
  return `<nav class="person-unit-nav" aria-label="${e(back)}"><button type="button" class="button person-unit-back" data-action="person_unit_back">← ${e(back)}</button></nav>`+html;
 }
 function returnFromPersonUnit(){
@@ -347,7 +349,7 @@ function exportReport(){
 const urgentShown=new Set();let localTest=null,localTestRead=false,popupSession='',importantLoginKeys=new Set(),popupBatch=[],localTestQueue=[],localTestReceipts=new Set();
 function notificationData(){const d=state.data;return {...d,userId:d.userId||'demo-user',announcements:[...(d.announcements||[]),...(localTest&&d.role==='super'?[localTest]:[]),...(d.role==='super'?localTestQueue:[])],acknowledgements:[...(d.acknowledgements||[]),...(localTestRead&&localTest?[{announcement_id:localTest.id,revision:localTest.revision,user_id:d.userId||'demo-user'}]:[]),...localTestQueue.filter(a=>localTestReceipts.has(a.id)).map(a=>({announcement_id:a.id,revision:a.revision,user_id:d.userId||'demo-user'}))]};}
 function updateNotifications(){const d=notificationData(),unread=unreadNotifications(d);$('notificationBell').hidden=state.mode==='signedout';$('notificationCount').hidden=!unread.length;$('notificationCount').textContent=unread.length>99?'99+':unread.length;$('notificationBell').setAttribute('aria-label',tr('Bildirimler')+' · '+unread.length);$('notificationsTitle').textContent=tr('Bildirimler');$('closeNotifications').textContent=tr('Kapat');if($('notificationsDialog').open)$('notificationsList').innerHTML=notificationList(d);}
-function openNotification(a,{progress=''}={}){if(!a)return;if($('notificationsDialog').open)$('notificationsDialog').close();$('urgentTitle').textContent=notificationTitle(a);$('urgentBody').textContent=notificationBody(a);$('urgentMeta').textContent=a.local_test?tr('Yalnızca Süper Admin testi'):new Date(a.created_at).toLocaleDateString(getLanguage()==='de'?'de-DE':'tr-TR')+(a.author_label?' · '+a.author_label:'');$('ackUrgent').dataset.id=a.id;$('ackUrgent').dataset.revision=a.revision||1;$('ackUrgent').dataset.key=acknowledgementKey(a);$('ackUrgent').textContent=tr(!announcementActive(a)||isAccessPreview()?'Kapat':'Okudum');$('urgentProgress').textContent=progress;$('urgentProgress').hidden=!progress;$('urgentDialog').dataset.required=a.priority==='urgent'&&announcementActive(a)&&!isAccessPreview()?'true':'false';$('ackUrgent').dataset.expired=String(!announcementActive(a)||isAccessPreview());if(a.priority!=='urgent')urgentShown.add(acknowledgementKey(a));if(!$('urgentDialog').open)$('urgentDialog').showModal();}
+function openNotification(a,{progress=''}={}){if(!a)return;if($('notificationsDialog').open)$('notificationsDialog').close();$('urgentTitle').textContent=notificationTitle(a);$('urgentBody').textContent=notificationBody(a);$('urgentMeta').textContent=a.local_test?tr('Yalnızca Süper Admin testi'):new Date(a.created_at).toLocaleDateString((getLanguage()==='tr'?('tr-TR'):(uiText("de-DE",getLanguage()))))+(a.author_label?' · '+a.author_label:'');$('ackUrgent').dataset.id=a.id;$('ackUrgent').dataset.revision=a.revision||1;$('ackUrgent').dataset.key=acknowledgementKey(a);$('ackUrgent').textContent=tr(!announcementActive(a)||isAccessPreview()?'Kapat':'Okudum');$('urgentProgress').textContent=progress;$('urgentProgress').hidden=!progress;$('urgentDialog').dataset.required=a.priority==='urgent'&&announcementActive(a)&&!isAccessPreview()?'true':'false';$('ackUrgent').dataset.expired=String(!announcementActive(a)||isAccessPreview());if(a.priority!=='urgent')urgentShown.add(acknowledgementKey(a));if(!$('urgentDialog').open)$('urgentDialog').showModal();}
 function checkUrgent(){const key=state.mode+':'+(state.data.userId||'demo-user')+':'+epoch;if(key!==popupSession){popupSession=key;popupBatch=[];importantLoginKeys=new Set(unreadNotifications(notificationData()).filter(a=>a.priority==='important'&&a.popup_on_login).map(acknowledgementKey));}if(isAccessPreview()||state.mode==='signedout'||document.querySelector('dialog[open]'))return;const pending=unreadNotifications(notificationData()).filter(a=>(a.priority==='urgent'||a.priority==='important'&&a.popup_on_login&&importantLoginKeys.has(acknowledgementKey(a)))&&!urgentShown.has(acknowledgementKey(a)));if(!pending.length){popupBatch=[];return;}if(!popupBatch.length)popupBatch=pending.map(acknowledgementKey);else for(const a of pending)if(!popupBatch.includes(acknowledgementKey(a)))popupBatch.push(acknowledgementKey(a));const a=pending[0];openNotification(a,{progress:popupBatch.length>1?popupProgress(popupBatch,acknowledgementKey(a)):''});}
 $('notificationBell').addEventListener('click',()=>{$('notificationsList').innerHTML=notificationList(notificationData());$('notificationsDialog').showModal();});
 $('closeNotifications').addEventListener('click',()=>$('notificationsDialog').close());
@@ -470,14 +472,14 @@ document.addEventListener('click',async event=>{
 });
 $('languageToggle').addEventListener('click',()=>{
  const controls=Array.from($('actionFields').querySelectorAll('input,select,textarea')).map(node=>({name:node.name,value:node.value,checked:node.checked}));
- changePreference('language',getLanguage()==='tr'?'de':'tr',state.mode==='connected'?api:null);applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));
+ changePreference('language',nextLanguage(getLanguage()),state.mode==='connected'?api:null);applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));
  if($('detailDialog').open&&detailView){
   if(detailView.action==='staged')staged();
   else showDetail(detailView.action==='claims_detail'?residentClaimsDetail(state):detailView.action==='person_manage'?personManager(state,detailView.id):detailView.action==='unit'?linkedUnitDetail(detailView.id):detailView.action==='charge_detail'?chargeWithReceipts(detailView.id):detailView.action==='provider_detail'?providerDetail(state,detailView.id):transactionDetail(state,detailView.id));
  }
  if($('actionDialog').open&&formAction){
   const built=buildForm(state,formAction.action,{period:state.period,...formAction.args});
-  $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(action)?'<p class="info-strip">'+(getLanguage()==='de'?'Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.':'Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.')+'</p>':'')+built.body;
+  $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(formAction.action)?'<p class="info-strip">'+((getLanguage()==='tr'?('Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.'):(uiText("Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.",getLanguage()))))+'</p>':'')+built.body;
   if(formAction.action.startsWith('assignment_'))updateAssignmentForm($('actionFields'),state.data);
   for(const saved of controls){const node=$('actionFields').querySelector(`[name="${saved.name}"]`);if(node){node.value=saved.value;if(node.type==='checkbox')node.checked=saved.checked;}}
  }
@@ -674,23 +676,23 @@ $('refreshButton').addEventListener('click',async()=>{
  finally{$('refreshButton').disabled=false;$('refreshButton').setAttribute('aria-busy','false');}
 });
 function applyBankImportLabels(){
- $('bankFileIntro').textContent=getLanguage()==='de'?'Die Datei wird auf diesem Gerät gelesen. Erst „Importieren“ erstellt Einträge.':'Dosya bu cihazda okunur. Kayıt oluşturmak için ayrıca “İçe aktar” düğmesine basın.';
- $('bankFormatHint').textContent=getLanguage()==='de'?'Unterstützte PDF- oder XLSX-Dateien direkt auswählen. Für andere Formate die CSV-Vorlage verwenden. Zahlungszuordnungen anschließend getrennt prüfen.':'Desteklenen PDF veya XLSX dosyasını doğrudan seçebilirsiniz. Diğer biçimler için CSV şablonunu kullanın. Ödeme eşleştirmelerini ayrıca kontrol edin.';
- $('bankFileLabel').textContent=getLanguage()==='de'?'CSV-, PDF- oder XLSX-Datei auswählen':'CSV, PDF veya XLSX dosyası seçin';
- $('bankFileHelp').textContent=getLanguage()==='de'?'Maximal 2 MB / 2.000 Bewegungen. PDF: unterstützte Yapı-Kredi-Textauszüge; Excel: Vorlagenspalten.':'En fazla 2 MB / 2.000 hareket. PDF: desteklenen Yapı Kredi metin dökümleri; Excel: şablon sütunları.';
- $('importTitle').textContent=getLanguage()==='de'?'Bankdatei prüfen und importieren':'Banka dosyasını kontrol et ve aktar';
+ $('bankFileIntro').textContent=(getLanguage()==='tr'?('Dosya bu cihazda okunur. Kayıt oluşturmak için ayrıca “İçe aktar” düğmesine basın.'):(uiText("Die Datei wird auf diesem Gerät gelesen. Erst „Importieren“ erstellt Einträge.",getLanguage())));
+ $('bankFormatHint').textContent=(getLanguage()==='tr'?('Desteklenen PDF veya XLSX dosyasını doğrudan seçebilirsiniz. Diğer biçimler için CSV şablonunu kullanın. Ödeme eşleştirmelerini ayrıca kontrol edin.'):(uiText("Unterstützte PDF- oder XLSX-Dateien direkt auswählen. Für andere Formate die CSV-Vorlage verwenden. Zahlungszuordnungen anschließend getrennt prüfen.",getLanguage())));
+ $('bankFileLabel').textContent=(getLanguage()==='tr'?('CSV, PDF veya XLSX dosyası seçin'):(uiText("CSV-, PDF- oder XLSX-Datei auswählen",getLanguage())));
+ $('bankFileHelp').textContent=(getLanguage()==='tr'?('En fazla 2 MB / 2.000 hareket. PDF: desteklenen Yapı Kredi metin dökümleri; Excel: şablon sütunları.'):(uiText("Maximal 2 MB / 2.000 Bewegungen. PDF: unterstützte Yapı-Kredi-Textauszüge; Excel: Vorlagenspalten.",getLanguage())));
+ $('importTitle').textContent=(getLanguage()==='tr'?('Banka dosyasını kontrol et ve aktar'):(uiText("Bankdatei prüfen und importieren",getLanguage())));
 }
 document.addEventListener('ay2:languagechange',applyBankImportLabels);
 async function previewImportFile(options={}){
  const generation=++fileGeneration,file=$('csvFile').files[0];importController?.abort();importController=new AbortController();importPayload=null;$('commitImport').disabled=true;if(!file)return;
  try{
-  $('importPreview').textContent=getLanguage()==='de'?'Datei wird lokal gelesen …':'Dosya yerel olarak okunuyor …';
-  const loaded=await readBankFile(file,{...options,signal:importController.signal,onProgress:(page,total)=>{if(generation===fileGeneration)$('importPreview').textContent=(getLanguage()==='de'?'PDF-Seite ':'PDF sayfası ')+page+' / '+total;}});if(generation!==fileGeneration)return;
-  if(loaded.sheets){$('importPreview').innerHTML=`<label class="field">${getLanguage()==='de'?'Tabellenblatt auswählen – es wird nur dieses Blatt importiert':'Çalışma sayfası seçin – yalnızca seçilen sayfa aktarılır'}<select id="bankSheetSelect"><option value="">${getLanguage()==='de'?'Bitte auswählen':'Lütfen seçin'}</option>${loaded.sheets.map(name=>`<option value="${e(name)}">${e(name)}</option>`).join('')}</select></label>`;$('bankSheetSelect').addEventListener('change',event=>{if(event.target.value)void previewImportFile({sheet:event.target.value});});return;}
+  $('importPreview').textContent=(getLanguage()==='tr'?('Dosya yerel olarak okunuyor …'):(uiText("Datei wird lokal gelesen …",getLanguage())));
+  const loaded=await readBankFile(file,{...options,signal:importController.signal,onProgress:(page,total)=>{if(generation===fileGeneration)$('importPreview').textContent=((getLanguage()==='tr'?('PDF sayfası '):(uiText("PDF-Seite ",getLanguage()))))+page+' / '+total;}});if(generation!==fileGeneration)return;
+  if(loaded.sheets){$('importPreview').innerHTML=`<label class="field">${(getLanguage()==='tr'?('Çalışma sayfası seçin – yalnızca seçilen sayfa aktarılır'):(uiText("Tabellenblatt auswählen – es wird nur dieses Blatt importiert",getLanguage())))}<select id="bankSheetSelect"><option value="">${(getLanguage()==='tr'?('Lütfen seçin'):(uiText("Bitte auswählen",getLanguage())))}</option>${loaded.sheets.map(name=>`<option value="${e(name)}">${e(name)}</option>`).join('')}</select></label>`;$('bankSheetSelect').addEventListener('change',event=>{if(event.target.value)void previewImportFile({sheet:event.target.value});});return;}
   const raw=loaded.raw;
-  const parsed=parseCsv(raw);const sourceReview=reviewImport(parsed.entries);if(!sourceReview.mayImport)throw Error(getLanguage()==='de'?'Die laufenden Salden passen nicht zu den Bewegungen. Bitte prüfe Beträge, Gebühren und Reihenfolge der Quelldatei. Es wurde nichts importiert.':'Ara bakiyeler hareketlerle uyuşmuyor. Kaynak dosyadaki tutarları, ücretleri ve sıralamayı kontrol edin. Hiçbir kayıt aktarılmadı.');const digest=loaded.digest||await sha256(raw);if(generation!==fileGeneration)return;
+  const parsed=parseCsv(raw);const sourceReview=reviewImport(parsed.entries);if(!sourceReview.mayImport)throw Error((getLanguage()==='tr'?('Ara bakiyeler hareketlerle uyuşmuyor. Kaynak dosyadaki tutarları, ücretleri ve sıralamayı kontrol edin. Hiçbir kayıt aktarılmadı.'):(uiText("Die laufenden Salden passen nicht zu den Bewegungen. Bitte prüfe Beträge, Gebühren und Reihenfolge der Quelldatei. Es wurde nichts importiert.",getLanguage()))));const digest=loaded.digest||await sha256(raw);if(generation!==fileGeneration)return;
   importPayload={source:file.name,digest,entries:parsed.entries.map(t=>({date:t.date,desc:t.desc,cents:t.cents,category:'Diğer',reference:t.reference||'',balance_cents:t.balance_cents,counterparty:t.counterparty||'',iban:t.iban||'',unit_hint:t.unit_hint||''}))};
-  $('importPreview').innerHTML=`${loaded.metadata?.format==='pdf'?`<p>PDF · ${loaded.metadata.pages} ${getLanguage()==='de'?'Seiten gelesen':'sayfa okundu'}${loaded.metadata.identifiersRemoved?' · '+(getLanguage()==='de'?'markierte Identitäts-/Steuernummern entfernt':'işaretli kimlik/vergi numaraları çıkarıldı'):''}</p>`:loaded.metadata?.sheet?`<p>${getLanguage()==='de'?'Tabellenblatt':'Çalışma sayfası'}: ${e(loaded.metadata.sheet)}</p>`:''}<strong>${parsed.entries.length}${tr(" satır · ")}${parsed.duplicates}${tr(" dosya içi olası tekrar")}</strong><p role="status">${getLanguage()==='de'?(sourceReview.status==='consistent'?'Laufende Salden stimmen überein.':sourceReview.status==='partial'?'Vorhandene Salden stimmen überein; Saldoangaben fehlen teilweise.':'Kein Saldoabgleich möglich: mindestens zwei laufende Salden werden benötigt.'):(sourceReview.status==='consistent'?'Ara bakiyeler hareketlerle uyumlu.':sourceReview.status==='partial'?'Mevcut ara bakiyeler uyumlu; bazı bakiye bilgileri eksik.':'Bakiye kontrolü yapılamıyor: en az iki ara bakiye gerekli.')}</p><p>${getLanguage()==='de'?'Einnahmen':'Gelir'}: ${money(sourceReview.incomeCents)} · ${getLanguage()==='de'?'Ausgaben':'Gider'}: ${money(sourceReview.expenseCents)} · ${getLanguage()==='de'?'Netto':'Net'}: ${money(sourceReview.netCents)}</p><p class="fine">${getLanguage()==='de'?'Der Anfangssaldo und die Vollständigkeit der Quelle müssen separat geprüft werden.':'Açılış bakiyesi ve kaynağın eksiksizliği ayrıca kontrol edilmelidir.'}</p><p class="fine">${tr("Henüz kayıt oluşturulmadı. Sunucu aynı hareketleri tekrar kaydetmez. Banka referansı bulunmayan aynı tarih/açıklama/tutarlı CSV satırları tekrar kabul edilmez; ayrı gerçek hareketler için bankanın referanslı kaydını kullanın.")}</p><div class="table-wrap"><table><caption>${tr("İlk 5 satır")}</caption><thead><tr><th>${tr("Tarih")}</th><th>${tr("Açıklama")}</th><th>${tr("Tutar")}</th></tr></thead><tbody>${parsed.entries.slice(0,5).map(t=>`<tr><td>${e(t.date)}</td><td>${e(t.desc)}</td><td>${money(t.cents)}</td></tr>`).join('')}</tbody></table></div>`;
+  $('importPreview').innerHTML=`${loaded.metadata?.format==='pdf'?`<p>PDF · ${loaded.metadata.pages} ${(getLanguage()==='tr'?('sayfa okundu'):(uiText("Seiten gelesen",getLanguage())))}${loaded.metadata.identifiersRemoved?' · '+((getLanguage()==='tr'?('işaretli kimlik/vergi numaraları çıkarıldı'):(uiText("markierte Identitäts-/Steuernummern entfernt",getLanguage())))):''}</p>`:loaded.metadata?.sheet?`<p>${(getLanguage()==='tr'?('Çalışma sayfası'):(uiText("Tabellenblatt",getLanguage())))}: ${e(loaded.metadata.sheet)}</p>`:''}<strong>${parsed.entries.length}${tr(" satır · ")}${parsed.duplicates}${tr(" dosya içi olası tekrar")}</strong><p role="status">${(getLanguage()==='tr'?(sourceReview.status==='consistent'?'Ara bakiyeler hareketlerle uyumlu.':sourceReview.status==='partial'?'Mevcut ara bakiyeler uyumlu; bazı bakiye bilgileri eksik.':'Bakiye kontrolü yapılamıyor: en az iki ara bakiye gerekli.'):(sourceReview.status==='consistent'?uiText("Laufende Salden stimmen überein.",getLanguage()):sourceReview.status==='partial'?uiText("Vorhandene Salden stimmen überein; Saldoangaben fehlen teilweise.",getLanguage()):uiText("Kein Saldoabgleich möglich: mindestens zwei laufende Salden werden benötigt.",getLanguage())))}</p><p>${(getLanguage()==='tr'?('Gelir'):(uiText("Einnahmen",getLanguage())))}: ${money(sourceReview.incomeCents)} · ${(getLanguage()==='tr'?('Gider'):(uiText("Ausgaben",getLanguage())))}: ${money(sourceReview.expenseCents)} · ${(getLanguage()==='tr'?('Net'):(uiText("Netto",getLanguage())))}: ${money(sourceReview.netCents)}</p><p class="fine">${(getLanguage()==='tr'?('Açılış bakiyesi ve kaynağın eksiksizliği ayrıca kontrol edilmelidir.'):(uiText("Der Anfangssaldo und die Vollständigkeit der Quelle müssen separat geprüft werden.",getLanguage())))}</p><p class="fine">${tr("Henüz kayıt oluşturulmadı. Sunucu aynı hareketleri tekrar kaydetmez. Banka referansı bulunmayan aynı tarih/açıklama/tutarlı CSV satırları tekrar kabul edilmez; ayrı gerçek hareketler için bankanın referanslı kaydını kullanın.")}</p><div class="table-wrap"><table><caption>${tr("İlk 5 satır")}</caption><thead><tr><th>${tr("Tarih")}</th><th>${tr("Açıklama")}</th><th>${tr("Tutar")}</th></tr></thead><tbody>${parsed.entries.slice(0,5).map(t=>`<tr><td>${e(t.date)}</td><td>${e(t.desc)}</td><td>${money(t.cents)}</td></tr>`).join('')}</tbody></table></div>`;
   $('commitImport').disabled=false;
  }catch(error){if(generation===fileGeneration&&error.name!=='AbortError')$('importPreview').textContent=error.code?bankFileMessage(error,getLanguage()):error.message;}
 }
@@ -713,7 +715,7 @@ function updateProviderCategorySelection(){
  const root=$('actionFields'),output=root?.querySelector('#providerCategorySelectionCount');
  if(!output)return;
  const count=root.querySelectorAll('input[name="categories"]:checked').length;
- output.textContent=getLanguage()==='de'?count+' von 8 ausgewählt':count+' / 8 seçildi';
+ output.textContent=(getLanguage()==='tr'?(count+' / 8 seçildi'):(count+uiText(" von 8 ausgewählt",getLanguage())));
  output.dataset.invalid=String(count<1||count>8);
 }
 function updateConditionalForm(changed=''){
@@ -829,10 +831,10 @@ document.addEventListener('click',async event=>{const button=event.target.closes
 document.addEventListener('submit',async event=>{
  const form=event.target;if(!form.matches('[data-contact-request],[data-contact-review]'))return;event.preventDefault();if(writeBusy)return;
  const values=new FormData(form),review=form.matches('[data-contact-review]'),approve=event.submitter?.value==='approve',status=form.querySelector('[data-contact-status]');
- if(review&&approve&&!values.has('verified')){status.textContent=getLanguage()==='de'?'Bitte bestätigen Sie die unabhängige Prüfung.':'Lütfen bağımsız doğrulamayı onaylayın.';return;}
+ if(review&&approve&&!values.has('verified')){status.textContent=(getLanguage()==='tr'?('Lütfen bağımsız doğrulamayı onaylayın.'):(uiText("Bitte bestätigen Sie die unabhängige Prüfung.",getLanguage())));return;}
  try{writeBusy=true;for(const b of form.querySelectorAll('button'))b.disabled=true;
  await mutate(review?'contact_decide':'contact_request',review?{id:form.dataset.id,approve,verified:values.has('verified'),reason:String(values.get('reason')||'')}:{person_id:values.get('person_id'),request_id:values.get('request_id'),email:values.get('email'),phone:values.get('phone')});
- toast(getLanguage()==='de'?'Antrag gespeichert.':'Talep kaydedildi.');
+ toast((getLanguage()==='tr'?('Talep kaydedildi.'):(uiText("Antrag gespeichert.",getLanguage()))));
  }catch(error){status.textContent=contactError(error.message);}finally{writeBusy=false;for(const b of form.querySelectorAll('button'))b.disabled=false;}
 });
 document.addEventListener('click',async event=>{const b=event.target.closest('[data-contact-withdraw]');if(!b||writeBusy)return;try{writeBusy=true;b.disabled=true;await mutate('contact_withdraw',{id:b.dataset.contactWithdraw});}catch(error){toast(error.message);}finally{writeBusy=false;b.disabled=false;}});

@@ -47,6 +47,8 @@ jobs:
         run: |
           npm run build:import-parsers
           git diff --exit-code -- vendor
+      - name: Isolated English language preference checks
+        run: node tests/sql/english-preferences.mjs
       - name: Full JavaScript regression suite
         run: npm test
       - uses: denoland/setup-deno@v2

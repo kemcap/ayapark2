@@ -1,10 +1,11 @@
-import {escapeHtml as e,money} from './core.mjs?v=5.8.1';
-import {locale,t as tr} from './i18n.mjs?v=5.9.28';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {escapeHtml as e,money} from './core.mjs?v=5.10.0';
+import {locale,t as tr} from './i18n.mjs?v=5.10.0';
 
 const de=()=>locale().startsWith('de');
-const t=(g,trText)=>de()?g:trText;
+const t=(g,trText)=>(locale().slice(0,2)==='tr'?(trText):(uiText(g,locale().slice(0,2))));
 const currency=v=>money(Math.round(v));
-const pct=v=>new Intl.NumberFormat(de()?'de-DE':'tr-TR',{maximumFractionDigits:1}).format(v)+' %';
+const pct=v=>new Intl.NumberFormat((locale().slice(0,2)==='tr'?('tr-TR'):(uiText("de-DE",locale().slice(0,2)))),{maximumFractionDigits:1}).format(v)+' %';
 const num=v=>Number.isFinite(Number(v))?Math.max(0,Number(v)):0;
 const colors=10;
 const color=i=>'var(--fch-color-'+(i%colors)+')';
@@ -41,7 +42,7 @@ export function donutViz(entries,{id,centerLabel,centerAmount,subtitle='',compac
 }
 const shortNumber=v=>{
  const units=v/100;
- return new Intl.NumberFormat(de()?'de-DE':'tr-TR',{notation:'compact',maximumFractionDigits:1}).format(units);
+ return new Intl.NumberFormat((locale().slice(0,2)==='tr'?('tr-TR'):(uiText("de-DE",locale().slice(0,2)))),{notation:'compact',maximumFractionDigits:1}).format(units);
 };
 const xLabel=period=>/^\d{4}-\d{2}$/.test(period)?period.slice(5)+'/'+period.slice(2,4):period;
 

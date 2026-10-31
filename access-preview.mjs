@@ -1,7 +1,7 @@
-import {receives} from './notifications.mjs?v=5.9.39';
-import {escapeHtml as e} from './core.mjs?v=5.8.1';
-import {t as tr} from './i18n.mjs?v=5.9.28';
-import {activeAt} from './v3-domain.mjs?v=5.9.26';
+import {receives} from './notifications.mjs?v=5.10.0';
+import {escapeHtml as e} from './core.mjs?v=5.10.0';
+import {t as tr} from './i18n.mjs?v=5.10.0';
+import {activeAt} from './v3-domain.mjs?v=5.10.0';
 import {calculateClaims} from './supabase/functions/ay3-site-open-claims/math.mjs?v=5.8.1';
 // Only roles verified by the server may access the read-only view simulator.
 // Staff may select the resident view but never the Super Admin view.

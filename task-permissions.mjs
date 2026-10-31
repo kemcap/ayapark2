@@ -1,11 +1,12 @@
-import {getLanguage} from './i18n.mjs?v=5.9.28';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {getLanguage} from './i18n.mjs?v=5.10.0';
 export const taskOptions=()=>[
  ['people_manage','Kişi ve daire bilgilerini düzenle','Personen und Wohnungen bearbeiten'],
  ['occupancy_invite','Sakin değişimi ve davetler','Bewohnerwechsel und Einladungen'],
  ['charges_prepare','Aidat ve ek ödeme taslağı hazırla','Hausgeld und Umlagen vorbereiten'],
  ['bank_reconcile','Banka ödemelerini eşleştir','Bankzahlungen zuordnen'],
  ['announcements_publish','Duyuruları yayımla','Ankündigungen veröffentlichen']
-].map(([key,tr,de])=>[key,getLanguage()==='de'?de:tr]);
+].map(([key,tr,de])=>[key,(getLanguage()==='tr'?(tr):(uiText(de,getLanguage())))]);
 
 export function mayUseTaskAction(data,action){
  if(data.capabilities?.admin)return true;

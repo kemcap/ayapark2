@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-const source=readFileSync(new URL('../app.mjs',import.meta.url),'utf8');
+const source=readFileSync(new URL('../app.mjs?v=5.10.0',import.meta.url),'utf8');
 const handlers=source.slice(source.indexOf("$('cancelLogin').addEventListener"),source.indexOf("$('refreshButton').addEventListener"));
 const restore=source.slice(source.indexOf('async function resumeSession()'),source.indexOf("window.addEventListener('storage'"));
 const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};};

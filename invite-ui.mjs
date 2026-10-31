@@ -1,6 +1,7 @@
-import {escapeHtml as escape} from './core.mjs?v=5.8.1';
-import {today} from './v3-domain.mjs?v=5.9.26';
-import {getLanguage} from './i18n.mjs?v=5.9.28';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {escapeHtml as escape} from './core.mjs?v=5.10.0';
+import {today} from './v3-domain.mjs?v=5.10.0';
+import {getLanguage} from './i18n.mjs?v=5.10.0';
 
 export const invitableRelationship=link=>['owner','tenant','representative'].includes(link.role)
  && (!link.starts_on||link.starts_on<=today()) && link.archive_reason!=='mistake';
@@ -26,14 +27,12 @@ export function whatsappShareUrl(phone,message) {
 export function inviteText({name,units,link='',language='tr',contactKind='phone'}) {
  const unit=String(units||'').trim();
  const salutation=String(name||'')+(unit?' ('+unit+')':'');
- return language==='de'
- ? '🏡 Willkommen bei AYAPARK 2!\n\nHallo '+salutation+' 👋\n\nUnsere App bietet dir Informationen zu Hausgeld, Mitteilungen und deiner Wohnung.\n\n📲 Konto erstellen:\n'+(link||'[EINLADUNGSLINK]')+'\n\n🔐 '+(contactKind==='email'?'Persönliche Einladung.':'Anmeldung ohne E-Mail.')+' 7 Tage gültig und nur einmal verwendbar.\n\nAYAPARK 2 Verwaltung 🌿'
- : '🏡 AYAPARK 2’ye Hoş Geldiniz!\n\nMerhaba '+salutation+' 👋\n\nSite yönetim uygulamamızla aidat, duyuru ve daire bilgilerinize kolayca ulaşabilirsiniz.\n\n📲 Hesabınızı oluşturmak için:\n'+(link||'[DAVET BAĞLANTISI]')+'\n\n🔐 '+(contactKind==='email'?'Kişisel davet.':'E-posta gerekmez.')+' Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir.\n\nAYAPARK 2 Site Yönetimi 🌿';
+ return (language==='tr'?('🏡 AYAPARK 2’ye Hoş Geldiniz!\n\nMerhaba '+salutation+' 👋\n\nSite yönetim uygulamamızla aidat, duyuru ve daire bilgilerinize kolayca ulaşabilirsiniz.\n\n📲 Hesabınızı oluşturmak için:\n'+(link||'[DAVET BAĞLANTISI]')+'\n\n🔐 '+(contactKind==='email'?'Kişisel davet.':'E-posta gerekmez.')+' Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir.\n\nAYAPARK 2 Site Yönetimi 🌿'):(uiText("🏡 Willkommen bei AYAPARK 2!\n\nHallo ",language)+salutation+uiText(" 👋\n\nUnsere App bietet dir Informationen zu Hausgeld, Mitteilungen und deiner Wohnung.\n\n📲 Konto erstellen:\n",language)+(link||uiText("[EINLADUNGSLINK]",language))+uiText("\n\n🔐 ",language)+(contactKind==='email'?uiText("Persönliche Einladung.",language):uiText("Anmeldung ohne E-Mail.",language))+uiText(" 7 Tage gültig und nur einmal verwendbar.\n\nAYAPARK 2 Verwaltung 🌿",language)));
 }
-const tx=(tr,de)=>getLanguage()==='de'?de:tr;
+const tx=(tr,de)=>(getLanguage()==='tr'?(tr):(uiText(de,getLanguage())));
 const $=id=>document.getElementById(id);
-const replacePlaceholder=(message,link)=>/\[(?:EINLADUNGSLINK|DAVET BAĞLANTISI)\]/.test(message)
- ?message.replace(/\[(?:EINLADUNGSLINK|DAVET BAĞLANTISI)\]/g,link):message+'\n\n'+link;
+const replacePlaceholder=(message,link)=>/\[(?:EINLADUNGSLINK|DAVET BAĞLANTISI|INVITATION LINK)\]/.test(message)
+ ?message.replace(/\[(?:EINLADUNGSLINK|DAVET BAĞLANTISI|INVITATION LINK)\]/g,link):message+'\n\n'+link;
 
 export function bindInvitations({api,getState,rerender,onActivated,openPhoneLogin}) {
  let selected=null,inviteUrl='',preview=null,token=null,inviteBusy=false;

@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {buildLegacyForm,payloadLegacy} from '../forms.mjs';
-import {AyaparkApi} from '../api.mjs';
-import {inviteEligible} from '../invite-ui.mjs';
-import {taskOptions} from '../task-permissions.mjs';
+import {buildLegacyForm,payloadLegacy} from '../forms.mjs?v=5.10.0';
+import {AyaparkApi} from '../api.mjs?v=5.10.0';
+import {inviteEligible} from '../invite-ui.mjs?v=5.10.0';
+import {taskOptions} from '../task-permissions.mjs?v=5.10.0';
 test('administration form exposes five task checkboxes plus independent default-on read checkbox and serializes them',()=>{
  const s={data:{units:[],permissions:[],taskGrants:[{user_id:'staff',tasks:['bank_reconcile']}]}};
  const f=buildLegacyForm(s,'permissions',{id:'staff'});

@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {providerCategoryChoices,providerServices,providerMatchesCategory} from '../provider-categories.mjs?v=5.9.53';
-import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.9.53';
-import {providersV3} from '../v3-ui.mjs?v=5.9.53';
+import {buildV3Form,payloadV3} from '../v3-forms.mjs?v=5.10.0';
+import {providersV3} from '../v3-ui.mjs?v=5.10.0';
 
 const id=i=>'00000000-0000-0000-0000-'+String(i).padStart(12,'0');
 const provider=id(5),noteId=id(6);

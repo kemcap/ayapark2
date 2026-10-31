@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {AyaparkApi} from '../api.mjs';
+import {AyaparkApi} from '../api.mjs?v=5.10.0';
 
 test('released controllers can reach their declared RPCs through the real authenticated API client',async()=>{
  const files=['app.mjs','claim-hold-ui.mjs','management-tasks-ui.mjs','archive-ui.mjs','budget-planning-ui.mjs','levy-review-ui.mjs','period-closing-ui.mjs','report-release-ui.mjs'];const names=new Set();

@@ -1,8 +1,8 @@
-import {financePanel} from '../finance-forms.mjs';
+import {financePanel} from '../finance-forms.mjs?v=5.10.0';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {charges,transactionDetailV3} from '../v3-ui.mjs?v=5.9.25';
-import {allocationTable} from '../ui.mjs?v=5.9.0';
+import {charges,transactionDetailV3} from '../v3-ui.mjs?v=5.10.0';
+import {allocationTable} from '../ui.mjs?v=5.10.0';
 const fixture=admin=>({mode:'live',filter:{q:'',block:'all',status:'all'},data:{
  role:admin?'super':'staff',capabilities:{finance:true,admin},units:[{id:'u',code:'A-1'}],
  charges:[{id:'c',unit_id:'u',person_id:'p',cents:1000,label:'QA charge'}],

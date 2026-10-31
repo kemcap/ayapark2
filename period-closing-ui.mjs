@@ -1,9 +1,10 @@
-import {escapeHtml as e,money,randomId} from './core.mjs?v=5.8.1';
+import {uiText} from './language-text.mjs?v=5.10.0';
+import {escapeHtml as e,money,randomId} from './core.mjs?v=5.10.0';
 
 // Each RPC still checks the actual account server-side. No simulated finalization.
 export function periodClosings({rpc,allowed,site,language,onSaved=async()=>{}}){
  let dialog,workspace,snapshot,request,busy=false,generation=0;
- const t=(de,tr)=>language()==='de'?de:tr;
+ const t=(de,tr)=>(language()==='tr'?(tr):(uiText(de,language())));
  const errorText=error=>{
   const messages=[['preview changed','Daten haben sich geändert. Vorschau erneut laden.','Veriler değişti. Önizlemeyi yeniden yükleyin.'],['bank difference','Der Banksaldo stimmt nicht mit dem Buchsaldo überein.','Banka ve kayıt bakiyesi eşleşmiyor.'],['annual unresolved','Für den Jahresabschluss müssen offene Zuordnungen und ungeprüfte Übernahmen erledigt sein.','Yıl kapanışı için eşleşmeler ve devir kontrolleri tamamlanmalıdır.'],['annual months','Zuerst alle zwölf Monate abschließen.','Önce on iki ayı kapatın.'],['period not complete','Der Zeitraum ist noch nicht beendet.','Dönem henüz tamamlanmadı.'],['year first','Zuerst den zugehörigen Jahresabschluss wieder öffnen.','Önce ilgili yıl kapanışını yeniden açın.'],['later first','Zuerst spätere Abschlüsse wieder öffnen.','Önce sonraki dönem kapanışlarını yeniden açın.'],['already closed','Dieser Zeitraum ist bereits abgeschlossen.','Bu dönem zaten kapatılmış.'],['opening required','Für diesen Zeitraum fehlt ein bestätigter Anfangsbestand.','Bu dönem için onaylı açılış bakiyesi gerekli.']];
   const found=messages.find(([key])=>String(error.message).includes(key));return found?t(found[1],found[2]):t('Vorgang fehlgeschlagen. Zugriff und Eingaben prüfen; bei unklarem Ergebnis dieselbe Anfrage erneut senden.','İşlem tamamlanamadı. Yetki ve alanları kontrol edin; sonuç belirsizse aynı isteği yeniden gönderin.');

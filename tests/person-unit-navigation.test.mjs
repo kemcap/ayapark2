@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {linkedUnitButton} from '../people-ui.mjs';
+import {linkedUnitButton} from '../people-ui.mjs?v=5.10.0';
 
 test('linked apartment button refers to the exact person and apartment',()=>{
  const state={data:{units:[{id:'unit-a4',code:'A-4'},{id:'unit-b9',code:'B-9'}]}};
@@ -20,13 +20,13 @@ test('a removed apartment reference never creates a broken navigation button',()
 });
 
 test('person list and person detail both render apartment buttons',()=>{
- const src=readFileSync(new URL('../people-ui.mjs',import.meta.url),'utf8');
+ const src=readFileSync(new URL('../people-ui.mjs?v=5.10.0',import.meta.url),'utf8');
  assert.match(src,/showUnit\?\x60<span class="person-unit-reference">\$\{linkedUnitButton\(s,l\)\}/);
  assert.match(src,/person-unit-reference">\$\{linkedUnitButton\(s,l\)\} \$\{role\(l\)\}/);
 });
 
 test('navigation retains parent and exposes direct back, close and escape routes',()=>{
- const src=readFileSync(new URL('../app.mjs',import.meta.url),'utf8');
+ const src=readFileSync(new URL('../app.mjs?v=5.10.0',import.meta.url),'utf8');
  assert.match(src,/function returnFromPersonUnit\(/);
  assert.match(src,/personUnitReturn=\{personId,unitId:id,fromDialog,dialogScroll:/);
  assert.match(src,/dialog\.scrollTop=context\.dialogScroll/);

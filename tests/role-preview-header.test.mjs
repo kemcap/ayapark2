@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {mayPreview,nativePreviewRole,allowedPreviewRoles,previewProjection,residentPreviewOptions,previewControls,previewBanner} from '../access-preview.mjs?v=5.9.3';
+import {mayPreview,nativePreviewRole,allowedPreviewRoles,previewProjection,residentPreviewOptions,previewControls,previewBanner} from '../access-preview.mjs?v=5.10.0';
 
 const index=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const css=readFileSync(new URL('../v5-ui.css',import.meta.url),'utf8');
-const script=readFileSync(new URL('../app.mjs',import.meta.url),'utf8');
+const script=readFileSync(new URL('../app.mjs?v=5.10.0',import.meta.url),'utf8');
 const source=()=>({
  role:'super',serverRole:'manager',
  capabilities:{admin:true,people:true,finance:true,import:true,announcements:true},

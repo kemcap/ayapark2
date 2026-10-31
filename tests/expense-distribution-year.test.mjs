@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {expenseDistributionModel} from '../expense-distribution.mjs?v=5.9.57';
-import {expenseDistributionPanel} from '../expense-distribution-ui.mjs?v=5.9.57';
-import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {reportV3} from '../v3-ui.mjs?v=5.9.57';
-import {selectedRange} from '../v3-domain.mjs?v=5.9.26';
-import {setLanguage,getLanguage} from '../i18n.mjs?v=5.9.28';
+import {expenseDistributionModel} from '../expense-distribution.mjs?v=5.10.0';
+import {expenseDistributionPanel} from '../expense-distribution-ui.mjs?v=5.10.0';
+import {fullDemo} from '../ledger.mjs?v=5.10.0';
+import {reportV3} from '../v3-ui.mjs?v=5.10.0';
+import {selectedRange} from '../v3-domain.mjs?v=5.10.0';
+import {setLanguage,getLanguage} from '../i18n.mjs?v=5.10.0';
 
 const rows=[
  {date:'2024-02-15',income_cents:0,expense_cents:130000,categories:{Temizlik:80000,Peyzaj:50000}},
@@ -88,7 +88,7 @@ test('category display escapes source values and year selection is a local DOM u
   assert(!result.includes('<img src=x'));
   assert(result.includes('&lt;img'));
  }finally{setLanguage(previous);}
- const app=await readFile(new URL('../app.mjs',import.meta.url),'utf8');
+ const app=await readFile(new URL('../app.mjs?v=5.10.0',import.meta.url),'utf8');
  assert.match(app,/id==='expenseDistributionYear'/);
  assert.match(app,/panel\.outerHTML=expenseDistributionPanel\(state,selectedRange\(state,'report'\)\)/);
  const css=await readFile(new URL('../expense-distribution.css',import.meta.url),'utf8');

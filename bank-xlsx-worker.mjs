@@ -1,5 +1,5 @@
 import {unzipSync,readWorkbook} from './vendor/xlsx-9.3.14/reader.mjs';
-import {validateXlsxArchive,workbookToCsv} from './bank-file-adapters.mjs?v=5.9.35';
+import {validateXlsxArchive,workbookToCsv} from './bank-file-adapters.mjs?v=5.10.0';
 self.onmessage=async({data})=>{try{
  const bytes=new Uint8Array(data.buffer);validateXlsxArchive(bytes);
  const contents=unzipSync(bytes);if(Object.values(contents).reduce((sum,body)=>sum+body.length,0)>16*1024*1024)throw Object.assign(Error(),{code:'xlsx-archive'});const decoder=new TextDecoder('utf-8',{fatal:true});

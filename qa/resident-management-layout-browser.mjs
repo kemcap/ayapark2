@@ -13,7 +13,7 @@ try{
  await page.evaluate(async({styles,html})=>{
   const template=new DOMParser().parseFromString(html,'text/html');document.body.innerHTML=template.body.innerHTML;document.querySelectorAll('script').forEach(s=>s.remove());
   await Promise.all(styles.map(href=>new Promise((ok,bad)=>{const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.onload=ok;l.onerror=bad;document.head.append(l);})));document.head.insertAdjacentHTML('beforeend','<style>*,*::before,*::after{animation:none!important;transition:none!important}</style>');
-  const [{fullDemo},ui,i18n,{prepareV5Demo},pageUI]=await Promise.all([import('/ledger.mjs?v=5.9.39'),import('/v3-ui.mjs?v=5.9.54'),import('/i18n.mjs?v=5.9.28'),import('/finance-demo.mjs?v=5.8.0'),import('/ui.mjs?v=5.9.54')]);
+  const [{fullDemo},ui,i18n,{prepareV5Demo},pageUI]=await Promise.all([import('/ledger.mjs?v=5.10.0'),import('/v3-ui.mjs?v=5.10.0'),import('/i18n.mjs?v=5.10.0'),import('/finance-demo.mjs?v=5.10.0'),import('/ui.mjs?v=5.10.0')]);
   window.qaRender=({lang,view,design,theme,font,community=true,role='resident'})=>{
    i18n.setLanguage(lang);Object.assign(document.documentElement.dataset,{design,theme,palette:'park',contrast:'normal'});document.documentElement.style.fontSize=font+'px';
    let d=prepareV5Demo(fullDemo());d.role=role;d.communityAccess=community;d.currentMember=true;d.managementRead=role==='staff';d.capabilities={admin:false,people:false,finance:false,announcements:false};d.taskGrants=[{user_id:'staff',tasks:[],management_read:true}];

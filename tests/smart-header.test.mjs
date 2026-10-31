@@ -37,7 +37,7 @@ test('open header controls, keyboard focus and manual reveal override the hidden
 
 test('both desktop and mobile use sticky layout without disabling reduced motion or print rules',async()=>{
  const css=await readFile(new URL('../smart-header.css',import.meta.url),'utf8');
- const app=await readFile(new URL('../app.mjs',import.meta.url),'utf8');
+ const app=await readFile(new URL('../app.mjs?v=5.10.0',import.meta.url),'utf8');
  const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
  assert.match(css,/position:sticky/);
  assert.match(css,/top:0/);

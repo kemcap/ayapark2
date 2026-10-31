@@ -3,7 +3,7 @@ import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {loadCurrentSchema} from './current-schema.mjs';
 const current=process.argv.includes('--current');
-import {distribute} from '../../finance-v5.mjs?v=5.1.0';
+import {distribute} from '../../finance-v5.mjs?v=5.10.0';
 const db=new PGlite(),results=[];
 const site='50000000-0000-0000-0000-000000000001',admin='10000000-0000-0000-0000-000000000001',tenant='10000000-0000-0000-0000-000000000002',owner='10000000-0000-0000-0000-000000000003',rep='10000000-0000-0000-0000-000000000004',stranger='10000000-0000-0000-0000-000000000005',staff='10000000-0000-0000-0000-000000000006';
 const uid=i=>'a0000000-0000-0000-0000-'+String(i).padStart(12,'0'),pid=i=>'b0000000-0000-0000-0000-'+String(i).padStart(12,'0'),lid=i=>'c0000000-0000-0000-0000-'+String(i).padStart(12,'0');
