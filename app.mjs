@@ -149,6 +149,45 @@ async function mutateInner(action,payload){
  if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
  if(state.mode==='demo'&&action==='user_access')return {ok:true};
  if(action==='user_access'){const result=await api.provision({...payload,site_id:state.data.site.id});await reload();return result;}
+
+ if(action==='provider'||action==='provider_category'){
+  if(!can(state,'people'))throw Error(tr('Bu işlem için yetkiniz yok.'));
+  if(state.mode==='demo'){
+   const d=state.data;d.providerCategories=d.providerCategories||[];
+   if(action==='provider'){
+    const old=d.providers.find(x=>x.id===payload.id);
+    const id=old?.id||randomId();
+    const values={name:payload.name,category:payload.categories[0],categories:payload.categories,
+      contact:payload.contact||'',phone:payload.phone||'',email:payload.email||'',status:payload.status||'preferred'};
+    if(old)Object.assign(old,values);else d.providers.push({...values,id});
+    if(payload.edit_note_id){
+     const note=d.providerNotes.find(x=>x.id===payload.edit_note_id&&x.provider_id===id);
+     if(!note)throw Error(tr('Not bulunamadı.'));
+     note.body=payload.edit_note_body;
+    }else if(payload.new_note_body){
+     d.providerNotes.push({id:randomId(),provider_id:id,body:payload.new_note_body,created_at:new Date().toISOString(),author_label:'Örnek Yönetici'});
+    }
+   }else{
+    const name=payload.name||'',match=d.providerCategories.find(x=>x.id===payload.category_id);
+    if(payload.operation==='add'){
+     if(d.providerCategories.some(x=>x.name.toLocaleLowerCase('tr-TR')===name.toLocaleLowerCase('tr-TR')))throw Error(tr('Kategori zaten var.'));
+     d.providerCategories.push({id:randomId(),name});
+    }else if(!match)throw Error(tr('Kategori bulunamadı.'));
+    else if(payload.operation==='rename'){
+     const oldName=match.name;match.name=name;
+     for(const p of d.providers){p.categories=(p.categories||[p.category]).map(x=>x===oldName?name:x);if(p.category===oldName)p.category=name;}
+    }else if(payload.operation==='delete'){
+     if(d.providers.some(p=>(p.categories||[p.category]).includes(match.name)))throw Error(tr('Kategori halen kullanılıyor.'));
+     d.providerCategories=d.providerCategories.filter(x=>x.id!==match.id);
+    }
+   }
+   render();return {ok:true};
+  }
+  const p_site=state.data.site.id;
+  const result=action==='provider'?await api.rpc('ay3_save_provider',{p_site,p_payload:payload}):
+   await api.rpc('ay3_manage_provider_category',{p_site,p_action:payload.operation,p_name:payload.name||null,p_id:payload.category_id||null});
+  await reload();return result;
+ }
  if(action==='staff_remove'){
   if(state.mode==='demo'){
    const member=state.data.staff.find(x=>x.user_id===payload.user_id);
@@ -217,7 +256,7 @@ async function mutateInner(action,payload){
  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
  return result;
 }
-function permissionFor(action){return ['entry','classify_entry','bind_charge','budget','monthly_exception','disable_exception','reverse','unallocate','void_charge','void_credit','user_access','staff_remove','person_lifecycle','person_restore','settings','permissions','publish_report'].includes(action)?'admin':['assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
+function permissionFor(action){return ['entry','classify_entry','bind_charge','budget','monthly_exception','disable_exception','reverse','unallocate','void_charge','void_credit','user_access','staff_remove','person_lifecycle','person_restore','settings','permissions','publish_report'].includes(action)?'admin':['assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_category','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
 function showForm(action,args={}){
  if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
  if(writeBusy)throw Error(tr("Önce devam eden işlemin tamamlanmasını bekleyin."));
@@ -445,6 +484,7 @@ document.addEventListener('change',event=>{
  const id=event.target.id;if(id==='previewRoleSelect'){changePreviewRole(event.target.value);return;}if(id==='previewPersonSelect'){changePreviewRole('resident',event.target.value);return;}
  if(event.target.closest('#actionFields')){if(financeActions.includes(formAction?.action)){if(event.target.name!=='confirmed'){delete formAction.context.previewSignature;if($('financePreview'))$('financePreview').textContent='';const confirm=$('actionFields').querySelector('[name=confirmed]');if(confirm)confirm.checked=false;}updateFinanceForm($('actionFields'),state.data,event.target.name);}updateAnnouncementTargets();}
  if((formAction?.action.startsWith('assignment_')||formAction?.action==='user_access')&&event.target.closest('#actionFields'))updateConditionalForm(event.target.name);
+ if(formAction?.action==='provider_category'&&event.target.name==='operation'&&event.target.closest('#actionFields'))updateConditionalForm();
  if(event.target.name==='category'||event.target.name==='relation'||event.target.name==='person_id'||event.target.name==='start_unknown')updateConditionalForm();
  if(['statusFilter','txnFilter','periodFilter'].includes(id)){
   const key={statusFilter:'status',txnFilter:'type',periodFilter:'period'}[id];state.filter[key]=event.target.value;
@@ -610,6 +650,14 @@ document.dispatchEvent(new Event('ay2:languagechange'));
 if(!new URLSearchParams(location.hash.slice(1)).has('access_token')&&!new URLSearchParams(location.hash.slice(1)).has('error'))navigate(location.hash.slice(1)||'overview');
 
 function updateConditionalForm(changed=''){
+ if(formAction?.action==='provider_category'){
+  const root=$('actionFields'),mode=root.querySelector('[name="operation"]')?.value||'add';
+  for(const [id,visible] of [['providerCategoryExisting',mode!=='add'],['providerCategoryName',mode!=='delete']]){
+   const el=$(id);if(!el)continue;el.hidden=!visible;
+   for(const input of el.querySelectorAll('input,select')){input.disabled=!visible;input.required=visible;}
+  }
+  return;
+ }
  if(formAction?.action==='user_access'){
   const root=$('actionFields');
   const fresh=root.querySelector('[name="person_mode"]:checked')?.value==='new';
