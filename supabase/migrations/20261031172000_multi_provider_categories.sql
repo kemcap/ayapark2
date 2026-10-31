@@ -70,6 +70,10 @@ declare
  submitted int;
  pname text:=btrim(coalesce(p_payload->>'name',''));
  status_name text:=coalesce(p_payload->>'status','preferred');
+ edited_note_id uuid:=nullif(p_payload->>'edit_note_id','')::uuid;
+ edited_note_body text;
+ previous_note text;
+ previous_provider uuid;
 begin
  if actor is null or not ay2_private.can(p_site,'people') then
   raise exception 'Access denied' using errcode='42501';end if;
@@ -103,6 +107,28 @@ begin
     email=left(btrim(coalesce(p_payload->>'email','')),254),status=status_name
    where id=pid and site_id=p_site;
   if not found then raise exception 'Provider not found';end if;
+ end if;
+ if edited_note_id is not null then
+  if not (p_payload ? 'edit_note_body') then raise exception 'Note body missing';end if;
+  edited_note_body:=btrim(coalesce(p_payload->>'edit_note_body',''));
+  if length(edited_note_body)>5000 then raise exception 'Note too long';end if;
+  select n.provider_id,n.body into previous_provider,previous_note
+    from public.ay3_provider_notes n where n.id=edited_note_id and n.site_id=p_site for update;
+  if previous_provider is distinct from pid then raise exception 'Provider note not found';end if;
+  if edited_note_body<>previous_note then
+   if length(edited_note_body)=0 then raise exception 'Existing note must not be empty';end if;
+   insert into public.ay2_audit(site_id,actor,action,entity_id,details)
+   values(p_site,actor,'provider_note_edit_before',edited_note_id,
+     jsonb_build_object('body',previous_note,'source','provider_edit_form'));
+   update public.ay3_provider_notes set body=edited_note_body
+    where id=edited_note_id and site_id=p_site and provider_id=pid;
+  end if;
+ elsif p_payload ? 'new_note_body' and length(btrim(coalesce(p_payload->>'new_note_body','')))>0 then
+  edited_note_body:=btrim(p_payload->>'new_note_body');
+  if length(edited_note_body)>5000 then raise exception 'Note too long';end if;
+  insert into public.ay3_provider_notes(site_id,provider_id,body,created_by,author_label)
+  values(p_site,pid,edited_note_body,actor,
+    coalesce((select nullif(a.raw_user_meta_data->>'full_name','') from auth.users a where a.id=actor),'Yönetim'));
  end if;
  insert into public.ay2_audit(site_id,actor,action,entity_id,details)
  values(p_site,actor,'provider',pid,jsonb_build_object('categories',to_jsonb(cats),'source','multiple_categories_ui'));
