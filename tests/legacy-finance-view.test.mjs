@@ -109,3 +109,16 @@ test('resident sees source summary with no administrative allocation actions or 
   assert(!html.includes('Aidat Oktober für A-2 und A-8'));
  }finally{setLanguage('tr');}
 });
+
+test('multiple source rows for one apartment are consolidated without omitting the second person',()=>{
+ const d=makeFixture();
+ d.devirSnapshot=[
+  {unit_id:A2,source_date:'2026-10-09',total_cents:910300,categories:{Aidat:662300,Havuz:210000,Asansör:38000}},
+  {unit_id:A2,source_date:'2026-10-09',total_cents:750000,categories:{Demirbaş:105000,'Su dijital kafa':110000,'Su arıtma bakımı':125000,'Bina kapısı bakımı':410000}}
+ ];
+ const x=legacyFinance(d,A2,d.charges);
+ assert.equal(x.sourceVerified,true);
+ assert.equal(x.gross,1660300);
+ assert.equal(x.categories.length,7);
+ assert.equal(x.open,1110300);
+});
