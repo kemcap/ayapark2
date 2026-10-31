@@ -1,34 +1,84 @@
-/* Wohnungsübersicht: show both apartment blocks side-by-side on desktop only.
-   Scope to the dashboard card. Leave the full apartment directory and resident cards unchanged. */
-@media (min-width:1001px) {
-  .main-grid.overview-main-grid,
-  :root[data-design="modern"] .main-grid.overview-main-grid {
-    grid-template-columns:minmax(0,1fr);
-  }
-  .overview-main-grid .building-plan,
-  :root[data-design="modern"] .overview-main-grid .building-plan {
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    align-items:start;
-    gap:clamp(14px,2vw,24px);
-  }
-  .overview-main-grid .building-block { min-width:0; }
+/* AyaPark 2 dashboard: two apartment blocks side-by-side when space permits.
+   Inside EACH block, tile columns depend on real available width (not screen alone).
+   No visual truncation of residents, amounts, or warning information. */
+.main-grid.overview-main-grid,
+:root[data-design="modern"] .main-grid.overview-main-grid{
+ grid-template-columns:minmax(0,1fr);
 }
-/* Preserve readable apartment tiles at laptop widths instead of four cramped cards per row. */
-@media (min-width:1001px) and (max-width:1499px) {
-  .overview-main-grid .unit-card-grid,
-  :root[data-design="modern"] .overview-main-grid .unit-card-grid {
-    grid-template-columns:minmax(0,1fr);
-  }
+.overview-main-grid .building-plan,
+:root[data-design="modern"] .overview-main-grid .building-plan{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ align-items:start;
+ gap:clamp(12px,1.6vw,22px);
 }
-/* Mobile/tablet navigation has no sidebar: stack blocks and retain full-width tap targets. */
-@media (max-width:1000px) {
-  .main-grid.overview-main-grid,
-  :root[data-design="modern"] .main-grid.overview-main-grid {
-    grid-template-columns:minmax(0,1fr);
-  }
-  .overview-main-grid .building-plan,
-  :root[data-design="modern"] .overview-main-grid .building-plan {
-    grid-template-columns:minmax(0,1fr);
-  }
+.overview-main-grid .building-block,
+:root[data-design="modern"] .overview-main-grid .building-block{
+ container-type:inline-size;
+ min-width:0;
+}
+.overview-main-grid .unit-card-grid,
+:root[data-design="modern"] .overview-main-grid .unit-card-grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:clamp(7px,.65vw,11px);
+}
+.overview-main-grid .apartment-card{min-width:0;max-width:100%}
+.overview-main-grid .apartment-card .apartment-open,
+:root[data-design="modern"] .overview-main-grid .apartment-card .apartment-open{
+ min-width:0;
+ padding:11px 9px;
+ gap:7px;
+}
+.overview-main-grid .apartment-heading{
+ display:flex;
+ flex-wrap:wrap;
+ gap:4px 6px;
+ align-items:center;
+}
+.overview-main-grid .apartment-heading>strong,
+:root[data-design="modern"] .overview-main-grid .apartment-heading>strong{
+ font-size:clamp(13px,1.1vw,17px);
+}
+.overview-main-grid .apartment-resident,
+:root[data-design="modern"] .overview-main-grid .apartment-resident{
+ margin:4px 0;
+ font-size:11px;
+ line-height:1.45;
+ overflow-wrap:anywhere;
+}
+.overview-main-grid .apartment-balance,
+:root[data-design="modern"] .overview-main-grid .apartment-balance{
+ font-size:12px;
+ margin-top:4px;
+ padding-top:7px;
+ overflow-wrap:anywhere;
+}
+.overview-main-grid .apartment-card .badge{
+ max-width:100%;
+ white-space:normal;
+ overflow-wrap:anywhere;
+}
+@container (min-width:580px){
+ .overview-main-grid .unit-card-grid,
+ :root[data-design="modern"] .overview-main-grid .unit-card-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+ }
+}
+@container (max-width:389px){
+ .overview-main-grid .unit-card-grid,
+ :root[data-design="modern"] .overview-main-grid .unit-card-grid{
+  grid-template-columns:minmax(0,1fr);
+ }
+}
+/* Two blocks may stack; each still adapts its apartment cards to its own width. */
+@media(max-width:1000px){
+ .overview-main-grid .building-plan,
+ :root[data-design="modern"] .overview-main-grid .building-plan{
+  grid-template-columns:minmax(0,1fr);
+ }
+}
+@media(max-width:450px){
+ .overview-main-grid .building-plan,
+ :root[data-design="modern"] .overview-main-grid .building-plan{gap:14px}
 }
