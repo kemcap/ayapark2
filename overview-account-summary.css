@@ -1,0 +1,80 @@
+/* AyaPark 2: explain the difference between net account balance and all recorded receipts. */
+.overview-account-summary{
+ display:grid;
+ gap:13px;
+ min-width:0;
+}
+.overview-account-main{
+ display:grid;
+ gap:6px;
+ padding:13px 14px;
+ border:1px solid var(--line);
+ border-radius:12px;
+ background:var(--soft);
+ min-width:0;
+}
+.overview-account-main>span{
+ font-size:12px;
+ font-weight:650;
+ line-height:1.45;
+ color:var(--muted);
+}
+.overview-account-main .large-amount{
+ display:block;
+ margin:0;
+ font-size:clamp(21px,2vw,29px);
+ line-height:1.2;
+ font-variant-numeric:tabular-nums;
+ letter-spacing:-.02em;
+ color:var(--ink);
+ overflow-wrap:anywhere;
+}
+.overview-account-movements{
+ display:grid;
+ gap:10px;
+ margin:0;
+ min-width:0;
+}
+.overview-account-movements>div{
+ display:flex;
+ align-items:baseline;
+ justify-content:space-between;
+ flex-wrap:wrap;
+ column-gap:12px;
+ row-gap:5px;
+ padding-block:7px;
+ border-bottom:1px solid var(--line);
+ font-size:12px;
+ line-height:1.5;
+}
+.overview-account-movements span{
+ min-width:0;
+ flex:1 1 165px;
+ color:var(--muted);
+ overflow-wrap:anywhere;
+}
+.overview-account-movements strong{
+ font-size:13px;
+ font-variant-numeric:tabular-nums;
+ color:var(--ink);
+ white-space:nowrap;
+}
+.overview-account-explanation{
+ margin:0;
+ font-size:11px;
+ line-height:1.55;
+ color:var(--muted);
+}
+.overview-account-summary .text-button{
+ display:inline-flex;
+ align-items:center;
+ justify-self:start;
+ gap:6px;
+ min-height:36px;
+ font-size:12px;
+}
+@media(max-width:470px){
+ .overview-account-main{padding:12px}
+ .overview-account-movements>div{align-items:flex-start}
+ .overview-account-movements strong{white-space:normal}
+}
