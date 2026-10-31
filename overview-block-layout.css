@@ -1,5 +1,6 @@
-/* AyaPark 2 dashboard: two apartment blocks side-by-side when space permits.
-   Inside EACH block, tile columns depend on real available width (not screen alone).
+/* AyaPark 2 dashboard: exactly two cards per block = four columns overall.
+   At narrower content widths, show B on the left and A on the right with one
+   card each. Only stack entire blocks once two side-by-side cards cannot fit.
    No visual truncation of residents, amounts, or warning information. */
 .main-grid.overview-main-grid,
 :root[data-design="modern"] .main-grid.overview-main-grid{
@@ -11,6 +12,7 @@
 :root[data-design="modern"] .overview-main-grid .building-plan{
  display:grid;
  grid-template-columns:repeat(2,minmax(0,1fr));
+ direction:ltr; /* DOM already orders B, A; ensure B-left/A-right. */
  align-items:start;
  gap:clamp(12px,1.6vw,22px);
 }
@@ -61,30 +63,17 @@
  white-space:normal;
  overflow-wrap:anywhere;
 }
-@container (min-width:580px){
- .overview-main-grid .unit-card-grid,
- :root[data-design="modern"] .overview-main-grid .unit-card-grid{
-  grid-template-columns:repeat(4,minmax(0,1fr));
- }
-}
-@container (max-width:389px){
+/* A block with at least 360px has room for two apartment cards.
+   Below that, the two visible overall columns become B and A themselves. */
+@container (max-width:359px){
  .overview-main-grid .unit-card-grid,
  :root[data-design="modern"] .overview-main-grid .unit-card-grid{
   grid-template-columns:minmax(0,1fr);
  }
 }
-/* Keep four cards PER block at laptop widths.
-   A 1000–1070px viewport has too little room for two narrow blocks side-by-side.
-   Stack the blocks instead; each block regains enough width for four readable cards.
-   This is container-based so sidebars, zoom and custom desktop widths also work. */
-@container apartment-overview (max-width:1240px){
- .overview-main-grid .building-plan,
- :root[data-design="modern"] .overview-main-grid .building-plan{
-  grid-template-columns:minmax(0,1fr);
- }
-}
-/* Mobile navigation: continue stacking both blocks below desktop widths. */
-@media(max-width:1000px){
+/* Only genuinely narrow content stacks B and A. Sidebar width, window zoom,
+   and tablet/mobile layout are handled by the actual dashboard container. */
+@container apartment-overview (max-width:520px){
  .overview-main-grid .building-plan,
  :root[data-design="modern"] .overview-main-grid .building-plan{
   grid-template-columns:minmax(0,1fr);
