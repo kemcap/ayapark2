@@ -3,7 +3,7 @@ import {effectiveOccupancy} from './relationships.mjs?v=5.8.1';
 import {announcementTime,validateAnnouncement} from './announcement-validation.mjs?v=5.8.1';
 import {t as tr,getLanguage} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,randomId,money} from './core.mjs?v=5.8.1';
-import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.9.51';
+import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.9.52';
 import {today,personName,personLinks,activeAt,dateValid} from './v3-domain.mjs?v=5.9.26';
 import {roleLabel} from './v3-ui.mjs?v=5.9.51';
 const loc=(de,trText)=>getLanguage()==='de'?de:trText;
