@@ -37,8 +37,10 @@ Migration `20261031170253_english_language_preference` am 31.10.2026 erfolgreich
 - 31 zusätzliche Browserprüfungen für echte lokale XLSX-Downloads, PDF-/Druckansichten und den geschützten Popup-Kanal in Deutsch, Türkisch und Englisch bestanden; Originaldaten und eigene Nachweise bleiben getrennt, keine externen Anfragen.
 - Bestehende echte Mobilgeräte-/PWA-/Mailabnahme bleibt separat offen. Synthetische Browserprüfungen verwenden keine produktiven Zugänge.
 
-## Veröffentlichungsstand
+## Veröffentlicht und live geprüft
 
-Backend aktiv; Frontend und Texte im Entwicklungsbranch vorbereitet und lokal geprüft. GitHub-CI, Merge und tatsächliche Pages-Auslieferung werden vor der abschließenden Live-Meldung separat bestätigt. Vorbereitungsstand ist keine Live-Freigabebehauptung.
+[PR #105](https://github.com/kemcap/ayapark2/pull/105) nach erfolgreicher vollständiger CI zusammengeführt. Live-Stand `68cb7a8b73fac098445829afd5c2d017cad06fbe`; CI `41222999248`, Pages `41223197330` erfolgreich. Die 75 geänderten ausgelieferten Laufzeitdateien einschließlich Englisch-Wörterbuch, Sprachsteuerung, App, Anmeldung, Wiederherstellung und Exportmodulen mit dem getesteten Stand bytegleich verglichen. Nachweis: `qa/results/english-language-release-20261031.json`.
 
-Nächster Schritt: GitHub-CI durchführen, autorisiert veröffentlichen, ausgelieferte Dateien vergleichen und diesen Abschnitt mit den tatsächlichen Nachweisen aktualisieren. Backup bleibt ausdrücklich übersprungen.
+Englisch ist damit tatsächlich veröffentlicht. In Einstellungen → Sprache lässt es sich direkt auswählen; oben schaltet die Sprachtaste TR → DE → EN. Bestehende Benutzer müssen ihre Sprache nicht umstellen. Es gibt keine zusätzlichen laufenden Kosten; Supabase bleibt Free.
+
+Nächster gesonderter Abnahmepunkt: bestehende echte Zugänge auf dem eigenen Smartphone/PWA einschließlich dauerhaftem Anmeldestatus und eigener Mailzustellung prüfen. Diese reale Geräteabnahme wird durch lokale Browser- und Live-Dateiprüfungen nicht ersetzt. Keine weiteren Finanzkorrekturen ohne konkrete Freigabe. Backup bleibt ausdrücklich übersprungen.

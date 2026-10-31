@@ -1,12 +1,12 @@
 # Verbleibende reale Abnahme – 31.10.2026
 
-## Englisch als dritte Sprache – geprüft, Veröffentlichung läuft – 31.10.2026
+## Englisch als dritte Sprache – veröffentlicht und live geprüft – 31.10.2026
 
 Englisch ergänzt Deutsch/Türkisch, ohne bestehende Spracheinstellungen oder private Inhalte umzustellen. 1.279 zentrale Quelltexte vollständig abgedeckt, insgesamt 1.873 englische Texte/Fragmente. Anmeldung, Wiederherstellung, Dialoge, Berichte, PDF/Excel und Konto-Sprache berücksichtigt. Begriffe auf einfache, eindeutige Formulierungen geprüft; türkisches „Guthaben“ verständlich als „Alacak bakiyesi“ dargestellt. Daten und Finanzregeln unverändert.
 
-399 JavaScript-, zehn isolierte SQL- und 100 synthetische Browserprüfungen erfolgreich. Backend-Migration `20261031170253` erweitert nur die erlaubte Einstellung um Englisch; vorhandene Einstellungen vor/nach Änderung identisch. Frontend noch nicht als live bestätigt. Details: [Sprachprüfung](ENGLISH-LANGUAGE-AUDIT.md).
+399 JavaScript-, zehn isolierte SQL- und 100 synthetische Browserprüfungen erfolgreich. Backend-Migration `20261031170253` erweitert nur die erlaubte Einstellung um Englisch; vorhandene Einstellungen vor/nach Änderung identisch. Frontend über [PR #105](https://github.com/kemcap/ayapark2/pull/105) veröffentlicht: main `68cb7a8b73fac098445829afd5c2d017cad06fbe`, vollständige CI `41222999248` und Pages `41223197330` erfolgreich. 75 ausgelieferte Laufzeitdateien bytegleich; zusätzliche 31 PDF-/Excel-Browserprüfungen in allen drei Sprachen erfolgreich. Details: [Sprachprüfung](ENGLISH-LANGUAGE-AUDIT.md).
 
-Nächster Schritt: CI, autorisierte Veröffentlichung und bytegleiche Pages-Prüfung; anschließend reale Geräte-/PWA-/Sitzungs-/Mailabnahme fortführen, ohne produktive Testdaten zu verändern. Backup weiterhin übersprungen.
+Nächster gesonderter Abnahmepunkt: reale Geräte-/PWA-/Sitzungs-/Mailabnahme mit bestehenden Zugängen fortführen. Technische Sprachfreigabe abgeschlossen; keine reale Mobilgeräteabnahme oder automatische Übersetzung privater Mitteilungen behauptet. Backup weiterhin übersprungen.
 
 
 ## Veröffentlicht und live geprüft – 31.10.2026

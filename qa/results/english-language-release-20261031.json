@@ -1,0 +1,468 @@
+{
+  "checkedAt": "2026-10-31T17:11:34Z",
+  "mainCommit": "68cb7a8b73fac098445829afd5c2d017cad06fbe",
+  "pr": 105,
+  "ciRun": 41222999248,
+  "migration": "20261031170253_english_language_preference",
+  "existingPreferencesUnchanged": true,
+  "unitTests": 399,
+  "isolatedSqlChecks": 10,
+  "syntheticBrowserChecks": 100,
+  "exportBrowserChecks": 31,
+  "productionDataWrites": 0,
+  "files": [
+    {
+      "path": "access-preview.mjs",
+      "byteEqual": true,
+      "bytes": 6253,
+      "sha256": "4a5db926b530d3f5990bb775b1ab4ff44888d87cb9625e316d79d257e03b7cd3"
+    },
+    {
+      "path": "access-request-ui.mjs",
+      "byteEqual": true,
+      "bytes": 5572,
+      "sha256": "ba1534b57e5bf00a91dbdd45028abfe03501443500da8203489a58c3d4f6296c"
+    },
+    {
+      "path": "access-requests.mjs",
+      "byteEqual": true,
+      "bytes": 2363,
+      "sha256": "7f8d05841310d7dda8e879ab4ad63b5b98af56a501b8077f1c07c750e4d42895"
+    },
+    {
+      "path": "admin-recovery-ui.mjs",
+      "byteEqual": true,
+      "bytes": 5894,
+      "sha256": "55391860de7091ae723767892d57398a7de61f643bfc16d1ddd03f2738d06861"
+    },
+    {
+      "path": "announcement-validation.mjs",
+      "byteEqual": true,
+      "bytes": 1073,
+      "sha256": "188bd5a1de0e5558c992ddc4fb90463ef45575980cb6a4dbe07927bd4e0b9231"
+    },
+    {
+      "path": "apartment-info.mjs",
+      "byteEqual": true,
+      "bytes": 4417,
+      "sha256": "5f91454f1f83ad0d92f6dbcf0293c3531ee42c992b38154148569286ca485245"
+    },
+    {
+      "path": "api.mjs",
+      "byteEqual": true,
+      "bytes": 22631,
+      "sha256": "78165340eb6b2ad6a2a78db46098a467bb301226af526d9197af48327880cd48"
+    },
+    {
+      "path": "app.mjs",
+      "byteEqual": true,
+      "bytes": 93228,
+      "sha256": "985bd23ba18809755ce91c97fef62a8a50b2bec4fbfafff5603cd455d7e9c8ca"
+    },
+    {
+      "path": "archive-ui.mjs",
+      "byteEqual": true,
+      "bytes": 18588,
+      "sha256": "2564992e41a4e1aade3f06ed163a20e89a19fa9c45aa61472e322c8d54c12ea7"
+    },
+    {
+      "path": "assets/en.svg",
+      "byteEqual": true,
+      "bytes": 246,
+      "sha256": "8e6236eadb3daee7ab241fa388f2e8782d09b27572f91be03e5eefdd99495467"
+    },
+    {
+      "path": "assignments.mjs",
+      "byteEqual": true,
+      "bytes": 10623,
+      "sha256": "2cf54c9193a67117fb6509e6d84814afe010719ec054f93fec4b7e8debb8c3a7"
+    },
+    {
+      "path": "bank-file-adapters.mjs",
+      "byteEqual": true,
+      "bytes": 11891,
+      "sha256": "cf4928f90d91df02fb663649b6640b20821bad37b55307306d629ac936675dd8"
+    },
+    {
+      "path": "bank-file-reader.mjs",
+      "byteEqual": true,
+      "bytes": 3493,
+      "sha256": "f50eb985e5ae3e990674c09f4c9da4a2e2478fbff5a2dd5db3d81b39a9d0ad2f"
+    },
+    {
+      "path": "bank-xlsx-worker.mjs",
+      "byteEqual": true,
+      "bytes": 1394,
+      "sha256": "b198ff515fc107ca88aa813272a8e2e67ae05689c9f9ae6e453547b993d951f4"
+    },
+    {
+      "path": "budget-planning-ui.mjs",
+      "byteEqual": true,
+      "bytes": 17568,
+      "sha256": "e512188b382abf356b6f6d5ef7c49629e06e389bdb02d338d4824b745f7edbe0"
+    },
+    {
+      "path": "category-balance-ui.mjs",
+      "byteEqual": true,
+      "bytes": 5287,
+      "sha256": "a45def69b0a3e35c1ea44ce4c8e8450406083ce96974a63b44958141730693f7"
+    },
+    {
+      "path": "charge-drafts.mjs",
+      "byteEqual": true,
+      "bytes": 2396,
+      "sha256": "ed558b97a38bf7b153fa2710aabd925bed6ecc8f4c481e1dedb0429fec7e7b4d"
+    },
+    {
+      "path": "claim-hold-ui.mjs",
+      "byteEqual": true,
+      "bytes": 5281,
+      "sha256": "bc57124338f52f6e38df55d1cd6af6dba98fd042a46110773da090e0459575dd"
+    },
+    {
+      "path": "contact-requests.mjs",
+      "byteEqual": true,
+      "bytes": 5276,
+      "sha256": "f4c9ffbe64e982ce0f306a065c11d029289ac60a57cb18774d1c031473db7e82"
+    },
+    {
+      "path": "core.mjs",
+      "byteEqual": true,
+      "bytes": 5405,
+      "sha256": "39880115955700752e68d3e1c429a304d1e41e6b386a4a1016b4362847e21bc2"
+    },
+    {
+      "path": "design.mjs",
+      "byteEqual": true,
+      "bytes": 3371,
+      "sha256": "338285a430f8f7da14f3e5304d146e25afcc420ed301b226c1124cfd0b491627"
+    },
+    {
+      "path": "devir-archive-ui.mjs",
+      "byteEqual": true,
+      "bytes": 3783,
+      "sha256": "db7c8dc018233a02ea0af2964738c3821c479d42039c6ceb22945cdf9c27ece5"
+    },
+    {
+      "path": "due-reminders.mjs",
+      "byteEqual": true,
+      "bytes": 2737,
+      "sha256": "14d994720d5e50fb2151de94981ae2a1c111c379a2ac186a03fbab672c3eb1a3"
+    },
+    {
+      "path": "english.mjs",
+      "byteEqual": true,
+      "bytes": 155765,
+      "sha256": "29f79ccbb894d4064e196236ba956e9893cade4724a92bc96337d1caccb216ad"
+    },
+    {
+      "path": "expense-distribution-ui.mjs",
+      "byteEqual": true,
+      "bytes": 3611,
+      "sha256": "159374dd8ad3076a706dad4e9f6d49eabe1b902d05113195f855c12499630df9"
+    },
+    {
+      "path": "expense-distribution.mjs",
+      "byteEqual": true,
+      "bytes": 1056,
+      "sha256": "294b702d580b25579cb3b0a0fc122c153c63b8bd94db8b3b6ffc3e8507cc3693"
+    },
+    {
+      "path": "export-page.mjs",
+      "byteEqual": true,
+      "bytes": 1921,
+      "sha256": "c79aa7f5dbea44269ed8b6f2b951104a2358af55bf69b788ff2cfdb8f4381dd9"
+    },
+    {
+      "path": "export.html",
+      "byteEqual": true,
+      "bytes": 872,
+      "sha256": "336db9c291239854008121ab35b05e83009e4949a16e67e8b46133255f75d33b"
+    },
+    {
+      "path": "finance-charts.mjs",
+      "byteEqual": true,
+      "bytes": 11567,
+      "sha256": "700b4de82879771d984b8d8d4623c4b4b50d58ad8584f574510bcfe053714fc4"
+    },
+    {
+      "path": "finance-demo.mjs",
+      "byteEqual": true,
+      "bytes": 4393,
+      "sha256": "d98818d76b43c64f8ccf2f9672aae0f65e454bffec261e34b354eacac46b10e4"
+    },
+    {
+      "path": "finance-forms.mjs",
+      "byteEqual": true,
+      "bytes": 15925,
+      "sha256": "4ec72804a43d58086ae6e0255c1cda084a43b17b57fa51d6566876c5f97e16a1"
+    },
+    {
+      "path": "finance-v5.mjs",
+      "byteEqual": true,
+      "bytes": 4279,
+      "sha256": "84ff5cd3cab031694fb1da306e73a1fd41f1b3613502e8121b3bd0b6c2514917"
+    },
+    {
+      "path": "forms.mjs",
+      "byteEqual": true,
+      "bytes": 11091,
+      "sha256": "bf99d5af3ea1dc04e8c93b23e92e3879827e290873d76509528399b1272acfc0"
+    },
+    {
+      "path": "i18n.mjs",
+      "byteEqual": true,
+      "bytes": 102176,
+      "sha256": "cda538f0b616b42744ff06f547e1944b5494270497f8ab2375058ab175dafb2d"
+    },
+    {
+      "path": "index.html",
+      "byteEqual": true,
+      "bytes": 19088,
+      "sha256": "1a2f7021f79668acf0837404dfd8bb34a5e0727cd5bb50ef48114207903c72d2"
+    },
+    {
+      "path": "install-tutorial.mjs",
+      "byteEqual": true,
+      "bytes": 7038,
+      "sha256": "eda2d7f25d44f8d4417e6ea7c6639ed61a8cbbd8f638f746d06ab05375a94130"
+    },
+    {
+      "path": "install.mjs",
+      "byteEqual": true,
+      "bytes": 2275,
+      "sha256": "f4b4f3a4accca0d82b1dad64ecdaf0ebe74c7b07dec4cfa07e6384ea1e4d47fe"
+    },
+    {
+      "path": "invite-ui.mjs",
+      "byteEqual": true,
+      "bytes": 13736,
+      "sha256": "f3ba15d402f50add5d89fc8e8a4a9ef6528054173e7b40b39df1b46254f44ddc"
+    },
+    {
+      "path": "language-text.mjs",
+      "byteEqual": true,
+      "bytes": 505,
+      "sha256": "ac27306bbd1a6e6b4ffe486c385811e2cb57fa34050fc22344dc66296662d9bd"
+    },
+    {
+      "path": "law-info.mjs",
+      "byteEqual": true,
+      "bytes": 5885,
+      "sha256": "d37349083acfea08f1390c981d20eeb745ba7bd55236ece1f92807060e668957"
+    },
+    {
+      "path": "ledger.mjs",
+      "byteEqual": true,
+      "bytes": 6841,
+      "sha256": "9ff842de512465957d56b28c154b1e70a7f851897c5b0763ce8714455ef9b505"
+    },
+    {
+      "path": "levy-review-ui.mjs",
+      "byteEqual": true,
+      "bytes": 12312,
+      "sha256": "f70fca938a98dcc85396deb8bbbadb686cdc53aaaa61efd95159dd814ea03e45"
+    },
+    {
+      "path": "management-tasks-ui.mjs",
+      "byteEqual": true,
+      "bytes": 9771,
+      "sha256": "d5460ed4ba33f77840184c898d02ec64a878c2b597167ca93ba5b6b6ecb95b3d"
+    },
+    {
+      "path": "modern-ui.mjs",
+      "byteEqual": true,
+      "bytes": 3127,
+      "sha256": "23f48de1cffa8b2ab51f94a973ea06460788c8498e22babb9649d6686c23b519"
+    },
+    {
+      "path": "notifications.mjs",
+      "byteEqual": true,
+      "bytes": 4394,
+      "sha256": "310dfffc75fbe8ed80261ba4d0fd1fa7fd655db7af6ba0bd4529e0692a0a1d81"
+    },
+    {
+      "path": "password-eye.mjs",
+      "byteEqual": true,
+      "bytes": 1044,
+      "sha256": "928ca6247886f9f21c8c27d22a0ef8caf9f4505f7e6c994efe6dd5190da00e78"
+    },
+    {
+      "path": "people-ui.mjs",
+      "byteEqual": true,
+      "bytes": 8337,
+      "sha256": "c63f34c6b8a49f2f2b1894553acc511b829fb02e1f9a2ee01aa1b379356ccfd4"
+    },
+    {
+      "path": "period-closing-ui.mjs",
+      "byteEqual": true,
+      "bytes": 9961,
+      "sha256": "fd22a907010dce0789404ddfe4f0676643bb06e6eab6f6784ca9d19cafdfb8c0"
+    },
+    {
+      "path": "person-picker.mjs",
+      "byteEqual": true,
+      "bytes": 4725,
+      "sha256": "1168aa674d874b535bb6231958c8c3e9ac51ecbdde66048a3bc6187c1194c72b"
+    },
+    {
+      "path": "person-status.mjs",
+      "byteEqual": true,
+      "bytes": 585,
+      "sha256": "6408cf0676f425c6f48ffa73b2d38359cdd9636f5f8a8ad2b2df4e56652f68fd"
+    },
+    {
+      "path": "preferences.mjs",
+      "byteEqual": true,
+      "bytes": 7930,
+      "sha256": "eadc837d4f7329c109cd9e62c3ad2e1599f40347faa86e276cd89dcd199106b0"
+    },
+    {
+      "path": "public-reports.html",
+      "byteEqual": true,
+      "bytes": 1208,
+      "sha256": "159edc75bba8bb458c89e5ebe97891a0979fd0fc97ebe2cb40814f9d09fac09b"
+    },
+    {
+      "path": "public-reports.mjs",
+      "byteEqual": true,
+      "bytes": 2712,
+      "sha256": "c5b279ac3885f3db409e68ff71d348e51f73a090cd24301957314c5c67982044"
+    },
+    {
+      "path": "reconcile.mjs",
+      "byteEqual": true,
+      "bytes": 4167,
+      "sha256": "f013befe7d36feb009d0c3588f92f5dd54551de4b0fb53ab1c057fcb7b36bd49"
+    },
+    {
+      "path": "recovery-api.mjs",
+      "byteEqual": true,
+      "bytes": 2656,
+      "sha256": "7c908fa6a059cee88edfa2312644bdc539afb7b6861d138efc4e2f4d8340474a"
+    },
+    {
+      "path": "recovery.mjs",
+      "byteEqual": true,
+      "bytes": 4871,
+      "sha256": "15a7dcf273820d3152c4895c9b4aaa74374ccd8728c6f6a6f97092029dff5d1e"
+    },
+    {
+      "path": "relationships.mjs",
+      "byteEqual": true,
+      "bytes": 322,
+      "sha256": "ce549f6742eabf2d051cbb6ff2dc4196eefb2c22a75f2d6f03d3af75c3900526"
+    },
+    {
+      "path": "released-report-model.mjs",
+      "byteEqual": true,
+      "bytes": 1782,
+      "sha256": "ffc7910fcfe40de4687e1ee90738d4d977aec6b3c9eeea55143308f7af18ba53"
+    },
+    {
+      "path": "report-export-domain.mjs",
+      "byteEqual": true,
+      "bytes": 4017,
+      "sha256": "19dfbca79203c9072644d94a752ec5a4612050d678683015f175aa5963229877"
+    },
+    {
+      "path": "report-export-ui.mjs",
+      "byteEqual": true,
+      "bytes": 2242,
+      "sha256": "88718a6fe1f4fe6f35ad513c724e38adc6df923d20f03a73aac0db1e0fd3b5e0"
+    },
+    {
+      "path": "report-export-view.mjs",
+      "byteEqual": true,
+      "bytes": 1796,
+      "sha256": "21b63c86ec0bfa9ac1674ad6509049602c8133c6475c3109b96b10419c186e5a"
+    },
+    {
+      "path": "report-release-ui.mjs",
+      "byteEqual": true,
+      "bytes": 6928,
+      "sha256": "a6268d87936c64553b076aff24a35cfbb1e049aedf8ed2253f1567f2c0c2af2d"
+    },
+    {
+      "path": "reset.html",
+      "byteEqual": true,
+      "bytes": 3938,
+      "sha256": "5c7c75b27b32b81da5e46bf68283bcf59fdc2c640189a8ba98f4db6d2fdb72e8"
+    },
+    {
+      "path": "review-ui.mjs",
+      "byteEqual": true,
+      "bytes": 2530,
+      "sha256": "526ef691dda05d44806825437e045d31da911fcec0d30fc8c7c57c2d625a6502"
+    },
+    {
+      "path": "settings-ui.mjs",
+      "byteEqual": true,
+      "bytes": 6476,
+      "sha256": "60de212acaee74f9be6aeab5b4d5c90c8cf29823fb3873390aa88031b692c1be"
+    },
+    {
+      "path": "seven-ux.mjs",
+      "byteEqual": true,
+      "bytes": 887,
+      "sha256": "6b50116bc639a0fb2352f64db36b69b022bd1e377f84d2f4a98612cefdbcbe2a"
+    },
+    {
+      "path": "site-claims-ui.mjs",
+      "byteEqual": true,
+      "bytes": 7342,
+      "sha256": "562d4fc2d2dacd563c5a294ae3ec068614eee251a48ace956831601f15be9af3"
+    },
+    {
+      "path": "task-permissions.mjs",
+      "byteEqual": true,
+      "bytes": 1510,
+      "sha256": "42a27464eb65a490cd72727a1e84aae847fa7ba1434677db180e4cb781f84b81"
+    },
+    {
+      "path": "ui.mjs",
+      "byteEqual": true,
+      "bytes": 7279,
+      "sha256": "f6a9d99a39f1db7d52ac32040c49ce297855e8e046f53510cb65af90d02cf154"
+    },
+    {
+      "path": "v3-domain.mjs",
+      "byteEqual": true,
+      "bytes": 9025,
+      "sha256": "ce0f244bbf777f05a251e750aea27a19be24e06e915a1586e49f028fe42727dd"
+    },
+    {
+      "path": "v3-forms.mjs",
+      "byteEqual": true,
+      "bytes": 24924,
+      "sha256": "ee34d5911bd187d9a833e51b224cd86af7b2d8e7afbe270b4014aa4226eea923"
+    },
+    {
+      "path": "v3-import.mjs",
+      "byteEqual": true,
+      "bytes": 3395,
+      "sha256": "90a4c9041716a42ced1b8ffac6dc313951dc0a53171bfddb54e3d63a6f5f7fa5"
+    },
+    {
+      "path": "v3-ledger.mjs",
+      "byteEqual": true,
+      "bytes": 4722,
+      "sha256": "dd1d9b6f132ff7b320cc7dd99b61fb3e54fa0a8d4776188982a02b7f4984cfc6"
+    },
+    {
+      "path": "v3-ui.mjs",
+      "byteEqual": true,
+      "bytes": 49640,
+      "sha256": "d3b6290cd9e43acce0f793c89e5ff74a18ad27b7880af3a74361776b80c7cdcb"
+    },
+    {
+      "path": "xlsx-export.mjs",
+      "byteEqual": true,
+      "bytes": 4440,
+      "sha256": "1f49e0ce32ee64455df96093d4f399c8d7e12a67b3775233055e2de53993ced7"
+    }
+  ],
+  "allByteEqual": true,
+  "pagesRun": 41223197330,
+  "pagesConclusion": "success"
+}
