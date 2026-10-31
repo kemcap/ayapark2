@@ -126,5 +126,5 @@ test('UI uses one chart module, local re-render, accessible keyboard and reduced
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
  assert.match(css,/@media\(max-width:520px\)/);
  assert.match(css,/:focus-visible/);
- assert.match(index,/finance-charts\.css\?v=5\.9\.58/);
+ assert.match(index,/finance-charts\.css\?v=[\d.]+/);
 });

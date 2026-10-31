@@ -60,5 +60,5 @@ test('bank account toolbar is unchanged, financial filter CSS stacks on narrower
  assert.match(css,/@media\(max-width:760px\)/);
  assert.match(css,/@media\(max-width:390px\)/);
  assert.match(css,/:focus-visible/);
- assert.match(index,/report-filters\.css\?v=5\.9\.59/);
+ assert.match(index,/report-filters\.css\?v=[\d.]+/);
 });

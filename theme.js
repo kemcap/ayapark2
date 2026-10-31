@@ -10,10 +10,10 @@
   root.dataset.theme=theme;root.dataset.themePreference=preference;
   const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=getComputedStyle(root).getPropertyValue('--header-bg').trim()||(theme==='dark'?'#252c30':'#eeece7');
   const menu=document.getElementById('themeMenu');if(!menu)return;
-  const de=root.lang==='de',names=de?['Automatisch','Hell','Dunkel']:['Otomatik','Açık','Koyu'];
-  const label=(de?'Darstellung: ':'Görünüm: ')+names[modes.indexOf(preference)],toggle=document.getElementById('themeToggle');
+  const de=root.lang==='de',en=root.lang==='en',names=de?['Automatisch','Hell','Dunkel']:en?['System','Light','Dark']:['Otomatik','Açık','Koyu'];
+  const label=(de?'Darstellung: ':en?'Appearance: ':'Görünüm: ')+names[modes.indexOf(preference)],toggle=document.getElementById('themeToggle');
   toggle.innerHTML=icon(preference);toggle.setAttribute('aria-label',label);toggle.title=label;
-  menu.querySelector('.theme-options').setAttribute('aria-label',de?'Darstellung wählen':'Görünüm seçin');
+  menu.querySelector('.theme-options').setAttribute('aria-label',de?'Darstellung wählen':en?'Choose appearance':'Görünüm seçin');
   for(const [i,mode] of modes.entries()){
    const button=menu.querySelector('[data-theme-choice="'+mode+'"]');button.title=names[i];button.setAttribute('aria-label',names[i]);button.setAttribute('aria-pressed',String(mode===preference));button.querySelector('.sr-only').textContent=names[i];
   }

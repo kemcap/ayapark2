@@ -74,6 +74,14 @@
  overflow-wrap:anywhere;
 }
 @media(max-width:760px){
+ .report-filter-surface .date-toolbar>label>select,
+ .report-filter-surface .date-toolbar>label>input,
+ :root[data-design="modern"] .report-filter-surface .date-toolbar>label>select,
+ :root[data-design="modern"] .report-filter-surface .date-toolbar>label>input{
+  font-size:max(16px,1rem);
+  min-height:44px;
+  height:auto;
+ }
  .report-filter-surface .toolbar.date-toolbar,
  :root[data-design="modern"] .report-filter-surface .toolbar.date-toolbar{
   display:grid;
