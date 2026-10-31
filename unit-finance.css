@@ -1,0 +1,56 @@
+
+/* Shared apartment finance view: management/resident parity. */
+.uf-finance{display:grid;gap:22px;min-width:0;color:var(--ink)}
+.uf-balance{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:16px;background:var(--soft);padding:18px 20px}
+.uf-balance>span{font-size:12px;font-weight:650;color:var(--muted)}
+.uf-balance>strong{font-size:clamp(23px,3vw,32px);letter-spacing:-.035em;font-variant-numeric:tabular-nums;line-height:1.25;overflow-wrap:anywhere}
+.uf-balance>small{font-size:11px;line-height:1.6;color:var(--muted)}
+.uf-section{min-width:0;display:grid;gap:12px}
+.uf-section>h3{margin:0;font-size:17px}
+.uf-help{font-size:12px;line-height:1.6;color:var(--muted);margin:0 0 3px}
+.uf-person{border:1px solid var(--line);border-radius:13px;background:var(--paper);min-width:0;overflow:hidden}
+.uf-person>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:17px 15px;min-height:62px}
+.uf-person>summary::-webkit-details-marker{display:none}
+.uf-person-title{min-width:0;display:grid;gap:3px;overflow-wrap:anywhere}
+.uf-person-title>strong{font-size:14px}
+.uf-person-title>small{color:var(--muted);font-size:11px}
+.uf-person-balance{display:flex;gap:12px;align-items:center;flex-shrink:0;font-variant-numeric:tabular-nums}
+.uf-person-balance>strong{font-size:15px;white-space:nowrap}
+.uf-person-balance>span{color:var(--muted);font-size:17px;transition:transform .18s ease}
+.uf-person[open] .uf-person-balance>span{transform:rotate(180deg)}
+.uf-charge-list{border-top:1px solid var(--line)}
+.uf-charge{padding:13px 15px;display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.uf-charge+.uf-charge{border-top:1px solid var(--line)}
+.uf-charge-main{min-width:0;display:grid;gap:3px}
+.uf-charge-main>strong{font-size:13px;overflow-wrap:anywhere}
+.uf-charge-main>small{font-size:11px;color:var(--muted);line-height:1.6;overflow-wrap:anywhere}
+.uf-charge-side{flex-shrink:0;display:grid;justify-items:end;gap:4px;text-align:right;font-variant-numeric:tabular-nums;max-width:55%}
+.uf-charge-side>strong{font-size:13px}
+.uf-charge-side>small{font-size:10px;color:var(--muted)}
+.uf-actions{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
+.uf-actions .button{font-size:11px;min-height:32px;padding:5px 8px}
+.uf-payment{border:1px solid var(--line);border-radius:13px;padding:15px;background:var(--paper);min-width:0;display:grid;gap:10px}
+.uf-payment-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.uf-payment-top>span{display:grid;gap:5px;min-width:0;overflow-wrap:anywhere}
+.uf-payment-top strong{font-size:13px}
+.uf-payment-top small,.uf-payment>small{font-size:11px;color:var(--muted);line-height:1.6}
+.uf-payment-amount{color:var(--primary);font-variant-numeric:tabular-nums;white-space:nowrap}
+.uf-matches{margin:0;list-style:none;padding:9px 0 0;border-top:1px solid var(--line);display:grid;gap:9px}
+.uf-matches li{display:flex;gap:12px;justify-content:space-between;font-size:12px;line-height:1.45;align-items:flex-start}
+.uf-matches li>span{min-width:0;overflow-wrap:anywhere}
+.uf-matches li strong{flex-shrink:0;white-space:nowrap;font-variant-numeric:tabular-nums}
+.uf-bank-reference{font-size:11px;color:var(--muted)}
+.uf-bank-reference summary{cursor:pointer;padding:8px 0;min-height:32px}
+.uf-bank-reference p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;margin:3px 0}
+.uf-empty{font-size:13px;color:var(--muted)}
+.unit-person-contacts{border:1px solid var(--line);border-radius:13px;padding:12px;min-width:0;margin-top:12px}
+.unit-person-contacts>summary{font-weight:650;cursor:pointer;min-height:36px;align-content:center}
+.unit-person-contacts[open]>summary{margin-bottom:10px}
+@media(max-width:600px){.uf-finance{gap:19px}.uf-balance{padding:16px}.uf-person>summary{padding:14px 12px}.uf-charge{padding:12px}.uf-payment{padding:12px}.uf-person-balance{gap:7px}.uf-person-balance>strong{font-size:13px}.uf-payment-top{flex-wrap:wrap}.uf-payment-amount{font-size:15px}.uf-charge-side{max-width:47%}}
+@media(prefers-reduced-motion:reduce){.uf-person-balance>span{transition:none}}
+
+.uf-credit{padding:13px 18px;border:1px solid var(--line);border-radius:13px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 14px;background:var(--paper)}
+.uf-credit>span{font-size:12px;color:var(--muted);line-height:1.5}
+.uf-credit>strong{font-size:17px;font-variant-numeric:tabular-nums}
+.uf-credit>small{grid-column:1/-1;font-size:11px;color:var(--muted)}
+@media(max-width:480px){.uf-credit{grid-template-columns:1fr}.uf-credit>strong{justify-self:start}}
