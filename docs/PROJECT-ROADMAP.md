@@ -1,4 +1,10 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Hinweise veröffentlicht; private Prüfpause lokal abgenommen – 31.10.2026
+
+Forderungshinweise #81 nach CI41179128934 gemergt: main86d95d9549b1ba19ec10115c56c94e322824a41e; Pages41179300237 erfolgreich. Acht Regel-/26 native Renderer-/334 allgemeine Tests. Read-time-Stufen7/21 für eigene Schuldner und35 ausschließlich intern, keine Nachrichten/Rechtsverfolgung. Alt-Einstiege #80 über Pages41179037572 veröffentlicht; vier Live-Dateien bytegleich geprüft. Keine alte Loginoberfläche mehr über diese vier aktuellen Adressen; historische Git-Versionen bleiben erhalten.
+
+Weiterer beschlossener Funktionsrest jetzt im separaten Branch feature/private-claim-review-holds-20261031 vorbereitet: Superadmin-Prüfpause mit privater Begründung, Revision/Audit; keine Änderung an Forderungs-/Bankoriginalen. Aktive/unklare Prüfpause unterdrückt automatische Hinweise. 27 SQL-/38 native Dialog-/34 Startseitenprüfungen DE/TR375/1440px,337 allgemeine Tests bestanden. Details CLAIM-HOLD-AUDIT.md. Backend-/Frontendrollout noch separat offen; keine echte Prüfung angelegt. Reale Auth-/Mail-/Geräte-/Storageabnahme bleibt offen. Backup weiterhin übersprungen.
+
 ## Forderungshinweise ergänzt; Altpfade übernommen – 31.10.2026
 
 PR #80 nach CI 41178847767 gemergt: main5996c4dd5d5def610ce1364d72d07a68841b7882. Alle vier alten Einstiege leiten jetzt zur aktuellen Anwendung; 18 native JS-/Fallback-Prüfungen bestanden. Tatsächliche Pages-Auslieferung noch separat bestätigen. Aufgaben #79 live anhand sechs Dateien bytegleich verifiziert; deren frühere Hinweise „Rollout offen“ sind überholt.
@@ -263,7 +269,7 @@ Stand: 29.10.2026 · Projekt: `kemcap/ayapark2` · Produktivbranch: `main`
 - [x] Supabase-Produktivprojekt read-only geprüft: PostgreSQL 17.11, 2 Blöcke/20 Wohnungen, 39 Public-Tabellen (RLS aktiviert).
 - [x] Vorhandene Finanz-/Anmelde-Module und vorhandenen CI-Workflow im Code identifiziert.
 - [x] Zum Prüfzeitpunkt: keine Storage-Buckets/Storage-Dateien; kein täglicher Backup-Workflow in `main`.
-- [ ] Aktuelles Live-Deployment, Weiterleitung von `/old/` und möglicherweise öffentlich erreichbare historische Dateien gezielt überprüfen.
+- [x] Aktuelle Live-Deployments und alle vier alten Einstiegspfade geprüft; verbleibende Altoberflächen durch Weiterleitungen ersetzt #80, Pages/live bestätigt. Historische Git-Versionen bleiben erhalten.
 - [ ] Supabase-Advisor-Hinweise zu `SECURITY DEFINER`, Auth-Passwortschutz und drei RLS-Tabellen ohne Policy fachlich prüfen; nicht pauschal Zugriffsrechte erweitern.
 - [ ] Verbindliche Backupprozedur inklusive Restore-Ziel, maximal tolerierbarem Datenverlust, Betreiberkontakten und Prüfkriterien festhalten.
 
