@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fullDemo} from '../ledger.mjs?v=5.8.1';
-import {unitDetailV3} from '../v3-ui.mjs?v=5.9.48';
+import {unitDetailV3} from '../v3-ui.mjs?v=5.9.50';
 import {setLanguage} from '../i18n.mjs?v=5.9.28';
 import {money} from '../core.mjs?v=5.8.1';
 
@@ -23,11 +23,13 @@ function state(role='super') {
  return {data:d,mode:'demo',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',preset:'all'}};
 }
 
-test('one apartment dashboard groups by actual debtors and uses its own allocated payment share',()=>{
+test('one apartment dashboard consolidates inherited balances and keeps a separate payments history',()=>{
  setLanguage('de');
  try {
   const html=unitDetailV3(state('super'),'A-4');
-  assert.match(html,/Wer schuldet welchen Betrag/);
+  assert.match(html,/Altbestand – vorherige Verwaltung/);
+  assert.match(html,/Bereits verrechnet/);
+  assert.match(html,/Originalforderungen und Zuordnung anzeigen/);
   assert.match(html,/Ada Tenant/);
   assert.match(html,/Ali Owner/);
   assert.match(html,/Altbestand/);
@@ -38,7 +40,8 @@ test('one apartment dashboard groups by actual debtors and uses its own allocate
   assert(html.includes(money(940000))); // 13,000 original less 3,600 shared payment
   assert(html.includes(money(360000)));
   assert.equal((html.match(/class="uf-payment"/g)||[]).length,1);
-  assert.equal((html.match(/class="uf-person"/g)||[]).length,2);
+  assert.equal((html.match(/class="uf-legacy"/g)||[]).length,1);
+  assert.match(html,/Neue Forderungen – aktuelle Verwaltung/);
   assert(!html.includes('class="person-open-amount"')); // person cards no repeated balances
  } finally {setLanguage('tr');}
 });
@@ -78,7 +81,7 @@ test('advance credits remain visible and are not subtracted again from claim bal
  setLanguage('de');
  try {
   const html=unitDetailV3(s,'A-4');
-  assert.match(html,/Noch nicht mit Forderungen verrechnetes Guthaben/);
+  assert.match(html,/Nicht verrechnetes Guthaben/);
   assert.match(html,/Guthaben/);
   assert(html.includes(money(940000))); // prior debt unchanged: credit is unallocated
   assert(html.includes(money(360000)));
