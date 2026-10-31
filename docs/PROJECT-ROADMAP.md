@@ -1,5 +1,14 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
 
+## Freigegebene Ausgabenkategorien korrigiert – 31.10.2026
+
+Nach ausdrücklicher konkreter Nutzerfreigabe wurden die 49 zuvor einzeln mit dem Originalkontoauszug abgeglichenen Vidanjör-Ausgaben aus „Diğer“ nach „Vidanjör“ umkategorisiert. Ausschließlich diese festgelegten Datensätze und ausschließlich die Kategorie wurden geändert. Ausführung in einer atomaren Transaktion mit Mengen-/Summen-/Originalfeldprüfung und bestehendem Abschluss-Sperrtrigger; keine gesperrten Zeiträume betroffen.
+
+Der vorherige Kategoriezuordnungstand und die Freigabe sind je Buchung im geschützten Anwendungs-Audit dokumentiert. Ausführungskontext ausdrücklich Management-Connector, Genehmiger bestehender Superadmin; keine simulierte Benutzersitzung oder Authänderung. Gesamtfingerprints bestätigen unveränderte Beträge, Daten, Originalbeschreibungen, sämtliche sonstigen Buchungsfelder, Forderungen, Zahlungszuordnungen und Kategorien aller unbeteiligten Buchungen. Nach Commit Jahres-Kategoriensummen erneut lesend geprüft.
+
+Keine privaten Bankbeschreibungen, Kontaktdaten, Einzelbuchungskennungen oder Finanzexporte ins Repository übernehmen. Keine Code-/Schemaänderung oder neue App-Veröffentlichung für diese Datenkorrektur erforderlich. Weitere auffällige Wasser-/Verwaltungs-/Bankkostenposten bleiben unverändert und benötigen getrennte Prüfung sowie gegebenenfalls konkrete Freigabe. Keine pauschale Umkategorisierung aller „Sonstiges“-Buchungen. Backup weiterhin übersprungen.
+
+
 ## Veröffentlicht und live geprüft – 31.10.2026
 
 Verwaltungs-Leseeinsicht und Bewohnerlayout aus PR #94 sind veröffentlicht: main `1b656615798e1fda0903aa9b2ce3986da85ce230`. Vollständige GitHub-CI `41210069004` erfolgreich, einschließlich der 27 neuen SQL-Leserechteprüfungen. Pages `41210205720` erfolgreich. Elf ausgelieferte Dateien (Index, API, App, Formulare, Einstellungen, V3-UI, Forderungsübersicht/-CSS, Kategorien-CSS, UI, V3-Formulare) mit dem geprüften Stand bytegleich bestätigt. Cachegraph einheitlich aktualisiert; die parallel ergänzten Dienstleister-Kategorien/Notizfunktionen erhalten.
