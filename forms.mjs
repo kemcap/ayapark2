@@ -1,6 +1,6 @@
 import {taskOptions} from './task-permissions.mjs?v=5.9.28';
 import {buildFinanceForm,financePayload} from './finance-forms.mjs?v=5.9.39';
-import {buildV3Form,payloadV3} from './v3-forms.mjs?v=5.9.54';
+import {buildV3Form,payloadV3} from './v3-forms.mjs?v=5.9.56';
 import {t as tr,getLanguage} from './i18n.mjs?v=5.9.28';
 
 import {escapeHtml as e,money,randomId} from './core.mjs?v=5.8.1';
