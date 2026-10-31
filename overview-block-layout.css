@@ -4,6 +4,8 @@
 .main-grid.overview-main-grid,
 :root[data-design="modern"] .main-grid.overview-main-grid{
  grid-template-columns:minmax(0,1fr);
+ /* Use the actual available dashboard width, including sidebar and browser zoom. */
+ container: apartment-overview / inline-size;
 }
 .overview-main-grid .building-plan,
 :root[data-design="modern"] .overview-main-grid .building-plan{
@@ -71,7 +73,17 @@
   grid-template-columns:minmax(0,1fr);
  }
 }
-/* Two blocks may stack; each still adapts its apartment cards to its own width. */
+/* Keep four cards PER block at laptop widths.
+   A 1000–1070px viewport has too little room for two narrow blocks side-by-side.
+   Stack the blocks instead; each block regains enough width for four readable cards.
+   This is container-based so sidebars, zoom and custom desktop widths also work. */
+@container apartment-overview (max-width:1240px){
+ .overview-main-grid .building-plan,
+ :root[data-design="modern"] .overview-main-grid .building-plan{
+  grid-template-columns:minmax(0,1fr);
+ }
+}
+/* Mobile navigation: continue stacking both blocks below desktop widths. */
 @media(max-width:1000px){
  .overview-main-grid .building-plan,
  :root[data-design="modern"] .overview-main-grid .building-plan{
