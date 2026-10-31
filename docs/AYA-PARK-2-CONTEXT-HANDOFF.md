@@ -1,4 +1,10 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+## Aufgaben veröffentlicht; Alt-Einstiege geprüft – 31.10.2026
+
+PR #79 gemergt: main b8af467a5e55c5ac132517a7f0d153e905aabe01, CI 41178664364 erfolgreich, Pages 41178752049 erfolgreich. Backendmigration 20261031065623 aktiv und 0 echte Aufgaben bestätigt, RLS/Client-/Anonymgrenzen geprüft. 35 SQL-/52 native DE/TR-Browserprüfungen und 326 allgemeine Tests bestanden. Interne Terminhinweise beim Laden, keine automatische Folgeanlage/Bestellung/Zahlung/Nachricht. Details PHASE-6-TASKS-AUDIT.md. Reale Gesamtabnahme bleibt separat offen.
+
+Nächsten P0-Restpunkt gefunden: /old/ leitete weiter, drei tiefere alte Login-/API-Oberflächen waren weiterhin vorhanden. Im separaten Branch fix/retired-legacy-entrypoints-20261031 durch bestehende Weiterleitungslogik ersetzt. 18 native Prüfungen mit/ohne JavaScript, Callback-/Fallback-Erhalt, keine alten Formulare/externen Requests. Noch nicht veröffentlicht; Details LEGACY-ENTRYPOINT-AUDIT.md. Danach dokumentierte Forderungshinweise7/21/interne Prüfung35 gegen Implementierung abgleichen. Backup weiterhin übersprungen.
+
 ## Archiv veröffentlicht, Aufgaben lokal geprüft – 31.10.2026
 
 PR #78 gemergt: main 8fe18db9be53506b2215330abc9d9cf43d0d4ec5, CI 41178154418 erfolgreich, Pages 41178235871 erfolgreich. Neun Dateien (App/API/Index/Archivmodule/CSS/Recoverygraph) live bytegleich geprüft. Backendmigration 20261031064800 aktiv: privater 10-MiB-Bucket, 0 echte Dokument-/Versammlungs-/Objektzeilen, RLS und restriktive Storagegrenzen bestätigt. API-Aufrufliste für bereits veröffentlichte Abschlüsse/Freigaben/Umlagen/Budget gezielt repariert; 325 allgemeine Tests einschließlich echter Clientintegration erfolgreich. 50 Archiv-SQL- und 70 Archiv-Browserprüfungen. Echte Storage-Übertragung und reale Auth-/Geräteabnahme bleiben ausdrücklich offen; vorbereitete Originaldateiablage ist technisch veröffentlicht, nicht als vollständige reale Abnahme markieren.
