@@ -1,6 +1,6 @@
 import {t as tr} from './i18n.mjs?v=5.9.28';
 import {money} from './core.mjs?v=5.8.1';
-import {can} from './ui.mjs?v=5.9.43';
+import {can} from './ui.mjs?v=5.9.44';
 import {remaining,unassigned} from './ledger.mjs?v=5.9.39';
 import {scopedCharges,personLinks,personName,suggestUnits,creditAvailable,isReversed} from './v3-domain.mjs?v=5.9.26';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';

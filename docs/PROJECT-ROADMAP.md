@@ -1,4 +1,10 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Forderungshinweise ergänzt; Altpfade übernommen – 31.10.2026
+
+PR #80 nach CI 41178847767 gemergt: main5996c4dd5d5def610ce1364d72d07a68841b7882. Alle vier alten Einstiege leiten jetzt zur aktuellen Anwendung; 18 native JS-/Fallback-Prüfungen bestanden. Tatsächliche Pages-Auslieferung noch separat bestätigen. Aufgaben #79 live anhand sechs Dateien bytegleich verifiziert; deren frühere Hinweise „Rollout offen“ sind überholt.
+
+Nächster dokumentierter Funktionsrest im separaten Branch feature/friendly-claim-reminders-20261031 lokal geprüft: freundliche eigene Forderungshinweise ab7/21 Tagen und finanzberechtigte interne Prüfung ab35 Tagen. Bestehenden Startseitenbereich wiederverwendet, keine externen Nachrichten/automatische Rechtsverfolgung. Acht reine Regeln- und26 native DE/TR-Browserprüfungen, allgemeine Suite334 bestanden. Fremd-/Altschulden derselben Wohnung werden nicht als persönliche Erinnerung ausgegeben. Details CLAIM-REMINDER-AUDIT.md. Noch nicht veröffentlicht. Prüfpause-Oberfläche und verbleibende reale Gesamtabnahme separat abgleichen; Backup bleibt übersprungen.
+
 ## Aufgaben veröffentlicht; Alt-Einstiege geprüft – 31.10.2026
 
 PR #79 gemergt: main b8af467a5e55c5ac132517a7f0d153e905aabe01, CI 41178664364 erfolgreich, Pages 41178752049 erfolgreich. Backendmigration 20261031065623 aktiv und 0 echte Aufgaben bestätigt, RLS/Client-/Anonymgrenzen geprüft. 35 SQL-/52 native DE/TR-Browserprüfungen und 326 allgemeine Tests bestanden. Interne Terminhinweise beim Laden, keine automatische Folgeanlage/Bestellung/Zahlung/Nachricht. Details PHASE-6-TASKS-AUDIT.md. Reale Gesamtabnahme bleibt separat offen.
