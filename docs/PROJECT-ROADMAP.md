@@ -1,4 +1,10 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Archiv veröffentlicht, Aufgaben lokal geprüft – 31.10.2026
+
+PR #78 gemergt: main 8fe18db9be53506b2215330abc9d9cf43d0d4ec5, CI 41178154418 erfolgreich, Pages 41178235871 erfolgreich. Neun Dateien (App/API/Index/Archivmodule/CSS/Recoverygraph) live bytegleich geprüft. Backendmigration 20261031064800 aktiv: privater 10-MiB-Bucket, 0 echte Dokument-/Versammlungs-/Objektzeilen, RLS und restriktive Storagegrenzen bestätigt. API-Aufrufliste für bereits veröffentlichte Abschlüsse/Freigaben/Umlagen/Budget gezielt repariert; 325 allgemeine Tests einschließlich echter Clientintegration erfolgreich. 50 Archiv-SQL- und 70 Archiv-Browserprüfungen. Echte Storage-Übertragung und reale Auth-/Geräteabnahme bleiben ausdrücklich offen; vorbereitete Originaldateiablage ist technisch veröffentlicht, nicht als vollständige reale Abnahme markieren.
+
+Danach Aufgabenliste implementiert und lokal geprüft: vorhandene Verwaltungsmitglieder/Dienstleister/Dateirechte, Termin/Priorität/Status, interne Fälligkeit beim Laden, bewusste manuelle Wiederholung nur nach erledigter Vorlage. 35 SQL-/52 native DE/TR-Browserprüfungen (375/1440px), Details PHASE-6-TASKS-AUDIT.md. Keine automatische Folgeaufgabe, Nachricht, Bestellung oder Zahlung. Aufgabenrollout noch separat offen. Backup bleibt übersprungen.
+
 
 ## Privates Archiv lokal abgenommen – 31.10.2026
 
@@ -324,8 +330,8 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 
 ## Phase 6 – Einfache Verwaltungswerkzeuge (P2)
 
-- [ ] Einfaches Dokumentenarchiv mit privaten Supabase-Storage-Buckets, Kategorien, Namenssuche, Download, Audits und RLS; kein OCR.
-- [ ] Einfaches Sitzungs-/Beschlussarchiv für unterschriebene Dokumente und Karar Defteri.
+- [x] Privates Dokumentenarchiv technisch veröffentlicht #78; Kategorien/Namenssuche/authentifizierter Originaldownload/Audits/RLS geprüft. Echte Storage-/Auth-Sitzungsabnahme separat offen, kein OCR.
+- [x] Einfaches Sitzungs-/Beschlussarchiv technisch veröffentlicht #78; getrennte Originaldateirechte und externe Karar-Defteri-Prüfung. Keine automatische Rechtsgültigkeitsprüfung.
 - [ ] Aufgabenliste mit Verantwortlichkeit, Termin und Status.
 - [ ] Manuelle Wiederholungsanlage und automatische Terminerinnerung; keine automatische neue Aufgabe.
 

@@ -28,7 +28,8 @@
     "test:releases:sql": "node tests/sql/report-releases.mjs",
     "test:levy:sql": "node tests/sql/levy-review.mjs",
     "test:budget:sql": "node tests/sql/budget-planning.mjs",
-    "test:archive:sql": "node tests/sql/private-archive.mjs"
+    "test:archive:sql": "node tests/sql/private-archive.mjs",
+    "test:management:sql": "node tests/sql/management-tasks.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.11",

@@ -95,6 +95,7 @@ jobs:
           npm run test:levy:sql
           npm run test:budget:sql
           npm run test:archive:sql
+          npm run test:management:sql
       - name: Safe Edge Function smoke checks (no resident data)
         run: node tests/invite-edge-smoke.mjs
       - name: Safe site receivables smoke checks (no resident data)

@@ -1,4 +1,5 @@
-import {privateArchive} from './archive-ui.mjs?v=5.9.42';
+import {managementTasks} from './management-tasks-ui.mjs?v=5.9.43';
+import {privateArchive} from './archive-ui.mjs?v=5.9.43';
 import {budgetPlanning} from './budget-planning-ui.mjs?v=5.9.41';
 import {levyReviews} from './levy-review-ui.mjs?v=5.9.39';
 import {reportReleases} from './report-release-ui.mjs?v=5.9.40';
@@ -19,24 +20,24 @@ import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,not
 import {bindDesign} from './design.mjs?v=5.8.1';
 import {enhanceTables} from './ui-accessibility.mjs?v=5.8.1';
 import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.9.0';
-import {apartmentInfo} from './apartment-info.mjs?v=5.9.39';
+import {apartmentInfo} from './apartment-info.mjs?v=5.9.43';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.8.1';
 import {updateAssignmentForm} from './assignments.mjs?v=5.9.4';
-import {personManager} from './people-ui.mjs?v=5.9.39';
+import {personManager} from './people-ui.mjs?v=5.9.43';
 import {bindInvitations} from './invite-ui.mjs?v=5.9.28';
-import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.39';
+import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.9.43';
 import {bindInstall} from './install.mjs?v=5.9.39';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.8.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.39';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.9.43';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.9.26';
 import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.9.39';
-import {AyaparkApi} from './api.mjs?v=5.9.42';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.39';
-import {buildForm,payloadFor} from './forms.mjs?v=5.9.39';
+import {AyaparkApi} from './api.mjs?v=5.9.43';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.43';
+import {buildForm,payloadFor} from './forms.mjs?v=5.9.43';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -111,6 +112,7 @@ function render(focus=false){
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/buildings.svg" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>${invitationUi.landing()}`:renderPage(state);
  if(state.mode!=='signedout'&&state.page==='reports'&&!can(state,'finance')&&state.data.communityAccess!==true)$('content').innerHTML='<section class="card"><h1>'+(getLanguage()==='de'?'Finanzübersicht nicht freigegeben':'Mali özet erişime açık değil')+'</h1><p>'+(getLanguage()==='de'?'Für diesen Zugang sind keine gemeinsamen Finanzübersichten freigegeben. Eigene Forderungen und Zahlungen bleiben im persönlichen Bereich verfügbar.':'Bu erişim için ortak mali özetler açık değil. Kendi borç ve ödemeleriniz kişisel alanda kullanılabilir.')+'</p></section>';
  if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview')$('content').insertAdjacentHTML('afterbegin','<div class="archive-toolbar"><button class="button" type="button" data-action="private_archive">'+(getLanguage()==='de'?'Dokumente & Versammlungen':'Belgeler ve toplantılar')+'</button></div>');
+ if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview'&&['super','staff'].includes(d.role)){const tasks=d.taskWorkspace,c=tasks?.counts;document.querySelector('.archive-toolbar')?.insertAdjacentHTML('beforeend','<button class="button" type="button" data-action="management_tasks">'+(getLanguage()==='de'?'Aufgaben & Termine':'Görevler ve tarihler')+'</button><span role="status">'+(c?(getLanguage()==='de'?'Überfällig: '+c.overdue+' · Heute: '+c.today+' · Nächste 7 Tage: '+c.soon:'Gecikmiş: '+c.overdue+' · Bugün: '+c.today+' · Gelecek 7 gün: '+c.soon):(getLanguage()==='de'?'Aufgabenstand nicht verfügbar – Liste öffnen.':'Görev durumu yok – listeyi açın.'))+'</span>');}
  if(appearanceWasOpen&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;
  addExportControls();const previewBar=$('accessPreviewBanner');previewBar.innerHTML=previewBanner(state);previewBar.hidden=!isAccessPreview();labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
  document.dispatchEvent(new CustomEvent('ay5:view',{detail:{resident:own,page:state.page,mode:state.mode}}));
@@ -126,7 +128,8 @@ const releaseUI=reportReleases({rpc:(name,args)=>api.rpc(name,args),admin:()=>st
 const levyUI=levyReviews({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),connected:()=>state.mode==='connected'&&!isAccessPreview(),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload});
 const budgetUI=budgetPlanning({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'finance'),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload,onRender:applyAmountPrivacy});
 const archiveUI=privateArchive({rpc:(name,args)=>api.rpc(name,args),storage:(path,args)=>api.storageDocument(path,args),allowed:()=>state.mode==='connected'&&!isAccessPreview(),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,siteName:()=>state.data.site.name||'AyaPark 2',language:getLanguage});
-function closeDialogs(){archiveUI.close();closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
+const tasksUI=managementTasks({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&['super','staff'].includes(state.data.role),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,onSaved:reload,onDocument:id=>void archiveUI.open({documentId:id})});
+function closeDialogs(){tasksUI.close();archiveUI.close();closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
@@ -384,6 +387,7 @@ document.addEventListener('click',async event=>{
   if(action==='review_import'){$('importDialog').close();navigate('transactions');state.filter.type='unmatched';render();return;}
   if(action==='print')return window.print();
   if((action==='budget_plan'||action==='budget')&&state.mode==='connected'&&!isAccessPreview())return await budgetUI.open();
+  if(action==='management_tasks')return await tasksUI.open();
   if(action==='private_archive')return await archiveUI.open();
   if(action==='levy_manage')return await levyUI.openAdmin();
   if(action==='levy_owner')return await levyUI.openOwner();
