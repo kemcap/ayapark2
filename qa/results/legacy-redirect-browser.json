@@ -1,0 +1,8 @@
+{
+  "passed": 18,
+  "failed": 0,
+  "browser": "153.0.8010.0",
+  "errors": [],
+  "external": [],
+  "scope": "four retired routes, JS/no-JS, callback preservation, no old forms or remote API"
+}
