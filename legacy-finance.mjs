@@ -21,17 +21,16 @@ export function legacyFinance(d,unitId,claims){
  const categories=Object.entries(snapshot?.categories||{}).map(([name,cents])=>({name,cents:numeric(cents)}));
  const sourceVerified=!!snapshot&&numeric(snapshot.total_cents)===gross&&categories.reduce((n,c)=>n+c.cents,0)===gross;
  // No silent reconciliation: when exact source/category sum differs, present entered charges instead.
- const fallback=old.filter(c=>!String(c.reference||'').startsWith('purpose-split-20261015-')).map(c=>({
-   name:String(c.label||c.category||'—').replace(/^.*?(?: · |\/ )/,'')||String(c.category||'—'),cents:numeric(c.cents)
- }));
- if(!sourceVerified){
-   for(const c of old.filter(c=>String(c.reference||'').startsWith('purpose-split-20261015-'))){
-     const link=c.distribution_basis?.source_original_charge_id||c.distribution_basis?.source_original_id;
-     const oldItem=old.find(r=>r.id===link);
-     if(oldItem){const index=fallback.findIndex(x=>x.reference===link);if(index>=0)fallback[index].cents+=numeric(c.cents);else fallback.push({name:oldItem.category,cents:numeric(c.cents),reference:link});}
-     else fallback.push({name:c.category||'—',cents:numeric(c.cents)});
-   }
+ const fallbackGroups=new Map();
+ for(const c of old){
+   const originalId=c.distribution_basis?.source_original_charge_id||c.distribution_basis?.source_original_id||c.id;
+   const base=old.find(x=>x.id===originalId)||c;
+   const key=String(base.id);
+   const name=String(base.label||base.category||'—').replace(/^.*? · /,'')||String(base.category||'—');
+   if(!fallbackGroups.has(key))fallbackGroups.set(key,{name,cents:0});
+   fallbackGroups.get(key).cents+=numeric(c.cents);
  }
+ const fallback=[...fallbackGroups.values()];
  const byPerson=new Map();
  for(const c of old){
   const id=c.person_id||'not-assigned',g=byPerson.get(id)||{personId:id,gross:0,paid:0,open:0,count:0};
