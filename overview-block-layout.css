@@ -1,0 +1,30 @@
+/* Wohnungsübersicht: show both apartment blocks side-by-side on desktop only.
+   Scope to the dashboard card. Leave the full apartment directory and resident cards unchanged. */
+@media (min-width:1001px) {
+  .main-grid.overview-main-grid,
+  :root[data-design="modern"] .main-grid.overview-main-grid {
+    grid-template-columns:minmax(0,1fr);
+  }
+  .overview-main-grid .building-plan,
+  :root[data-design="modern"] .overview-main-grid .building-plan {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    align-items:start;
+    gap:clamp(14px,2vw,24px);
+  }
+  .overview-main-grid .building-block { min-width:0; }
+}
+/* Preserve readable apartment tiles at laptop widths instead of four cramped cards per row. */
+@media (min-width:1001px) and (max-width:1499px) {
+  .overview-main-grid .unit-card-grid,
+  :root[data-design="modern"] .overview-main-grid .unit-card-grid {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+/* Mobile/tablet navigation has no sidebar: stack blocks and retain full-width tap targets. */
+@media (max-width:1000px) {
+  .overview-main-grid .building-plan,
+  :root[data-design="modern"] .overview-main-grid .building-plan {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
