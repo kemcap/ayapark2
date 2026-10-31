@@ -1,4 +1,12 @@
 # AyaPark 2 – Verbindliche Projekt-Roadmap und Fortschrittsliste
+## Aktueller Übergabestand – 31.10.2026
+
+Fortlaufende Nutzerfreigabe für geprüfte Code-Releases gilt. Alle technischen Schritte dieser Fortsetzung #78–#84 veröffentlicht: privates Archiv/Versammlungen und echte API-Anbindung, Aufgaben/Termine/manuelle Wiederholung, alte Einstiegspfade, Forderungshinweise7/21/interne Prüfung35, private Prüfpause, gezielte Clientprivileg-Härtung und Theme-/Großschriftfix. #84 main37d69403bb7fd33eb2bea6ef730547714c1c9101, CI41180568814/Pages41180701638 erfolgreich; ausgelieferte CSS/Indexdatei bytegleich.337 allgemeine Tests ohne Fehler; produktive Finanzoriginale nicht zu Testzwecken verändert. #83-Backendrechte aktiv, keine Client-DDL-Rechte; vier Audittrigger erhalten und RLS/DML-Rechte unverändert.
+
+Letzter semantischer Dialogfix separat geprüft: eindeutige lokalisierte Bildschirmlesernamen,110 native Stil-/Layout-/axe-Prüfungen in24 Dialog-/Theme-/Breitenkombinationen; keine gemeldete Verletzung im untersuchten Dialogbereich. Keine Behauptung vollständiger realer Geräte-/Barrierefreiheitsabnahme. Dieser kleine Controller-Rollout wird separat bestätigt.
+
+**Nächster echter Schritt benötigt eine reguläre vorhandene Benutzersitzung:** privater Storage-Upload und authentifizierter Originaldownload; danach reale Konten-/Mail-/Geräte- und fachliche Bank-/Zuordnungsabnahme. Vollständige genaue Anleitung: FINAL-ACCEPTANCE-OPEN.md. Keine Passwörter/Tokens teilen, keine künstlichen produktiven Authkonten/Buchungen und keine tatsächlichen Finanz-/Authänderungen ohne konkreten Fachauftrag. Backup auf Nutzerwunsch ausdrücklich nicht erneut bearbeiten. Darunterliegende alte „Nächster Schritt“-Abschnitte sind historische Nachweise und setzen diesen aktuellen Stand nicht außer Kraft.
+
 ## Technische Pakete veröffentlicht; echte Abnahme präzisiert – 31.10.2026
 
 Archiv #78, Aufgaben #79, Alt-Einstiege #80, Forderungshinweise #81 und private Prüfpause #82 sind veröffentlicht und anhand ausgelieferter Quellen bestätigt. Prüfpause-Pages41179801684 erfolgreich; sieben Dateien bytegleich. Privileghärtung #83 nach CI41180113451 gemergt: maine87fc07bb6cdb2f63bbb185bf19495d6233b6143. Tatsächliche Migrationen20261031071623/20261031071802 aktiv: keine unnötigen Client-DDL-Rechte, vier Audittrigger erhalten; Lese-/DML-/RLS-Fingerprint unverändert.17 isolierte Prüfungen. Anonym ausführbar bleibt nur die beabsichtigte begrenzte Summen-RPC. Free-Vorgabe/Passwörter unverändert; verbleibende Advisor-Hinweise fachlich dokumentiert.
@@ -333,10 +341,11 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [x] Teilaufgabe Entwicklungsstand: reverse/unallocate/void_charge/void_credit serverseitig und in der UI auf Superadmin begrenzt; 28 isolierte SQL- und 2 UI-Prüfungen bestanden. Produktiv veröffentlicht über #55.
 - [x] Kritische Finanzfreigaben und fünf getrennte Aufgabenrechte technisch umgesetzt und isoliert integriert geprüft; echte Client-Aufrufliste in #78 korrigiert. Reale Konten-/Gerätegesamtabnahme bleibt eigener offener Punkt.
 - [x] Fünf getrennte Aufgabenrechte und Aidat-/Umlagenentwurf mit Superadmin-Endfreigabe umgesetzt und veröffentlicht (#56/#57); bestehende Altzuweisungen werden erst bei ausdrücklichem Speichern umgestellt.
-- [x] 13 bestehende allgemeine Testfehler fachlich aufgelöst und veröffentlicht (#55); allgemeine Suite inzwischen 269/269 erfolgreich.
+- [x] Die13 ursprünglichen allgemeinen Testfehler behoben/veröffentlicht #55; aktuelle allgemeine Suite337 ohne Fehler. Historische Angaben269/269 dokumentieren damalige Zwischenstände.
 - [x] Registrierung/Einladungen, administrative Wiederherstellung, Kontaktfreigaben, Historie und RLS mit synthetischen Identitäten geprüft (84 aktuelle Rechte-/Einladungs-/Recovery-, 23 Kontakt- und 43 Historienprüfungen; kein echter Mail-/Auth-Browser-E2E).
 - [x] Eigentümerwechsel, Mehrfachzuordnungen, Altlasten und Zutrittsentzug isoliert mit unveränderter Finanzhistorie getestet (43 aktuelle Historienprüfungen; kein Geräte-/Mail-E2E).
-- [ ] Barrierefreie mobile Bedienung, DE/TR und eindeutige Freigabetexte prüfen.
+- [x] Technische DE/TR-/Mobil-/Freigabetextprüfungen und gezielte neue Dialogabnahme durchgeführt;110 Stil-/Layout-/axe-Prüfungen, inklusive großer Schrift und Hell/Dunkel.
+- [ ] Vollständige praktische Barrierefreiheits-/Geräteabnahme mit realen Zugängen; gezielte Dialogtests ersetzen keine Gesamtzertifizierung.
 - [ ] Durchgängige Phase-2-Gesamtabnahme vervollständigen. Grundsätzliche Live-Freigabe liegt vor; offene Geräte-/Mail-/Auth-E2E-Prüfungen nicht als bestanden behaupten.
 
 ## Phase 3 – Finanzkern und Bankimporte (P1)
@@ -367,7 +376,9 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 - [x] Aufgabenliste mit Zuständigkeit/Termin/Priorität/Status, Dienstleister-/geschützten Dokumentverweisen veröffentlicht #79.
 - [x] Bewusste manuelle Folgeanlage und interne automatische Fälligkeit beim Laden veröffentlicht #79; keine automatische neue Aufgabe/externen Nachrichten.
 
-## Wiederkehrendes Gate vor jedem produktiven Release
+## Wiederkehrendes Gate vor jedem produktiven Release (Vorlage)
+
+Diese Vorlage ist keine zusätzliche Liste unerledigter Funktionspakete. Konkrete Nachweise stehen bei den jeweiligen PRs/Auditdateien. Backup/Restore wird aufgrund der ausdrücklichen Nutzerentscheidung hier nicht erneut bearbeitet oder ungeprüft als bestätigt markiert.
 
 - [ ] Expliziter Geltungsbereich; schriftlich festhalten, welche bestehende Funktion verändert wird.
 - [ ] Unabhängiges jüngstes Backup und Restore-Weg verifiziert.
@@ -379,7 +390,7 @@ Entwicklungsbranch `feature/free-backup-preparation-20261028`, **Draft PR #52**:
 
 ## Nächster Schritt – Übergabe an nächsten Chat
 
-**Aktuelle nächste Aufgabe: direkten PDF-/XLSX-Lesepfad vor die bestehende Importvorschau integrieren.** Die Quellenprüfung und die exakte CSV-Saldenprüfung sind umgesetzt; direkte Dateiformate bleiben offen. Mehrseiten-, Beschreibungs- und Spaltenadapter zunächst mit synthetischen Daten absichern. Details: `docs/PHASE-3-IMPORT-AUDIT.md`. Backup ausdrücklich übersprungen; nicht erneut einrichten oder auf einen Restore umschwenken. Aktuellen Hauptzweig und neueste Fortschrittsnotiz prüfen; ältere Zwischenstände darunter sind historische Nachweise.
+**Aktuelle nächste Aufgabe: reale vorhandene Benutzersitzung und privaten Storage-Upload/-Download nachweisen.** Genaue verständliche Anleitung und anschließend reale Auth-/Mail-/Geräte- sowie finanzielle Originalabnahme: `docs/FINAL-ACCEPTANCE-OPEN.md`. Direkter PDF-/CSV-/XLSX-Import ist bereits veröffentlicht #65; ältere „als Nächstes“-Texte sind historische Zwischenstände. Keine produktiven Testkonten/-buchungen anlegen und keine Finanz-/Authänderungen aus einer Codefreigabe ableiten. Backup ausdrücklich übersprungen.
 
 **Projektkontext:** `docs/AYA-PARK-2-CONTEXT-HANDOFF.md`
 **Backup-Anleitung:** `docs/FREE-BACKUP-SETUP.md`
