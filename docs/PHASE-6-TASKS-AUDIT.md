@@ -27,3 +27,5 @@ Kein Testauftrag, kein produktives Konto oder Originaldokument angelegt, keine e
 Separater Branch feature/management-tasks-reminders-20261031. Migration erst nach lokalen Tests; tatsächliche Version übernehmen. CI/Pages und ausgelieferte Dateien bestätigen. Frontend-Rückfall auf vorherigen geprüften Stand, Tabellen/Originale/Audits erhalten; keine destruktive Rückmigration. Management-Workspace fällt beim allgemeinen Laden separat aus, ohne Finanz-/Anmeldedaten zu erfinden oder ansonsten lesbare Finanzansichten zu sperren.
 
 Nächster Abgleich: verbleibende übergreifende Sicherheits-/Finanz-/Auth-/Mail-/Geräteabnahme und dokumentierte freundliche Forderungshinweise Tag 7/21/interne Prüfung35 gegen tatsächlichen Code prüfen; keine externen Nachrichten ohne ausdrücklichen Versandauftrag.
+
+Backend aktiv: tatsächliche Migration 20261031065623_management_tasks_internal_due_and_manual_recurrence. Rein lesend verifiziert: 0 Aufgaben, RLS aktiv, kein direkter Client-Insert und kein anonymer Workspace-/Speicheraufruf. Allgemeine Suite 326 bestanden; Archivbrowser nach Erweiterung der Dokumentdelegation erneut 70 bestanden. Frontendauslieferung/CI noch separat offen.

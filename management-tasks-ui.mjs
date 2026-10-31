@@ -7,7 +7,7 @@ export function managementTasks({rpc,allowed,admin,site,language,onSaved=async()
  const label=(pairs,id)=>pairs.find(([key])=>id===key)?.[1]||id;
  const field=(name,title,value='',attrs='')=>'<label class="field">'+e(title)+'<input name="'+name+'" value="'+e(value)+'" '+attrs+'></label>';
  const hidden=(name,value)=>'<input name="'+name+'" type="hidden" value="'+e(value)+'">';
- const select=(name,title,pairs,value)=>'<label class="field">'+e(title)+'<select name="'+name+'">'+pairs.map(([id,title])=>'<option value="'+e(id)+'" '+(id===value?'selected':'')+'>'+e(title)+'</option>').join('')+'</select></label>';
+ const select=(name,title,pairs,value)=>'<label class="field">'+e(title)+'<select name="'+name+'"'+(name==='assignee'?' required':'')+'>'+pairs.map(([id,title])=>'<option value="'+e(id)+'" '+(id===value?'selected':'')+'>'+e(title)+'</option>').join('')+'</select></label>';
  function close(){generation++;busy=false;workspace=null;docs=[];requests.clear();dialog?.close();if(dialog)dialog.textContent='';}
  const scope=mutating=>({generation,site:site(),mutating}),valid=s=>dialog?.open&&s.generation===generation&&s.site===site()&&allowed()&&(!s.mutating||admin());
  async function call(name,args,s){if(!valid(s))throw Error('Task access denied');const r=await rpc(name,{p_site:s.site,...args});if(!valid(s))throw Error('Task session changed');return r;}
