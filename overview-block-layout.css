@@ -23,6 +23,10 @@
 }
 /* Mobile/tablet navigation has no sidebar: stack blocks and retain full-width tap targets. */
 @media (max-width:1000px) {
+  .main-grid.overview-main-grid,
+  :root[data-design="modern"] .main-grid.overview-main-grid {
+    grid-template-columns:minmax(0,1fr);
+  }
   .overview-main-grid .building-plan,
   :root[data-design="modern"] .overview-main-grid .building-plan {
     grid-template-columns:minmax(0,1fr);
