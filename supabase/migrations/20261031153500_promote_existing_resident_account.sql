@@ -57,4 +57,53 @@ end;
 $function$;
 revoke all on function ay2_private.access_target(uuid,uuid,text) from public,anon,authenticated;
 grant execute on function ay2_private.access_target(uuid,uuid,text) to service_role;
+
+-- Promoting an existing resident to staff must not reactivate previously revoked
+-- resident access. Keep apartment access untouched for management-only grants.
+create or replace function public.ay3_provision_access(p_actor uuid,p_person uuid,p_user uuid,p_role text)
+returns jsonb
+language plpgsql security invoker set search_path=''
+as $function$
+declare
+ p public.ay3_persons;
+ target jsonb;
+begin
+ select * into p from public.ay3_persons where id=p_person for update;
+ target:=public.ay3_access_target(p_actor,p_person,p_role);
+ if (target->>'user_id')::uuid is distinct from p_user
+ then raise exception 'Account mismatch';end if;
+
+ if p_role='resident' and exists(
+  select 1 from public.site_staff_memberships
+  where site_id=p.site_id and user_id=p_user
+ ) then raise exception 'Existing management role must be reviewed';end if;
+ if p_role in ('manager','deputy') and exists(
+  select 1 from public.site_staff_memberships
+  where site_id=p.site_id and user_id=p_user and role<>p_role
+ ) then raise exception 'Existing management role must be reviewed';end if;
+
+ update public.ay3_persons set auth_user_id=p_user where id=p.id;
+
+ if p_role='resident' then
+  insert into public.site_resident_units(unit_id,user_id,role,person_id,active)
+  select unit_id,p_user,role,NULL,true from public.ay3_links
+  where person_id=p.id and site_id=p.site_id
+   and role in ('owner','tenant') and active
+  on conflict(unit_id,user_id,role) do update set active=true;
+ end if;
+
+ if p_role in ('manager','deputy') then
+  insert into public.site_staff_memberships(site_id,user_id,role)
+  values(p.site_id,p_user,p_role)
+  on conflict(site_id,user_id) do nothing;
+ end if;
+
+ insert into public.ay2_audit(site_id,actor,action,entity_id,details)
+ values(p.site_id,p_actor,'user_access',p.id,
+   jsonb_build_object('role',p_role,'reused_existing_user',p.auth_user_id=p_user));
+ return jsonb_build_object('ok',true);
+end;
+$function$;
+revoke all on function public.ay3_provision_access(uuid,uuid,uuid,text) from public,anon,authenticated;
+grant execute on function public.ay3_provision_access(uuid,uuid,uuid,text) to service_role;
 commit;
