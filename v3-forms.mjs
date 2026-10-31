@@ -3,9 +3,9 @@ import {effectiveOccupancy} from './relationships.mjs?v=5.8.1';
 import {announcementTime,validateAnnouncement} from './announcement-validation.mjs?v=5.8.1';
 import {t as tr,getLanguage} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,randomId,money} from './core.mjs?v=5.8.1';
-import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.9.45';
+import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=5.9.51';
 import {today,personName,personLinks,activeAt,dateValid} from './v3-domain.mjs?v=5.9.26';
-import {roleLabel} from './v3-ui.mjs?v=5.9.50';
+import {roleLabel} from './v3-ui.mjs?v=5.9.51';
 const loc=(de,trText)=>getLanguage()==='de'?de:trText;
 const sel=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}">${options.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(l)}</option>`).join('')}</select></label>`;
 const text=(name,label,value='')=>`<label class="field">${tr(label)}<textarea name="${name}" maxlength="5000" rows="3">${e(value)}</textarea></label>`;
@@ -17,7 +17,9 @@ export function buildV3Form(s,action,args={}){
  const d=s.data;let title='',body='',context={...args,request_id:randomId()};
  if(action==='user_access'){
   title=tr('Kullanıcı erişimi');
-  body=`<fieldset class="person-choice"><legend>${tr('Kişi seçimi')}</legend><label class="check-field"><input type="radio" name="person_mode" value="existing" checked>${tr('Kayıtlı kişi seç')}</label><label class="check-field"><input type="radio" name="person_mode" value="new">${tr('Yeni kişi oluştur')}</label></fieldset><div id="accessExisting">${sel('person_id','Kişi',personOptions(d))}</div><div id="accessNew" hidden>${field('first_name',tr('Ad'),'text','','maxlength="75" disabled')}${field('last_name',tr('Soyad'),'text','','maxlength="75" disabled')}${field('email',tr('E-posta'),'email','','maxlength="254" disabled')}</div>`+sel('access_role','Erişim rolü',[['resident',tr('Site Sakini')],['deputy',tr('Yönetim')],['manager',tr('Süper Admin')]],'deputy')+`<p class="fine">${tr('Yönetim için daire ilişkisi gerekmez. Sakin erişimi için güncel bir daire ilişkisi ve her durumda geçerli e-posta gerekir. Bu işlem e-posta göndermez.')}</p>`+check('confirmation','Erişimi tanımlamayı onaylıyorum.');
+  const selected=d.persons.find(p=>p.id===args.person&&!p.archived_at);
+  const linkedAccount=!!selected?.auth_user_id;
+  body=`<fieldset class="person-choice"><legend>${tr('Kişi seçimi')}</legend><label class="check-field"><input type="radio" name="person_mode" value="existing" checked>${tr('Kayıtlı kişi seç')}</label><label class="check-field"><input type="radio" name="person_mode" value="new">${tr('Yeni kişi oluştur')}</label></fieldset><div id="accessExisting">${sel('person_id','Kişi',personOptions(d),selected?.id||'')}</div><div id="accessNew" hidden>${field('first_name',tr('Ad'),'text','','maxlength="75" disabled')}${field('last_name',tr('Soyad'),'text','','maxlength="75" disabled')}${field('email',tr('E-posta'),'email','','maxlength="254" disabled')}</div>`+sel('access_role','Erişim rolü',[['resident',tr('Site Sakini')],['deputy',tr('Yönetim')],['manager',tr('Süper Admin')]],'deputy')+`<p class="fine">${loc('Vorhandene Personen und Anmeldekonten werden wiederverwendet. Eine verknüpfte Anmeldung benötigt keine zusätzliche E-Mail-Adresse; nur für neue Konten ist eine gültige E-Mail erforderlich. Wohnungszuordnungen bleiben bestehen.','Kayıtlı kişi ve giriş hesabı yeniden kullanılır. Bağlı giriş hesabı için ayrıca e-posta gerekmez; yalnız yeni hesaplarda geçerli e-posta gerekir. Daire ilişkileri korunur.')}</p>`+(linkedAccount?`<p class="fine">${loc('Bestehendes Anmeldekonto erkannt – kein zweites Konto wird erstellt.','Mevcut giriş hesabı bulundu – ikinci hesap oluşturulmayacak.')}</p>`:'')+check('confirmation','Erişimi tanımlamayı onaylıyorum.');
  }
  else if(action==='staff_remove'){
   const member=d.staff.find(x=>x.user_id===args.id);
