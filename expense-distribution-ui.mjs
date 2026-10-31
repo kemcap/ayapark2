@@ -1,6 +1,6 @@
 import {expenseDistributionModel} from './expense-distribution.mjs?v=5.9.57';
 import {escapeHtml as esc,money} from './core.mjs?v=5.8.1';
-import {locale} from './i18n.mjs?v=5.9.28';
+import {locale,t as tr} from './i18n.mjs?v=5.9.28';
 
 export function expenseDistributionPanel(s,reportRange={}){
  const de=locale().startsWith('de'),t=(a,b)=>de?a:b;
@@ -15,9 +15,9 @@ export function expenseDistributionPanel(s,reportRange={}){
   const percentage=model.total>0?value/model.total*100:0;
   const percentLabel=formatPercent.format(percentage)+' %';
   return '<div class="expense-distribution-item">'+
-   '<div class="expense-distribution-item-head"><span class="expense-distribution-item-name">'+esc(category)+'</span>'+
+   '<div class="expense-distribution-item-head"><span class="expense-distribution-item-name">'+esc(tr(category))+'</span>'+
    '<span class="expense-distribution-item-values"><strong>'+money(value)+'</strong><small>'+esc(percentLabel)+'</small></span></div>'+
-   '<progress value="'+value+'" max="'+Math.max(model.total,value,1)+'" aria-label="'+esc(category)+': '+esc(percentLabel)+'"></progress></div>';
+   '<progress value="'+value+'" max="'+Math.max(model.total,value,1)+'" aria-label="'+esc(tr(category))+': '+esc(percentLabel)+'"></progress></div>';
  }).join('');
  const options=yearOptions.map(([value,label])=>'<option value="'+esc(value)+'" '+(model.selected===value?'selected':'')+'>'+esc(label)+'</option>').join('');
  return '<section id="expenseDistributionPanel" class="expense-distribution-panel" aria-label="'+t('Ausgabenverteilung','Gider dağılımı')+'">'+
