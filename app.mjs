@@ -15,6 +15,7 @@ import {mayUseTaskAction} from './task-permissions.mjs?v=5.9.28';
 import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.9.2';
 import {bindAccessRequests} from './access-request-ui.mjs?v=5.9.0';
 import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=5.9.39';
+import {installSmartHeader} from './smart-header.mjs?v=5.9.49';
 import {prepareV5Demo} from './finance-demo.mjs?v=5.9.39';
 import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.9.39';
 import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.9.39';
@@ -619,6 +620,8 @@ function updateConditionalForm(changed=''){
 function labelTables(){enhanceTables(document);}
 
 window.matchMedia('(max-width:1000px)').addEventListener('change',()=>{mobileNavGroup=null;renderNavigation();});
+// Keep the top controls reachable after a short upward scroll without a layout jump.
+installSmartHeader();
 
 // Page hints open on hover; dialog disclosures open only by click or keyboard.
 document.addEventListener('pointerover',event=>{if(event.pointerType!=='mouse'||event.target.closest('dialog'))return;const el=event.target.closest('.info-help');if(el&&!el.open){el.dataset.hoverOpen='1';el.open=true;}});
