@@ -1,5 +1,16 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
 
+## Verwaltungs-Leseeinsicht und Bewohneransicht – 31.10.2026
+
+Auf Nutzerauftrag: unabhängige, standardmäßig aktive und vom Superadmin abwählbare Verwaltungs-Leseeinsicht für alle Wohnungen, zugeordnete Namen, Forderungen und zugehörige Zahlungszuordnungen. Fünf Bearbeitungsaufgaben bleiben getrennt; kein neuer Schreibzugriff. Keine zusätzliche Freigabe privater Kontakte, Notizen oder Bank-Verwendungszwecke. Neue/alte Verwaltungsmitgliedschaften standardmäßig aktiv; ausdrückliche Abwahl bleibt auch bei alten Aufgabenrechte-Aufrufen erhalten. Abwahl hebt separat vergebene Bearbeitungs-/Finanzrechte nicht auf. Bestehende personenbezogene RLS-/Mutationsregeln bleiben erhalten; schmale, serverseitig rollen- und standortgeprüfte Projektion.
+
+Bewohner: bestehende anklickbare Wohnungskarte unter „Wohnungen“ ganz oben und auf der Übersicht direkt nach den offenen Forderungen; keine Personen-/Kontaktsuche oder Block-/Statusfilter dort. Keine doppelte einfache Wohnungsliste und kein redundanter Link „Forderungen und zugeordnete Personen ansehen“. Mobile Forderungsübersicht einspaltig in voller Inhaltsbreite. Bestehende autorisierte Personen-/Zahlungsdetails wiederverwendet; keine Erweiterung des Bewohner-Datenumfangs.
+
+Nachweise: 364 allgemeine Tests, 27 neue isolierte Datenbankprüfungen, 84 bestehende Aufgabenrechteprüfungen, 279 native synthetische Browserprüfungen (DE/TR, Classic/Modern, 320/375 mit großer Schrift/430/768/1440). Browser ohne externe Requests/JS-Fehler; reale CSS-Kaskade und bestehender Karten-Detaildialog. Backendmigration 20261031141453 aktiv. Vor-/Nachher-Fingerprints sämtlicher vorhandenen Personen, Forderungen, Bankbewegungen und Zuordnungen identisch. Keine produktiven Testbuchungen, Konten oder Sessions erzeugt. Frontend-Auslieferung wird separat bestätigt. Details: MANAGEMENT-READ-RESIDENT-LAYOUT.md.
+
+Zusätzliche reale Rückmeldung des Nutzers vor dieser Änderung: separater Bewohnerzugang mit korrekt begrenzten Wohnungen/Zahlungen, ohne Verwaltungstestdatei oder Bearbeitungsaktionen; Abmelden, Neuladen und Wiederanmelden unauffällig. Hochgeladener Bewohner-XLSX-Export geprüft: ausschließlich allgemeine Summen, keine persönlichen Schuldnerdetails. Separater Verwaltungszugang ohne Aufgabenrechte: Verwaltungstestdatei erfolgreich heruntergeladen, keine Verwaltungs-Bearbeitungsaktionen. Dies sind Nutzerbeobachtungen; kein Ersatz für technische Negativtests und noch keine Abnahme der jetzt erweiterten Leseoption. Mail-/physische Geräte-/PWA-/fachliche Finanzabnahme bleiben offen. Backup unverändert übersprungen.
+
+
 ## Reale Storage-Abnahme bestanden – 31.10.2026
 
 Der Nutzer hat die Testübernahme ausdrücklich beauftragt und eine vorhandene reguläre Sitzung bereitgestellt. In der tatsächlichen Superadmin-Ansicht der Live-Anwendung (Cloud Chrome, keine Rollen-Vorschau) wurde die unverfängliche TXT-Prüfdatei erfolgreich hochgeladen und anschließend über „Aslı kontrol et ve indir“ authentifiziert heruntergeladen. Zielgruppe blieb „Yalnız yönetim“ (Nur Verwaltung), Kategorie „Genel“. App bestätigt „Hazır“ und „Asıl kontrol edildi ve tarayıcı indirmesine verildi.“.

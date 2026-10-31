@@ -31,6 +31,7 @@
     "test:archive:sql": "node tests/sql/private-archive.mjs",
     "test:management:sql": "node tests/sql/management-tasks.mjs",
     "test:holds:sql": "node tests/sql/claim-review-holds.mjs",
+    "test:management-read:sql": "node tests/sql/management-read-access.mjs",
     "test:ddl:sql": "node tests/sql/client-ddl-hardening.mjs"
   },
   "devDependencies": {

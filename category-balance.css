@@ -291,3 +291,11 @@
   }
   .category-balance-summary .devir-archive-total{white-space:normal}
 }
+@media(max-width:760px){
+ .category-balance-summary .balance-toggle{flex-wrap:wrap}
+ .category-balance-summary .balance-toggle-action{flex-wrap:wrap;justify-content:flex-start;max-width:100%}
+ .category-balance-summary .balance-total{white-space:normal;overflow-wrap:anywhere;max-width:100%}
+ .category-balance-summary .balance-total strong{white-space:normal;overflow-wrap:anywhere}
+ .category-balance-summary .balance-mobile-item dl div{flex-wrap:wrap}
+ .category-balance-summary .balance-mobile-item dd{max-width:100%;overflow-wrap:anywhere}
+}

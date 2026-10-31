@@ -32,3 +32,24 @@
 .claim-debt-main small {color:var(--muted,#6b7280);line-height:1.45;}
 .claim-debt-actions {display:flex;align-items:flex-end;flex-direction:column;gap:.4rem;white-space:nowrap;font-variant-numeric:tabular-nums;}
 @media(max-width:550px){.claim-debt-row{flex-direction:column;gap:.6rem;}.claim-debt-actions{width:100%;align-items:flex-start;flex-direction:row;justify-content:space-between;white-space:normal;flex-wrap:wrap;}}
+
+/* Resident cards use the full content width, including enlarged mobile text. */
+:root[data-design] .main-grid.resident-main-grid{grid-template-columns:minmax(0,1fr)}
+.resident-apartments{margin:0 0 1.25rem;min-width:0}
+@media(max-width:900px){
+ :root[data-design] .resident-claims-panel>.summary-grid,
+ :root[data-design] .resident-apartments .building-plan,
+ :root[data-design] .resident-apartments .unit-card-grid{display:grid;grid-template-columns:minmax(0,1fr);width:100%;min-width:0}
+ :root[data-design] .resident-claims-panel .claim-metric{width:100%;min-width:0;box-sizing:border-box}
+}
+
+@media(max-width:900px){
+ :root[data-design] .resident-claims-panel.resident-dashboard-claims>.summary-grid{grid-template-columns:minmax(0,1fr)}
+ :root[data-design] .resident-claims-panel.resident-dashboard-claims>.summary-grid .card-head h2{font-size:1rem}
+ :root[data-design] .resident-claims-panel.resident-dashboard-claims>.summary-grid .card-head p{font-size:.9rem}
+}
+.main-grid.resident-main-grid>div{min-width:0}
+@media(max-width:900px){
+ .balance-toggle-action,.balance-toggle-action .balance-total{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+ .resident-main-grid .money-pair>div,.resident-main-grid .money-pair dd{min-width:0;max-width:100%;overflow-wrap:anywhere}
+}
