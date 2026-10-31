@@ -87,7 +87,8 @@ test('A-2 screen shows original source amounts only once, newly assessed debt se
   assert(html.includes(money(360000)));
   assert(html.includes(money(1470300))); // 11,103 legacy + 3,600 current
   assert(!html.includes('Teilweise verrechnet'));
-  assert.equal((html.match(/class="uf-legacy-row"/g)||[]).length,7);
+  assert.match(html,/Su dijital kafa/);
+  assert.equal((html.match(/class="uf-legacy-row"/g)||[]).length,7,html.slice(html.indexOf('class="uf-legacy-rows"'),html.indexOf('class="uf-legacy-assignment"')));
   assert.equal((html.match(/class="uf-payment"/g)||[]).length,2);
   assert.equal((html.match(/class="uf-current-row"/g)||[]).length,1);
  }finally{setLanguage('tr');}
