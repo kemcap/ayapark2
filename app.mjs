@@ -39,7 +39,7 @@ import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.9.39';
 import {AyaparkApi} from './api.mjs?v=5.9.54';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.54';
-import {buildForm,payloadFor} from './forms.mjs?v=5.9.54';
+import {buildForm,payloadFor} from './forms.mjs?v=5.9.56';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -266,7 +266,7 @@ function showForm(action,args={}){
  const built=buildForm(state,action,{period:state.period,...args});
  if($('detailDialog').open)$('detailDialog').close();
  formAction={action,args,context:built.context,origin};$('actionFields').dataset.financeAction=financeActions.includes(action)?action:'';
- $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(action)?'<p class="info-strip">'+(getLanguage()==='de'?'Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.':'Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.')+'</p>':'')+built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=action==='person_lifecycle'?(getLanguage()==='de'?'Aktion bestätigen':'İşlemi onayla'):action==='person_restore'?(getLanguage()==='de'?'Wiederherstellen':'Arşivden çıkar'):tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');if(['batch_charge','monthly_v5'].includes(action))$('saveAction').textContent=getLanguage()==='de'?'Entwurf einreichen':'Taslağı gönder';$('actionDialog').showModal();updateConditionalForm();if(financeActions.includes(action))updateFinanceForm($('actionFields'),state.data);updateAnnouncementTargets();
+ $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(action)?'<p class="info-strip">'+(getLanguage()==='de'?'Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.':'Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.')+'</p>':'')+built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=action==='person_lifecycle'?(getLanguage()==='de'?'Aktion bestätigen':'İşlemi onayla'):action==='person_restore'?(getLanguage()==='de'?'Wiederherstellen':'Arşivden çıkar'):tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');if(['batch_charge','monthly_v5'].includes(action))$('saveAction').textContent=getLanguage()==='de'?'Entwurf einreichen':'Taslağı gönder';$('actionDialog').showModal();updateConditionalForm();if(action==='provider')updateProviderCategorySelection();if(financeActions.includes(action))updateFinanceForm($('actionFields'),state.data);updateAnnouncementTargets();
 }
 function exportOptions(){return {language:getLanguage(),demo:state.mode==='demo'||isAccessPreview(),canFinance:can(state,'finance')};}
 function reportExportModel(){const range=selectedRange(state,'report'),error=rangeError(range);if(error)throw Error(error);return summaryExport(state.data,financialSeries(state.data,range,state.reportGroup||'year'),{...exportOptions(),range});}
@@ -485,6 +485,7 @@ document.addEventListener('change',event=>{
  if(event.target.closest('#actionFields')){if(financeActions.includes(formAction?.action)){if(event.target.name!=='confirmed'){delete formAction.context.previewSignature;if($('financePreview'))$('financePreview').textContent='';const confirm=$('actionFields').querySelector('[name=confirmed]');if(confirm)confirm.checked=false;}updateFinanceForm($('actionFields'),state.data,event.target.name);}updateAnnouncementTargets();}
  if((formAction?.action.startsWith('assignment_')||formAction?.action==='user_access')&&event.target.closest('#actionFields'))updateConditionalForm(event.target.name);
  if(formAction?.action==='provider_category'&&event.target.name==='operation'&&event.target.closest('#actionFields'))updateConditionalForm();
+ if(formAction?.action==='provider'&&event.target.name==='categories'&&event.target.closest('#actionFields'))updateProviderCategorySelection();
  if(event.target.name==='category'||event.target.name==='relation'||event.target.name==='person_id'||event.target.name==='start_unknown')updateConditionalForm();
  if(['statusFilter','txnFilter','periodFilter'].includes(id)){
   const key={statusFilter:'status',txnFilter:'type',periodFilter:'period'}[id];state.filter[key]=event.target.value;
@@ -649,6 +650,13 @@ document.documentElement.lang=getLanguage();
 document.dispatchEvent(new Event('ay2:languagechange'));
 if(!new URLSearchParams(location.hash.slice(1)).has('access_token')&&!new URLSearchParams(location.hash.slice(1)).has('error'))navigate(location.hash.slice(1)||'overview');
 
+function updateProviderCategorySelection(){
+ const root=$('actionFields'),output=root?.querySelector('#providerCategorySelectionCount');
+ if(!output)return;
+ const count=root.querySelectorAll('input[name="categories"]:checked').length;
+ output.textContent=getLanguage()==='de'?count+' von 8 ausgewählt':count+' / 8 seçildi';
+ output.dataset.invalid=String(count<1||count>8);
+}
 function updateConditionalForm(changed=''){
  if(formAction?.action==='provider_category'){
   const root=$('actionFields'),mode=root.querySelector('[name="operation"]')?.value||'add';
