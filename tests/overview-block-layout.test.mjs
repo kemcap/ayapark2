@@ -31,11 +31,24 @@ test('four columns inside each wide block; automatically two then one by measure
  assert.doesNotMatch(css,/display:none/);
 });
 
+test('1000–1070px desktop keeps four apartment cards by stacking narrow blocks',async()=>{
+ const css=await readFile(new URL('../overview-block-layout.css',import.meta.url),'utf8');
+ assert.match(css,/container:\s*apartment-overview\s*\/\s*inline-size/);
+ assert.match(css,/@container\s+apartment-overview\s*\(max-width:1240px\)\s*\{[\s\S]*?\.overview-main-grid \.building-plan,[\s\S]*?grid-template-columns:minmax\(0,1fr\)/);
+ assert.match(css,/@container\s*\(min-width:580px\)\s*\{[\s\S]*?grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+ assert.match(css,/@container\s*\(max-width:389px\)/);
+ // At laptop sizes, the full-width block (not two half-width blocks) contains the four-card grid.
+ const width=1070,sidebar=250,gutters=84,innerCard=32;
+ const available=width-sidebar-gutters-innerCard;
+ assert(available>=580,'each stacked block should have enough width at 1070px');
+ assert(1000-available<580,'two side-by-side half-width blocks would force two cards');
+});
+
 test('dashboard CSS is last after modern and wide-screen overrides and scope excludes Daireler page',async()=>{
  const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
  const v3=await readFile(new URL('../v3-ui.mjs',import.meta.url),'utf8');
  const wide=html.indexOf('large-screens.css?v=');
- const custom=html.indexOf('overview-block-layout.css?v=5.9.59');
+ const custom=html.indexOf('overview-block-layout.css?v=5.9.60');
  assert(wide>=0 && custom>wide);
  assert.match(v3,/main-grid \$\{own\?'resident-main-grid':'overview-main-grid'\}/);
  assert.match(v3,/\$\{\['B','A'\]\.map\(block=>/);
