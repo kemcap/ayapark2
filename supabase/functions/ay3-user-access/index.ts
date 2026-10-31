@@ -21,19 +21,23 @@ Deno.serve(async(req:Request)=>{
    person=prepared;
   }
   if(!/^[0-9a-f-]{36}$/i.test(person)||!['resident','deputy','manager'].includes(role)||body.confirmation!==true)return reply({error:'invalid_request'},400);
-  const {data:target,error:targetError}=await admin.rpc('ay3_access_target',{p_actor:identity.user.id,p_person:person,p_role:role});
-  if(targetError||!target){const message=String(targetError?.message||'');const code=message.includes('Current apartment')?'apartment_required':message.includes('Account mismatch')?'account_mismatch':message.includes('Person or role incomplete')?'invalid_email':'access_denied';return reply({error:code},code==='access_denied'?403:400);}
+  const inlineEmail=body.new_person===true?'':String(body.access_email||'').trim();
+  const targetRpc=inlineEmail?'ay3_access_target_inline_email':'ay3_access_target';
+  const targetParams={p_actor:identity.user.id,p_person:person,p_role:role,...(inlineEmail?{p_email:inlineEmail}:{})};
+  const {data:target,error:targetError}=await admin.rpc(targetRpc,targetParams);
+  if(targetError||!target){const message=String(targetError?.message||'');const code=message.includes('Current apartment')?'apartment_required':message.includes('Account mismatch')?'account_mismatch':message.includes('Email already assigned')?'email_conflict':message.includes('Existing account email')?'email_conflict':message.includes('Person or role incomplete')||message.includes('Email required')?'invalid_email':'access_denied';return reply({error:code},code==='access_denied'?403:400);}
   let userId=target.user_id;
   if(!userId){
    // No email is sent here. The user proves ownership with an OTP at first login.
    const {data:created,error:createError}=await admin.auth.admin.createUser({email:target.email,email_confirm:false});
    if(createError||!created.user){
-    const retry=await admin.rpc('ay3_access_target',{p_actor:identity.user.id,p_person:person,p_role:role});userId=retry.data?.user_id;
+    const retry=await admin.rpc(targetRpc,targetParams);userId=retry.data?.user_id;
     if(!userId)return reply({error:'account_failed'},502);
    }else userId=created.user.id;
   }
-  const {error}=await admin.rpc('ay3_provision_access',{p_actor:identity.user.id,p_person:person,p_user:userId,p_role:role});
-  if(error)return reply({error:String(error.message).includes('Existing management role')?'role_conflict':String(error.message).includes('Account mismatch')?'account_mismatch':'assignment_failed'},409);
+  const provisionRpc=inlineEmail?'ay3_provision_access_inline_email':'ay3_provision_access';
+  const {error}=await admin.rpc(provisionRpc,{...targetParams,p_user:userId});
+  if(error){const message=String(error.message);return reply({error:message.includes('Existing management role')?'role_conflict':message.includes('Account mismatch')?'account_mismatch':message.includes('Email already assigned')||message.includes('Existing account email')?'email_conflict':message.includes('Email required')?'invalid_email':'assignment_failed'},409);}
   return reply({ok:true});
  }catch{return reply({error:'Request could not be completed'},500);}
 });
