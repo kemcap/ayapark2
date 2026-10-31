@@ -70,3 +70,20 @@ test('allocation creation day is never misrepresented as bank booking day',()=>{
   assert(!html.includes('31.10.2026 · Halil Kantarcı'));
  } finally {setLanguage('tr');}
 });
+
+test('advance credits remain visible and are not subtracted again from claim balances',()=>{
+ const s=state('super');
+ s.data.allocations=s.data.allocations.filter(a=>a.charge_id==='c-aidat');
+ s.data.credits=[{id:'credit',entry_id:'wire',unit_id:'A-4',person_id:'tenant',cents:360000,created_at:'2026-10-31T08:00:00Z'}];
+ setLanguage('de');
+ try {
+  const html=unitDetailV3(s,'A-4');
+  assert.match(html,/Noch nicht mit Forderungen verrechnetes Guthaben/);
+  assert.match(html,/Guthaben/);
+  assert(html.includes(money(940000))); // prior debt unchanged: credit is unallocated
+  assert(html.includes(money(360000)));
+  assert(html.includes(money(720000))); // bank entry shown once at apartment level
+  assert.equal((html.match(/class="uf-payment"/g)||[]).length,1);
+  assert.equal((html.match(/class="uf-matches"/g)||[]).length,1);
+ } finally {setLanguage('tr');}
+});
