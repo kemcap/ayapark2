@@ -75,7 +75,7 @@ test('charge form requires both valid period dates in chronological order',()=>{
 });
 test('German provider categories are translated and searchable without changing stored content',()=>{
  const s=state();s.data.providers=[{id:'qa',name:'Temizlik Ltd',category:'Temizlik',status:'preferred',phone:'05550000000'}];
- setLanguage('de');try{s.providerQuery='Reinigung';const html=providersV3(s);assert(html.includes('value="Temizlik">Reinigung</option>'));assert(html.includes('Temizlik Ltd'));assert(html.includes('<p>Reinigung</p>'));assert.equal(s.data.providers[0].category,'Temizlik');}finally{setLanguage('tr');}
+ setLanguage('de');try{s.providerQuery='Reinigung';const html=providersV3(s);assert(html.includes('value="Temizlik">Reinigung</option>'));assert(html.includes('Temizlik Ltd'));assert(html.includes('<span class="provider-service-tag">Reinigung</span>'));assert.equal(s.data.providers[0].category,'Temizlik');}finally{setLanguage('tr');}
 });
 
 test('overview uses the same B-first apartment plan and a wider dedicated layout',()=>{
