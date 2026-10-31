@@ -1,0 +1,28 @@
+/* Smart sticky topbar, shared across mobile/desktop and all design palettes.
+   Sticky keeps its original layout space: showing/hiding never shifts the page. */
+:root .workspace > .topbar,
+:root[data-design="modern"] .workspace > .topbar {
+ position:sticky;
+ top:0;
+ z-index:75;
+ transform:translate3d(0,0,0);
+ transition:transform 200ms ease,box-shadow 200ms ease;
+ background:var(--header-bg,var(--paper));
+ box-shadow:0 5px 18px rgb(0 0 0 / 6%);
+}
+:root.smart-header-enabled .workspace > .topbar.smart-header-hidden,
+:root.smart-header-enabled[data-design="modern"] .workspace > .topbar.smart-header-hidden {
+ transform:translate3d(0,calc(-100% - 2px),0);
+ pointer-events:none;
+ box-shadow:none;
+}
+@media(prefers-reduced-motion:reduce) {
+ :root .workspace > .topbar,
+ :root[data-design="modern"] .workspace > .topbar {transition:none;}
+}
+@media print {
+ :root .workspace > .topbar,
+ :root[data-design="modern"] .workspace > .topbar {
+  position:static;transform:none!important;box-shadow:none;
+ }
+}
