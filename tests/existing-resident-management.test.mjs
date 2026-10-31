@@ -52,7 +52,7 @@ test('SQL reuses linked phone-only account; unauthorized actor cannot promote',a
     "insert into public.site_resident_units(unit_id,user_id,role,active) values('00000000-0000-0000-0000-000000000301','"+resident+"','tenant',false);"
   ].join('\n'));
   await db.exec(await readFile(new URL('../supabase/migrations/20261031153500_promote_existing_resident_account.sql',import.meta.url),'utf8'));
-  await db.exec('create or replace function public.ay3_access_target(p_actor uuid,p_person uuid,p_role text) returns jsonb language sql as $ select ay2_private.access_target(p_actor,p_person,p_role); $;');
+  await db.exec('create or replace function public.ay3_access_target(p_actor uuid,p_person uuid,p_role text) returns jsonb language sql as $fn$ select ay2_private.access_target(p_actor,p_person,p_role); $fn$;');
   const call=async (actor,personId=person.id,role='deputy')=>db.query(
     'select ay2_private.access_target($1::uuid,$2::uuid,$3::text) as target',[actor,personId,role]);
   const value=(await call(manager)).rows[0].target;
