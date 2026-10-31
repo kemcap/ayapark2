@@ -1,3 +1,4 @@
+import {privateArchive} from './archive-ui.mjs?v=5.9.42';
 import {budgetPlanning} from './budget-planning-ui.mjs?v=5.9.41';
 import {levyReviews} from './levy-review-ui.mjs?v=5.9.39';
 import {reportReleases} from './report-release-ui.mjs?v=5.9.40';
@@ -33,7 +34,7 @@ import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.9.39';
-import {AyaparkApi} from './api.mjs?v=5.9.31';
+import {AyaparkApi} from './api.mjs?v=5.9.42';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.39';
 import {buildForm,payloadFor} from './forms.mjs?v=5.9.39';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
@@ -109,6 +110,7 @@ function render(focus=false){
  $('connectionButton').textContent=IS_PREVIEW?tr('Giriş ekranını incele'):state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/buildings.svg" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>${invitationUi.landing()}`:renderPage(state);
  if(state.mode!=='signedout'&&state.page==='reports'&&!can(state,'finance')&&state.data.communityAccess!==true)$('content').innerHTML='<section class="card"><h1>'+(getLanguage()==='de'?'Finanzübersicht nicht freigegeben':'Mali özet erişime açık değil')+'</h1><p>'+(getLanguage()==='de'?'Für diesen Zugang sind keine gemeinsamen Finanzübersichten freigegeben. Eigene Forderungen und Zahlungen bleiben im persönlichen Bereich verfügbar.':'Bu erişim için ortak mali özetler açık değil. Kendi borç ve ödemeleriniz kişisel alanda kullanılabilir.')+'</p></section>';
+ if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview')$('content').insertAdjacentHTML('afterbegin','<div class="archive-toolbar"><button class="button" type="button" data-action="private_archive">'+(getLanguage()==='de'?'Dokumente & Versammlungen':'Belgeler ve toplantılar')+'</button></div>');
  if(appearanceWasOpen&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;
  addExportControls();const previewBar=$('accessPreviewBanner');previewBar.innerHTML=previewBanner(state);previewBar.hidden=!isAccessPreview();labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
  document.dispatchEvent(new CustomEvent('ay5:view',{detail:{resident:own,page:state.page,mode:state.mode}}));
@@ -123,7 +125,8 @@ const closingUI=periodClosings({rpc:(name,args)=>api.rpc(name,args),allowed:()=>
 const releaseUI=reportReleases({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),community:()=>state.mode==='connected'&&!isAccessPreview()&&(can(state,'finance')||state.data.communityAccess===true),site:()=>state.data.site.id,language:getLanguage});
 const levyUI=levyReviews({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),connected:()=>state.mode==='connected'&&!isAccessPreview(),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload});
 const budgetUI=budgetPlanning({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'finance'),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload,onRender:applyAmountPrivacy});
-function closeDialogs(){closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
+const archiveUI=privateArchive({rpc:(name,args)=>api.rpc(name,args),storage:(path,args)=>api.storageDocument(path,args),allowed:()=>state.mode==='connected'&&!isAccessPreview(),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,siteName:()=>state.data.site.name||'AyaPark 2',language:getLanguage});
+function closeDialogs(){archiveUI.close();closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
@@ -381,6 +384,7 @@ document.addEventListener('click',async event=>{
   if(action==='review_import'){$('importDialog').close();navigate('transactions');state.filter.type='unmatched';render();return;}
   if(action==='print')return window.print();
   if((action==='budget_plan'||action==='budget')&&state.mode==='connected'&&!isAccessPreview())return await budgetUI.open();
+  if(action==='private_archive')return await archiveUI.open();
   if(action==='levy_manage')return await levyUI.openAdmin();
   if(action==='levy_owner')return await levyUI.openOwner();
   if(action==='report_releases')return await releaseUI.openAdmin();
