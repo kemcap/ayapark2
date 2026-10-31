@@ -1,5 +1,14 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
 
+## Veröffentlicht und live geprüft – 31.10.2026
+
+Verwaltungs-Leseeinsicht und Bewohnerlayout aus PR #94 sind veröffentlicht: main `1b656615798e1fda0903aa9b2ce3986da85ce230`. Vollständige GitHub-CI `41210069004` erfolgreich, einschließlich der 27 neuen SQL-Leserechteprüfungen. Pages `41210205720` erfolgreich. Elf ausgelieferte Dateien (Index, API, App, Formulare, Einstellungen, V3-UI, Forderungsübersicht/-CSS, Kategorien-CSS, UI, V3-Formulare) mit dem geprüften Stand bytegleich bestätigt. Cachegraph einheitlich aktualisiert; die parallel ergänzten Dienstleister-Kategorien/Notizfunktionen erhalten.
+
+364 allgemeine Tests, 27 neue SQL-, 84 bestehende Aufgabenrechte- und 279 native synthetische Layoutprüfungen bestanden. Backend `20261031141453` aktiv; vorhandene Verwaltungs-Leseoption standardmäßig aktiv, RLS unverändert eingeschaltet. Personen-/Finanzoriginale vor/nach Migration identisch. Frühere Vorbereitungs-/Frontend-offen-Hinweise dieses Pakets sind überholt. Kein realer Schreibtest an Bewohnern/Buchungen/Accounts.
+
+Nächster realer Abnahmepunkt: die neue Verwaltungs-Leseansicht und Bewohnerkarten nach Neuladen im vorhandenen Zugang ansehen; anschließend Smartphone-/PWA-/dauerhafte Sitzung und sichere eigene Mailzustellung sowie fachlicher Originalbankabgleich. Technische Paketfertigstellung ist keine pauschale reale Gesamtfertigmeldung. Backup bleibt übersprungen. Nachweis: `qa/results/management-read-resident-release-20261031.json`.
+
+
 ## Verwaltungs-Leseeinsicht und Bewohneransicht – 31.10.2026
 
 Auf Nutzerauftrag: unabhängige, standardmäßig aktive und vom Superadmin abwählbare Verwaltungs-Leseeinsicht für alle Wohnungen, zugeordnete Namen, Forderungen und zugehörige Zahlungszuordnungen. Fünf Bearbeitungsaufgaben bleiben getrennt; kein neuer Schreibzugriff. Keine zusätzliche Freigabe privater Kontakte, Notizen oder Bank-Verwendungszwecke. Neue/alte Verwaltungsmitgliedschaften standardmäßig aktiv; ausdrückliche Abwahl bleibt auch bei alten Aufgabenrechte-Aufrufen erhalten. Abwahl hebt separat vergebene Bearbeitungs-/Finanzrechte nicht auf. Bestehende personenbezogene RLS-/Mutationsregeln bleiben erhalten; schmale, serverseitig rollen- und standortgeprüfte Projektion.

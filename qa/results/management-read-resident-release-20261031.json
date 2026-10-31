@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-31",
+  "pr": 94,
+  "runtime_main": "1b656615798e1fda0903aa9b2ce3986da85ce230",
+  "ci": {
+    "run": 41210069004,
+    "conclusion": "success"
+  },
+  "pages": {
+    "run": 41210205720,
+    "conclusion": "success"
+  },
+  "migration": "20261031141453_management_read_only_apartment_claims_default_on",
+  "tests": {
+    "general": 364,
+    "new_isolated_sql": 27,
+    "existing_task_rights_sql": 84,
+    "synthetic_browser_checks": 279
+  },
+  "live_byte_equal_files": [
+    "index.html",
+    "api.mjs",
+    "app.mjs",
+    "forms.mjs",
+    "settings-ui.mjs",
+    "v3-ui.mjs",
+    "site-claims-ui.mjs",
+    "site-claims.css",
+    "category-balance.css",
+    "ui.mjs",
+    "v3-forms.mjs"
+  ],
+  "resident_financial_originals_unchanged": true,
+  "production_test_accounts_or_bookings_created": false,
+  "actual_post_release_separate_role_and_device_acceptance": "pending; earlier role observations user-reported before this change"
+}
