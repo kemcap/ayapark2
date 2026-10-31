@@ -41,7 +41,7 @@ test('SQL reuses linked phone-only account; unauthorized actor cannot promote',a
     'create schema auth; create schema ay2_private;',
     'create table auth.users(id uuid primary key,email text);',
     'create table public.ay3_persons(id uuid primary key,site_id uuid not null,email text,auth_user_id uuid,archived_at timestamptz);',
-    'create table public.site_staff_memberships(site_id uuid,user_id uuid,role text);',
+    'create table public.site_staff_memberships(site_id uuid,user_id uuid,role text, primary key(site_id,user_id));',
     'create table public.ay3_links(site_id uuid,person_id uuid,unit_id uuid,role text,active bool);',
     'create table public.site_resident_units(unit_id uuid,user_id uuid,role text,person_id uuid,active bool, primary key(unit_id,user_id,role));',
     'create table public.ay2_audit(site_id uuid,actor uuid,action text,entity_id uuid,details jsonb);',
