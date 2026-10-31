@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {legacyFinance,isLegacyCharge} from '../legacy-finance.mjs?v=5.9.50';
-import {unitDetailV3} from '../v3-ui.mjs?v=5.9.50';
+import {unitDetailV3,former} from '../v3-ui.mjs?v=5.9.50';
 import {fullDemo} from '../ledger.mjs?v=5.8.1';
 import {money} from '../core.mjs?v=5.8.1';
 import {setLanguage} from '../i18n.mjs?v=5.9.28';
@@ -77,6 +77,9 @@ test('A-2 screen shows original source amounts only once, newly assessed debt se
  const d=makeFixture(),s={data:d,mode:'demo',page:'units'};
  setLanguage('de');
  try{
+  const filtered=d.charges.filter(c=>!former(d,c));
+  const check=legacyFinance(d,A2,filtered);
+  assert.equal(check.sourceVerified,true,JSON.stringify({size:filtered.length,gross:check.gross,source:d.devirSnapshot?.[0],items:filtered.map(c=>[c.id,c.cents,c.reference])}));
   const html=unitDetailV3(s,A2);
   assert.match(html,/Altbestand – vorherige Verwaltung/);
   assert.match(html,/Originalforderungen und Zuordnung anzeigen/);
