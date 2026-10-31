@@ -74,7 +74,7 @@ export function cartesianViz(buckets,{type='bar'}={}){
    const path=points.map(([px,py],i)=>(i?'L':'M')+px.toFixed(2)+' '+py.toFixed(2)).join(' ');
    const area=path+' L'+points.at(-1)[0].toFixed(2)+' '+bottom+' L'+points[0][0].toFixed(2)+' '+bottom+' Z';
    return '<path class="fch-area fch-'+kind+'-area" d="'+area+'" fill="url(#fch-'+kind+'-area)"/>'+
-    '<path class="fch-line fch-'+kind+'-line" d="'+path+'" fill="none" stroke="var(--fch-'+kind+')" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>'+
+    '<path class="fch-line fch-'+kind+'-line" d="'+path+'" pathLength="1" fill="none" stroke="var(--fch-'+kind+')" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>'+
     buckets.map((b,i)=>{
      const v=num(b[kind]);
      return '<circle class="fch-point fch-'+kind+'-point" cx="'+x(i).toFixed(2)+'" cy="'+y(v).toFixed(2)+'" r="6.5" fill="var(--fch-'+kind+')" stroke="var(--paper)" stroke-width="3"'+guide(kind,label+' · '+b.period,v)+'><title>'+e(label+' · '+b.period+' · '+currency(v))+'</title></circle>';
