@@ -1,0 +1,8 @@
+{
+  "passed": 70,
+  "failed": 0,
+  "browser": "153.0.8010.0",
+  "errors": [],
+  "external": [],
+  "scope": "synthetic DE/TR 375/1440px upload/retry/hash/download/role/meeting/invitation; not real Supabase Storage or auth"
+}

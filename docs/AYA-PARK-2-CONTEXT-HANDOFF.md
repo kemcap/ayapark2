@@ -1,4 +1,11 @@
 # AyaPark 2 – Projektübergabe / Fortsetzungskontext
+
+## Privates Archiv lokal abgenommen – 31.10.2026
+
+Privates Datei-/Versammlungsarchiv im separaten Branch vorbereitet: unveränderte Originalbytes, authentifizierte Rücklese mit SHA-256, getrennte vollständige Dateifreigaben, keine öffentlichen URLs/Überschreibungen, begründete Rücknahme und eigene Versammlungs-/Karar-Defteri-Nachweise. 50 isolierte SQL-, 70 native DE/TR-Browserprüfungen bei 375/1440 px und 323 allgemeine Tests bestanden. Ein mobiler Dialogkopf-Überlauf behoben. Details und tatsächliche Prüfgrenzen: PHASE-6-ARCHIVE-AUDIT.md.
+
+Noch keine Backend-/Frontend-Veröffentlichung dieses Archivschritts bestätigt. Tatsächliche Supabase-Storage-Übertragung mit realer Sitzung und restliche Auth-/Geräteabnahme bleiben offen; lokale Transporttests ersetzen sie nicht. Keine produktiven Dokumente/Bewohner-/Auth-/Finanzdaten für Tests verändert. Backup bleibt auf Nutzerwunsch übersprungen. Danach einfache Aufgaben/Terminerinnerungen mit manueller Wiederholungsanlage.
+
 ## Private Freigabeanfragen zusätzlich abgeschirmt – 31.10.2026
 
 Beim anschließenden Archiv-Sicherheitsabgleich einen zweiten Lesepfad gefunden und gezielt geschlossen: Die bisherige allgemeine ay5_operations-Policy erlaubte Finanzlesern auch neue private Freigabepayloads. Arbeitsansichten waren bereits getrennt, diese direkte Verlaufstabelle benötigte aber eine zusätzliche restriktive Policy. Neue administrative Requests werden serverseitig als privat markiert; bekannte ältere Budget-/Rücklagenrequests ohne Markierung sind ebenfalls auf Superadmin-Lesen begrenzt. Historische Anfragen werden nicht umgeschrieben; identische Wiederholungen vor/nach der Härtung bleiben gültig. Gewöhnlicher Finanzverlauf bleibt lesbar.
@@ -357,3 +364,5 @@ Nachweise: 266 allgemeine Tests bestanden; 49 isolierte SQL-Prüfungen des Entwu
 
 
 Backend-Veröffentlichung 30.10.2026 bestätigt: Migration 20261030201427_explicit_period_closing_and_reopening aktiv. Rein lesende Prüfung: 0 echte Abschlussdatensätze, RLS aktiv, kein Client-INSERT und keine anonyme Finalisierung. Keine bestehenden Finanz-/Bewohner-/Authdatensätze geändert. 50 aktuelle Finanz-, 31 Finanzabnahme-, 16 Bankimport-, 84 Rechte-, 23 Kontakt- und 43 Historienprüfungen mit installierter neuer Abschlusssicherung erfolgreich; allgemeine Suite 299/299. Frontend-Rollout noch offen.
+
+Integrationskorrektur 31.10.2026: Beim tatsächlichen API-Client fehlten die freigegebenen RPC-Namen für Historienzuordnung, Abschlüsse/Summenfreigaben, Sonderumlagen und Budget. Die bisherigen synthetischen UI-Tests umgingen diese Aufrufliste. Explizite Liste ergänzt (keine Wildcard, keine serverseitige Rechteänderung); neue Regression führt die von den Controllern verwendeten Aufrufe durch den wirklichen authentifizierten Client und prüft unbekannte Endpunkte/Sitzungswechsel. Früherer technischer Release-Nachweis dieser Module war hinsichtlich dieses Clientwegs unvollständig; keine echten Backend-/Finanzdaten dadurch geändert.

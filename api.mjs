@@ -1,3 +1,4 @@
+import {archivePath,MAX_DOCUMENT_BYTES} from './archive-files.mjs?v=5.9.42';
 import {classifyIdentifier,newPasswordError} from './auth-policy.mjs?v=5.8.1';
 import {ENABLE_VERIFIED_PHONE_LOGIN} from './auth-features.mjs?v=5.8.1';
 import {t as tr} from './i18n.mjs?v=5.9.28';
@@ -40,6 +41,22 @@ export class AyaparkApi {
  async accessRequests(payload,authenticated=false){return this.raw('/functions/v1/ay3-access-requests','POST',payload,authenticated?await this.token():undefined);}
  async provision(payload){return this.raw('/functions/v1/ay3-user-access','POST',payload,await this.token());}
  async invitation(payload,authenticated=false){return this.raw('/functions/v1/ay3-whatsapp-invite','POST',payload,authenticated?await this.token():undefined);}
+ async storageDocument(path,{bytes,mime,signal}={}){
+  if(this.previewOnly)throw Error(tr('Bu önizleme yalnızca örnek veriler kullanır. Canlı hesaba bağlanılmaz.'));
+  archivePath(path);const uploading=bytes!==undefined;
+  if(uploading&&(!(bytes instanceof Uint8Array)||bytes.byteLength<1||bytes.byteLength>MAX_DOCUMENT_BYTES))throw Error('Invalid document size');
+  const generation=this.generation,token=await this.token(),controller=new AbortController(),abort=()=>controller.abort();
+  const timer=setTimeout(abort,60000);if(signal?.aborted)abort();signal?.addEventListener('abort',abort,{once:true});
+  try{
+   const response=await this.fetcher(URL+'/storage/v1/object/'+(uploading?'':'authenticated/')+'ayapark2-documents/'+path,{method:uploading?'POST':'GET',headers:{apikey:KEY,Authorization:'Bearer '+token,...(uploading?{'Content-Type':mime,'x-upsert':'false'}:{})},body:uploading?new Blob([bytes],{type:mime}):undefined,credentials:'omit',cache:'no-store',signal:controller.signal});
+   if(generation!==this.generation)throw Error(tr('Oturum değişti.'));
+   if(uploading&&response.status===409)return {already_uploaded:true};
+   if(!response.ok){const error=Error(tr(response.status===403?'Bu işlem için yetkiniz yok.':'Dosya işlemi tamamlanamadı.'));error.status=response.status;throw error;}
+   if(uploading)return {uploaded:true};
+   const length=Number(response.headers.get('content-length'));if(Number.isFinite(length)&&length>MAX_DOCUMENT_BYTES){abort();throw Error('Invalid document size');}
+   const data=new Uint8Array(await response.arrayBuffer());if(generation!==this.generation)throw Error(tr('Oturum değişti.'));if(data.byteLength>MAX_DOCUMENT_BYTES)throw Error('Invalid document size');return data;
+  }finally{clearTimeout(timer);signal?.removeEventListener('abort',abort);}
+ }
  async raw(path,method='GET',body,token) {
   if(this.previewOnly)throw Error(tr('Bu önizleme yalnızca örnek veriler kullanır. Canlı hesaba bağlanılmaz.'));
   const response=await this.fetcher(URL+path,{method,headers:{apikey:KEY,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',signal:AbortSignal.timeout(15000)});
@@ -105,7 +122,7 @@ export class AyaparkApi {
   return data;
  }
  async rpc(name,body){
-  if(!['ay3_contact_workspace','ay3_request_contact_change','ay3_decide_contact_change','ay3_withdraw_contact_change','ay3_set_task_grants','ay3_draft_workspace','ay3_submit_charge_draft','ay3_decide_charge_draft','ay5_command','ay5_workspace','ay5_payment_plan','ay2_command','ay2_capabilities','ay2_workspace','ay3_financial_summary','ay3_provider_directory','ay3_preferences','ay3_review_state','ay3_review_selected','ay3_staff_directory','ay3_audit_page','ay3_remove_staff_member','ay3_manage_person','ay3_manage_person_v2'].includes(name))throw Error(tr("İşlem kapsam dışında."));
+  if(!['ay3_add_historical_assignment','ay3_closing_preview','ay3_closing_workspace','ay3_finalize_period','ay3_reopen_period','ay3_community_report_summaries','ay3_release_report','ay3_report_release_workspace','ay3_revoke_report_release','ay3_document_levy_review','ay3_levy_review_workspace','ay3_owner_levy_previews','ay3_share_levy_review','ay3_withdraw_levy_review','ay6_bind_budget_payment','ay6_budget_workspace','ay6_release_reserve','ay6_review_legacy_budget','ay6_save_budget_plan','ay6_unbind_budget_payment','ay6_archive_document','ay6_confirm_document','ay6_document_download','ay6_document_workspace','ay6_meeting_workspace','ay6_prepare_document','ay6_save_meeting','ay6_set_document_access','ay3_contact_workspace','ay3_request_contact_change','ay3_decide_contact_change','ay3_withdraw_contact_change','ay3_set_task_grants','ay3_draft_workspace','ay3_submit_charge_draft','ay3_decide_charge_draft','ay5_command','ay5_workspace','ay5_payment_plan','ay2_command','ay2_capabilities','ay2_workspace','ay3_financial_summary','ay3_provider_directory','ay3_preferences','ay3_review_state','ay3_review_selected','ay3_staff_directory','ay3_audit_page','ay3_remove_staff_member','ay3_manage_person','ay3_manage_person_v2'].includes(name))throw Error(tr("İşlem kapsam dışında."));
   const generation=this.generation,token=await this.token();
   const result=await this.raw('/rest/v1/rpc/'+name,'POST',body,token);
   if(generation!==this.generation)throw Error(tr("Oturum değişti."));return result;
