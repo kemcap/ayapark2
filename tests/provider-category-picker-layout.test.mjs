@@ -41,7 +41,8 @@ test('new provider retains the preselected cleaning category',()=>{
 
 test('existing multiple selection submits unchanged; maximum eight categories remains enforced',()=>{
  const form=buildV3Form(existing,'provider',{id:'provider-1'});
- const p=payloadV3('provider',new Map([['name','Test Service'],['status','preferred'],['categories','Elektrik']]),form.context);
+ const input=new FormData();input.set('name','Test Service');input.set('status','preferred');input.append('categories','Elektrik');
+ const p=payloadV3('provider',input,form.context);
  assert.deepEqual(p.categories,['Elektrik']);
  const names=Array.from({length:9},(_,i)=>'Category '+i);
  const many={get:k=>k==='name'?'Test Service':k==='status'?'preferred':'',getAll:k=>k==='categories'?names:[],has:()=>false,*[Symbol.iterator](){yield ['name','Test Service'];}};
