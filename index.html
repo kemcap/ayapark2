@@ -10,26 +10,26 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https://eisozwhhinqszfikemot.supabase.co; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Ayapark 2 · Site Yönetimi V5.1</title>
 <script src="./preferences-boot.js"></script>
-<script src="./theme.js"></script>
+<script src="./theme.js?v=5.10.1"></script>
 <script src="./design-boot.js"></script>
 <script src="./recovery-redirect.js"></script>
 <link rel="icon" href="./assets/buildings.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./assets/app-icon.png">
-<link rel="stylesheet" href="./styles.css?v=5.9.0">
+<link rel="stylesheet" href="./styles.css?v=5.10.1">
 <link rel="stylesheet" href="./recovery.css">
 <link rel="stylesheet" href="./install-tutorial.css">
-<script type="module" src="./app.mjs?v=5.10.0"></script>
+<script type="module" src="./app.mjs?v=5.10.1"></script>
 <link rel="stylesheet" href="./v4-ui.css?v=4.0">
 <link rel="stylesheet" href="./access-requests.css?v=5.8.1">
 <link rel="stylesheet" href="./invite-ui.css?v=5.2.0">
 <link rel="stylesheet" href="./site-claims.css?v=5.9.54">
-<link rel="stylesheet" href="./modern.css?v=5.9.17"><link rel="stylesheet" href="./v5-ui.css?v=5.1.3">
+<link rel="stylesheet" href="./modern.css?v=5.10.1"><link rel="stylesheet" href="./v5-ui.css?v=5.1.3">
 <link rel="stylesheet" href="./large-screens.css?v=5.9.1">
 <link rel="stylesheet" href="./people-management.css?v=5.9.18">
-<link rel="stylesheet" href="./category-balance.css?v=5.9.54">
+<link rel="stylesheet" href="./category-balance.css?v=5.10.1">
 <link rel="stylesheet" href="./apartment-access.css?v=5.9.11">
-<link rel="stylesheet" href="./levy-review.css?v=5.9.39"><link rel="stylesheet" href="./budget-planning.css?v=5.9.41"><link rel="stylesheet" href="./archive.css?v=5.9.46"><link rel="stylesheet" href="./unit-finance.css?v=5.9.48"><link rel="stylesheet" href="./smart-header.css?v=5.9.49"><link rel="stylesheet" href="./legacy-finance.css?v=5.9.50"><link rel="stylesheet" href="./provider-categories.css?v=5.9.56"><link rel="stylesheet" href="./overview-block-layout.css?v=5.9.62"><link rel="stylesheet" href="./expense-distribution.css?v=5.9.57"><link rel="stylesheet" href="./finance-charts.css?v=5.9.58"><link rel="stylesheet" href="./report-filters.css?v=5.9.59"><link rel="stylesheet" href="./overview-account-summary.css?v=5.9.61"></head>
+<link rel="stylesheet" href="./levy-review.css?v=5.9.39"><link rel="stylesheet" href="./budget-planning.css?v=5.9.41"><link rel="stylesheet" href="./archive.css?v=5.9.46"><link rel="stylesheet" href="./unit-finance.css?v=5.9.48"><link rel="stylesheet" href="./smart-header.css?v=5.9.49"><link rel="stylesheet" href="./legacy-finance.css?v=5.9.50"><link rel="stylesheet" href="./provider-categories.css?v=5.9.56"><link rel="stylesheet" href="./overview-block-layout.css?v=5.9.62"><link rel="stylesheet" href="./expense-distribution.css?v=5.9.57"><link rel="stylesheet" href="./finance-charts.css?v=5.10.1"><link rel="stylesheet" href="./report-filters.css?v=5.10.1"><link rel="stylesheet" href="./overview-account-summary.css?v=5.9.61"></head>
 <body>
 <a class="skip" href="#content">İçeriğe geç</a>
 <div id="previewBanner" class="preview-banner" role="note" hidden>V5.1 önizleme · Örnek veriler · Canlı kayıtlara erişim yok</div>
@@ -87,10 +87,10 @@
  <h2 id="inviteActivationTitle">Hesabımı etkinleştir</h2>
  <p class="muted">Lütfen kendi şifrenizi oluşturun.</p>
  <form id="inviteActivateForm">
-  <label class="field">Yeni şifre (en az 6 karakter)
-   <input id="inviteActivationPassword" type="password" autocomplete="new-password" minlength="6" maxlength="256" required></label>
-  <label class="field">Şifreyi tekrar gir
-   <input id="inviteActivationConfirm" type="password" autocomplete="new-password" minlength="6" maxlength="256" required></label>
+  <label class="field" for="inviteActivationPassword">Yeni şifre (en az 6 karakter)</label>
+  <div class="password-control"><input id="inviteActivationPassword" type="password" autocomplete="new-password" minlength="6" maxlength="256" required><button class="button password-eye" type="button" data-password-eye="inviteActivationPassword" aria-label="Şifreyi göster" aria-pressed="false"></button></div>
+  <label class="field" for="inviteActivationConfirm">Şifreyi tekrar gir</label>
+  <div class="password-control"><input id="inviteActivationConfirm" type="password" autocomplete="new-password" minlength="6" maxlength="256" required><button class="button password-eye" type="button" data-password-eye="inviteActivationConfirm" aria-label="Şifreyi göster" aria-pressed="false"></button></div>
   <p class="fine">Davet bağlantısı yalnızca bir kez kullanılır.</p>
   <p id="inviteActivateStatus" role="status" aria-live="polite"></p>
   <div class="dialog-actions"><button type="button" class="button" id="inviteActivationCancel">Vazgeç</button><button id="inviteActivationSubmit" type="submit" class="button primary">Etkinleştir</button></div>

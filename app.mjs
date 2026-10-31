@@ -1,3 +1,4 @@
+import {preserveViewFocus} from './ui-focus.mjs?v=5.10.1';
 import {nextLanguage} from './language-text.mjs?v=5.10.0';
 import {uiText} from './language-text.mjs?v=5.10.0';
 import {claimHoldReview} from './claim-hold-ui.mjs?v=5.10.0';
@@ -24,8 +25,8 @@ import {prepareV5Demo} from './finance-demo.mjs?v=5.10.0';
 import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=5.10.0';
 import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=5.10.0';
 import {bindDesign} from './design.mjs?v=5.10.0';
-import {enhanceTables} from './ui-accessibility.mjs?v=5.8.1';
-import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.9.0';
+import {enhanceTables} from './ui-accessibility.mjs?v=5.10.1';
+import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.10.1';
 import {apartmentInfo} from './apartment-info.mjs?v=5.10.0';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=5.10.0';
 import {updateAssignmentForm} from './assignments.mjs?v=5.10.0';
@@ -33,9 +34,9 @@ import {personManager} from './people-ui.mjs?v=5.10.0';
 import {bindInvitations} from './invite-ui.mjs?v=5.10.0';
 import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=5.10.0';
 import {bindInstall} from './install.mjs?v=5.10.0';
-import {bindPasswordEyes} from './password-eye.mjs?v=5.10.0';
+import {bindPasswordEyes} from './password-eye.mjs?v=5.10.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.10.0';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=5.10.1';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=5.10.0';
 import {template} from './v3-import.mjs?v=5.10.0';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
@@ -67,6 +68,7 @@ function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)'
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
 function isAccessPreview(){return ['connected','demo'].includes(state.mode)&&mayPreview(state.fullData)&&allowedPreviewRoles(state.fullData).includes(state.viewRole)&&state.viewRole!==nativePreviewRole(state.fullData);}
 function render(focus=false){
+ const restoreFocus=focus?()=>{}:preserveViewFocus();
  const appearanceWasOpen=document.querySelector('.appearance-settings')?.open;
  if(state.mode==='connected'){
   if(mayPreview(state.data)&&state.data!==state.fullData)state.fullData=state.data;
@@ -107,7 +109,7 @@ function render(focus=false){
   $('residentPreviewSelect').value=state.previewSelection;
  }
  $('modeBadge').textContent=tr("Örnek veriler");
- $('contextText').textContent=state.mode==='demo'?tr("Örnek çalışma alanı · Değişiklikler bu sayfayla sınırlıdır."):state.stale?tr("Kayıt kaydedildi; görünüm yenilenemedi. Sayfayı yeniden açın."):tr("Son okuma ")+(d.loadedAt||'')+tr(" · Kayıtlar hesabınızın yetkileriyle gösterilir.");
+ $('contextText').textContent=state.mode==='demo'?tr("Örnek çalışma alanı · Değişiklikler bu sayfayla sınırlıdır."):state.stale?tr("Veriler yenilenemedi. Ekranda önceki okuma var."):tr("Son okuma ")+(d.loadedAt||'')+tr(" · Kayıtlar hesabınızın yetkileriyle gösterilir.");
  if(isAccessPreview())$('contextText').textContent=tr(nativePreviewRole(state.fullData)==='super'?'Görünüm önizlemesi · İşlemler kaydedilmez. Süper Admin görünümüne dönerek düzenleyin.':'Görünüm önizlemesi · İşlemler kaydedilmez. Yönetim görünümüne dönerek düzenleyin.');
  $('footerMode').textContent=state.mode==='demo'?tr("Örnek veriler"):tr("Hesabınız");$('connectionButton').textContent=state.mode==='demo'?tr("Hesabımla giriş"):tr("Çıkış yap");$('refreshButton').hidden=state.mode==='demo';
  document.body.classList.toggle('signed-out',state.mode==='signedout');
@@ -126,9 +128,9 @@ function render(focus=false){
  $('refreshButton').hidden=state.mode!=='connected';const powerLabel=tr(state.mode==='connected'?'Çıkış yap':'Giriş yap');$('connectionButton').innerHTML=icon('power');$('connectionButton').setAttribute('aria-label',powerLabel);$('connectionButton').title=powerLabel;
  if(state.page==='settings'&&can(state,'admin')&&!state.auditLoading&&state.auditData!==state.data){void loadAuditPage(0);}
  for(const [id,value] of [['statusFilter',state.filter.status],['txnFilter',state.filter.type],['periodFilter',state.filter.period]])if($(id))$(id).value=value;
- if(focus)$('content').focus({preventScroll:true});
+ if(focus)$('content').focus({preventScroll:true});else restoreFocus();
 }
-function navigate(page){mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
+function navigate(page){clearTimeout(peopleSearchTimer);mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
 const closingUI=periodClosings({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,onSaved:reload});
 const releaseUI=reportReleases({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),community:()=>state.mode==='connected'&&!isAccessPreview()&&(can(state,'finance')||state.data.communityAccess===true),site:()=>state.data.site.id,language:getLanguage});
 const levyUI=levyReviews({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),connected:()=>state.mode==='connected'&&!isAccessPreview(),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload});
@@ -358,6 +360,8 @@ $('urgentDialog').addEventListener('cancel',event=>{if($('urgentDialog').dataset
 function updateAnnouncementTargets(){const root=$('actionFields'),kind=root.querySelector('[name="target_kind"]')?.value;for(const section of root.querySelectorAll('[data-notification-target]'))section.hidden=section.dataset.notificationTarget!==kind;}
 
 document.addEventListener('click',async event=>{
+ if(event.target.closest('a.skip[href="#content"]')){event.preventDefault();$('content').focus({preventScroll:true});$('content').scrollIntoView({block:'start'});return;}
+ if(mobileNavGroup!==null&&!event.target.closest('#nav')){mobileNavGroup=null;renderNavigation();}
  // The normal close button also returns to the person card when an apartment was opened from there.
  if(event.target.closest('#detailDialog > .dialog-actions button')&&personUnitReturn&&detailView?.action==='unit'){
   event.preventDefault();
@@ -386,7 +390,7 @@ document.addEventListener('click',async event=>{
   const block=blockButton.dataset.block;if(!['A','B'].includes(block))return;
   state.filter.block=state.filter.block===block?'all':block;
   for(const node of document.querySelectorAll('[data-block]'))node.setAttribute('aria-pressed',String(node.dataset.block===state.filter.block));
-  $('unitResults').innerHTML=unitResults(state);$('resultCount').textContent=filteredUnits(state).length+tr(' daire');
+  $('unitResults').innerHTML=unitResults(state);labelTables();applyAmountPrivacy();$('resultCount').textContent=filteredUnits(state).length+tr(' daire');
   return;
  }
  const tab=event.target.closest('[data-tab]');if(tab){const history=tab.dataset.tab==='history';$('unitCurrent').hidden=history;$('unitHistory').hidden=!history;for(const node of document.querySelectorAll('[data-tab]'))node.setAttribute('aria-pressed',String(node===tab));return;}
@@ -485,20 +489,23 @@ $('languageToggle').addEventListener('click',()=>{
  }
  updateConditionalForm();document.dispatchEvent(new Event('ay2:languagechange'));
 });
-window.addEventListener('hashchange',()=>navigate(location.hash.slice(1)));
+window.addEventListener('hashchange',()=>{if(location.hash==='#content'){$('content').focus();history.replaceState(null,'','#'+state.page);return;}navigate(location.hash.slice(1));});
 function changePreviewRole(role,selection){if(writeBusy||loginBusy||!mayPreview(state.fullData)||!allowedPreviewRoles(state.fullData).includes(role))return;closeDialogs();state.viewRole=role;if(selection!==undefined)state.previewSelection=selection;else if(role==='resident')state.previewSelection=residentPreviewOptions(state.fullData)[0]?.id||'';state.page='overview';state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.reportFilter={preset:'all'};render(true);}
 $('roleSelect').addEventListener('change',event=>changePreviewRole(event.target.value));
 $('residentPreviewSelect').addEventListener('change',event=>changePreviewRole('resident',event.target.value));
 document.addEventListener('input',event=>{
  clearFieldError(event.target);
+ const picker=event.target.closest('.person-picker');if(picker){clearFieldError(picker.querySelector('[name=person_id]'));clearFieldError(picker.querySelector('button'));}
  if(formAction?.action.startsWith('assignment_')&&event.target.closest('#actionFields')){if(event.target.name==='person_search')updateConditionalForm('person_search');$('actionMessage').textContent='';}
- if(event.target.id==='unitSearch'){state.filter.q=event.target.value;$('unitResults').innerHTML=unitResults(state);$('resultCount').textContent=filteredUnits(state).length+tr(" daire");}
- if(event.target.id==='peopleSearch'){clearTimeout(peopleSearchTimer);const value=event.target.value,pos=event.target.selectionStart;peopleSearchTimer=setTimeout(()=>{state.peopleQuery=value;render();$('peopleSearch')?.focus();$('peopleSearch')?.setSelectionRange(pos,pos);},160);return;}
+ if(event.target.id==='unitSearch'){state.filter.q=event.target.value;$('unitResults').innerHTML=unitResults(state);labelTables();applyAmountPrivacy();$('resultCount').textContent=filteredUnits(state).length+tr(" daire");}
+ if(event.target.id==='peopleSearch'){clearTimeout(peopleSearchTimer);const input=event.target,value=input.value,attempt=epoch;peopleSearchTimer=setTimeout(()=>{if(state.page!=='persons'||attempt!==epoch||!input.isConnected)return;state.peopleQuery=value;render();},160);return;}
 
- if(event.target.id==='providerSearch'){state.providerQuery=event.target.value;const start=event.target.selectionStart;render();$('providerSearch').focus();$('providerSearch').setSelectionRange(start,start);}
- if(event.target.id==='txnSearch'){state.filter.q=event.target.value;$('transactionResults').innerHTML=transactionTable(state);}
+ if(event.target.id==='providerSearch'){state.providerQuery=event.target.value;render();}
+ if(event.target.id==='txnSearch'){state.filter.q=event.target.value;state.bankPage=0;$('transactionResults').innerHTML=transactionTable(state);labelTables();applyAmountPrivacy();}
 });
 document.addEventListener('change',event=>{
+ clearFieldError(event.target);
+ const picker=event.target.closest('.person-picker');if(picker){clearFieldError(picker.querySelector('[name=person_id]'));clearFieldError(picker.querySelector('button'));}
  const id=event.target.id;if(id==='previewRoleSelect'){changePreviewRole(event.target.value);return;}if(id==='previewPersonSelect'){changePreviewRole('resident',event.target.value);return;}
  if(event.target.closest('#actionFields')){if(financeActions.includes(formAction?.action)){if(event.target.name!=='confirmed'){delete formAction.context.previewSignature;if($('financePreview'))$('financePreview').textContent='';const confirm=$('actionFields').querySelector('[name=confirmed]');if(confirm)confirm.checked=false;}updateFinanceForm($('actionFields'),state.data,event.target.name);}updateAnnouncementTargets();}
  if((formAction?.action.startsWith('assignment_')||formAction?.action==='user_access')&&event.target.closest('#actionFields'))updateConditionalForm(event.target.name);
@@ -506,8 +513,8 @@ document.addEventListener('change',event=>{
  if(formAction?.action==='provider'&&event.target.name==='categories'&&event.target.closest('#actionFields'))updateProviderCategorySelection();
  if(event.target.name==='category'||event.target.name==='relation'||event.target.name==='person_id'||event.target.name==='start_unknown')updateConditionalForm();
  if(['statusFilter','txnFilter','periodFilter'].includes(id)){
-  const key={statusFilter:'status',txnFilter:'type',periodFilter:'period'}[id];state.filter[key]=event.target.value;
-  if(id==='statusFilter'){$('unitResults').innerHTML=unitResults(state);$('resultCount').textContent=filteredUnits(state).length+tr(" daire");}else $('transactionResults').innerHTML=transactionTable(state);
+  const key={statusFilter:'status',txnFilter:'type',periodFilter:'period'}[id];state.filter[key]=event.target.value;state.bankPage=0;
+  if(id==='statusFilter'){$('unitResults').innerHTML=unitResults(state);labelTables();applyAmountPrivacy();$('resultCount').textContent=filteredUnits(state).length+tr(" daire");}else {$('transactionResults').innerHTML=transactionTable(state);labelTables();applyAmountPrivacy();}
  }
  if(event.target.dataset.range){const kind=event.target.dataset.range,f=kind==='report'?state.reportFilter:state.filter;f[event.target.dataset.rangeField]=event.target.value;state.bankPage=0;render();return;}
  if(id==='reportGroup'){state.reportGroup=event.target.value;render();}
@@ -752,6 +759,11 @@ function updateConditionalForm(changed=''){
 function labelTables(){enhanceTables(document);}
 
 window.matchMedia('(max-width:1000px)').addEventListener('change',()=>{mobileNavGroup=null;renderNavigation();});
+document.addEventListener('keydown',event=>{
+ if(event.key!=='Escape'||mobileNavGroup===null||!event.target.closest('#nav'))return;
+ event.preventDefault();const group=mobileNavGroup;mobileNavGroup=null;renderNavigation();
+ $('nav').querySelector('[data-nav-group="'+group+'"]')?.focus({preventScroll:true});
+});
 // Keep the top controls reachable after a short upward scroll without a layout jump.
 installSmartHeader();
 
@@ -812,8 +824,8 @@ window.addEventListener('storage',event=>{
 });
 // Refresh on resume and periodically while open. Network failures preserve the saved session.
 setInterval(()=>{if(state.mode==='connected')void api.token().catch(error=>{if([400,401,403].includes(error.status)){epoch++;closeDialogs();state.mode='signedout';state.data=prepareV5Demo(fullDemo());navigate('overview');toast(error.message);}});},30000);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&state.mode==='signedout'&&api.saved())void resumeSession();else if(document.visibilityState==='visible'&&state.mode==='connected'&&!writeBusy&&!document.querySelector('dialog[open]'))void reload().catch(()=>{});});
-setInterval(()=>{if(document.visibilityState==='visible'&&state.mode==='connected'&&['persons','units'].includes(state.page)&&!writeBusy&&!document.querySelector('dialog[open]'))void reload().catch(()=>{});},60000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&state.mode==='signedout'&&api.saved())void resumeSession();});
+// All background data refreshes use refreshWhenIdle below to preserve active input.
 void resumeSession();
 void invitationUi.inspect();
 

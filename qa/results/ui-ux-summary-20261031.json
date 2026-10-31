@@ -1,0 +1,31 @@
+{
+  "unit_tests": {
+    "passed": 405,
+    "failed": 0
+  },
+  "browser_standard": {
+    "views": 336,
+    "failed": 0
+  },
+  "browser_variants": {
+    "views": 252,
+    "failed": 0
+  },
+  "axe_scans": 112,
+  "manual_browser": [
+    "mobile navigation Escape closes submenu and returns focus",
+    "date filter rerender preserves input focus and value",
+    "skip link preserves report route and date filter",
+    "bank search empty state remains focused and disables pagination"
+  ],
+  "dom_checks": [
+    "empty person picker keyboard navigation",
+    "combobox expanded state",
+    "Escape returns to picker button",
+    "visible and repeated person field errors",
+    "clearing field errors",
+    "nested disclosure error focus",
+    "password toggle idempotence and closing concealment"
+  ],
+  "data": "synthetic only; no production writes"
+}

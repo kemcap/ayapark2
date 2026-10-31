@@ -1,5 +1,5 @@
-import {personPicker,bindPersonPicker} from './person-picker.mjs?v=5.10.0';
-import {fieldError} from './ui-feedback.mjs?v=5.9.0';
+import {personPicker,bindPersonPicker} from './person-picker.mjs?v=5.10.1';
+import {fieldError} from './ui-feedback.mjs?v=5.10.1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,randomId} from './core.mjs?v=5.10.0';
 import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=5.10.0';
