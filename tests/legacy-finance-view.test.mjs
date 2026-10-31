@@ -35,7 +35,7 @@ const makeFixture=()=>{
  d.units=[{id:A2,code:A2,occupancy_status:'occupied',block:'A',number:2}];
  d.persons=[{id:'Sibel',full_name:'Sibel Kantarcı'},{id:'Owner',full_name:'Halil Geçer'}];
  d.links=[{id:'l1',unit_id:A2,person_id:'Sibel',role:'tenant',active:true},{id:'l2',unit_id:A2,person_id:'Owner',role:'owner',active:true}];
- d.devirSnapshot=[{unit_id:A2,source_date:'2026-10-09',total_cents:1660300,categories}];
+ d.devirSnapshot=[{unit_id:A2,source_date:'2026-10-09',total_cents:1660300,categories:{...categories}}];
  return d;
 };
 
