@@ -64,7 +64,7 @@ export function residentClaimsCards(s){
  const count=stats?.site_unit_count??20;
  const ownCount=(s.data.ownIds||[]).length;
  const hint=text('siteNote').replace('20',String(count));
- return `<article class="card claim-metric claim-metric-action"><button type="button" class="claim-metric-trigger" data-action="claims_detail" aria-label="${text(ownCount>1?'ownMany':'own')}: ${owned}. ${text('view')}"><span class="claim-metric-heading">${text(ownCount>1?'ownMany':'own')}</span><span class="claim-metric-note">${text('ownNote')}</span><strong class="large-amount">${owned}</strong><span class="claim-drilldown">${text('view')} <span aria-hidden="true">→</span></span></button></article>`+
+ return `<article class="card claim-metric"><div class="card-head"><div><h2>${text(ownCount>1?'ownMany':'own')}</h2><p>${text('ownNote')}</p></div></div><strong class="large-amount">${owned}</strong></article>`+
  `<article class="card claim-metric"><div class="card-head"><div><h2>${text('site')}</h2><p>${hint}</p></div></div><strong class="large-amount">${site}</strong><small>${text('notAdd')}</small></article>`;
 }
 export function residentClaimsPanel(s,{dashboard=false}={}){

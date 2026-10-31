@@ -46,3 +46,12 @@ test('readAll preserves pagination rather than silently truncating after 1000 ro
  api.read=async(_table,q)=>{const n=Number(new URLSearchParams(q).get('offset'));offsets.push(n);return Array.from({length:n<2000?1000:1},(_,i)=>({id:n+i}));};
  const rows=await api.readAll('site_resident_units','select=user_id');assert.equal(rows.length,2001);assert.deepEqual(offsets,[0,1000,2000]);
 });
+test('management read projection enables apartment balances without any editing capability',async()=>{
+ const f=fixture('deputy');f.workspace.management_read=true;f.workspace.capabilities={admin:false,finance:false,people:false};
+ f.workspace.persons=[{id:'owner',full_name:'Synthetic owner',is_self:false}];f.workspace.links=[{id:'owner-link',unit_id:'u2',person_id:'owner',role:'owner',active:true}];
+ const old=f.api.rpc;f.api.rpc=async name=>name==='ay3_draft_workspace'?{tasks:{charges_prepare:true},grants:[{user_id:'qa-user',tasks:['charges_prepare'],management_read:true}],preparation:{persons:[],links:[]}}:old(name);
+ const data=await f.api.load();assert.equal(data.managementRead,true);assert.equal(data.capabilities.finance,false);assert.equal(data.capabilities.people,false);assert.equal(data.persons[0].full_name,'Synthetic owner');assert(data.units.every(u=>typeof u.debt==='number'));assert.equal(data.links[0].id,'owner-link');assert.equal(data.opening,null,'allocated-payment projection must not become an account balance');
+});
+test('management opt-out does not infer new read access from the role label',async()=>{
+ const f=fixture('deputy');f.workspace.management_read=false;f.workspace.capabilities={admin:false,finance:false,people:false};const data=await f.api.load();assert.equal(data.managementRead,false);assert.equal(data.units.find(u=>u.id==='u2').debt,null);
+});
