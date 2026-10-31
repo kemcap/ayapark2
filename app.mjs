@@ -37,9 +37,9 @@ import {template} from './v3-import.mjs?v=5.8.1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.9.28';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.8.1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.9.39';
-import {AyaparkApi} from './api.mjs?v=5.9.45';
+import {AyaparkApi} from './api.mjs?v=5.9.52';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.9.51';
-import {buildForm,payloadFor} from './forms.mjs?v=5.9.51';
+import {buildForm,payloadFor} from './forms.mjs?v=5.9.52';
 import {analyzeStage} from './reconcile.mjs?v=5.8.1';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -610,7 +610,22 @@ document.dispatchEvent(new Event('ay2:languagechange'));
 if(!new URLSearchParams(location.hash.slice(1)).has('access_token')&&!new URLSearchParams(location.hash.slice(1)).has('error'))navigate(location.hash.slice(1)||'overview');
 
 function updateConditionalForm(changed=''){
- if(formAction?.action==='user_access'){const fresh=$('actionFields').querySelector('[name="person_mode"]:checked')?.value==='new';for(const[id,enabled]of [['accessExisting',!fresh],['accessNew',fresh]]){const container=$(id);if(!container)continue;container.hidden=!enabled;for(const input of container.querySelectorAll('input,select')){input.disabled=!enabled;input.required=enabled;}}return;}
+ if(formAction?.action==='user_access'){
+  const root=$('actionFields');
+  const fresh=root.querySelector('[name="person_mode"]:checked')?.value==='new';
+  for(const[id,enabled]of [['accessExisting',!fresh],['accessNew',fresh]]){
+   const container=$(id);if(!container)continue;
+   container.hidden=!enabled;
+   for(const input of container.querySelectorAll('input,select')){input.disabled=!enabled;input.required=enabled;}
+  }
+  const selected=root.querySelector('[name="person_id"]')?.value;
+  const person=state.data.persons.find(p=>p.id===selected);
+  const storedEmail=String(person?.email||'').trim();
+  const needsEmail=!fresh&&!!person&&!person.auth_user_id&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(storedEmail);
+  const container=$('accessExistingEmail');
+  if(container){container.hidden=!needsEmail;const input=container.querySelector('[name="access_email"]');if(input){input.disabled=!needsEmail;input.required=needsEmail;}}
+  return;
+ }
 
  if(formAction?.action.startsWith('assignment_'))updateAssignmentForm($('actionFields'),state.data,changed);
 
