@@ -33,3 +33,10 @@
 @media(max-width:900px){.ay-preview-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.ay-preview-management{gap:12px}.ay-preview-panel{padding:14px}.ay-preview-stat{min-height:93px;padding:13px}.ay-preview-heading{align-items:flex-start}.ay-preview-notice{padding:12px}.ay-home-switch{bottom:calc(12px + env(safe-area-inset-bottom))}}
 @media(prefers-reduced-motion:reduce){.ay-preview-management *{scroll-behavior:auto}}
+
+/* Compact headline: keep KPI cards near the top. */
+.ay-preview-management{gap:12px}
+.ay-preview-heading{gap:6px;min-height:0}
+.ay-preview-heading h1{font-size:clamp(19px,2.5vw,24px);line-height:1.2}
+.ay-preview-heading p{margin:3px 0 0;font-size:11px;line-height:1.35}
+.ay-preview-label{padding:5px 8px}
