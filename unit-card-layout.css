@@ -19,3 +19,11 @@
 .building-plan > .building-block[hidden]{display:none!important}
 
 .unit-card-grid > .apartment-card[hidden]{display:none!important}
+
+/* Quiet 3-second apartment detail discovery cue. */
+.apartment-open-cue{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 16px 13px;padding:10px 11px;min-width:0;border-radius:10px;background:var(--soft);color:var(--primary);font-size:11px;font-weight:700;line-height:1.35;transition:background-color .6s ease,color .6s ease}
+.apartment-open-cue-arrow{display:inline-flex;align-items:center;justify-content:center;flex:0 0 27px;width:27px;height:27px;border-radius:8px;background:var(--paper);color:var(--primary);font-size:17px;transition:transform .65s cubic-bezier(.2,.8,.2,1),background-color .65s ease}
+.apartment-card.ay2-discovery-pulse .apartment-open-cue-arrow{transform:translate(3px,-3px);background:var(--hover)}
+.apartment-card.ay2-discovery-pulse .apartment-open-cue{background:var(--hover)}
+.apartment-open:focus-visible .apartment-open-cue{outline:2px solid var(--focus);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.apartment-open-cue,.apartment-open-cue-arrow{transition:none!important}}
