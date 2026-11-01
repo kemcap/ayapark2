@@ -21,3 +21,5 @@
 .unit-card-layout-control button{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:9px;padding:9px 12px;min-height:44px;font-size:12px}
 .unit-card-layout-control button[aria-pressed="true"]{background:var(--primary);color:var(--paper);border-color:var(--primary);font-weight:750}
 @media(max-width:600px){:root[data-unit-card-layout="structured"] .apartment-person-row{grid-template-columns:minmax(72px,34%) minmax(0,1fr)}}
+
+.building-plan > .building-block[hidden]{display:none!important}
