@@ -96,7 +96,7 @@ function render(focus=false){
  }else if(state.mode==='demo'){if(!state.demoFullData||state.data.role==='super'){state.demoFullData=state.data;state.demoFullData.serverRole='manager';}state.fullData=state.demoFullData;state.data=previewProjection(state.fullData,state.viewRole||'super',state.previewSelection||'');}else{state.fullData=null;state.demoFullData=null;state.viewRole='super';state.previewSelection='';}
 
  document.documentElement.lang=getLanguage();
- $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> <span class="language-code">'+getLanguage().toUpperCase()+'</span>';$('languageToggle').title=tr('Dili değiştir')+' · Türkçe → Deutsch → English';$('languageToggle').setAttribute('aria-label',$('languageToggle').title);
+ $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg?v=uk1"> <span class="language-code">'+getLanguage().toUpperCase()+'</span>';$('languageToggle').title=tr('Dili değiştir')+' · Türkçe → Deutsch → English';$('languageToggle').setAttribute('aria-label',$('languageToggle').title);
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
  const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V5.10.0'+(IS_PREVIEW?' · '+tr('Önizleme'):'');
