@@ -27,3 +27,8 @@
 .apartment-card.ay2-discovery-pulse .apartment-open-cue{background:var(--hover)}
 .apartment-open:focus-visible .apartment-open-cue{outline:2px solid var(--focus);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){.apartment-open-cue,.apartment-open-cue-arrow{transition:none!important}}
+
+/* Align the opening cue to the full width of the apartment heading. */
+.apartment-open .apartment-open-cue{width:100%;align-self:stretch;margin:0;border-radius:0 0 12px 12px;box-sizing:border-box;padding:12px 16px;}
+/* Overview cards add padding to their open button: cancel it only for the full-width cue. */
+.overview-main-grid .apartment-card .apartment-open-cue{width:calc(100% + 18px);margin-left:-9px;margin-right:-9px;margin-bottom:-11px;}
