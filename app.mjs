@@ -51,6 +51,18 @@ const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnl
 const applyStaticLanguage=bindStaticText(document.body);
 const hideLoginPassword=bindPasswordEyes();
 let detailView=null,personUnitReturn=null,loginMethod='password';
+let unitCardLayout='structured';
+try{unitCardLayout=localStorage.getItem('ayapark2-unit-card-layout')==='classic'?'classic':'structured';}catch{}
+document.documentElement.dataset.unitCardLayout=unitCardLayout;
+function unitCardLayoutControl(){
+ const L=getLanguage();
+ const title=L==='tr'?'Daire kartı tasarımı':L==='en'?'Apartment card design':'Wohnungskarten-Design';
+ const classic=L==='tr'?'Önceki':L==='en'?'Previous':'Bisherig';
+ const modern=L==='tr'?'Yeni düzen':L==='en'?'New layout':'Neue Struktur';
+ const note=L==='tr'?'Yalnızca bu tarayıcıda karşılaştırma':L==='en'?'Compare locally in this browser':'Vergleich nur in diesem Browser';
+ return '<div class="unit-card-layout-control" role="group" aria-label="'+title+'"><span><strong>'+title+'</strong><small>'+note+'</small></span><div class="switch-actions"><button type="button" data-unit-card-choice="classic" aria-pressed="'+(unitCardLayout==='classic')+'">'+classic+'</button><button type="button" data-unit-card-choice="structured" aria-pressed="'+(unitCardLayout==='structured')+'">'+modern+'</button></div></div>';
+}
+
 bindInstall();
 initializePreferences();
 const updateDesignControl=bindDesign(()=>render());
@@ -80,7 +92,7 @@ function render(focus=false){
  $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg"> <span class="language-code">'+getLanguage().toUpperCase()+'</span>';$('languageToggle').title=tr('Dili değiştir')+' · Türkçe → Deutsch → English';$('languageToggle').setAttribute('aria-label',$('languageToggle').title);
  if(!pages(state).includes(state.page))state.page='overview';
  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
- const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V5.1'+(IS_PREVIEW?' · '+tr('Önizleme'):'');
+ const d=state.data,own=d.role==='resident';document.title=labels[state.page]+' · Ayapark 2 · V5.10.0'+(IS_PREVIEW?' · '+tr('Önizleme'):'');
  renderNavigation();
  updateDesignControl();
  $('breadcrumb').textContent=labels[state.page];
@@ -119,6 +131,7 @@ function render(focus=false){
  $('modeBadge').hidden=state.mode!=='demo';$('refreshButton').hidden=state.mode!=='connected';
  $('connectionButton').textContent=IS_PREVIEW?tr('Giriş ekranını incele'):state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/buildings.svg" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>${invitationUi.landing()}`:renderPage(state);
+ if(state.mode!=='signedout'&&state.data.role==='super'&&document.querySelector('.building-plan'))$('content').insertAdjacentHTML('afterbegin',unitCardLayoutControl());
  if(state.mode!=='signedout'&&state.page==='reports'&&!can(state,'finance')&&state.data.communityAccess!==true)$('content').innerHTML='<section class="card"><h1>'+((getLanguage()==='tr'?('Mali özet erişime açık değil'):(uiText("Finanzübersicht nicht freigegeben",getLanguage()))))+'</h1><p>'+((getLanguage()==='tr'?('Bu erişim için ortak mali özetler açık değil. Kendi borç ve ödemeleriniz kişisel alanda kullanılabilir.'):(uiText("Für diesen Zugang sind keine gemeinsamen Finanzübersichten freigegeben. Eigene Forderungen und Zahlungen bleiben im persönlichen Bereich verfügbar.",getLanguage()))))+'</p></section>';
  if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview')$('content').insertAdjacentHTML('afterbegin','<div class="archive-toolbar"><button class="button" type="button" data-action="private_archive">'+((getLanguage()==='tr'?('Belgeler ve toplantılar'):(uiText("Dokumente & Versammlungen",getLanguage()))))+'</button></div>');
  if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview'&&['super','staff'].includes(d.role)){const tasks=d.taskWorkspace,c=tasks?.counts;document.querySelector('.archive-toolbar')?.insertAdjacentHTML('beforeend','<button class="button" type="button" data-action="management_tasks">'+((getLanguage()==='tr'?('Görevler ve tarihler'):(uiText("Aufgaben & Termine",getLanguage()))))+'</button><span role="status">'+(c?((getLanguage()==='tr'?('Gecikmiş: '+c.overdue+' · Bugün: '+c.today+' · Gelecek 7 gün: '+c.soon):(uiText("Überfällig: ",getLanguage())+c.overdue+uiText(" · Heute: ",getLanguage())+c.today+uiText(" · Nächste 7 Tage: ",getLanguage())+c.soon))):((getLanguage()==='tr'?('Görev durumu yok – listeyi açın.'):(uiText("Aufgabenstand nicht verfügbar – Liste öffnen.",getLanguage())))))+'</span>');}
@@ -362,6 +375,17 @@ $('urgentDialog').addEventListener('cancel',event=>{if($('urgentDialog').dataset
 function updateAnnouncementTargets(){const root=$('actionFields'),kind=root.querySelector('[name="target_kind"]')?.value;for(const section of root.querySelectorAll('[data-notification-target]'))section.hidden=section.dataset.notificationTarget!==kind;}
 
 document.addEventListener('click',async event=>{
+ const layoutChoice=event.target.closest('[data-unit-card-choice]');
+ if(layoutChoice){
+  if(state.data.role!=='super')return;
+  const next=layoutChoice.dataset.unitCardChoice;
+  if(!['classic','structured'].includes(next))return;
+  unitCardLayout=next;
+  document.documentElement.dataset.unitCardLayout=next;
+  try{localStorage.setItem('ayapark2-unit-card-layout',next);}catch{}
+  document.querySelectorAll('[data-unit-card-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.unitCardChoice===next)));
+  return;
+ }
  if(event.target.closest('a.skip[href="#content"]')){event.preventDefault();$('content').focus({preventScroll:true});$('content').scrollIntoView({block:'start'});return;}
  if(mobileNavGroup!==null&&!event.target.closest('#nav')){mobileNavGroup=null;renderNavigation();}
  // The normal close button also returns to the person card when an apartment was opened from there.
