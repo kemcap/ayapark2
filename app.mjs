@@ -1,3 +1,4 @@
+import {createPrivacyGate} from './privacy-gate.mjs?v=1';
 import {preserveViewFocus} from './ui-focus.mjs?v=5.10.1';
 import {nextLanguage} from './language-text.mjs?v=5.10.0';
 import {uiText} from './language-text.mjs?v=5.10.0';
@@ -74,6 +75,7 @@ bindInstall();
 initializePreferences();
 const updateDesignControl=bindDesign(()=>render());
 const state={data:prepareV5Demo(fullDemo()),mode:IS_PREVIEW||new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},expenseDistributionYear:'report',financeChartView:'bar',stale:false};
+const privacyGate=createPrivacyGate({api,language:getLanguage});
 let peopleSearchTimer;
 const invitationUi=bindInvitations({
  api,getState:()=>state,rerender:()=>render(),
@@ -617,6 +619,7 @@ $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 function completeSignIn(loaded){
  state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';state.fullData=null;
   state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;recordAppEvent('app_open');state.personLogins={};void loadPersonLogins();
+ void privacyGate.check();
  state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
  // Closing a completed login must not trigger the pending-login cancellation handler.
  loginBusy=false;pendingSetupLoaded=null;$('loginSubmit').disabled=false;
