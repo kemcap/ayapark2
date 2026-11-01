@@ -44,7 +44,7 @@ import {template} from './v3-import.mjs?v=perf1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=perf1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=perf1';
-import {AyaparkApi} from './api.mjs?v=pushread1';
+import {AyaparkApi} from './api.mjs?v=activity1';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=logs2';
 import {buildForm,payloadFor} from './forms.mjs?v=perf1';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
@@ -92,6 +92,16 @@ let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGener
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
 function isAccessPreview(){return ['connected','demo'].includes(state.mode)&&mayPreview(state.fullData)&&allowedPreviewRoles(state.fullData).includes(state.viewRole)&&state.viewRole!==nativePreviewRole(state.fullData);}
+const activityNames={app_open:'App geöffnet',login:'Angemeldet',sign_in:'Angemeldet',logout:'Abgemeldet',announcement:'Mitteilung erstellt oder geändert',person:'Personendaten bearbeitet',person_purge:'Person gelöscht',assignment_add:'Wohnungszuordnung hinzugefügt',assignment_edit:'Wohnungszuordnung geändert',assignment_remove:'Wohnungszuordnung entfernt',invite_created:'Einladung erstellt',payment_purpose_reclassification:'Zahlungszweck geändert',import:'Daten importiert',review_checked:'Prüfung durchgeführt',expense_category_correction:'Ausgabenkategorie korrigiert',phone_login_verified:'Anmeldung bestätigt',whatsapp_invite_activated:'Einladungszugang aktiviert'};
+function renderLogDataPage(){
+ const people=(state.data.persons||[]).filter(p=>!p.archived_at&&p.auth_user_id).sort((a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'tr'));
+ const peopleHtml='<details class="ay-log-people-fold"><summary>Personen ('+people.length+')</summary><div class="ay-logdata-people">'+people.map(p=>'<button class="ay-logdata-person" type="button" data-action="person_login_logs" data-id="'+e(p.id)+'"><span><strong>'+e(p.full_name||'—')+'</strong><small>'+e(p.email||'Registrierter Zugang')+'</small></span><span aria-hidden="true">›</span></button>').join('')+'</div></details>';
+ const rows=Array.isArray(state.activityFeed)?state.activityFeed:[];
+ const fmt=v=>{try{return new Intl.DateTimeFormat('de-DE',{timeZone:'Europe/Istanbul',dateStyle:'short',timeStyle:'short'}).format(new Date(v));}catch{return '—';}};
+ const activity=rows.map(row=>'<div class="ay-activity-line"><time>'+e(fmt(row.at))+'</time><span><strong>'+e(row.actor_name||'Kullanıcı')+'</strong> · '+e(activityNames[row.action]||('App-Aktion: '+String(row.action||'Unbekannt').replace(/_/g,' ')))+'</span></div>').join('');
+ return '<section class="card ay-logdata-page"><h2>Logdaten · Anmeldehistorie</h2><p class="fine">Dokumentierte Anmeldungen und Änderungen, chronologisch. Zeiten: Türkiye. Nicht jede Eingabe oder Seitenaktion wurde historisch erfasst.</p>'+peopleHtml+'<section class="ay-activity-feed"><h3>Aktivitätenprotokoll</h3>'+(state.activityLoading?'<p>Lade Einträge …</p>':state.activityError?'<p role="alert">'+e(state.activityError)+'</p>':activity||'<p class="muted">Keine protokollierten Aktivitäten vorhanden.</p>')+'<button class="button" data-action="reload_activity" type="button">Aktualisieren</button></section></section>';
+}
+async function loadActivityFeed(){if(state.mode!=='connected'||!can(state,'admin'))return;state.activityLoading=true;state.activityError='';try{const r=await api.rpc('ay12_admin_activity_feed',{p_site:state.data.site.id,p_limit:150});state.activityFeed=Array.isArray(r)?r:[];}catch(error){state.activityError=error.message||'Protokoll konnte nicht geladen werden.';}finally{state.activityLoading=false;if(state.page==='logdata')render();}}
 function render(focus=false){
  const restoreFocus=focus?()=>{}:preserveViewFocus();
  const appearanceWasOpen=document.querySelector('.appearance-settings')?.open;
@@ -143,7 +153,7 @@ function render(focus=false){
  $('modeBadge').hidden=state.mode!=='demo';$('refreshButton').hidden=state.mode!=='connected';
  $('connectionButton').textContent=IS_PREVIEW?tr('Giriş ekranını incele'):state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
  const logPage=state.page==='logdata'&&state.mode==='connected'&&can(state,'admin');
- const logBody=logPage?'<section class="card ay-logdata-page"><div class="card-head"><div><h2>Logdaten · Anmeldehistorie</h2><p>Gespeicherte Login- und App-Ereignisse einzelner Personen einsehen.</p></div></div><p class="fine">Die Angaben zeigen dokumentierte Ereignisse, keine geschätzte Online-Zeit. Eine Sitzungsdauer ist nur mit zuverlässigem Anfangs- und Endzeitpunkt bestimmbar. Zeitangaben: Türkiye.</p><div class="ay-logdata-people">'+(state.data.persons||[]).filter(p=>!p.archived_at&&p.auth_user_id).sort((a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'tr')).map(p=>'<button class="ay-logdata-person" type="button" data-action="person_login_logs" data-id="'+e(p.id)+'"><span><strong>'+e(p.full_name||'—')+'</strong><small>'+e(p.email||'Registrierter Zugang')+'</small></span><span aria-hidden="true">›</span></button>').join('')+'</div></section>':'';
+ const logBody=logPage?renderLogDataPage():'';
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/ayapark2-modern-icon.svg?v=8" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>${invitationUi.landing()}`:(logPage?logBody:renderPage(state));
  if(state.mode!=='signedout'&&state.page==='reports'&&!can(state,'finance')&&state.data.communityAccess!==true)$('content').innerHTML='<section class="card"><h1>'+((getLanguage()==='tr'?('Mali özet erişime açık değil'):(uiText("Finanzübersicht nicht freigegeben",getLanguage()))))+'</h1><p>'+((getLanguage()==='tr'?('Bu erişim için ortak mali özetler açık değil. Kendi borç ve ödemeleriniz kişisel alanda kullanılabilir.'):(uiText("Für diesen Zugang sind keine gemeinsamen Finanzübersichten freigegeben. Eigene Forderungen und Zahlungen bleiben im persönlichen Bereich verfügbar.",getLanguage()))))+'</p></section>';
  if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview')$('content').insertAdjacentHTML('afterbegin','<div class="archive-toolbar"><button class="button" type="button" data-action="private_archive">'+((getLanguage()==='tr'?('Belgeler ve toplantılar'):(uiText("Dokumente & Versammlungen",getLanguage()))))+'</button></div>');
@@ -461,6 +471,7 @@ document.addEventListener('click',async event=>{
  const b=event.target.closest('[data-action]');if(!b)return;const action=b.dataset.action;
  try{
   if(action==='claims_detail'){if(state.data.role!=='resident'||state.data.communityAccess===false)return;detailView={action};return showDetail(residentClaimsDetail(state));}
+  if(action==='reload_activity'){await loadActivityFeed();return;}
   if(action==='audit_page'){if(can(state,'admin'))await loadAuditPage(Number(b.dataset.page));return;}
   if(action==='review_selected'){await reviewSelected();return;}
   if(action==='recover_person'){adminRecoveryUi.open(b.dataset.id);return;}
@@ -639,7 +650,7 @@ let pendingSetupLoaded=null;
 $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 function completeSignIn(loaded){
  state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';state.fullData=null;
-  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;recordAppEvent('app_open');state.personLogins={};void loadPersonLogins();void loadPushStatuses();
+  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;recordAppEvent('app_open');state.personLogins={};void loadPersonLogins();void loadPushStatuses();void loadActivityFeed();
  browserAlerts.scheduleReminder();
  void privacyGate.check();
  state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
