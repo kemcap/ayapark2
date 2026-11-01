@@ -95,7 +95,25 @@ export function reportControls(s,range,group){
 }
 export function reportV3(s){if(s.data.role==='resident'&&s.data.communityAccess===false)return duesV3(s);if(rangeError(selectedRange(s,'report')))return heading(s,tr('Mali raporlar'),tr('Sitenin gelir ve giderlerini dönemlere göre takip edin.'))+dateFilters(s,'report');const d=s.data,range=selectedRange(s,'report'),group=s.reportGroup||'year',summary=financialSeries({...d,summaryDays:d.summaryDays||buildSummaryDays(d)},range,group),max=Math.max(1,...summary.buckets.flatMap(b=>[b.income,b.expense]));const days=(d.summaryDays||[]).filter(r=>r.date<(range.from||'')),opening=(d.summaryOpening??d.opening??0)+days.reduce((n,r)=>n+Number(r.income_cents)-Number(r.expense_cents),0);
  return heading(s,tr('Mali raporlar'),tr('Sitenin gelir ve giderlerini dönemlere göre takip edin.'),button(tr('Yazdır / PDF'),'print')+button(tr('CSV indir'),'export_report'))+reportControls(s,range,group)+`<p class="fine">${tr('Son hesap hareketi')}: ${date(d.sourceLastDate||d.transactions.map(t=>t.date).sort().at(-1))} · ${tr('Kişisel bilgi içermez.')}</p><div class="report-metrics">${[['Gelir',summary.income],['Gider',summary.expense],['Dönem farkı',summary.income-summary.expense],['Kayıtlara göre mevcut hesap bakiyesi',d.summaryBalance??(d.opening==null?null:d.opening+d.transactions.reduce((n,t)=>n+t.cents,0))]].map(([k,v])=>`<div class="metric"><small>${tr(k)}</small><strong>${money(v)}</strong></div>`).join('')}</div>`+card(tr('Gelir ve gider'),tr('Gelir ve giderleri farklı grafiklerde karşılaştırın.'),incomeExpenseChart(s,summary))+card(tr('Gider dağılımı'),tr('Kayıtlı gider kategorileri'),expenseDistributionPanel(s,range))+info('Rapor nasıl hesaplanır?','Bu özet kayıtlı banka hareketlerinden oluşur. Storno edilen kayıtlar ve işaretlenmiş hesaplar arası aktarmalar gelir-gider grafiğine dahil edilmez. Güncel hesap bakiyesi tüm banka hareketlerini içerir. İade ve kategori sınıflandırmalarını yönetim kontrol etmelidir.');}
-export function announcementsV3(s){const d=s.data,manage=can(s,'announcements'),rows=notificationCenter(d);return heading(s,tr('Duyurular'),tr('Sitenizden haberler ve duyurular.'),manage?button(tr('Duyuru oluştur'),'announcement','',true):'')+rows.map(a=>`<div class="announcement-status ${announcementActive(a)?'announcement-active':notificationExpired(a)?'announcement-expired':'announcement-draft'}">`+card(e(notificationTitle(a)),date(a.created_at)+' · '+e(a.author_label||tr('Yönetim')),`<p class="pre-wrap">${e(notificationBody(a))}</p><p>${badge(tr({normal:'Normal',important:'Önemli',urgent:'Acil'}[a.priority||'normal']))} ${badge(tr(hasRead(d,a)?'Okundu':'Okunmadı'),'neutral')} ${badge(notificationState(a),'neutral')}</p><button class="button" data-notification="${e(a.id)}">${tr(notificationExpired(a)?'Duyuruyu aç':'Aç / Okudum')}</button>`,manage?'<div class="ay-announcement-management-actions">'+button(tr('Düzenle'),'announcement',`data-id="${e(a.id)}"`)+(can(s,'admin')?'<button class="button ay-announcement-delete" type="button" data-action="delete_announcement" data-id="'+e(a.id)+'">'+(locale().slice(0,2)==='de'?'Mitteilung löschen':locale().slice(0,2)==='en'?'Delete announcement':'Duyuruyu sil')+'</button>':'')+'</div>':'')+'</div>').join('');}
+export function announcementsV3(s){
+ const d=s.data,manage=can(s,'announcements'),isAdmin=can(s,'admin');
+ const lang=locale().slice(0,2);
+ const headingHtml=heading(s,tr('Duyurular'),tr('Sitenizden haberler ve duyurular.'),manage?button(tr('Duyuru oluştur'),'announcement','',true):'');
+ const records=Array.isArray(d.announcements)?d.announcements:[];
+ let rows=[];
+ try{rows=notificationCenter({...d,announcements:records});}catch(error){console.error('Announcement list could not be filtered:',error);rows=manage?records.filter(a=>a&&a.id):[];}
+ const items=rows.map(a=>{
+  try{
+   const id=e(String(a.id||'')),title=e(notificationTitle(a)||a.title||'—');
+   const subtitle=date(a.created_at)+' · '+e(a.author_label||tr('Yönetim'));
+   const content='<p class="pre-wrap">'+e(notificationBody(a)||a.body||'')+'</p>';
+   const open='<button type="button" class="button" data-notification="'+id+'">'+tr('Aç / Okudum')+'</button>';
+   const controls=manage?'<div class="ay-announcement-management-actions">'+button(tr('Düzenle'),'announcement','data-id="'+id+'"')+(isAdmin?'<button type="button" class="button ay-announcement-delete" data-action="delete_announcement" data-id="'+id+'">'+(lang==='de'?'Mitteilung löschen':lang==='en'?'Delete announcement':'Duyuruyu sil')+'</button>':'')+'</div>':'';
+   return '<div class="announcement-status">'+card(title,subtitle,content+open,controls)+'</div>';
+  }catch(error){console.error('Cannot render announcement',a?.id,error);return manage&&a?.id?'<article class="card"><h3>'+e(a.title||'Duyuru')+'</h3><p>'+e(a.body||'')+'</p>'+button(tr('Düzenle'),'announcement','data-id="'+e(a.id)+'"')+'</article>':'';}
+ }).join('');
+ return headingHtml+(items||'<p class="muted">'+tr('Henüz duyuru yok.')+'</p>');
+}
 export function overviewAccountCard(s){
  const d=s.data;
  const opening=d.summaryOpening??d.opening;
