@@ -24,7 +24,7 @@ export function createBrowserAlerts(){
   if(!primed){seen=new Set(keys);primed=true;return;}
   for(const a of relevant){const id=String(a.id)+':'+String(a.revision||1);if(seen.has(id))continue;seen.add(id);if(!enabled())continue;
    const title=lang==='de'?(a.title_de||a.title):a.title;
-   const n=new Notification('AYA PARK 2 · '+title,{body:(lang==='de'?(a.body_de||a.body):a.body||'').slice(0,145),tag:'ayapark-'+a.id,icon:'./assets/app-icon.png'});
+   const n=new Notification('AYA PARK 2 · '+title,{body:lang==='de'?'Neue wichtige Mitteilung in der App.':lang==='en'?'New important announcement in the app.':'Uygulamada yeni önemli duyuru var.',tag:'ayapark-'+a.id,icon:'./assets/app-icon.png'});
    n.onclick=()=>{window.focus();n.close();};
   }
  }
