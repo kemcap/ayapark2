@@ -1,0 +1,23 @@
+/* AYAPARK 2 optional apartment card layout. Original layout stays untouched. */
+:root[data-unit-card-layout="structured"] .apartment-card{border-radius:var(--radius-card,var(--radius,18px));overflow:hidden;border-color:var(--line)}
+:root[data-unit-card-layout="structured"] .apartment-open{display:flex;flex-direction:column;gap:0;padding:0;border-radius:inherit}
+:root[data-unit-card-layout="structured"] .apartment-open .apartment-heading{padding:15px 16px;background:var(--soft);border-bottom:1px solid var(--line);width:100%}
+:root[data-unit-card-layout="structured"] .apartment-open .apartment-heading>strong{font-size:1.15rem;letter-spacing:-.025em}
+:root[data-unit-card-layout="structured"] .apartment-resident{width:100%;padding:5px 16px 3px;gap:0;color:var(--ink);font-size:12px}
+:root[data-unit-card-layout="structured"] .apartment-person-row{display:grid;grid-template-columns:minmax(65px,34%) minmax(0,1fr);gap:9px;align-items:start;padding:11px 0;border-bottom:1px solid var(--subtle-line,var(--line));min-width:0}
+:root[data-unit-card-layout="structured"] .apartment-person-row:last-child{border-bottom:0}
+:root[data-unit-card-layout="structured"] .apartment-person-role{color:var(--muted);font-size:11px;font-weight:550}
+:root[data-unit-card-layout="structured"] .apartment-person-names{font-weight:650;color:var(--ink);font-size:12px}
+:root[data-unit-card-layout="structured"] .apartment-total-label{display:block;margin:7px 16px 0;padding-top:12px;border-top:1px solid var(--line);width:calc(100% - 32px);font-size:11px}
+:root[data-unit-card-layout="structured"] .apartment-balance{padding:5px 16px 13px;font-size:16px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+:root[data-unit-card-layout="structured"] .apartment-source-note{padding:0 16px 12px}
+:root[data-unit-card-layout="structured"] .apartment-open .old-balance{margin:0 16px 13px}
+:root[data-unit-card-layout="structured"] .apartment-open .unassigned-amount{margin:4px 16px}
+:root[data-unit-card-layout="structured"] .apartment-access{margin:0 16px 12px}
+.unit-card-layout-control{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:0 0 16px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink)}
+.unit-card-layout-control>span{display:grid;gap:3px}
+.unit-card-layout-control small{font-size:11px;color:var(--muted)}
+.unit-card-layout-control .switch-actions{display:flex;gap:6px;flex-wrap:wrap}
+.unit-card-layout-control button{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:9px;padding:9px 12px;min-height:44px;font-size:12px}
+.unit-card-layout-control button[aria-pressed="true"]{background:var(--primary);color:var(--paper);border-color:var(--primary);font-weight:750}
+@media(max-width:600px){:root[data-unit-card-layout="structured"] .apartment-person-row{grid-template-columns:minmax(72px,34%) minmax(0,1fr)}}
