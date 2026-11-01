@@ -416,7 +416,17 @@ document.addEventListener('click',async event=>{
   const block=blockButton.dataset.block;if(!['A','B'].includes(block))return;
   state.filter.block=state.filter.block===block?'all':block;
   for(const node of document.querySelectorAll('[data-block]'))node.setAttribute('aria-pressed',String(node.dataset.block===state.filter.block));
-  $('unitResults').innerHTML=unitResults(state);labelTables();applyAmountPrivacy();$('resultCount').textContent=filteredUnits(state).length+tr(' daire');
+  // Filter already rendered cards; no expensive finance/person recalculation on each tap.
+  const results=$('unitResults');
+  if(results){
+   for(const section of results.querySelectorAll('.building-block')){
+    const heading=section.querySelector('h3')?.textContent?.trim()||'';
+    const sectionBlock=heading[0]?.toUpperCase();
+    section.hidden=state.filter.block!=='all'&&sectionBlock!==state.filter.block;
+   }
+   const visibleCount=[...results.querySelectorAll('.building-block:not([hidden]) .apartment-card')].length;
+   if($('resultCount'))$('resultCount').textContent=visibleCount+tr(' daire');
+  }
   return;
  }
  const tab=event.target.closest('[data-tab]');if(tab){const history=tab.dataset.tab==='history';$('unitCurrent').hidden=history;$('unitHistory').hidden=!history;for(const node of document.querySelectorAll('[data-tab]'))node.setAttribute('aria-pressed',String(node===tab));return;}
