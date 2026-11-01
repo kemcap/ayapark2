@@ -15,7 +15,7 @@ const labelText={overview:'Genel bakış',units:'Daireler',persons:'Kişiler',du
 export const labels=new Proxy(labelText,{get:(target,key)=>tr(target[key])});
 export const date=v=>v?dateFormatter(locale()).format(new Date(v)):'—';
 export const can=(s,k)=>s.mode==='demo'?s.data.role==='super'||(s.data.role==='staff'&&['finance','people','announcements'].includes(k)):!!s.data.capabilities[k];
-export const pages=s=>Object.keys(labels).filter(p=>p!=='logdata'||can(s,'admin')).filter(p=>p!=='transactions'||can(s,'finance')).filter(p=>p!=='persons'||can(s,'people')).filter(p=>s.data.role!=='resident'||s.data.communityAccess!==false||!['reports'].includes(p)).filter(p=>s.data.role!=='resident'||s.data.currentMember!==false||!['announcements','providers'].includes(p));
+export const pages=s=>Object.keys(labels).filter(p=>p!=='logdata'||(s.mode==='connected'&&can(s,'admin'))).filter(p=>p!=='transactions'||can(s,'finance')).filter(p=>p!=='persons'||can(s,'people')).filter(p=>s.data.role!=='resident'||s.data.communityAccess!==false||!['reports'].includes(p)).filter(p=>s.data.role!=='resident'||s.data.currentMember!==false||!['announcements','providers'].includes(p));
 export const visible=s=>s.data.role==='resident'?s.data.units.filter(u=>s.data.ownIds.includes(u.id)):s.data.units;
 export const demo=s=>s.mode==='demo';
 export const badge=(text,kind='')=>`<span class="badge ${kind}">${e(text)}</span>`;
