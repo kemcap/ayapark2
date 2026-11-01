@@ -1,4 +1,4 @@
-import {createBrowserAlerts} from './browser-alerts.mjs?v=1';
+import {createBrowserAlerts} from './browser-alerts.mjs?v=2';
 import {createPrivacyGate} from './privacy-gate.mjs?v=3';
 import {preserveViewFocus} from './ui-focus.mjs?v=5.10.1';
 import {nextLanguage} from './language-text.mjs?v=5.10.0';
@@ -77,7 +77,7 @@ initializePreferences();
 const updateDesignControl=bindDesign(()=>render());
 const state={data:prepareV5Demo(fullDemo()),mode:IS_PREVIEW||new URLSearchParams(location.search).get('demo')==='1'?'demo':'signedout',page:'overview',period:'2026-10',filter:{q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''},reportFilter:{preset:'all'},expenseDistributionYear:'report',financeChartView:'bar',stale:false};
 const privacyGate=createPrivacyGate({api,language:getLanguage});
-const browserAlerts=createBrowserAlerts();
+const browserAlerts=createBrowserAlerts({api,getContext:()=>state.mode==='connected'?state.data:null,language:getLanguage});
 let peopleSearchTimer;
 const invitationUi=bindInvitations({
  api,getState:()=>state,rerender:()=>render(),
@@ -149,7 +149,7 @@ function render(focus=false){
  if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview'&&['super','staff'].includes(d.role)){const tasks=d.taskWorkspace,c=tasks?.counts;document.querySelector('.archive-toolbar')?.insertAdjacentHTML('beforeend','<button class="button" type="button" data-action="management_tasks">'+((getLanguage()==='tr'?('Görevler ve tarihler'):(uiText("Aufgaben & Termine",getLanguage()))))+'</button><span role="status">'+(c?((getLanguage()==='tr'?('Gecikmiş: '+c.overdue+' · Bugün: '+c.today+' · Gelecek 7 gün: '+c.soon):(uiText("Überfällig: ",getLanguage())+c.overdue+uiText(" · Heute: ",getLanguage())+c.today+uiText(" · Nächste 7 Tage: ",getLanguage())+c.soon))):((getLanguage()==='tr'?('Görev durumu yok – listeyi açın.'):(uiText("Aufgabenstand nicht verfügbar – Liste öffnen.",getLanguage())))))+'</span>');}
  if(state.mode==='connected'&&state.page==='settings')$('content').insertAdjacentHTML('afterbegin','<div class="ay-privacy-settings-link"><a href="./privacy-policy.html" target="_blank" rel="noopener noreferrer"><span aria-hidden="true" class="ay-privacy-document-icon">▤</span><span class="ay-privacy-document-copy"><strong>'+(getLanguage()==='de'?'Gesamten Vertrag lesen (30 Artikel)':getLanguage()==='en'?'Read full agreement (30 articles)':'Sözleşmenin tamamını oku (30 madde)')+'</strong><small>'+(getLanguage()==='de'?'Vollständiges Dokument öffnen':getLanguage()==='en'?'Open full document':'Tam metni aç ve incele')+'</small></span><span aria-hidden="true" class="ay-privacy-document-arrow">↗</span></a></div>');
  if(appearanceWasOpen&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;
- if(state.mode==='connected'&&state.page==='settings')browserAlerts.mount(getLanguage());
+ if(state.mode==='connected'&&state.page==='settings')browserAlerts.mount();
  addExportControls();const previewBar=$('accessPreviewBanner');previewBar.innerHTML=previewBanner(state);previewBar.hidden=!isAccessPreview();labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
  document.dispatchEvent(new CustomEvent('ay5:view',{detail:{resident:own,page:state.page,mode:state.mode}}));
  for(const card of document.querySelectorAll('.summary-grid .card')){const links=card.querySelectorAll('a[href]');if(links.length===1&&!card.querySelector('button,input,select')){card.classList.add('stretched-card');links[0].setAttribute('aria-label',(card.querySelector('h2')?.textContent||'')+': '+links[0].textContent);}}
@@ -169,6 +169,13 @@ const tasksUI=managementTasks({rpc:(name,args)=>api.rpc(name,args),allowed:()=>s
 const holdUI=claimHoldReview({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:async()=>{await reload();if(detailView?.action==='charge_detail'&&$('detailDialog').open)showDetail(chargeWithReceipts(detailView.id));}});
 function closeDialogs(){holdUI.close();tasksUI.close();archiveUI.close();closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
+async function sendImportantPush(result,payload){
+ if(!['important','urgent'].includes(payload.priority)||payload.target_kind&&payload.target_kind!=='all')return;
+ const id=result?.id||result?.announcement_id||payload?.id;
+ if(!id)return;
+ const token=await api.token();
+ await api.raw('/functions/v1/ay10-web-push-send','POST',{site_id:state.data.site.id,announcement_id:id},token);
+}
 async function mutate(action,payload){const stop=beginLoading($('contextText'),tr('Kaydediliyor…'));try{return await mutateInner(action,payload);}finally{stop();}}
 async function mutateInner(action,payload){
  if(action==='person_link')action='link';
@@ -287,7 +294,7 @@ async function mutateInner(action,payload){
   try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}return result;
  }
  if(state.mode==='demo'){const r=demoCommand(state.data,action,payload);state.data.transactions.sort((a,b)=>b.date.localeCompare(a.date));refreshDebts(state.data);render();return r;}
- const attempt=epoch,result=await api.command(state.data.site.id,action,payload);if(attempt!==epoch)throw Error(tr("Oturum değişti."));
+ const attempt=epoch,result=await api.command(state.data.site.id,action,payload);if(action==='announcement'&&payload.published===true){void sendImportantPush(result,payload).catch(error=>console.warn('Push dispatch:',error.message));}if(attempt!==epoch)throw Error(tr("Oturum değişti."));
  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
  return result;
 }
@@ -379,7 +386,7 @@ function exportReport(){
 }
 const urgentShown=new Set();let localTest=null,localTestRead=false,popupSession='',importantLoginKeys=new Set(),popupBatch=[],localTestQueue=[],localTestReceipts=new Set();
 function notificationData(){const d=state.data;return {...d,userId:d.userId||'demo-user',announcements:[...(d.announcements||[]),...(localTest&&d.role==='super'?[localTest]:[]),...(d.role==='super'?localTestQueue:[])],acknowledgements:[...(d.acknowledgements||[]),...(localTestRead&&localTest?[{announcement_id:localTest.id,revision:localTest.revision,user_id:d.userId||'demo-user'}]:[]),...localTestQueue.filter(a=>localTestReceipts.has(a.id)).map(a=>({announcement_id:a.id,revision:a.revision,user_id:d.userId||'demo-user'}))]};}
-function updateNotifications(){const d=notificationData(),unread=unreadNotifications(d);if(state.mode==='connected')browserAlerts.check(d.announcements,getLanguage());$('notificationBell').hidden=state.mode==='signedout';$('notificationCount').hidden=!unread.length;$('notificationCount').textContent=unread.length>99?'99+':unread.length;$('notificationBell').setAttribute('aria-label',tr('Bildirimler')+' · '+unread.length);$('notificationsTitle').textContent=tr('Bildirimler');$('closeNotifications').textContent=tr('Kapat');if($('notificationsDialog').open)$('notificationsList').innerHTML=notificationList(d);}
+function updateNotifications(){const d=notificationData(),unread=unreadNotifications(d);$('notificationBell').hidden=state.mode==='signedout';$('notificationCount').hidden=!unread.length;$('notificationCount').textContent=unread.length>99?'99+':unread.length;$('notificationBell').setAttribute('aria-label',tr('Bildirimler')+' · '+unread.length);$('notificationsTitle').textContent=tr('Bildirimler');$('closeNotifications').textContent=tr('Kapat');if($('notificationsDialog').open)$('notificationsList').innerHTML=notificationList(d);}
 function openNotification(a,{progress=''}={}){if(!a)return;if($('notificationsDialog').open)$('notificationsDialog').close();$('urgentTitle').textContent=notificationTitle(a);$('urgentBody').textContent=notificationBody(a);$('urgentMeta').textContent=a.local_test?tr('Yalnızca Süper Admin testi'):new Date(a.created_at).toLocaleDateString((getLanguage()==='tr'?('tr-TR'):(uiText("de-DE",getLanguage()))))+(a.author_label?' · '+a.author_label:'');$('ackUrgent').dataset.id=a.id;$('ackUrgent').dataset.revision=a.revision||1;$('ackUrgent').dataset.key=acknowledgementKey(a);$('ackUrgent').textContent=tr(!announcementActive(a)||isAccessPreview()?'Kapat':'Okudum');$('urgentProgress').textContent=progress;$('urgentProgress').hidden=!progress;$('urgentDialog').dataset.required=a.priority==='urgent'&&announcementActive(a)&&!isAccessPreview()?'true':'false';$('ackUrgent').dataset.expired=String(!announcementActive(a)||isAccessPreview());if(a.priority!=='urgent')urgentShown.add(acknowledgementKey(a));if(!$('urgentDialog').open)$('urgentDialog').showModal();}
 function checkUrgent(){const key=state.mode+':'+(state.data.userId||'demo-user')+':'+epoch;if(key!==popupSession){popupSession=key;popupBatch=[];importantLoginKeys=new Set(unreadNotifications(notificationData()).filter(a=>a.priority==='important'&&a.popup_on_login).map(acknowledgementKey));}if(isAccessPreview()||state.mode==='signedout'||document.querySelector('dialog[open]'))return;const pending=unreadNotifications(notificationData()).filter(a=>(a.priority==='urgent'||a.priority==='important'&&a.popup_on_login&&importantLoginKeys.has(acknowledgementKey(a)))&&!urgentShown.has(acknowledgementKey(a)));if(!pending.length){popupBatch=[];return;}if(!popupBatch.length)popupBatch=pending.map(acknowledgementKey);else for(const a of pending)if(!popupBatch.includes(acknowledgementKey(a)))popupBatch.push(acknowledgementKey(a));const a=pending[0];openNotification(a,{progress:popupBatch.length>1?popupProgress(popupBatch,acknowledgementKey(a)):''});}
 $('notificationBell').addEventListener('click',()=>{$('notificationsList').innerHTML=notificationList(notificationData());$('notificationsDialog').showModal();});
@@ -623,6 +630,7 @@ $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 function completeSignIn(loaded){
  state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';state.fullData=null;
   state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;recordAppEvent('app_open');state.personLogins={};void loadPersonLogins();
+ browserAlerts.scheduleReminder();
  void privacyGate.check();
  state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
  // Closing a completed login must not trigger the pending-login cancellation handler.
