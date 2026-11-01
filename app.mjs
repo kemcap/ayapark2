@@ -51,9 +51,6 @@ const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnl
 const applyStaticLanguage=bindStaticText(document.body);
 const hideLoginPassword=bindPasswordEyes();
 let detailView=null,personUnitReturn=null,loginMethod='password';
-let unitCardLayout='structured';
-try{unitCardLayout=localStorage.getItem('ayapark2-unit-card-layout')==='classic'?'classic':'structured';}catch{}
-document.documentElement.dataset.unitCardLayout=unitCardLayout;
 function applyApartmentQuickFilters(){
  const root=$('unitResults');if(!root)return;
  let count=0;
@@ -71,14 +68,6 @@ function applyApartmentQuickFilters(){
   count+=sectionCount;
  }
  if($('resultCount'))$('resultCount').textContent=count+tr(' daire');
-}
-function unitCardLayoutControl(){
- const L=getLanguage();
- const title=L==='tr'?'Daire kartı tasarımı':L==='en'?'Apartment card design':'Wohnungskarten-Design';
- const classic=L==='tr'?'Önceki':L==='en'?'Previous':'Bisherig';
- const modern=L==='tr'?'Yeni düzen':L==='en'?'New layout':'Neue Struktur';
- const note=L==='tr'?'Yalnızca bu tarayıcıda karşılaştırma':L==='en'?'Compare locally in this browser':'Vergleich nur in diesem Browser';
- return '<div class="unit-card-layout-control" role="group" aria-label="'+title+'"><span><strong>'+title+'</strong><small>'+note+'</small></span><div class="switch-actions"><button type="button" data-unit-card-choice="classic" aria-pressed="'+(unitCardLayout==='classic')+'">'+classic+'</button><button type="button" data-unit-card-choice="structured" aria-pressed="'+(unitCardLayout==='structured')+'">'+modern+'</button></div></div>';
 }
 
 bindInstall();
@@ -393,17 +382,6 @@ $('urgentDialog').addEventListener('cancel',event=>{if($('urgentDialog').dataset
 function updateAnnouncementTargets(){const root=$('actionFields'),kind=root.querySelector('[name="target_kind"]')?.value;for(const section of root.querySelectorAll('[data-notification-target]'))section.hidden=section.dataset.notificationTarget!==kind;}
 
 document.addEventListener('click',async event=>{
- const layoutChoice=event.target.closest('[data-unit-card-choice]');
- if(layoutChoice){
-  if(state.data.role!=='super')return;
-  const next=layoutChoice.dataset.unitCardChoice;
-  if(!['classic','structured'].includes(next))return;
-  unitCardLayout=next;
-  document.documentElement.dataset.unitCardLayout=next;
-  try{localStorage.setItem('ayapark2-unit-card-layout',next);}catch{}
-  document.querySelectorAll('[data-unit-card-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.unitCardChoice===next)));
-  return;
- }
  if(event.target.closest('a.skip[href="#content"]')){event.preventDefault();$('content').focus({preventScroll:true});$('content').scrollIntoView({block:'start'});return;}
  if(mobileNavGroup!==null&&!event.target.closest('#nav')){mobileNavGroup=null;renderNavigation();}
  // The normal close button also returns to the person card when an apartment was opened from there.
