@@ -51,12 +51,11 @@ export function createBrowserAlerts({api,getContext,language}){
  function closeReminder(){document.querySelector('#ayPushReminder')?.close();}
  async function remind(){
   if(prompted||!getContext()?.site?.id||!supported())return;
-  if(Notification.permission==='denied')return;
-  if(await isActive())return;
+  if(Notification.permission!=='denied'&&await isActive())return;
   if(document.querySelector('dialog[open]'))return;
   prompted=true;
   let dlg=document.querySelector('#ayPushReminder');if(!dlg){dlg=document.createElement('dialog');dlg.id='ayPushReminder';dlg.className='ay-push-reminder';document.body.append(dlg);}
-  const x=words();dlg.innerHTML='<div class="ay-push-reminder-body"><div class="ay-push-reminder-icon" aria-hidden="true">🔔</div><h2>'+x.heading+'</h2><p>'+x.body+'</p><p id="ayPushReminderError" class="fine" role="alert"></p><div class="ay-push-reminder-actions"><button type="button" id="ayPushLater" class="button">'+x.later+'</button><button type="button" id="ayPushActivate" class="button primary">'+x.activate+'</button></div></div>';
+  const x=words(),blocked=Notification.permission==='denied';dlg.innerHTML='<div class="ay-push-reminder-body"><div class="ay-push-reminder-icon" aria-hidden="true">🔔</div><h2>'+x.heading+'</h2><p>'+x.body+'</p>'+(blocked?'<p class="fine">'+x.blocked+'</p>':'')+'<p id="ayPushReminderError" class="fine" role="alert"></p><div class="ay-push-reminder-actions"><button type="button" id="ayPushLater" class="button">'+x.later+'</button><button type="button" id="ayPushActivate" class="button primary" '+(blocked?'disabled':'')+'>'+x.activate+'</button></div></div>';
   dlg.querySelector('#ayPushLater').onclick=closeReminder;
   const button=dlg.querySelector('#ayPushActivate');button.onclick=async()=>{button.disabled=true;try{await enable()}catch(e){dlg.querySelector('#ayPushReminderError').textContent=e.message||x.failed;}finally{button.disabled=false;}};
   dlg.showModal();
