@@ -1,0 +1,10 @@
+/* Manager-only login audit directory */
+.ay-logdata-page{max-width:900px}
+.ay-logdata-people{display:grid;gap:9px;margin-top:17px}
+.ay-logdata-person{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink);text-align:left;cursor:pointer;font:inherit}
+.ay-logdata-person:hover,.ay-logdata-person:focus-visible{border-color:var(--primary)}
+.ay-logdata-person>span:first-child{display:grid;gap:3px;min-width:0}
+.ay-logdata-person strong{font-size:13px;overflow-wrap:anywhere}
+.ay-logdata-person small{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.ay-logdata-person>span:last-child{font-size:25px;color:var(--primary)}
+.ay-logdata-page .fine{font-size:11px;line-height:1.6}
