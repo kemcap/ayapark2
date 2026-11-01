@@ -25,7 +25,7 @@ import {expenseDistributionPanel} from './expense-distribution-ui.mjs?v=perf1';
 import {incomeExpenseChart} from './finance-charts.mjs?v=perf1';
 import {prepareV5Demo} from './finance-demo.mjs?v=perf1';
 import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=perf1';
-import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=perf1';
+import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=cleartests1';
 import {bindDesign} from './design.mjs?v=5.10.0';
 import {enhanceTables} from './ui-accessibility.mjs?v=5.10.1';
 import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.10.1';
@@ -454,6 +454,7 @@ document.addEventListener('click',async event=>{
   else{localTestQueue=[];localTestReceipts.clear();localTest??=testAnnouncement();if(action==='reset')localTestRead=false;if(action==='show'||action==='reopen')openNotification(localTest);if(action==='reset')urgentShown.delete(acknowledgementKey(localTest));}
   updateNotifications();if($('notificationTestStatus'))$('notificationTestStatus').textContent=tr(action==='disable'?'Test devre dışı.':'Test hazır. Gerçek bildirim gönderilmedi.');return;
  }
+ const testDelete=event.target.closest('[data-action="delete_test_notification"]');if(testDelete){if(state.data.role!=='super')return;const id=testDelete.dataset.id;if(id==='local-test-notification'){localTest=null;localTestRead=false;}else{localTestQueue=localTestQueue.filter(x=>x.id!==id);localTestReceipts.delete(id);}updateNotifications();return;}
  const notice=event.target.closest('[data-notification]');if(notice){openNotification(notificationCenter(notificationData()).find(a=>a.id===notice.dataset.notification));return;}
  const previewButton=event.target.closest('[data-finance-preview]');
  if(previewButton&&formAction){try{previewButton.disabled=true;const {action,context}=formAction,payload=financePayload(action,new FormData($('actionForm')),context,{previewing:true});const value=action==='auto_allocate'&&state.mode==='connected'?await api.rpc('ay5_payment_plan',{p_site:state.data.site.id,p_payload:payload}):localFinancePreview(state.data,action,payload);context.preview=value;context.previewSignature=JSON.stringify(payload);$('financePreview').innerHTML=financePreviewMarkup(state.data,action,value);labelTables();$('actionMessage').textContent='';}catch(error){$('actionMessage').textContent=tr(error.message);}finally{previewButton.disabled=false;}return;}
