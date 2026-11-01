@@ -142,7 +142,14 @@ function render(focus=false){
  const previewEligible=state.mode==='connected'&&state.data?.role==='super'&&state.page==='overview'&&!isAccessPreview();
  if(previewEligible){
   let choice='old';try{choice=sessionStorage.getItem('ay2-management-home-preview')==='new'?'new':'old';}catch{}
-  if(choice==='new')$('content').innerHTML=managementHomePreview(state);
+  const oldMarkup=$('content').innerHTML;
+  const newMarkup=managementHomePreview(state);
+  const holder=document.createElement('div');holder.className='ay-home-preview-stage';
+  const oldPanel=document.createElement('div');oldPanel.className='ay-home-layout-old';oldPanel.innerHTML=oldMarkup;
+  const newPanel=document.createElement('div');newPanel.className='ay-home-layout-new';newPanel.innerHTML=newMarkup;
+  holder.append(choice==='new'?newPanel:oldPanel);
+  window.__ayHomePreview={holder,oldPanel,newPanel,choice};
+  $('content').replaceChildren(holder);
   $('content').insertAdjacentHTML('beforeend','<div class="ay-home-switch" role="group" aria-label="Yönetim ana sayfası test görünümü"><span class="ay-home-switch-caption">TEST</span><button type="button" data-action="home_layout_toggle" data-layout="old" aria-pressed="'+(choice==='old')+'">Alt</button><button type="button" data-action="home_layout_toggle" data-layout="new" aria-pressed="'+(choice==='new')+'">Neu</button></div>');
  }
  if(state.mode!=='signedout'&&state.page==='reports'&&!can(state,'finance')&&state.data.communityAccess!==true)$('content').innerHTML='<section class="card"><h1>'+((getLanguage()==='tr'?('Mali özet erişime açık değil'):(uiText("Finanzübersicht nicht freigegeben",getLanguage()))))+'</h1><p>'+((getLanguage()==='tr'?('Bu erişim için ortak mali özetler açık değil. Kendi borç ve ödemeleriniz kişisel alanda kullanılabilir.'):(uiText("Für diesen Zugang sind keine gemeinsamen Finanzübersichten freigegeben. Eigene Forderungen und Zahlungen bleiben im persönlichen Bereich verfügbar.",getLanguage()))))+'</p></section>';
@@ -451,7 +458,19 @@ document.addEventListener('click',async event=>{
  const b=event.target.closest('[data-action]');if(!b)return;const action=b.dataset.action;
  try{
   if(action==='claims_detail'){if(state.data.role!=='resident'||state.data.communityAccess===false)return;detailView={action};return showDetail(residentClaimsDetail(state));}
-   if(action==='home_layout_toggle'){if(state.mode==='connected'&&state.data?.role==='super'&&state.page==='overview'&&!isAccessPreview()){const layout=b.dataset.layout==='new'?'new':'old';try{sessionStorage.setItem('ay2-management-home-preview',layout);}catch{}render();}return;}
+   if(action==='home_layout_toggle'){
+   const preview=window.__ayHomePreview;
+   if(preview&&state.mode==='connected'&&state.data?.role==='super'&&state.page==='overview'&&!isAccessPreview()){
+    const layout=b.dataset.layout==='new'?'new':'old';
+    if(layout!==preview.choice){
+     preview.holder.replaceChildren(layout==='new'?preview.newPanel:preview.oldPanel);
+     preview.choice=layout;
+    }
+    try{sessionStorage.setItem('ay2-management-home-preview',layout);}catch{}
+    document.querySelectorAll('.ay-home-switch [data-layout]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.layout===layout)));
+   }
+   return;
+  }
   if(action==='audit_page'){if(can(state,'admin'))await loadAuditPage(Number(b.dataset.page));return;}
   if(action==='review_selected'){await reviewSelected();return;}
   if(action==='recover_person'){adminRecoveryUi.open(b.dataset.id);return;}
