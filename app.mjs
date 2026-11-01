@@ -1,4 +1,4 @@
-import {createBrowserAlerts} from './browser-alerts.mjs?v=3';
+import {createBrowserAlerts} from './browser-alerts.mjs?v=4';
 import {createPrivacyGate} from './privacy-gate.mjs?v=3';
 import {preserveViewFocus} from './ui-focus.mjs?v=5.10.1';
 import {nextLanguage} from './language-text.mjs?v=5.10.0';
