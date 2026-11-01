@@ -170,7 +170,7 @@ const holdUI=claimHoldReview({rpc:(name,args)=>api.rpc(name,args),allowed:()=>st
 function closeDialogs(){holdUI.close();tasksUI.close();archiveUI.close();closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
 async function sendImportantPush(result,payload){
- if(!['important','urgent'].includes(payload.priority)||payload.target_kind&&payload.target_kind!=='all')return;
+ // Server verifies priority, target, publishing window, site and sender authorization.
  const id=result?.id||result?.announcement_id||payload?.id;
  if(!id)return;
  const token=await api.token();
