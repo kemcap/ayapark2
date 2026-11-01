@@ -1,0 +1,68 @@
+name: Backfill confirmed historic AYAPARK 2 snapshots
+on:
+  push:
+    paths:
+      - .github/workflows/backfill-historic-archives.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: ayapark2-historical-backfill
+  cancel-in-progress: false
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - tag: historic-v2-pre-auth
+            sha: 869e0385639766ec90d218b4dfaf8da39717f475
+            title: "AYAPARK 2 – V2 development snapshot (historical)"
+            source: "baseline/ayapark-v2-before-auth-phase3"
+          - tag: v3.15.0
+            sha: deef766bbc22f2aa7b7bb4d6bf8b2ffc64e74c4c
+            title: "AYAPARK 2 – V3.15 (historical)"
+            source: "baseline/v3.15-before-v4"
+          - tag: v5.1.0
+            sha: 489b7182a228cb619b3393e5863147d0669e0a6a
+            title: "AYAPARK 2 – V5.1 (historical)"
+            source: "baseline/v5.1-before-audit-20261026"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify original snapshot commit
+        env:
+          SHA: ${{ matrix.sha }}
+        run: |
+          git cat-file -e "$SHA^{commit}"
+      - name: Preserve original commit under immutable historical tag
+        env:
+          TAG: ${{ matrix.tag }}
+          SHA: ${{ matrix.sha }}
+        run: |
+          git fetch --tags origin
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git rev-parse -q --verify "refs/tags/$TAG" > /dev/null; then
+            ACTUAL=$(git rev-list -n 1 "$TAG")
+            test "$ACTUAL" = "$SHA" || { echo "::error::Existing tag points to a different commit"; exit 1; }
+          else
+            git tag -a "$TAG" "$SHA" -m "Reconstructed historic source snapshot: $TAG"
+            git push origin "refs/tags/$TAG"
+          fi
+      - name: Publish historic archive release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ matrix.tag }}
+          SOURCE: ${{ matrix.source }}
+          SHA: ${{ matrix.sha }}
+          TITLE: ${{ matrix.title }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release already exists: $TAG"
+            exit 0
+          fi
+          printf 'Historical source-code archive reconstructed from branch `%s`.\n\nOriginal commit: `%s`.\n\nThis snapshot is not a guarantee that the old application still runs with the current Supabase database. Historical database contents and external secrets are not included. No production branch is modified.\n' "$SOURCE" "$SHA" > /tmp/notes.md
+          gh release create "$TAG" --title "$TITLE" --notes-file /tmp/notes.md --verify-tag
