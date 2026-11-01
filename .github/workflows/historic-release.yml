@@ -1,0 +1,52 @@
+name: Archive verified historic version
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Historic version, e.g. 3.15.0 (must be verified)"
+        required: true
+        type: string
+      commit_sha:
+        description: "Verified full commit SHA (40 hexadecimal characters)"
+        required: true
+        type: string
+      evidence:
+        description: "Evidence for mapping version to this commit"
+        required: true
+        type: string
+permissions:
+  contents: write
+jobs:
+  historic-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify tag inputs and historic commit
+        env:
+          VERSION: ${{ inputs.version }}
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+        run: |
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Invalid version"; exit 1; }
+          [[ "$COMMIT_SHA" =~ ^[a-fA-F0-9]{40}$ ]] || { echo "::error::Expected full commit SHA"; exit 1; }
+          git fetch --tags origin
+          git cat-file -e "$COMMIT_SHA^{commit}" || { echo "::error::Commit not found"; exit 1; }
+          git merge-base --is-ancestor "$COMMIT_SHA" origin/main || { echo "::error::Not an ancestor of main. Verify historical branch first."; exit 1; }
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "::error::Historical version tag already exists."
+            exit 1
+          fi
+          echo "TAG=v$VERSION" >> "$GITHUB_ENV"
+      - name: Tag original commit and publish archive release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+          EVIDENCE: ${{ inputs.evidence }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" "$COMMIT_SHA" -m "Reconstructed historical AYAPARK 2 $TAG"
+          git push origin "refs/tags/$TAG"
+          printf 'Reconstructed historical archive. Original commit: `%s`.\n\nEvidence: %s\n\nHistorical source snapshot only; Supabase database contents are not included.\n' "$COMMIT_SHA" "$EVIDENCE" > /tmp/historic-notes.md
+          gh release create "$TAG" --title "AYAPARK 2 $TAG (historical)" --notes-file /tmp/historic-notes.md --verify-tag
