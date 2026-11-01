@@ -93,3 +93,18 @@
 .overview-account-compact .text-button{justify-self:start;font-size:12px;font-weight:700;min-height:30px}
 .resident-apartments{width:100%;min-width:0}
 @media(max-width:700px){.overview-account-compact.card{grid-column:1/-1;width:100%;margin-inline:0}.resident-summary-wrap{width:100%;min-width:0}}
+
+/* Resident dashboard: deliberate full-width mobile order. */
+.resident-home-sections{display:flex;flex-direction:column;gap:15px;min-width:0;width:100%}
+.resident-home-sections>section{min-width:0;width:100%}
+.resident-home-sections .card{max-width:100%;margin-bottom:0}
+.resident-home-unit .resident-apartments{width:100%}
+.resident-announcement-strip{display:flex;align-items:center;gap:13px;padding:15px 17px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-card,18px);color:var(--ink);text-decoration:none;min-height:70px}
+.resident-announcement-strip:hover,.resident-announcement-strip:focus-visible{border-color:var(--primary);background:var(--hover)}
+.resident-announcement-bell{flex:none;width:35px;height:35px;border-radius:10px;background:var(--soft);color:var(--primary);display:grid;place-items:center;font-size:20px}
+.resident-announcement-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.resident-announcement-text strong{font-size:13px}
+.resident-announcement-text small{font-size:11px;color:var(--muted)}
+.resident-announcement-count{font-size:12px;padding:3px 8px;background:var(--neutral);border-radius:8px}
+.resident-home-finance .overview-account-compact{width:100%}
+@media(max-width:700px){.resident-home-sections{gap:13px}.resident-home-sections>section{width:100%;grid-column:1/-1}}
