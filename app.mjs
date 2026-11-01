@@ -1,3 +1,4 @@
+import {managementHomePreview} from './management-home-preview.mjs?v=5.15.0';
 import {preserveViewFocus} from './ui-focus.mjs?v=5.10.1';
 import {nextLanguage} from './language-text.mjs?v=5.10.0';
 import {uiText} from './language-text.mjs?v=5.10.0';
@@ -138,6 +139,12 @@ function render(focus=false){
  $('modeBadge').hidden=state.mode!=='demo';$('refreshButton').hidden=state.mode!=='connected';
  $('connectionButton').textContent=IS_PREVIEW?tr('Giriş ekranını incele'):state.mode==='connected'?tr('Çıkış yap'):tr('Giriş yap');
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/ayapark2-modern-icon.svg?v=8" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>${invitationUi.landing()}`:renderPage(state);
+ const previewEligible=state.mode==='connected'&&state.data?.role==='super'&&state.page==='overview'&&!isAccessPreview();
+ if(previewEligible){
+  let choice='old';try{choice=sessionStorage.getItem('ay2-management-home-preview')==='new'?'new':'old';}catch{}
+  if(choice==='new')$('content').innerHTML=managementHomePreview(state);
+  $('content').insertAdjacentHTML('beforeend','<div class="ay-home-switch" role="group" aria-label="Yönetim ana sayfası test görünümü"><span class="ay-home-switch-caption">TEST</span><button type="button" data-action="home_layout_toggle" data-layout="old" aria-pressed="'+(choice==='old')+'">Alt</button><button type="button" data-action="home_layout_toggle" data-layout="new" aria-pressed="'+(choice==='new')+'">Neu</button></div>');
+ }
  if(state.mode!=='signedout'&&state.page==='reports'&&!can(state,'finance')&&state.data.communityAccess!==true)$('content').innerHTML='<section class="card"><h1>'+((getLanguage()==='tr'?('Mali özet erişime açık değil'):(uiText("Finanzübersicht nicht freigegeben",getLanguage()))))+'</h1><p>'+((getLanguage()==='tr'?('Bu erişim için ortak mali özetler açık değil. Kendi borç ve ödemeleriniz kişisel alanda kullanılabilir.'):(uiText("Für diesen Zugang sind keine gemeinsamen Finanzübersichten freigegeben. Eigene Forderungen und Zahlungen bleiben im persönlichen Bereich verfügbar.",getLanguage()))))+'</p></section>';
  if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview')$('content').insertAdjacentHTML('afterbegin','<div class="archive-toolbar"><button class="button" type="button" data-action="private_archive">'+((getLanguage()==='tr'?('Belgeler ve toplantılar'):(uiText("Dokumente & Versammlungen",getLanguage()))))+'</button></div>');
  if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview'&&['super','staff'].includes(d.role)){const tasks=d.taskWorkspace,c=tasks?.counts;document.querySelector('.archive-toolbar')?.insertAdjacentHTML('beforeend','<button class="button" type="button" data-action="management_tasks">'+((getLanguage()==='tr'?('Görevler ve tarihler'):(uiText("Aufgaben & Termine",getLanguage()))))+'</button><span role="status">'+(c?((getLanguage()==='tr'?('Gecikmiş: '+c.overdue+' · Bugün: '+c.today+' · Gelecek 7 gün: '+c.soon):(uiText("Überfällig: ",getLanguage())+c.overdue+uiText(" · Heute: ",getLanguage())+c.today+uiText(" · Nächste 7 Tage: ",getLanguage())+c.soon))):((getLanguage()==='tr'?('Görev durumu yok – listeyi açın.'):(uiText("Aufgabenstand nicht verfügbar – Liste öffnen.",getLanguage())))))+'</span>');}
@@ -444,7 +451,8 @@ document.addEventListener('click',async event=>{
  const b=event.target.closest('[data-action]');if(!b)return;const action=b.dataset.action;
  try{
   if(action==='claims_detail'){if(state.data.role!=='resident'||state.data.communityAccess===false)return;detailView={action};return showDetail(residentClaimsDetail(state));}
-   if(action==='audit_page'){if(can(state,'admin'))await loadAuditPage(Number(b.dataset.page));return;}
+   if(action==='home_layout_toggle'){if(state.mode==='connected'&&state.data?.role==='super'&&state.page==='overview'&&!isAccessPreview()){const layout=b.dataset.layout==='new'?'new':'old';try{sessionStorage.setItem('ay2-management-home-preview',layout);}catch{}render();}return;}
+  if(action==='audit_page'){if(can(state,'admin'))await loadAuditPage(Number(b.dataset.page));return;}
   if(action==='review_selected'){await reviewSelected();return;}
   if(action==='recover_person'){adminRecoveryUi.open(b.dataset.id);return;}
   if(action==='invite_person'){invitationUi.open(b.dataset.id);return;}
