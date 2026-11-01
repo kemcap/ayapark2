@@ -1,52 +1,53 @@
-name: Auto version AYAPARK 2
+name: AYAPARK 2 official release
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       level:
-        description: "Version change"
+        description: "Semantic version increment for a verified release"
         required: true
         type: choice
-        options: [patch, minor, major]
+        options:
+          - patch
+          - minor
+          - major
 permissions:
   contents: write
 concurrency:
-  group: ayapark2-version-main
+  group: ayapark2-official-release
   cancel-in-progress: false
 jobs:
-  bump:
-    if: github.event_name == 'workflow_dispatch' || (!startsWith(github.event.head_commit.message, 'chore(release):') && !startsWith(github.event.head_commit.message, 'chore(version):'))
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
-          persist-credentials: true
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Detect release level
-        id: level
-        env:
-          MESSAGE: ${{ github.event.head_commit.message }}
-          MANUAL_LEVEL: ${{ inputs.level }}
+      - name: Run application unit tests
+        run: npm test
+      - name: Bump product version exactly once
+        run: node scripts/version/bump.mjs "${{ inputs.level }}"
+      - name: Validate release and create tag
         run: |
-          if [ -n "$MANUAL_LEVEL" ]; then
-            echo "value=$MANUAL_LEVEL" >> "$GITHUB_OUTPUT"
-          elif echo "$MESSAGE" | grep -Eq 'BREAKING CHANGE|^[a-z]+(\([^)]+\))?!:'; then
-            echo "value=major" >> "$GITHUB_OUTPUT"
-          elif echo "$MESSAGE" | grep -Eq '^feat(\([^)]+\))?:'; then
-            echo "value=minor" >> "$GITHUB_OUTPUT"
-          else
-            echo "value=patch" >> "$GITHUB_OUTPUT"
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v$VERSION"
+          git fetch --tags
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "::error::Tag already exists: $TAG"
+            exit 1
           fi
-      - name: Update product version
-        run: node scripts/version/bump.mjs "${{ steps.level.outputs.value }}"
-      - name: Commit version update
-        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add package.json index.html
-          git commit -m "chore(release): automatically bump product version"
-          git push
+          git commit -m "chore(release): AYAPARK 2 $TAG"
+          git push origin HEAD:main
+          git tag -a "$TAG" -m "AYAPARK 2 $TAG"
+          git push origin "$TAG"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+      - name: Publish GitHub release with generated notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$TAG" --title "AYAPARK 2 $TAG" --generate-notes --verify-tag
