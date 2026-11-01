@@ -23,3 +23,5 @@
 @media(max-width:600px){:root[data-unit-card-layout="structured"] .apartment-person-row{grid-template-columns:minmax(72px,34%) minmax(0,1fr)}}
 
 .building-plan > .building-block[hidden]{display:none!important}
+
+.unit-card-grid > .apartment-card[hidden]{display:none!important}
