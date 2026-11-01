@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https://eisozwhhinqszfikemot.supabase.co; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Ayapark 2 · Site Yönetimi V5.13.5</title>
+<title>Ayapark 2 · Site Yönetimi V5.13.6</title>
 <script src="./preferences-boot.js"></script>
 <script src="./theme.js?v=5.10.1"></script>
 <script src="./design-boot.js"></script>
@@ -33,11 +33,11 @@
 <link rel="stylesheet" href="./unit-card-layout.css?v=5.13.1"><link rel="stylesheet" href="./smart-header.css?v=5.9.49"><link rel="stylesheet" href="./legacy-finance.css?v=5.9.50"><link rel="stylesheet" href="./provider-categories.css?v=5.9.56"><link rel="stylesheet" href="./overview-block-layout.css?v=5.9.62"><link rel="stylesheet" href="./expense-distribution.css?v=5.9.57"><link rel="stylesheet" href="./finance-charts.css?v=5.10.1"><link rel="stylesheet" href="./report-filters.css?v=5.10.1"><link rel="stylesheet" href="./overview-account-summary.css?v=5.9.61"><link rel="stylesheet" href="./splash.css?v=7"><script defer src="./splash.js?v=7"></script></head>
 <body><div id="ay2Splash" role="status" aria-label="Ayapark 2 yükleniyor"><div class="ay2-splash-inner"><img class="ay2-splash-icon" src="./assets/ayapark2-modern-icon.svg?v=7" alt="" width="94" height="94"><div class="ay2-splash-name">AYAPARK 2</div><div class="ay2-splash-subtitle">Birlikte, daha düzenli.</div><div class="ay2-splash-track" aria-hidden="true"></div></div></div>
 <a class="skip" href="#content">İçeriğe geç</a>
-<div id="previewBanner" class="preview-banner" role="note" hidden>V5.13.5 önizleme · Örnek veriler · Canlı kayıtlara erişim yok</div>
+<div id="previewBanner" class="preview-banner" role="note" hidden>V5.13.6 önizleme · Örnek veriler · Canlı kayıtlara erişim yok</div>
 <div class="shell">
 <aside class="sidebar">
  <a href="#overview" class="brand" aria-label="Ayapark 2 ana sayfa"><span class="modern-brand-mark" aria-hidden="true"><i></i><i></i></span><img class="brand-logo" src="./assets/ayapark2-header.webp" alt="Ayapark 2 bina fotoğrafı" width="46" height="46"><span>AYAPARK 2<small>Birlikte, daha düzenli.</small></span></a>
- <div class="site-label"><span class="site-dot"></span>Döşemealtı, Antalya <span class="version">v5.13.5</span></div>
+ <div class="site-label"><span class="site-dot"></span>Döşemealtı, Antalya <span class="version">v5.13.6</span></div>
  <p class="nav-label">YAŞAM & YÖNETİM</p>
  <nav id="nav" aria-label="Ana menü"></nav>
  <div class="sidebar-bottom"><div class="mini-building" aria-hidden="true"><i></i><i></i><i></i></div><strong>Her şey yerli yerinde.</strong><p>Daireniz, ödemeleriniz ve siteniz.<br>Tek bir yerde.</p><div class="side-meta">A + B Blok <span>20 daire</span></div></div>
@@ -46,7 +46,7 @@
  <header class="topbar"><span id="breadcrumb">Yönetim / Genel bakış</span><div class="header-actions"><label id="roleControl" class="role-preview-control" hidden><svg class="role-preview-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg><span id="roleLabel" class="role-preview-label">Görünüm</span><select id="roleSelect" aria-label="Görünüm / Ansicht"><option value="super">Süper Admin</option><option value="staff">Yönetim</option><option value="resident">Site Sakini</option></select></label><button id="languageToggle" type="button" class="button small language-toggle" aria-label="Sprache wechseln / Dili değiştir" title="Deutsch" hidden>DE</button><button id="themeToggle" type="button" class="button header-icon" aria-label="Görünüm: Otomatik" title="Görünüm: Otomatik" hidden>◐</button><button id="notificationBell" type="button" class="button header-icon" aria-label="Bildirimler" aria-haspopup="dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span id="notificationCount" class="notification-count" hidden></span></button><span class="mode" id="modeBadge">Örnek veriler</span><button id="refreshButton" type="button" class="button header-icon" title="Kayıtları yenile" aria-label="Kayıtları yenile" hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17"/></svg></button><button id="connectionButton" class="button small">Hesabımla giriş</button></div></header>
  <div class="context-bar"><p id="contextText">Tasarım önizlemesi · Tüm tutarlar örnektir.</p></div>
  <div id="accessPreviewBanner" class="access-preview-banner" role="status" hidden></div><div id="previewTargetBar" class="preview-target-bar" hidden><label id="residentPreviewControl"><span id="residentPreviewLabel">Daire / Kişi</span><select id="residentPreviewSelect" aria-label="Sakin önizlemesi için daire ve kişi"></select></label></div><section id="installBanner" class="install-banner" hidden><span aria-hidden="true">▯</span><div><strong id="installBannerTitle">Uygulamayı telefonuna ekle</strong><small id="installBannerHelp"></small></div><button type="button" id="installApp" class="button small">Uygulamayı ekle</button><button id="dismissInstall" type="button" class="button header-icon" aria-label="Kapat">×</button></section><section id="accessRequestPanel" hidden></section><p id="requestAdminStatus" role="status"></p><main id="content" tabindex="-1"></main>
- <footer>AYAPARK 2 <span>V5.13.5 · <span id="footerMode">Örnek veriler</span></span></footer>
+ <footer>AYAPARK 2 <span>V5.13.6 · <span id="footerMode">Örnek veriler</span></span></footer>
 </div>
 </div>
 <dialog id="detailDialog" aria-labelledby="detailTitle"><div id="detailContent"></div><form method="dialog" class="dialog-actions"><button class="button">Kapat</button></form></dialog>
