@@ -1,4 +1,4 @@
-import {createPrivacyGate} from './privacy-gate.mjs?v=1';
+import {createPrivacyGate} from './privacy-gate.mjs?v=2';
 import {preserveViewFocus} from './ui-focus.mjs?v=5.10.1';
 import {nextLanguage} from './language-text.mjs?v=5.10.0';
 import {uiText} from './language-text.mjs?v=5.10.0';
