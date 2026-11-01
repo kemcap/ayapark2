@@ -38,7 +38,7 @@ import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,
 import {bindInstall} from './install.mjs?v=perf1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.10.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=logs1';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=delete1';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=perf1';
 import {template} from './v3-import.mjs?v=perf1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
@@ -465,6 +465,13 @@ document.addEventListener('click',async event=>{
   if(action==='recover_person'){adminRecoveryUi.open(b.dataset.id);return;}
   if(action==='invite_person'){invitationUi.open(b.dataset.id);return;}
   if(action==='invite_activate'){invitationUi.activate();return;}
+  if(action==='delete_announcement'){
+   if(state.mode!=='connected'||!can(state,'admin')||isAccessPreview())return;
+   const item=state.data.announcements.find(x=>x.id===b.dataset.id);if(!item)return;
+   const msg=(getLanguage()==='tr'?'Duyuru kalıcı olarak silinsin mi? Okundu kayıtları da silinir.':getLanguage()==='en'?'Permanently delete this announcement and its read receipts?':'Diese Mitteilung samt Lesebestätigungen endgültig löschen?')+'\n\n'+item.title;
+   if(!window.confirm(msg))return;
+   b.disabled=true;try{await api.rpc('ay11_delete_announcement',{p_site:state.data.site.id,p_announcement:item.id});await reload();toast(getLanguage()==='tr'?'Duyuru silindi.':getLanguage()==='en'?'Announcement deleted.':'Mitteilung gelöscht.');}catch(error){b.disabled=false;toast(error.message||'Silme işlemi başarısız.');}return;
+  }
   if(action==='person_unit_back'){returnFromPersonUnit();return;}
   if(action==='person_unit'){
    if(!can(state,'people'))return;
