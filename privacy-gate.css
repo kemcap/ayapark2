@@ -4,11 +4,4 @@
 .ay-privacy-read-full:hover,.ay-privacy-read-full:focus-visible{background:#dce8ff;border-color:#163ca8;outline-offset:3px}
 .ay-privacy-document-icon{font-size:26px;line-height:1}.ay-privacy-document-copy{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}.ay-privacy-document-copy strong{font-size:13px;line-height:1.3}.ay-privacy-document-copy small{font-size:11px;color:#465e9d}.ay-privacy-document-arrow{font-size:21px;font-weight:700}@media(max-width:480px){.ay-privacy-read-full{margin:10px 20px 2px;padding:12px}}
 
-/* v3: highly visible, always-outside-scroll, thumb-friendly document CTA */
-.ay-privacy-read-full{flex-shrink:0!important;display:flex!important;align-items:center!important;min-height:70px!important;padding:15px 18px!important;margin:12px 20px 8px!important;border:3px solid #143db8!important;border-radius:14px!important;background:#174bd5!important;color:#fff!important;box-shadow:0 7px 16px #174bd53d!important;text-decoration:none!important;cursor:pointer!important}
-.ay-privacy-read-full:hover,.ay-privacy-read-full:focus-visible{background:#1036a5!important;outline:3px solid #96b9ff!important;outline-offset:2px}
-.ay-privacy-read-full .ay-privacy-document-copy strong{font-size:16px!important;color:#fff!important;font-weight:800!important}
-.ay-privacy-read-full .ay-privacy-document-copy small{font-size:12px!important;color:#e8efff!important}
-.ay-privacy-read-full .ay-privacy-document-icon,.ay-privacy-read-full .ay-privacy-document-arrow{color:#fff!important;font-size:26px!important}
-.ay-privacy-read-full:active{transform:scale(.99)}
 .ay-privacy-settings-link{margin:0 0 16px}.ay-privacy-settings-link a{display:block;padding:16px 18px;border-radius:13px;background:#174bd5;color:#fff!important;font-size:14px;font-weight:800;text-decoration:none!important;box-shadow:0 5px 14px #174bd530}.ay-privacy-settings-link a:hover,.ay-privacy-settings-link a:focus-visible{background:#1036a5;text-decoration:underline!important}
