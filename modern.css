@@ -251,3 +251,11 @@
 @media(prefers-reduced-motion:no-preference){:root[data-design="modern"] .modern-page{animation:modern-enter .28s both}:root[data-design="modern"] dialog[open]{animation:modern-enter .2s both}:root[data-design="modern"] .modern-hero .orb{animation:modern-float 7s ease-in-out infinite}@keyframes modern-enter{from{opacity:.2;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}@keyframes modern-float{50%{transform:translateY(-5px)}}}
 @media(prefers-reduced-motion:reduce){:root[data-design="modern"] *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media print{:root[data-design="modern"]{--bg:#fff!important;--paper:#fff!important;--ink:#152035!important;--muted:#49556a!important;--line:#a3abb9!important}:root[data-design="modern"] .modern-hero,:root[data-design="modern"] .design-menu,:root[data-design="modern"] .design-settings{display:none!important}:root[data-design="modern"] .shell{display:block}:root[data-design="modern"] .workspace{padding:0}:root[data-design="modern"] .modern-page{display:block;animation:none}:root[data-design="modern"] #content{padding:0}:root[data-design="modern"] .card{box-shadow:none;break-inside:avoid}:root[data-design="modern"] .report-metrics{grid-template-columns:repeat(4,1fr)}}
+
+/* Old management dashboard: two KPI cards should not leave a blank mobile column. */
+@media(max-width:760px){
+ :root[data-design="modern"] .summary-grid:not(.resident-dashboard-summary){grid-template-columns:minmax(0,1fr)}
+ :root[data-design="modern"] .summary-grid:not(.resident-dashboard-summary)>.card{grid-column:1/-1;min-width:0;min-height:0;width:100%;box-sizing:border-box}
+ :root[data-design="modern"] .summary-grid:not(.resident-dashboard-summary)>.card:last-child{display:block}
+ :root[data-design="modern"] .summary-grid:not(.resident-dashboard-summary)>.card:last-child .card-head{margin-bottom:12px}
+}
