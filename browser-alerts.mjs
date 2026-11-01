@@ -12,7 +12,7 @@ export function createBrowserAlerts({api,getContext,language}){
  const supported=()=>Boolean(window.isSecureContext&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window);
  const getSub=async()=>{const registration=await navigator.serviceWorker.register('./sw.js',{scope:'./'});await navigator.serviceWorker.ready;return {registration,sub:await registration.pushManager.getSubscription()};};
  const notifyError=message=>{const el=document.querySelector('#ayPushStatus');if(el)el.textContent=message;};
- async function isActive(){if(!supported()||Notification.permission!=='granted')return false;try{const {sub}=await getSub();return !!sub;}catch{return false;}}
+ async function isActive(){if(!supported()||Notification.permission!=='granted')return false;try{const {sub}=await getSub();if(!sub||!api.session?.user?.id)return false;const rows=await api.raw('/rest/v1/ay10_push_subscriptions?select=id&enabled=eq.true&endpoint=eq.'+encodeURIComponent(sub.endpoint)+'&limit=1','GET',undefined,await api.token());return Array.isArray(rows)&&rows.length>0;}catch{return false;}}
  async function enable(){
   if(!supported())throw Error(words().unsupported);
   if(Notification.permission==='denied')throw Error(words().blocked);
@@ -24,11 +24,10 @@ export function createBrowserAlerts({api,getContext,language}){
   if(!context?.site?.id||!api.session?.user?.id)throw Error('Session unavailable');
   const token=await api.token();
   const payload={site_id:context.site.id,user_id:api.session.user.id,endpoint:sub.endpoint,p256dh:json.keys?.p256dh,auth_key:json.keys?.auth,enabled:true};
-  try{await api.raw('/rest/v1/ay10_push_subscriptions','POST',payload,token)}
-  catch(error){if(!String(error.message).includes('23505'))throw error;
-   const endpoint=encodeURIComponent(sub.endpoint);
-   await api.raw('/rest/v1/ay10_push_subscriptions?endpoint=eq.'+endpoint,'PATCH',payload,token);
-  }
+  const path='/rest/v1/ay10_push_subscriptions?endpoint=eq.'+encodeURIComponent(sub.endpoint);
+  const existingRows=await api.raw(path+'&select=id','GET',undefined,token);
+  if(Array.isArray(existingRows)&&existingRows.length)await api.raw(path,'PATCH',payload,token);
+  else await api.raw('/rest/v1/ay10_push_subscriptions','POST',payload,token);
   document.querySelector('#ayPushReminder')?.close();
   return true;
  }
