@@ -1,4 +1,4 @@
-import {managementHomePreview} from './management-home-preview.mjs?v=5.15.0';
+import {managementHomePreview} from './management-home-preview.mjs?v=5.15.2';
 import {preserveViewFocus} from './ui-focus.mjs?v=5.10.1';
 import {nextLanguage} from './language-text.mjs?v=5.10.0';
 import {uiText} from './language-text.mjs?v=5.10.0';
