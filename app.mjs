@@ -42,7 +42,7 @@ import {template} from './v3-import.mjs?v=5.10.0';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=5.10.0';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=5.10.0';
-import {AyaparkApi} from './api.mjs?v=5.10.3';
+import {AyaparkApi} from './api.mjs?v=5.10.4';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=5.10.0';
 import {buildForm,payloadFor} from './forms.mjs?v=5.10.0';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
@@ -131,7 +131,8 @@ function render(focus=false){
  for(const [id,value] of [['statusFilter',state.filter.status],['txnFilter',state.filter.type],['periodFilter',state.filter.period]])if($(id))$(id).value=value;
  if(focus)$('content').focus({preventScroll:true});else restoreFocus();
 }
-function navigate(page){clearTimeout(peopleSearchTimer);mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
+function recordAppEvent(event,page=null){if(state.mode!=='connected'||!state.data?.site?.id||isAccessPreview())return;void api.rpc('ay8_record_app_event',{p_site:state.data.site.id,p_event:event,p_page:page}).catch(()=>{});}
+function navigate(page){recordAppEvent('page_view',page);clearTimeout(peopleSearchTimer);mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
 const closingUI=periodClosings({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,onSaved:reload});
 const releaseUI=reportReleases({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),community:()=>state.mode==='connected'&&!isAccessPreview()&&(can(state,'finance')||state.data.communityAccess===true),site:()=>state.data.site.id,language:getLanguage});
 const levyUI=levyReviews({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),connected:()=>state.mode==='connected'&&!isAccessPreview(),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload});
@@ -594,7 +595,7 @@ let pendingSetupLoaded=null;
 $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 function completeSignIn(loaded){
  state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';state.fullData=null;
-  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;state.personLogins={};void loadPersonLogins();
+  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;recordAppEvent('app_open');state.personLogins={};void loadPersonLogins();
  state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
  // Closing a completed login must not trigger the pending-login cancellation handler.
  loginBusy=false;pendingSetupLoaded=null;$('loginSubmit').disabled=false;
