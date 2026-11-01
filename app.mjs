@@ -63,6 +63,7 @@ const invitationUi=bindInvitations({
 });
 const adminRecoveryUi=bindAdminRecovery({api,getState:()=>state});
 const accessRequestUi=bindAccessRequests({api,getState:()=>state,invite:id=>invitationUi.open(id)});
+async function loadPersonLogins(){if(state.mode!=='connected'||!can(state,'admin'))return;try{state.personLogins=await api.rpc('ay8_person_last_logins');render();}catch(error){console.warn('Login-Übersicht nicht verfügbar',error);}}
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null,importController=null;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
@@ -441,6 +442,7 @@ document.addEventListener('click',async event=>{
    $('detailDialog').classList.add('person-unit-drawer');
    return showDetail(linkedUnitDetail(id));
   }
+  if(action==='person_login_logs'){if(state.mode!=='connected'||!can(state,'admin'))return;const p=state.data.persons.find(x=>x.id===b.dataset.id);if(!p)return;showDetail('<h2 id="detailTitle">'+e(p.full_name)+'</h2><p role="status">Protokolle werden geladen…</p>');try{const result=await api.rpc('ay8_person_login_logs',{p_person:p.id,p_limit:500});const fmt=t=>t?new Intl.DateTimeFormat('de-DE',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Istanbul'}).format(new Date(t)):'—';const rows=Array.isArray(result?.events)?result.events:[];showDetail('<h2 id="detailTitle">'+e(p.full_name)+'</h2><p>Letzter Login: '+e(fmt(result?.last_login))+'</p><p class="fine">Zeiten: Türkiye · Vorhandene historische Logs · Sitzungsende nur bei verlässlichem Ereignis</p><div class="person-login-events">'+(rows.map(x=>'<article class="person-login-event"><small>'+e(fmt(x.occurred_at))+' · '+e(x.kind||'Ereignis')+'</small><p>'+e(x.details||'—')+'</p></article>').join('')||'<p>Keine bisherigen Ereignisse vorhanden.</p>')+'</div>');}catch(error){showDetail('<h2 id="detailTitle">'+e(p.full_name)+'</h2><p role="alert">'+e(error.message||'Protokolle nicht verfügbar')+'</p>');}return;}
   if(action==='person_manage'){personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');detailView={action,id:b.dataset.id};return showDetail(personManager(state,b.dataset.id));}
   if(action==='unit'){personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');detailView={action,id:b.dataset.id};return showDetail(unitDetail(state,b.dataset.id));}
   if(action==='transaction'){if(can(state,'finance')){detailView={action,id:b.dataset.id};showDetail(transactionDetail(state,b.dataset.id));}return;}
@@ -592,7 +594,7 @@ let pendingSetupLoaded=null;
 $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 function completeSignIn(loaded){
  state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';state.fullData=null;
-  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;
+  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;state.personLogins={};void loadPersonLogins();
  state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
  // Closing a completed login must not trigger the pending-login cancellation handler.
  loginBusy=false;pendingSetupLoaded=null;$('loginSubmit').disabled=false;
