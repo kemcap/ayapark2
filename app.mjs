@@ -54,6 +54,24 @@ let detailView=null,personUnitReturn=null,loginMethod='password';
 let unitCardLayout='structured';
 try{unitCardLayout=localStorage.getItem('ayapark2-unit-card-layout')==='classic'?'classic':'structured';}catch{}
 document.documentElement.dataset.unitCardLayout=unitCardLayout;
+function applyApartmentQuickFilters(){
+ const root=$('unitResults');if(!root)return;
+ let count=0;
+ for(const section of root.querySelectorAll('.building-block')){
+  const block=section.querySelector('h3')?.textContent?.trim()?.[0]?.toUpperCase();
+  const blockAllowed=state.filter.block==='all'||state.filter.block===block;
+  let sectionCount=0;
+  for(const card of section.querySelectorAll('.apartment-card')){
+   const status=state.filter.status;
+   const matching=status==='all'||(status==='debt'&&card.dataset.hasDebt==='true')||(status==='paid'&&card.dataset.hasDebt==='false')||(status==='occupied'&&card.dataset.occupancy==='occupied')||(status==='vacant'&&card.dataset.occupancy==='vacant');
+   card.hidden=!blockAllowed||!matching;
+   if(!card.hidden)sectionCount++;
+  }
+  section.hidden=sectionCount===0;
+  count+=sectionCount;
+ }
+ if($('resultCount'))$('resultCount').textContent=count+tr(' daire');
+}
 function unitCardLayoutControl(){
  const L=getLanguage();
  const title=L==='tr'?'Daire kartı tasarımı':L==='en'?'Apartment card design':'Wohnungskarten-Design';
@@ -416,17 +434,7 @@ document.addEventListener('click',async event=>{
   const block=blockButton.dataset.block;if(!['A','B'].includes(block))return;
   state.filter.block=state.filter.block===block?'all':block;
   for(const node of document.querySelectorAll('[data-block]'))node.setAttribute('aria-pressed',String(node.dataset.block===state.filter.block));
-  // Filter already rendered cards; no expensive finance/person recalculation on each tap.
-  const results=$('unitResults');
-  if(results){
-   for(const section of results.querySelectorAll('.building-block')){
-    const heading=section.querySelector('h3')?.textContent?.trim()||'';
-    const sectionBlock=heading[0]?.toUpperCase();
-    section.hidden=state.filter.block!=='all'&&sectionBlock!==state.filter.block;
-   }
-   const visibleCount=[...results.querySelectorAll('.building-block:not([hidden]) .apartment-card')].length;
-   if($('resultCount'))$('resultCount').textContent=visibleCount+tr(' daire');
-  }
+  applyApartmentQuickFilters();
   return;
  }
  const tab=event.target.closest('[data-tab]');if(tab){const history=tab.dataset.tab==='history';$('unitCurrent').hidden=history;$('unitHistory').hidden=!history;for(const node of document.querySelectorAll('[data-tab]'))node.setAttribute('aria-pressed',String(node===tab));return;}
@@ -551,7 +559,7 @@ document.addEventListener('change',event=>{
  if(event.target.name==='category'||event.target.name==='relation'||event.target.name==='person_id'||event.target.name==='start_unknown')updateConditionalForm();
  if(['statusFilter','txnFilter','periodFilter'].includes(id)){
   const key={statusFilter:'status',txnFilter:'type',periodFilter:'period'}[id];state.filter[key]=event.target.value;state.bankPage=0;
-  if(id==='statusFilter'){$('unitResults').innerHTML=unitResults(state);labelTables();applyAmountPrivacy();$('resultCount').textContent=filteredUnits(state).length+tr(" daire");}else {$('transactionResults').innerHTML=transactionTable(state);labelTables();applyAmountPrivacy();}
+  if(id==='statusFilter'){applyApartmentQuickFilters();}else {$('transactionResults').innerHTML=transactionTable(state);labelTables();applyAmountPrivacy();}
  }
  if(event.target.dataset.range){const kind=event.target.dataset.range,f=kind==='report'?state.reportFilter:state.filter;f[event.target.dataset.rangeField]=event.target.value;state.bankPage=0;render();return;}
  if(id==='reportGroup'){state.reportGroup=event.target.value;render();}
