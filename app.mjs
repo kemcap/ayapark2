@@ -32,7 +32,7 @@ import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.10
 import {apartmentInfo} from './apartment-info.mjs?v=perf1';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=perf1';
 import {updateAssignmentForm} from './assignments.mjs?v=perf1';
-import {personManager} from './people-ui.mjs?v=perf1';
+import {personManager} from './people-ui.mjs?v=pushstatus1';
 import {bindInvitations} from './invite-ui.mjs?v=perf1';
 import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=perf1';
 import {bindInstall} from './install.mjs?v=perf1';
@@ -86,6 +86,7 @@ const invitationUi=bindInvitations({
 });
 const adminRecoveryUi=bindAdminRecovery({api,getState:()=>state});
 const accessRequestUi=bindAccessRequests({api,getState:()=>state,invite:id=>invitationUi.open(id)});
+async function loadPushStatuses(){if(state.mode!=='connected'||!can(state,'admin'))return;try{const r=await api.rpc('ay10_person_push_status',{p_site:state.data.site.id});state.pushStatus=Object.fromEntries((Array.isArray(r)?r:[]).map(x=>[x.person_id,x]));render();}catch(error){console.warn('Push statuses unavailable',error);}}
 async function loadPersonLogins(){if(state.mode!=='connected'||!can(state,'admin'))return;try{state.personLogins=await api.rpc('ay8_person_last_logins');render();}catch(error){console.warn('Login-Übersicht nicht verfügbar',error);}}
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null,importController=null;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
@@ -629,7 +630,7 @@ let pendingSetupLoaded=null;
 $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 function completeSignIn(loaded){
  state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';state.fullData=null;
-  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;recordAppEvent('app_open');state.personLogins={};void loadPersonLogins();
+  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;recordAppEvent('app_open');state.personLogins={};void loadPersonLogins();void loadPushStatuses();
  browserAlerts.scheduleReminder();
  void privacyGate.check();
  state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
