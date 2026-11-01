@@ -51,3 +51,12 @@
  #detailDialog.person-unit-drawer .person-unit-nav{position:sticky;top:-20px;z-index:3;padding:10px 0;background:var(--paper)}
  #detailDialog.person-unit-drawer .person-unit-back{width:100%}
 }
+
+/* Compact, permission-gated login history beside registration status. */
+.person-login-link{display:inline-flex;align-items:center;gap:4px;margin:0 0 0 7px;padding:2px 1px;border:0;background:transparent;color:var(--muted,#657083);font:inherit;font-size:11px;line-height:1.5;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;cursor:pointer;vertical-align:middle;max-width:100%;white-space:normal;text-align:left}
+.person-login-link:hover,.person-login-link:focus-visible{color:var(--primary,#3159f1);text-decoration-style:solid}
+.person-login-inline{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:4px 0 9px}
+.person-login-events{max-height:min(60vh,600px);overflow-y:auto}
+.person-login-event{padding:10px 0;border-bottom:1px solid var(--line,#dce1e8)}
+.person-login-event small{color:var(--muted,#657083)}
+.person-login-event p{margin:3px 0 0;overflow-wrap:anywhere}
