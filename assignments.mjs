@@ -1,8 +1,8 @@
-import {personPicker,bindPersonPicker} from './person-picker.mjs?v=5.10.1';
+import {personPicker,bindPersonPicker} from './person-picker.mjs?v=perf1';
 import {fieldError} from './ui-feedback.mjs?v=5.10.1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
-import {escapeHtml as e,randomId} from './core.mjs?v=5.10.0';
-import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=5.10.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=perf1';
+import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=perf1';
 export const assignmentRoles=[['owner','Ev sahibi'],['tenant','Kiracı'],['representative','Temsilci']];
 export const historicalRoles=[['historical_owner','Eski Ev Sahibi'],['historical_tenant','Eski Kiracı'],['historical_representative','Eski Temsilci']];
 export const removalReasons=role=>[['mistake','Yanlışlıkla eklendi'],['ended',role==='owner'?'Mülkiyet ilişkisi sona erdi':role==='tenant'?'Kiracılık sona erdi':'Temsilcilik sona erdi'],['other','Diğer neden']];

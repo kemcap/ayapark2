@@ -1,5 +1,5 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {escapeHtml as e,randomId} from './core.mjs?v=5.10.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=perf1';
 export function claimHoldReview({rpc,allowed,site,language,data,onSaved=async()=>{}}){let dialog,charge,workspace,generation=0,busy=false;const requests=new Map(),t=(de,tr)=>(language()==='tr'?(tr):(uiText(de,language())));
  function close(){generation++;charge=null;workspace=null;requests.clear();busy=false;dialog?.close();if(dialog)dialog.textContent='';}
  const scope=()=>({generation,site:site()}),valid=s=>dialog?.open&&allowed()&&s.generation===generation&&s.site===site();

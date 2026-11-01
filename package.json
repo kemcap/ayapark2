@@ -32,13 +32,17 @@
     "test:management:sql": "node tests/sql/management-tasks.mjs",
     "test:holds:sql": "node tests/sql/claim-review-holds.mjs",
     "test:management-read:sql": "node tests/sql/management-read-access.mjs",
-    "test:ddl:sql": "node tests/sql/client-ddl-hardening.mjs"
+    "test:ddl:sql": "node tests/sql/client-ddl-hardening.mjs",
+    "bench:performance": "node tests/benchmark-performance.mjs",
+    "bench:load": "node tests/benchmark-api-load.mjs",
+    "test:performance:browser": "node tests/performance-browser.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.11",
     "axe-core": "4.14.0",
     "esbuild": "0.28.2",
     "pdfjs-dist": "6.4.299",
+    "playwright": "1.62.1",
     "read-excel-file": "9.3.14"
   },
   "version": "5.13.9"

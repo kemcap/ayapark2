@@ -1,5 +1,5 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {escapeHtml as e,money} from './core.mjs?v=5.10.0';
+import {escapeHtml as e,money} from './core.mjs?v=perf1';
 import {getLanguage} from './i18n.mjs?v=5.10.0';
 export function chargeDraftPanel(s){
  const de=getLanguage()==='de',d=s.data;

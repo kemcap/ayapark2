@@ -1,6 +1,6 @@
 import {ENABLE_ACCESS_REQUESTS} from './auth-features.mjs?v=5.8.1';
-import {accessRequestPayload,accessRequestsPanel} from './access-requests.mjs?v=5.10.0';
-import {escapeHtml as e} from './core.mjs?v=5.10.0';
+import {accessRequestPayload,accessRequestsPanel} from './access-requests.mjs?v=perf1';
+import {escapeHtml as e} from './core.mjs?v=perf1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 export function bindAccessRequests({api,getState,invite,enabled=ENABLE_ACCESS_REQUESTS}){
  const $=id=>document.getElementById(id);let offset=0,counts={},rows=[],generation=0,busy=false,selected=null;

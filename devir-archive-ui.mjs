@@ -1,6 +1,6 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
 import {t as tr,getLanguage} from './i18n.mjs?v=5.10.0';
-import {escapeHtml as e,money} from './core.mjs?v=5.10.0';
+import {escapeHtml as e,money} from './core.mjs?v=perf1';
 
 const columns=['Su dijital kafa','Aidat','Asansör','Bina kapısı bakımı','Havuz','Demirbaş','Su arıtma bakımı'];
 const entryValue=(r,k)=>Number((r.categories||{})[k]||0);

@@ -57,3 +57,9 @@ Gezielter Rückweg für diese Optimierung: supabase/rollback/read_performance.sq
 
 Quellen: https://supabase.com/docs/guides/platform/backups und https://supabase.com/docs/guides/database/postgres/row-level-security#rls-performance-recommendations
 
+
+## Performance-Audit vom 1. November 2026
+
+Aktuelle Frontend-/Ladeoptimierungen mit reproduzierbaren Browser-, CPU- und
+Regressionstests: [vollständiger Bericht](docs/PERFORMANCE-AUDIT-20261101.md).
+Die dortige Optimierung verändert keine produktiven Daten oder Datenbankschemata.

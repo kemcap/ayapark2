@@ -1,5 +1,6 @@
+import {dateFormatter} from './formatters.mjs?v=1';
 // Domain rules shared by views and the local demonstration. Amounts are integer kuruş.
-import {summarize} from './core.mjs?v=5.10.0';
+import {summarize} from './core.mjs?v=perf1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 // Shared only during a synchronous render; always discard after the callback.
 let paymentComputation=null;
@@ -8,12 +9,17 @@ export function withPaymentIndex(d,fn){
  const previous=paymentComputation,reversed=new Set(),credits=new Map();
  for(const t of d.transactions||[])if(t.reversal_of)reversed.add(t.reversal_of);
  for(const c of d.credits||[])if(!c.void_reason)credits.set(c.entry_id,(credits.get(c.entry_id)||0)+c.cents);
- paymentComputation={data:d,reversed,credits,suggestions:new Map()};
+ paymentComputation={data:d,reversed,credits,suggestions:new Map(),normalized:new Map()};
  try{return fn();}finally{paymentComputation=previous;}
 }
 export const isReversed=(d,t)=>paymentComputation?.data===d?paymentComputation.reversed.has(t.id):d.transactions.some(x=>x.reversal_of===t.id);
-export const norm=s=>String(s||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').replace(/[^a-z0-9]/g,'');
-export const today=()=>new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'});
+export function norm(s){
+ const value=String(s||''),cache=paymentComputation?.normalized;
+ if(cache?.has(value))return cache.get(value);
+ const result=value.toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').replace(/[^a-z0-9]/g,'');
+ cache?.set(value,result);return result;
+}
+export const today=()=>dateFormatter('sv-SE','day').format(new Date());
 export const activeAt=(l,day=today())=>typeof l.active==='boolean'?l.active:(!l.starts_on||l.starts_on<=day)&&(!l.ends_on||l.ends_on>=day);
 export const personName=(d,id)=>d.persons?.find(p=>p.id===id)?.full_name||'';
 export function personLinks(d,unit,day=today()){return (d.links||[]).filter(l=>(!unit||l.unit_id===unit)&&activeAt(l,day));}
@@ -54,7 +60,7 @@ export function financialSeries(d,range={},group='year'){
  for(const row of d.summaryDays||[]){if(!inRange(row.date,range))continue;const key=row.date.slice(0,group==='month'?7:4),b=buckets.get(key)||{period:key,income:0,expense:0};b.income+=Number(row.income_cents);b.expense+=Number(row.expense_cents);buckets.set(key,b);for(const[c,v]of Object.entries(row.categories||{}))categories.set(c,(categories.get(c)||0)+Number(v));}
  return {buckets:[...buckets.values()].sort((a,b)=>a.period.localeCompare(b.period)),categories:[...categories],income:[...buckets.values()].reduce((n,b)=>n+b.income,0),expense:[...buckets.values()].reduce((n,b)=>n+b.expense,0)};
 }
-export function buildSummaryDays(d){const days=new Map();for(const t of d.transactions){if(t.reversal_of||d.transactions.some(x=>x.reversal_of===t.id)||t.category==='Transfer')continue;const r=days.get(t.date)||{date:t.date,income_cents:0,expense_cents:0,categories:{}};if(t.cents>0)r.income_cents+=t.cents;else{r.expense_cents-=t.cents;r.categories[t.category]=(r.categories[t.category]||0)-t.cents;}days.set(t.date,r);}return [...days.values()];}
+export function buildSummaryDays(d){const days=new Map(),reversed=new Set(d.transactions.map(t=>t.reversal_of));for(const t of d.transactions){if(t.reversal_of||reversed.has(t.id)||t.category==='Transfer')continue;const r=days.get(t.date)||{date:t.date,income_cents:0,expense_cents:0,categories:{}};if(t.cents>0)r.income_cents+=t.cents;else{r.expense_cents-=t.cents;r.categories[t.category]=(r.categories[t.category]||0)-t.cents;}days.set(t.date,r);}return [...days.values()];}
 export function announcementStatus(a,now=Date.now()){
  if(!a.published)return 'Taslak';
  const current=typeof now==='number'?now:new Date(now).getTime(),start=a.starts_at?Date.parse(a.starts_at):null,end=a.ends_at?Date.parse(a.ends_at):null;

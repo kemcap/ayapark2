@@ -61,3 +61,36 @@ in-memory synthetic PostgreSQL, including function-body drift rejection, ACL/OID
 preservation, staff allocation and Superadmin correction/audit positives. The
 ordinary SQL audit and V5 runners apply this candidate too. No production schema
 or credentials are used.
+
+## Performance audit, 1 November 2026
+
+Use an immutable baseline, never the moving live checkout:
+
+```sh
+git worktree add --detach ../ayapark-performance-baseline b8a01e18c03c41c05f6d89e7f59ad672d77b7e07
+npm ci --ignore-scripts
+npm run bench:performance -- ../ayapark-performance-baseline
+npm run bench:load -- ../ayapark-performance-baseline
+npx playwright install chromium
+npm run test:performance:browser -- ../ayapark-performance-baseline
+```
+
+`bench:performance` compares identical HTML across 180 synthetic cases and reports
+seven measured CPU samples after two warmups. It excludes DOM and network.
+`bench:load` compares API results and request multisets with an artificial 25 ms
+per-request delay. Those numbers demonstrate scheduling only, not live latency.
+
+The browser test serves both checkouts itself on a random loopback port and blocks
+all external requests. It exercises the real demo app at 390 and 1440 px, all three
+roles and languages, block filters, apartment dialogs, and navigation. The narrow
+viewport uses 4x CPU throttling, not a real phone. It compares rendered HTML and
+apartment screenshots against the baseline, checks retained card DOM nodes,
+counts duplicate module requests and forced layouts, and enforces loose 150/200 ms
+median interaction budgets on the small demo. CI runs the current checkout alone;
+the immutable baseline comparison is a separate audit command. Configure
+`CHROMIUM_PATH` and `CHROMIUM_ARGS` (JSON array) to use a preinstalled browser;
+`PERF_OUTPUT` and `PERF_SCREENSHOT_DIR` optionally save results and images.
+
+No performance test connects to production, authenticates a real account, or
+submits a live form. See `docs/PERFORMANCE-AUDIT-20261101.md` and the raw JSON
+in `tests/evidence/performance-20261101/` for measurements and limitations.

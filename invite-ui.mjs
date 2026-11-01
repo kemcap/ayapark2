@@ -1,6 +1,6 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {escapeHtml as escape} from './core.mjs?v=5.10.0';
-import {today} from './v3-domain.mjs?v=5.10.0';
+import {escapeHtml as escape} from './core.mjs?v=perf1';
+import {today} from './v3-domain.mjs?v=perf1';
 import {getLanguage} from './i18n.mjs?v=5.10.0';
 
 export const invitableRelationship=link=>['owner','tenant','representative'].includes(link.role)

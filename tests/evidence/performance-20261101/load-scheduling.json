@@ -1,0 +1,29 @@
+{
+  "scope": "Synthetic 25 ms per request; 6 measured runs per variant; isolated load scheduling, no production network",
+  "results": [
+    {
+      "role": "manager",
+      "request_count": 16,
+      "before_ms": 151.90499999999997,
+      "after_ms": 101.32991700000002,
+      "same_requests": true,
+      "same_result": true
+    },
+    {
+      "role": "deputy",
+      "request_count": 15,
+      "before_ms": 177.5086369999999,
+      "after_ms": 126.649179,
+      "same_requests": true,
+      "same_result": true
+    },
+    {
+      "role": "resident",
+      "request_count": 15,
+      "before_ms": 177.02744100000018,
+      "after_ms": 126.6032639999994,
+      "same_requests": true,
+      "same_result": true
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {escapeHtml as e,randomId} from './core.mjs?v=5.10.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=perf1';
 export function managementTasks({rpc,allowed,admin,site,language,onSaved=async()=>{},onDocument=()=>{}}){
  let dialog,workspace,docs=[],busy=false,generation=0;const requests=new Map(),t=(de,tr)=>(language()==='tr'?(tr):(uiText(de,language())));
  const statuses=()=>[['open',t('Offen','Açık')],['in_progress',t('In Arbeit','Devam ediyor')],['done',t('Erledigt','Tamamlandı')],['cancelled',t('Abgebrochen','İptal')]];

@@ -1,8 +1,9 @@
-import {parseImport} from './v3-import.mjs?v=5.10.0';
+import {currencyFormatter} from './formatters.mjs?v=1';
+import {parseImport} from './v3-import.mjs?v=perf1';
 import {t as tr,locale} from './i18n.mjs?v=5.10.0';
 // Pure domain functions. Money is stored as integer kuruş.
 export const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export const money = (cents,currency='TRY') => cents == null ? '—' : new Intl.NumberFormat(locale(), {style:'currency', currency,currencyDisplay:'narrowSymbol', maximumFractionDigits:2}).format(cents / 100);
+export const money = (cents,currency='TRY') => cents == null ? '—' : currencyFormatter(locale(),currency).format(cents / 100);
 export const roleName = role => tr({super:'Süper Admin',staff:'Yönetim',resident:'Site Sakini'}[role] || 'Site Sakini');
 export function visibleUnits(units, role, ownIds) { return role === 'resident' ? units.filter(u => ownIds.includes(u.id)) : units; }
 export function allowedPages(role) { return role === 'resident' ? ['overview','units','dues','reports'] : role === 'super' ? ['overview','units','dues','transactions','reports','settings'] : ['overview','units','dues','transactions','reports']; }
