@@ -4,7 +4,7 @@ import {settingsPage} from './settings-ui.mjs?v=5.10.0';
 import {effectiveOccupancy} from './relationships.mjs?v=5.10.0';
 import {peoplePage} from './people-ui.mjs?v=5.10.0';
 
-import {charges,duesV3,directoryV3,overviewV3,bankV3,reportV3,announcementsV3,providersV3,filteredUnitsV3,unitDetailV3,transactionDetailV3,transactionTableV3} from './v3-ui.mjs?v=5.10.1';
+import {charges,duesV3,directoryV3,overviewV3,bankV3,reportV3,announcementsV3,providersV3,filteredUnitsV3,unitDetailV3,transactionDetailV3,transactionTableV3} from './v3-ui.mjs?v=5.14.1';
 import {t as tr,locale} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName} from './core.mjs?v=5.10.0';
 import {paid,remaining,unassigned,monthlySummary,withLedgerIndex} from './ledger.mjs?v=5.10.0';
