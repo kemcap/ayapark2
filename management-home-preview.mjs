@@ -20,7 +20,7 @@ export function managementHomePreview(s){
  const stat=(label,value,href)=>`<a class="ay-preview-stat" href="#${href}"><small>${e(label)}</small><strong>${e(value)}</strong><span aria-hidden="true">↗</span></a>`;
  const notice=`<a class="ay-preview-notice" href="#announcements"><span class="ay-preview-bell" aria-hidden="true">◉</span><span><strong>${tr('Duyurular')}</strong><small>${notices.length?notices.length+' '+tr('duyuru'):'Yeni duyuru yok'}</small></span><b>${notices.length}</b><span aria-hidden="true">›</span></a>`;
  return `<div class="ay-preview-management">
- <header class="ay-preview-heading"><div><h1>Yönetim paneli</h1><p>AYA PARK 2 · Genel bakış</p></div><span class="ay-preview-label">Yeni düzen · Test</span></header>
+ <header class="ay-preview-heading"><div><h1>Siteniz bugün nasıl?</h1><p>Güncel mali durum, bekleyen işlemler ve site bilgileri.</p></div><span class="ay-preview-label">Yeni düzen · Test</span></header>
  <section class="ay-preview-stats" aria-label="Genel göstergeler">
  ${stat('Site bakiyesi',money(balance),'reports')}
  ${stat('Açık alacaklar',money(open),'dues')}
