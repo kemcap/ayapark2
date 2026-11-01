@@ -1,2 +1,15 @@
-/* Shared Ayapark 2 launch identity, visually aligned with the modern sidebar. */
-#ay2Splash{position:fixed;inset:0;z-index:9999;background:#f2f4f8;color:#192235;display:grid;place-items:center;transition:opacity .24s ease,visibility .24s ease;font-family:Manrope,system-ui,sans-serif}html[data-theme=dark] #ay2Splash{background:#111725;color:#edf2ff}#ay2Splash[hidden]{display:none!important}#ay2Splash.is-done{opacity:0;visibility:hidden;pointer-events:none}.ay2-splash-inner{text-align:center;display:grid;justify-items:center;gap:13px;padding:30px}.ay2-splash-icon{width:94px;height:94px;border-radius:21px;box-shadow:0 16px 38px #171e3126}.ay2-splash-name{font-weight:800;font-size:24px;letter-spacing:-.8px}.ay2-splash-subtitle{font-size:13px;opacity:.72}.ay2-splash-track{height:3px;width:110px;background:#cdd5e6;border-radius:20px;overflow:hidden;margin-top:14px}.ay2-splash-track::after{content:'';display:block;height:100%;width:40%;border-radius:20px;background:#3159f1;animation:ay2-splash-slide 1.2s ease-in-out infinite alternate}@keyframes ay2-splash-slide{from{transform:translateX(0)}to{transform:translateX(165%)}}@media(prefers-reduced-motion:reduce){#ay2Splash{transition:none}.ay2-splash-track::after{animation:none;width:100%}}
+/* Ayapark 2 PWA launch surface — modern palette, light/dark/system aware. */
+#ay2Splash{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:#f2f4f8;color:#192235;font-family:Manrope,system-ui,sans-serif;transition:opacity .24s ease,visibility .24s ease}
+html[data-theme="dark"] #ay2Splash{background:#111725;color:#edf2ff}
+#ay2Splash[hidden]{display:none!important}
+#ay2Splash.is-done{opacity:0;visibility:hidden;pointer-events:none}
+.ay2-splash-inner{text-align:center;display:grid;justify-items:center;gap:13px;padding:30px;max-width:100%}
+.ay2-splash-icon{width:94px;height:94px;border-radius:21px;box-shadow:0 16px 38px #171e3126}
+.ay2-splash-name{font-weight:800;font-size:24px;letter-spacing:-.8px}
+.ay2-splash-subtitle{font-size:13px;opacity:.72}
+.ay2-splash-track{height:3px;width:110px;background:#d8deea;border-radius:20px;overflow:hidden;margin-top:14px}
+.ay2-splash-track::after{content:'';display:block;height:100%;width:42%;border-radius:20px;background:#3159f1;animation:ay2-splash-slide 1.2s ease-in-out infinite alternate}
+html[data-theme="dark"] .ay2-splash-track{background:#34425a}
+html[data-theme="dark"] .ay2-splash-track::after{background:#dcf58b}
+@keyframes ay2-splash-slide{from{transform:translateX(0)}to{transform:translateX(138%)}}
+@media(prefers-reduced-motion:reduce){#ay2Splash{transition:none}.ay2-splash-track::after{animation:none;width:100%}}
