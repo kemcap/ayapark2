@@ -1,8 +1,8 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {escapeHtml as e,randomId,money} from './core.mjs?v=5.10.0';
+import {escapeHtml as e,randomId,money} from './core.mjs?v=perf1';
 import {t as tr,getLanguage} from './i18n.mjs?v=5.10.0';
-import {activeAt,personName} from './v3-domain.mjs?v=5.10.0';
-import {financeLinkAt,amountCents,batchPreview,paymentPlan,chargeCategories,debtGroup,availableBudget} from './finance-v5.mjs?v=5.10.0';
+import {activeAt,personName} from './v3-domain.mjs?v=perf1';
+import {financeLinkAt,amountCents,batchPreview,paymentPlan,chargeCategories,debtGroup,availableBudget} from './finance-v5.mjs?v=perf1';
 const input=(n,label,type='text',value='',attrs='')=>`<label class="field">${tr(label)}<input name="${n}" type="${type}" value="${e(value)}" ${attrs}></label>`;
 const select=(n,label,values,value='')=>`<label class="field">${tr(label)}<select name="${n}">${values.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(tr(l))}</option>`).join('')}</select></label>`;
 const check=(n,label,value='on')=>`<label class="check-field"><input type="checkbox" name="${n}" value="${e(value)}">${tr(label)}</label>`;

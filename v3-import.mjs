@@ -1,4 +1,4 @@
-import {parseLegacyCsv} from './core.mjs?v=5.10.0';
+import {parseLegacyCsv} from './core.mjs?v=perf1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 export const templateHeader='date;reference;counterparty;description;income;expense;unit;iban;balance';
 export const template=templateHeader+'\r\n';

@@ -1,11 +1,11 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {contactPanel} from './contact-requests.mjs?v=5.10.0';
+import {contactPanel} from './contact-requests.mjs?v=perf1';
 import {taskOptions} from './task-permissions.mjs?v=5.10.0';
-import {previewControls} from './access-preview.mjs?v=5.10.0';
-import {testControls} from './notifications.mjs?v=5.10.0';
+import {previewControls} from './access-preview.mjs?v=perf1';
+import {testControls} from './notifications.mjs?v=perf1';
 import {t as tr,locale} from './i18n.mjs?v=5.10.0';
-import {escapeHtml as e} from './core.mjs?v=5.10.0';
-import {appearanceSettings} from './preferences.mjs?v=5.10.0';
+import {escapeHtml as e} from './core.mjs?v=perf1';
+import {appearanceSettings} from './preferences.mjs?v=perf1';
 const capLabels={finance:'Mali kayıtlar ve ödeme eşleştirme',import:'Banka dosyası içe aktarma',people:'Kişi kayıtları',announcements:'Duyuru oluşturma ve yayımlama'};
 const btn=(label,action,attrs='')=>`<button type="button" class="button" data-action="${action}" ${attrs}>${tr(label)}</button>`;
 const date=v=>v?new Intl.DateTimeFormat(locale(),{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Istanbul'}).format(new Date(v)):'—';

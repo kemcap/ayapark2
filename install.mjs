@@ -1,4 +1,4 @@
-import {installationVisible} from './seven-ux.mjs?v=5.10.0';
+import {installationVisible} from './seven-ux.mjs?v=perf1';
 import {openInstallTutorial} from './install-tutorial.mjs?v=5.10.0';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 export function bindInstall(){

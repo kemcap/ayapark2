@@ -1,5 +1,5 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {escapeHtml as e,money,randomId} from './core.mjs?v=5.10.0';
+import {escapeHtml as e,money,randomId} from './core.mjs?v=perf1';
 export function levyReviews({rpc,admin,connected,site,language,data,onSaved=async()=>{}}){
  let dialog,busy=false,generation=0,workspace={drafts:[],reviews:[]},requests=new Map();
  const t=(de,tr)=>(language()==='tr'?(tr):(uiText(de,language())));

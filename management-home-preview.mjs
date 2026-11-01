@@ -1,9 +1,9 @@
-import {overviewAccountCard,unitMapV3} from './v3-ui.mjs?v=5.15.0';
-import {card} from './ui.mjs?v=5.10.0';
-import {money,escapeHtml as e} from './core.mjs?v=5.10.0';
+import {overviewAccountCard,unitMapV3} from './v3-ui.mjs?v=perf1';
+import {card} from './ui.mjs?v=perf1';
+import {money,escapeHtml as e} from './core.mjs?v=perf1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
-import {remaining} from './ledger.mjs?v=5.10.0';
-import {announcementActive} from './v3-domain.mjs?v=5.10.0';
+import {remaining} from './ledger.mjs?v=perf1';
+import {announcementActive} from './v3-domain.mjs?v=perf1';
 
 /* Test-only management home layout. Existing data and actions stay in place. */
 export function managementHomePreview(s){

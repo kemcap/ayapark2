@@ -1,6 +1,6 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {escapeHtml as e,money,randomId} from './core.mjs?v=5.10.0';
-import {amountCents} from './finance-v5.mjs?v=5.10.0';
+import {escapeHtml as e,money,randomId} from './core.mjs?v=perf1';
+import {amountCents} from './finance-v5.mjs?v=perf1';
 import {cashForecast,annualPlan} from './budget-planning.mjs?v=5.9.41';
 export function budgetPlanning({rpc,allowed,admin,site,language,onSaved=async()=>{},data,onRender=()=>{}}){
  let dialog,workspace,busy=false,generation=0,horizon=6,year,requests=new Map();const t=(de,tr)=>(language()==='tr'?(tr):(uiText(de,language())));

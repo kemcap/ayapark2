@@ -1,8 +1,8 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {expenseDistributionModel} from './expense-distribution.mjs?v=5.10.0';
-import {escapeHtml as esc,money} from './core.mjs?v=5.10.0';
+import {expenseDistributionModel} from './expense-distribution.mjs?v=perf1';
+import {escapeHtml as esc,money} from './core.mjs?v=perf1';
 import {locale,t as tr} from './i18n.mjs?v=5.10.0';
-import {expenseDonutChart} from './finance-charts.mjs?v=5.10.0';
+import {expenseDonutChart} from './finance-charts.mjs?v=perf1';
 
 export function expenseDistributionPanel(s,reportRange={}){
  const de=locale().startsWith('de'),t=(a,b)=>(locale().slice(0,2)==='tr'?(b):(uiText(a,locale().slice(0,2))));

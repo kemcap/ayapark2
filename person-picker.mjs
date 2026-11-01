@@ -1,6 +1,6 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {norm} from './v3-domain.mjs?v=5.10.0';
-import {escapeHtml as e} from './core.mjs?v=5.10.0';
+import {norm} from './v3-domain.mjs?v=perf1';
+import {escapeHtml as e} from './core.mjs?v=perf1';
 import {getLanguage} from './i18n.mjs?v=5.10.0';
 const text=(tr,de)=>(getLanguage()==='tr'?(tr):(uiText(de,getLanguage())));
 const phone=value=>{let n=String(value||'').replace(/\D/g,'').replace(/^00/,'');return n.replace(/^90(?=5\d{9}$)/,'').replace(/^0(?=5\d{9}$)/,'');};

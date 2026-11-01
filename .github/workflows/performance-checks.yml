@@ -1,0 +1,26 @@
+name: Performance regressions
+on:
+  pull_request:
+    paths:
+      - '*.mjs'
+      - '*.js'
+      - '*.html'
+      - '*.css'
+      - 'tests/**'
+      - 'package*.json'
+      - '.github/workflows/performance-checks.yml'
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:performance:browser

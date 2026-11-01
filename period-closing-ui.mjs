@@ -1,5 +1,5 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {escapeHtml as e,money,randomId} from './core.mjs?v=5.10.0';
+import {escapeHtml as e,money,randomId} from './core.mjs?v=perf1';
 
 // Each RPC still checks the actual account server-side. No simulated finalization.
 export function periodClosings({rpc,allowed,site,language,onSaved=async()=>{}}){

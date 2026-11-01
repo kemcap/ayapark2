@@ -1,5 +1,5 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {escapeHtml as e,randomId} from './core.mjs?v=5.10.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=perf1';
 import {releasedReportModel} from './released-report-model.mjs?v=5.10.0';
 import {exportMarkup} from './report-export-view.mjs?v=5.10.0';
 import {downloadWorkbook,openExport} from './report-export-ui.mjs?v=5.10.0';

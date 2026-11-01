@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {AyaparkApi} from '../api.mjs?v=5.10.0';
+import {AyaparkApi} from '../api.mjs?v=perf1';
 
 const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};};
 function fixture(role='manager',count=6){
@@ -54,4 +54,25 @@ test('management read projection enables apartment balances without any editing 
 });
 test('management opt-out does not infer new read access from the role label',async()=>{
  const f=fixture('deputy');f.workspace.management_read=false;f.workspace.capabilities={admin:false,finance:false,people:false};const data=await f.api.load();assert.equal(data.managementRead,false);assert.equal(data.units.find(u=>u.id==='u2').debt,null);
+});
+test('independent workspaces start while the main workspace is pending, with unchanged request counts',async()=>{
+ const f=fixture(),gate=deferred(),started=deferred(),original=f.api.rpc;
+ f.api.rpc=async name=>{if(name==='ay5_workspace'){started.resolve();await gate.promise;}return original(name);};
+ const pending=f.api.load();await started.promise;
+ for(const name of ['ay3_draft_workspace','ay3_contact_workspace','ay6_task_workspace','ay6_claim_hold_workspace'])assert.equal(f.calls.filter(([n])=>n===name).length,1,name);
+ gate.resolve();await pending;
+ for(const name of ['ay3_draft_workspace','ay3_contact_workspace','ay6_task_workspace','ay6_claim_hold_workspace'])assert.equal(f.calls.filter(([n])=>n===name).length,1,name);
+});
+test('a session change rejects a pending workspace rather than publishing stale permissions or data',async()=>{
+ const f=fixture(),gate=deferred(),started=deferred(),original=f.api.rpc;
+ f.api.rpc=async name=>{if(name==='ay5_workspace'){started.resolve();await gate.promise;}return original(name);};
+ const pending=f.api.load();await started.promise;f.api.clear();gate.resolve();await assert.rejects(pending);
+});
+test('optional workspace failures remain unavailable; required workspace failures still reject',async()=>{
+ for(const failing of ['ay6_task_workspace','ay6_claim_hold_workspace','ay3_contact_workspace','ay3_draft_workspace']){
+  const f=fixture(),original=f.api.rpc;f.api.rpc=async name=>{if(name===failing)throw Error('offline');return original(name);};
+  if(failing==='ay6_task_workspace'||failing==='ay6_claim_hold_workspace'){
+   const d=await f.api.load();assert.equal(d[failing==='ay6_task_workspace'?'taskWorkspace':'claimHoldWorkspace'].unavailable,true);
+  }else await assert.rejects(f.api.load(),/offline/);
+ }
 });

@@ -1,0 +1,1627 @@
+{
+  "node": "v24.22.1",
+  "runs": 7,
+  "scope": "Local Node CPU / HTML generation; excludes DOM, network and mobile hardware",
+  "results": [
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "super",
+      "page": "overview",
+      "before_ms": 12.785327999999993,
+      "after_ms": 4.566938999999991,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "super",
+      "page": "units",
+      "before_ms": 8.951092999999958,
+      "after_ms": 1.0664490000000342,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "super",
+      "page": "dues",
+      "before_ms": 3.693651999999986,
+      "after_ms": 0.36361800000003086,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "super",
+      "page": "transactions",
+      "before_ms": 0.8563309999999547,
+      "after_ms": 0.08714099999997416,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "super",
+      "page": "reports",
+      "before_ms": 2.039295999999979,
+      "after_ms": 0.7979139999999916,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "super",
+      "page": "persons",
+      "before_ms": 2.250825000000077,
+      "after_ms": 0.22557099999994534,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "super",
+      "page": "providers",
+      "before_ms": 0.06128200000000561,
+      "after_ms": 0.017175999999949454,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "super",
+      "page": "announcements",
+      "before_ms": 0.11121800000000803,
+      "after_ms": 0.013830999999981941,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "super",
+      "page": "law",
+      "before_ms": 0.012207999999986896,
+      "after_ms": 0.010576000000014574,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "super",
+      "page": "settings",
+      "before_ms": 0.0762449999999717,
+      "after_ms": 0.06723199999998997,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "super",
+      "page": "unit",
+      "before_ms": 2.9251729999999725,
+      "after_ms": 0.4231689999999162,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "staff",
+      "page": "overview",
+      "before_ms": 14.981892000000016,
+      "after_ms": 1.682533000000035,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "staff",
+      "page": "units",
+      "before_ms": 10.304825999999935,
+      "after_ms": 1.0755629999999883,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "staff",
+      "page": "dues",
+      "before_ms": 5.036768000000052,
+      "after_ms": 0.4490680000000111,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "staff",
+      "page": "transactions",
+      "before_ms": 0.6833310000000665,
+      "after_ms": 0.0556339999999409,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "staff",
+      "page": "reports",
+      "before_ms": 1.9544680000000199,
+      "after_ms": 0.9359920000000557,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "staff",
+      "page": "persons",
+      "before_ms": 2.5185599999999795,
+      "after_ms": 0.1860310000000709,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "staff",
+      "page": "providers",
+      "before_ms": 0.0584880000000112,
+      "after_ms": 0.013681000000019594,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "staff",
+      "page": "announcements",
+      "before_ms": 0.09000600000001668,
+      "after_ms": 0.010454999999979009,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "staff",
+      "page": "law",
+      "before_ms": 0.006889999999998508,
+      "after_ms": 0.0066900000000487125,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "staff",
+      "page": "settings",
+      "before_ms": 0.009684999999990396,
+      "after_ms": 0.01024500000005446,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "staff",
+      "page": "unit",
+      "before_ms": 3.0587340000000722,
+      "after_ms": 0.3061719999999468,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "resident",
+      "page": "overview",
+      "before_ms": 2.6727109999999357,
+      "after_ms": 0.34746399999994537,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "resident",
+      "page": "units",
+      "before_ms": 0.7736969999998564,
+      "after_ms": 0.062124000000039814,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "resident",
+      "page": "dues",
+      "before_ms": 1.5713310000001002,
+      "after_ms": 0.12723200000004908,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "resident",
+      "page": "reports",
+      "before_ms": 1.9938179999999193,
+      "after_ms": 0.7228999999999814,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "resident",
+      "page": "providers",
+      "before_ms": 0.06215399999996407,
+      "after_ms": 0.013950999999906344,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "resident",
+      "page": "announcements",
+      "before_ms": 0.10154400000010355,
+      "after_ms": 0.0113979999998719,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "resident",
+      "page": "law",
+      "before_ms": 0.010706000000027416,
+      "after_ms": 0.011087000000088665,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "tr",
+      "role": "resident",
+      "page": "unit",
+      "before_ms": 0.9004679999998189,
+      "after_ms": 0.10001099999999497,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "super",
+      "page": "overview",
+      "before_ms": 10.867995000000064,
+      "after_ms": 1.564971000000014,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "super",
+      "page": "units",
+      "before_ms": 8.558330999999953,
+      "after_ms": 0.9354110000001583,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "super",
+      "page": "dues",
+      "before_ms": 3.803188000000091,
+      "after_ms": 0.41222099999981765,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "super",
+      "page": "transactions",
+      "before_ms": 0.7884899999999107,
+      "after_ms": 0.06017100000008213,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "super",
+      "page": "reports",
+      "before_ms": 1.7430789999998524,
+      "after_ms": 0.5970710000001418,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "super",
+      "page": "persons",
+      "before_ms": 2.0679989999998725,
+      "after_ms": 0.1705779999999777,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "super",
+      "page": "providers",
+      "before_ms": 0.05275899999992362,
+      "after_ms": 0.01350999999999658,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "super",
+      "page": "announcements",
+      "before_ms": 0.08761199999980818,
+      "after_ms": 0.009604000000081214,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "super",
+      "page": "law",
+      "before_ms": 0.005558999999948355,
+      "after_ms": 0.005568000000039319,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "super",
+      "page": "settings",
+      "before_ms": 0.046289000000115266,
+      "after_ms": 0.047812000000021726,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "super",
+      "page": "unit",
+      "before_ms": 2.5947450000001027,
+      "after_ms": 0.2949549999998453,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "staff",
+      "page": "overview",
+      "before_ms": 11.326015000000098,
+      "after_ms": 1.4222849999998743,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "staff",
+      "page": "units",
+      "before_ms": 8.827277000000095,
+      "after_ms": 0.9202579999998761,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "staff",
+      "page": "dues",
+      "before_ms": 4.5676710000000185,
+      "after_ms": 0.33315300000003845,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "staff",
+      "page": "transactions",
+      "before_ms": 0.815740999999889,
+      "after_ms": 0.060450999999829946,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "staff",
+      "page": "reports",
+      "before_ms": 2.6879250000001775,
+      "after_ms": 0.7457950000000437,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "staff",
+      "page": "persons",
+      "before_ms": 2.224505999999792,
+      "after_ms": 0.18516900000008718,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "staff",
+      "page": "providers",
+      "before_ms": 0.059690000000045984,
+      "after_ms": 0.014531999999917389,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "staff",
+      "page": "announcements",
+      "before_ms": 0.10454800000002251,
+      "after_ms": 0.012498999999934313,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "staff",
+      "page": "law",
+      "before_ms": 0.006478999999899315,
+      "after_ms": 0.005988999999999578,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "staff",
+      "page": "settings",
+      "before_ms": 0.008543000000145184,
+      "after_ms": 0.008912999999893145,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "staff",
+      "page": "unit",
+      "before_ms": 4.243652000000111,
+      "after_ms": 0.4147960000000239,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "resident",
+      "page": "overview",
+      "before_ms": 2.7633989999999358,
+      "after_ms": 0.3231079999998201,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "resident",
+      "page": "units",
+      "before_ms": 0.6790340000000015,
+      "after_ms": 0.054192000000057305,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "resident",
+      "page": "dues",
+      "before_ms": 1.8223700000003191,
+      "after_ms": 0.12160300000005009,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "resident",
+      "page": "reports",
+      "before_ms": 1.9002760000003036,
+      "after_ms": 0.8124250000000757,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "resident",
+      "page": "providers",
+      "before_ms": 0.07289000000037049,
+      "after_ms": 0.013971000000310596,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "resident",
+      "page": "announcements",
+      "before_ms": 0.09259000000020023,
+      "after_ms": 0.009293999999954394,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "resident",
+      "page": "law",
+      "before_ms": 0.00558900000032736,
+      "after_ms": 0.005818999999974039,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "de",
+      "role": "resident",
+      "page": "unit",
+      "before_ms": 0.8835630000003221,
+      "after_ms": 0.058567999999922904,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "super",
+      "page": "overview",
+      "before_ms": 13.711254000000281,
+      "after_ms": 1.384197999999742,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "super",
+      "page": "units",
+      "before_ms": 9.903229999999894,
+      "after_ms": 1.296415000000252,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "super",
+      "page": "dues",
+      "before_ms": 3.953515000000152,
+      "after_ms": 0.3663029999997889,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "super",
+      "page": "transactions",
+      "before_ms": 0.751252999999906,
+      "after_ms": 0.057106000000203494,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "super",
+      "page": "reports",
+      "before_ms": 2.1562430000003587,
+      "after_ms": 0.6245019999996657,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "super",
+      "page": "persons",
+      "before_ms": 2.009160999999949,
+      "after_ms": 0.23825899999974354,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "super",
+      "page": "providers",
+      "before_ms": 0.050196000000141794,
+      "after_ms": 0.012509000000136439,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "super",
+      "page": "announcements",
+      "before_ms": 0.10046099999999569,
+      "after_ms": 0.00923400000010588,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "super",
+      "page": "law",
+      "before_ms": 0.00599899999997433,
+      "after_ms": 0.006699999999909778,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "super",
+      "page": "settings",
+      "before_ms": 0.04525800000010349,
+      "after_ms": 0.04573900000013964,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "super",
+      "page": "unit",
+      "before_ms": 2.858473000000231,
+      "after_ms": 0.37957300000016403,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "staff",
+      "page": "overview",
+      "before_ms": 11.636785000000145,
+      "after_ms": 1.5876349999998638,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "staff",
+      "page": "units",
+      "before_ms": 9.121941000000334,
+      "after_ms": 1.0275700000001962,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "staff",
+      "page": "dues",
+      "before_ms": 3.753263000000061,
+      "after_ms": 0.378240999999889,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "staff",
+      "page": "transactions",
+      "before_ms": 0.8133269999998447,
+      "after_ms": 0.06279399999993984,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "staff",
+      "page": "reports",
+      "before_ms": 1.8257140000000618,
+      "after_ms": 0.72175900000002,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "staff",
+      "page": "persons",
+      "before_ms": 2.0993670000002567,
+      "after_ms": 0.1763860000000932,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "staff",
+      "page": "providers",
+      "before_ms": 0.06933400000025358,
+      "after_ms": 0.013310000000274158,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "staff",
+      "page": "announcements",
+      "before_ms": 0.08835399999998117,
+      "after_ms": 0.00938399999995454,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "staff",
+      "page": "law",
+      "before_ms": 0.006580000000212749,
+      "after_ms": 0.0066299999998591375,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "staff",
+      "page": "settings",
+      "before_ms": 0.010165000000142754,
+      "after_ms": 0.010095000000092114,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "staff",
+      "page": "unit",
+      "before_ms": 2.509806000000026,
+      "after_ms": 0.33494500000006155,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "resident",
+      "page": "overview",
+      "before_ms": 2.3754030000000057,
+      "after_ms": 0.2702679999997599,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "resident",
+      "page": "units",
+      "before_ms": 0.5488479999999072,
+      "after_ms": 0.05804699999998775,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "resident",
+      "page": "dues",
+      "before_ms": 1.5636590000003707,
+      "after_ms": 0.12188399999968169,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "resident",
+      "page": "reports",
+      "before_ms": 1.6810559999998986,
+      "after_ms": 0.7757699999997385,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "resident",
+      "page": "providers",
+      "before_ms": 0.05194900000014968,
+      "after_ms": 0.011297000000013213,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "resident",
+      "page": "announcements",
+      "before_ms": 0.08809299999984432,
+      "after_ms": 0.00898300000017116,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "resident",
+      "page": "law",
+      "before_ms": 0.005979000000024826,
+      "after_ms": 0.006279000000176893,
+      "html_equal": true
+    },
+    {
+      "scale": "demo",
+      "language": "en",
+      "role": "resident",
+      "page": "unit",
+      "before_ms": 0.7309329999998226,
+      "after_ms": 0.06011000000034983,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "super",
+      "page": "overview",
+      "before_ms": 500.03349399999934,
+      "after_ms": 127.01462299999912,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "super",
+      "page": "units",
+      "before_ms": 355.70358099999976,
+      "after_ms": 86.74693800000023,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "super",
+      "page": "dues",
+      "before_ms": 379.6966140000004,
+      "after_ms": 42.350587000000814,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "super",
+      "page": "transactions",
+      "before_ms": 6.043667000001733,
+      "after_ms": 0.47309300000051735,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "super",
+      "page": "reports",
+      "before_ms": 2.1423409999988507,
+      "after_ms": 0.8915549999983341,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "super",
+      "page": "persons",
+      "before_ms": 2.7940049999997427,
+      "after_ms": 0.3469829999994545,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "super",
+      "page": "providers",
+      "before_ms": 0.2413139999989653,
+      "after_ms": 0.1757949999991979,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "super",
+      "page": "announcements",
+      "before_ms": 0.31728799999837065,
+      "after_ms": 0.14707199999975273,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "super",
+      "page": "law",
+      "before_ms": 0.16594999999870197,
+      "after_ms": 0.13872900000205846,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "super",
+      "page": "settings",
+      "before_ms": 0.1959260000003269,
+      "after_ms": 0.21255100000053062,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "super",
+      "page": "unit",
+      "before_ms": 237.37516700000197,
+      "after_ms": 12.769272000001365,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "staff",
+      "page": "overview",
+      "before_ms": 472.8189170000005,
+      "after_ms": 98.32952700000169,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "staff",
+      "page": "units",
+      "before_ms": 641.8163210000021,
+      "after_ms": 165.8793019999939,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "staff",
+      "page": "dues",
+      "before_ms": 426.61204200000066,
+      "after_ms": 44.18392400000448,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "staff",
+      "page": "transactions",
+      "before_ms": 4.596322000004875,
+      "after_ms": 0.4411359999940032,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "staff",
+      "page": "reports",
+      "before_ms": 2.3222879999957513,
+      "after_ms": 0.9541210000024876,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "staff",
+      "page": "persons",
+      "before_ms": 3.1571179999955348,
+      "after_ms": 0.45807200000126613,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "staff",
+      "page": "providers",
+      "before_ms": 0.28906699999788543,
+      "after_ms": 0.23114900000655325,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "staff",
+      "page": "announcements",
+      "before_ms": 0.31227100000251085,
+      "after_ms": 0.20123400000011316,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "staff",
+      "page": "law",
+      "before_ms": 0.12897499999962747,
+      "after_ms": 0.1470919999992475,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "staff",
+      "page": "settings",
+      "before_ms": 0.1436669999966398,
+      "after_ms": 0.13640599999780534,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "staff",
+      "page": "unit",
+      "before_ms": 264.34998500000074,
+      "after_ms": 14.021678000004613,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "resident",
+      "page": "overview",
+      "before_ms": 20.437262999999803,
+      "after_ms": 4.425316000000748,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "resident",
+      "page": "units",
+      "before_ms": 2.895358000001579,
+      "after_ms": 0.48170699999900535,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "resident",
+      "page": "dues",
+      "before_ms": 44.55418700000155,
+      "after_ms": 22.935922999997274,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "resident",
+      "page": "reports",
+      "before_ms": 1.9112329999989015,
+      "after_ms": 0.804493999996339,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "resident",
+      "page": "providers",
+      "before_ms": 0.1981889999951818,
+      "after_ms": 0.14596000000165077,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "resident",
+      "page": "announcements",
+      "before_ms": 0.27685800000472227,
+      "after_ms": 0.14077199999883305,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "resident",
+      "page": "law",
+      "before_ms": 0.18051199999899836,
+      "after_ms": 0.15945099999953527,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "tr",
+      "role": "resident",
+      "page": "unit",
+      "before_ms": 19.38652799999545,
+      "after_ms": 1.6000229999990552,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "super",
+      "page": "overview",
+      "before_ms": 607.6485769999999,
+      "after_ms": 142.924374000002,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "super",
+      "page": "units",
+      "before_ms": 401.12233299999934,
+      "after_ms": 97.89894500000082,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "super",
+      "page": "dues",
+      "before_ms": 346.47120200000063,
+      "after_ms": 37.325737999999546,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "super",
+      "page": "transactions",
+      "before_ms": 4.0671369999981835,
+      "after_ms": 0.4028279999984079,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "super",
+      "page": "reports",
+      "before_ms": 1.867868000001181,
+      "after_ms": 0.8220599999986007,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "super",
+      "page": "persons",
+      "before_ms": 1.8799070000022766,
+      "after_ms": 0.3396329999959562,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "super",
+      "page": "providers",
+      "before_ms": 0.2008129999958328,
+      "after_ms": 0.14644099999713944,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "super",
+      "page": "announcements",
+      "before_ms": 0.2563369999988936,
+      "after_ms": 0.14584000000468222,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "super",
+      "page": "law",
+      "before_ms": 0.1219139999957406,
+      "after_ms": 0.12323599999945145,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "super",
+      "page": "settings",
+      "before_ms": 0.1740330000029644,
+      "after_ms": 0.1765159999995376,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "super",
+      "page": "unit",
+      "before_ms": 261.65956000000006,
+      "after_ms": 11.470637999998871,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "staff",
+      "page": "overview",
+      "before_ms": 556.4245479999954,
+      "after_ms": 131.14837799999805,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "staff",
+      "page": "units",
+      "before_ms": 414.03085199999623,
+      "after_ms": 106.702357999995,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "staff",
+      "page": "dues",
+      "before_ms": 387.70090399999754,
+      "after_ms": 46.201711000001524,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "staff",
+      "page": "transactions",
+      "before_ms": 4.109689999997499,
+      "after_ms": 0.4291579999990063,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "staff",
+      "page": "reports",
+      "before_ms": 1.885244999997667,
+      "after_ms": 0.8131670000002487,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "staff",
+      "page": "persons",
+      "before_ms": 1.8942580000002636,
+      "after_ms": 0.31110000000626314,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "staff",
+      "page": "providers",
+      "before_ms": 0.1933019999996759,
+      "after_ms": 0.14141399999789428,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "staff",
+      "page": "announcements",
+      "before_ms": 0.2692970000061905,
+      "after_ms": 0.14804300000832882,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "staff",
+      "page": "law",
+      "before_ms": 0.13613499999337364,
+      "after_ms": 0.1356439999944996,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "staff",
+      "page": "settings",
+      "before_ms": 0.13624500000150874,
+      "after_ms": 0.12871399999130517,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "staff",
+      "page": "unit",
+      "before_ms": 265.8229379999975,
+      "after_ms": 15.090106999996351,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "resident",
+      "page": "overview",
+      "before_ms": 23.299253999997745,
+      "after_ms": 4.194929000004777,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "resident",
+      "page": "units",
+      "before_ms": 3.5004919999919366,
+      "after_ms": 0.6949580000073183,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "resident",
+      "page": "dues",
+      "before_ms": 45.637486999999965,
+      "after_ms": 22.97022800000559,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "resident",
+      "page": "reports",
+      "before_ms": 1.8938779999880353,
+      "after_ms": 0.7830420000100276,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "resident",
+      "page": "providers",
+      "before_ms": 0.22600100000272505,
+      "after_ms": 0.15208899999561254,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "resident",
+      "page": "announcements",
+      "before_ms": 0.2383200000040233,
+      "after_ms": 0.14586000000417698,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "resident",
+      "page": "law",
+      "before_ms": 0.12020099999790546,
+      "after_ms": 0.135364000001573,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "de",
+      "role": "resident",
+      "page": "unit",
+      "before_ms": 18.581206000002567,
+      "after_ms": 1.4104280000028666,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "super",
+      "page": "overview",
+      "before_ms": 528.3746329999994,
+      "after_ms": 120.2805490000028,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "super",
+      "page": "units",
+      "before_ms": 365.2927950000012,
+      "after_ms": 94.8168319999968,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "super",
+      "page": "dues",
+      "before_ms": 361.20797299999685,
+      "after_ms": 39.21321600000374,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "super",
+      "page": "transactions",
+      "before_ms": 4.399588000000222,
+      "after_ms": 0.5206760000000941,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "super",
+      "page": "reports",
+      "before_ms": 2.453051000004052,
+      "after_ms": 1.0757029999949737,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "super",
+      "page": "persons",
+      "before_ms": 2.490496999991592,
+      "after_ms": 0.3596419999958016,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "super",
+      "page": "providers",
+      "before_ms": 0.21633600001223385,
+      "after_ms": 0.1470019999978831,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "super",
+      "page": "announcements",
+      "before_ms": 0.29499500000383705,
+      "after_ms": 0.17250100000819657,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "super",
+      "page": "law",
+      "before_ms": 0.16170399999828078,
+      "after_ms": 0.15330099999846425,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "super",
+      "page": "settings",
+      "before_ms": 0.25668699998641387,
+      "after_ms": 0.23574599999119528,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "super",
+      "page": "unit",
+      "before_ms": 252.43981799999892,
+      "after_ms": 15.061523999989731,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "staff",
+      "page": "overview",
+      "before_ms": 547.4025090000068,
+      "after_ms": 107.25206199999957,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "staff",
+      "page": "units",
+      "before_ms": 365.2219400000031,
+      "after_ms": 101.7469090000086,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "staff",
+      "page": "dues",
+      "before_ms": 369.4472259999893,
+      "after_ms": 47.09270199999446,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "staff",
+      "page": "transactions",
+      "before_ms": 4.244814999998198,
+      "after_ms": 0.4488080000010086,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "staff",
+      "page": "reports",
+      "before_ms": 2.0593880000087665,
+      "after_ms": 0.8049239999963902,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "staff",
+      "page": "persons",
+      "before_ms": 2.0294819999980973,
+      "after_ms": 0.31766899999638554,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "staff",
+      "page": "providers",
+      "before_ms": 0.18882399999711197,
+      "after_ms": 0.14772300000186078,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "staff",
+      "page": "announcements",
+      "before_ms": 0.23014699999475852,
+      "after_ms": 0.14259600000514183,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "staff",
+      "page": "law",
+      "before_ms": 0.1298160000005737,
+      "after_ms": 0.13110800000140443,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "staff",
+      "page": "settings",
+      "before_ms": 0.13989099999889731,
+      "after_ms": 0.14127300000109244,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "staff",
+      "page": "unit",
+      "before_ms": 255.11073000000033,
+      "after_ms": 11.647855000002892,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "resident",
+      "page": "overview",
+      "before_ms": 22.203068999995594,
+      "after_ms": 4.993723999999929,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "resident",
+      "page": "units",
+      "before_ms": 2.6379499999893596,
+      "after_ms": 0.47589800000423566,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "resident",
+      "page": "dues",
+      "before_ms": 40.19185999999172,
+      "after_ms": 22.72776100000192,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "resident",
+      "page": "reports",
+      "before_ms": 1.9473679999937303,
+      "after_ms": 0.7915840000059688,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "resident",
+      "page": "providers",
+      "before_ms": 0.20456900000863243,
+      "after_ms": 0.17850899999029934,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "resident",
+      "page": "announcements",
+      "before_ms": 0.2442190000001574,
+      "after_ms": 0.1437069999956293,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "resident",
+      "page": "law",
+      "before_ms": 0.12608999999065418,
+      "after_ms": 0.12748199999623466,
+      "html_equal": true
+    },
+    {
+      "scale": "1729-entries",
+      "language": "en",
+      "role": "resident",
+      "page": "unit",
+      "before_ms": 17.42746299999999,
+      "after_ms": 1.3340829999942798,
+      "html_equal": true
+    }
+  ]
+}

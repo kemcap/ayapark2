@@ -1,5 +1,5 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {escapeHtml as e,randomId} from './core.mjs?v=5.10.0';
+import {escapeHtml as e,randomId} from './core.mjs?v=perf1';
 import {inspectDocument,verifiedDocument,downloadOriginal} from './archive-files.mjs?v=5.9.42';
 
 // No public links, previews, automatic mail or browser persistence of file contents.
