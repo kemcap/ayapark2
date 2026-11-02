@@ -39,7 +39,7 @@ import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,
 import {bindInstall} from './install.mjs?v=perf1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.10.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261102-dashboardfix';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261102-financehotfix';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=perf1';
 import {template} from './v3-import.mjs?v=perf1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
@@ -181,7 +181,7 @@ const archiveUI=privateArchive({rpc:(name,args)=>api.rpc(name,args),storage:(pat
 const tasksUI=managementTasks({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&['super','staff'].includes(state.data.role),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,onSaved:reload,onDocument:id=>void archiveUI.open({documentId:id})});
 const holdUI=claimHoldReview({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:async()=>{await reload();if(detailView?.action==='charge_detail'&&$('detailDialog').open)showDetail(chargeWithReceipts(detailView.id));}});
 function closeDialogs(){holdUI.close();tasksUI.close();archiveUI.close();closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
-async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;lastFinancialLoad=Date.now();render();}finally{stop();}}
+async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;state.financialRefreshError='';lastFinancialLoad=Date.now();render();}finally{stop();}}
 async function refreshDashboardFinance(){
  if(financialRefreshBusy||state.mode!=='connected'||isAccessPreview()||!state.data?.site?.id)return;
  const site=state.data.site.id,attempt=epoch;
