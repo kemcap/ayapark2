@@ -29,6 +29,7 @@ function candidates(){
  }).sort((a,b)=>state.sort==='old'?(a.due_on||'').localeCompare(b.due_on||''):state.sort==='amount'?b.cents-a.cents:state.sort==='balance'?remaining(d,b)-remaining(d,a):(b.due_on||'').localeCompare(a.due_on||''));
 }
 function refresh(){
+ if(typeof document==='undefined')return;
  const root=document.getElementById('ay-charge-browser');if(!root||!context)return;
  const hits=candidates(),size=limit(),pages=Math.max(1,Math.ceil(hits.length/size));
  state.page=Math.max(1,Math.min(state.page,pages));
