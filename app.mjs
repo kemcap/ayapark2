@@ -89,6 +89,7 @@ const accessRequestUi=bindAccessRequests({api,getState:()=>state,invite:id=>invi
 async function loadPushStatuses(){if(state.mode!=='connected'||!can(state,'admin'))return;try{const r=await api.rpc('ay10_person_push_status',{p_site:state.data.site.id});state.pushStatus=Object.fromEntries((Array.isArray(r)?r:[]).map(x=>[x.person_id,x]));render();}catch(error){console.warn('Push statuses unavailable',error);}}
 async function loadPersonLogins(){if(state.mode!=='connected'||!can(state,'admin'))return;try{state.personLogins=await api.rpc('ay8_person_last_logins');render();}catch(error){console.warn('Login-Übersicht nicht verfügbar',error);}}
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null,importController=null;
+let lastFinancialLoad=0;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
 function isAccessPreview(){return ['connected','demo'].includes(state.mode)&&mayPreview(state.fullData)&&allowedPreviewRoles(state.fullData).includes(state.viewRole)&&state.viewRole!==nativePreviewRole(state.fullData);}
@@ -170,7 +171,7 @@ function render(focus=false){
  if(focus)$('content').focus({preventScroll:true});else restoreFocus();
 }
 function recordAppEvent(event,page=null){if(state.mode!=='connected'||!state.data?.site?.id||isAccessPreview())return;void api.rpc('ay8_record_app_event',{p_site:state.data.site.id,p_event:event,p_page:page}).catch(()=>{});}
-function navigate(page){recordAppEvent('page_view',page);clearTimeout(peopleSearchTimer);mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});}
+function navigate(page){recordAppEvent('page_view',page);clearTimeout(peopleSearchTimer);mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});if(page==='overview'&&state.mode==='connected'&&!isAccessPreview()&&!writeBusy&&Date.now()-lastFinancialLoad>15000)void reload().catch(()=>{state.stale=true;render();});}
 const closingUI=periodClosings({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,onSaved:reload});
 const releaseUI=reportReleases({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),community:()=>state.mode==='connected'&&!isAccessPreview()&&(can(state,'finance')||state.data.communityAccess===true),site:()=>state.data.site.id,language:getLanguage});
 const levyUI=levyReviews({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),connected:()=>state.mode==='connected'&&!isAccessPreview(),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload});
@@ -179,7 +180,7 @@ const archiveUI=privateArchive({rpc:(name,args)=>api.rpc(name,args),storage:(pat
 const tasksUI=managementTasks({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&['super','staff'].includes(state.data.role),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,onSaved:reload,onDocument:id=>void archiveUI.open({documentId:id})});
 const holdUI=claimHoldReview({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:async()=>{await reload();if(detailView?.action==='charge_detail'&&$('detailDialog').open)showDetail(chargeWithReceipts(detailView.id));}});
 function closeDialogs(){holdUI.close();tasksUI.close();archiveUI.close();closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
-async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;render();}finally{stop();}}
+async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;lastFinancialLoad=Date.now();render();}finally{stop();}}
 async function sendImportantPush(result,payload){
  // Server verifies priority, target, publishing window, site and sender authorization.
  const id=result?.id||result?.announcement_id||payload?.id;
@@ -473,6 +474,7 @@ document.addEventListener('click',async event=>{
   if(action==='claims_detail'){if(state.data.role!=='resident'||state.data.communityAccess===false)return;detailView={action};return showDetail(residentClaimsDetail(state));}
   if(action==='reload_activity'){await loadActivityFeed();return;}
   if(action==='audit_page'){if(can(state,'admin'))await loadAuditPage(Number(b.dataset.page));return;}
+  if(action==='refresh_dashboard'){if(state.mode!=='connected'||isAccessPreview())return;try{await reload();toast(tr('Kayıtlar güncellendi.'));}catch(error){state.stale=true;render();toast(tr('Veriler yenilenemedi. Ekranda önceki okuma var.'));}return;}
   if(action==='review_selected'){await reviewSelected();return;}
   if(action==='recover_person'){adminRecoveryUi.open(b.dataset.id);return;}
   if(action==='invite_person'){invitationUi.open(b.dataset.id);return;}
@@ -650,7 +652,7 @@ let pendingSetupLoaded=null;
 $('cancelLogin').addEventListener('click',()=>$('loginDialog').close());
 function completeSignIn(loaded){
  state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';state.fullData=null;
-  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;recordAppEvent('app_open');state.personLogins={};void loadPersonLogins();void loadPushStatuses();void loadActivityFeed();
+  state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.mode='connected';state.stale=false;lastFinancialLoad=Date.now();recordAppEvent('app_open');state.personLogins={};void loadPersonLogins();void loadPushStatuses();void loadActivityFeed();
  browserAlerts.scheduleReminder();
  void privacyGate.check();
  state.period=loaded.transactions.map(t=>t.date.slice(0,7)).sort().at(-1)||new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'}).slice(0,7);
