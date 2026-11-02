@@ -1,4 +1,4 @@
-import {chargeBrowser} from './charge-list-filter.mjs?v=1';
+import {chargeBrowser} from './charge-list-filter.mjs?v=compact-cards-20261102';
 import {uiText} from './language-text.mjs?v=5.10.0';
 import {claimReminderTasks} from './due-reminders.mjs?v=5.10.0';
 import {chargeDraftPanel} from './charge-drafts.mjs?v=archivefix-20261102';
