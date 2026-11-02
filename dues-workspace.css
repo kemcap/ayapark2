@@ -1,0 +1,100 @@
+/* Aidat & Forderungen workspace; scoped to preserve the existing AYAPARK design. */
+.dues-workspace{min-width:0}
+.dues-workspace .dues-overline{font-size:.7rem;letter-spacing:.12em;font-weight:800;color:var(--muted)}
+.dues-workspace .dues-kpis{display:grid;grid-template-columns:1.32fr 1fr 1fr;gap:12px;margin:0 0 18px}
+.dues-workspace .dues-kpi{min-width:0;display:flex;flex-direction:column;gap:8px;padding:19px 20px;border:1px solid var(--line);border-radius:19px;background:var(--paper)}
+.dues-workspace .dues-kpi>span{font-size:.85rem;font-weight:650;color:var(--muted)}
+.dues-workspace .dues-kpi>strong{font-size:clamp(1.55rem,2.6vw,2rem);font-weight:800;line-height:1.15;letter-spacing:-.03em;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.dues-workspace .dues-kpi>small{font-size:.76rem;line-height:1.45;color:var(--muted)}
+.dues-workspace .dues-kpi-primary{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 7%,var(--paper));}
+.dues-workspace .dues-jump{display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:thin;margin:0 0 20px;padding:2px 0 7px}
+.dues-workspace .dues-jump a{display:inline-flex;align-items:center;justify-content:center;min-height:39px;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-size:.83rem;font-weight:650;color:var(--ink);text-decoration:none;white-space:nowrap}
+.dues-workspace .dues-jump a:hover,.dues-workspace .dues-jump a:focus-visible{border-color:var(--primary);color:var(--primary)}
+.dues-workspace .dues-section-head{display:flex;align-items:start;justify-content:space-between;gap:15px;margin-bottom:18px}
+.dues-workspace .dues-section-head h2{margin:5px 0 6px;font-size:clamp(1.1rem,2vw,1.34rem);line-height:1.3}
+.dues-workspace .dues-section-head p{margin:0;max-width:57ch;font-size:.87rem;color:var(--muted);line-height:1.5}
+.dues-workspace .dues-create{margin-bottom:19px}
+.dues-workspace .dues-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dues-workspace .dues-action{min-width:0;display:grid;grid-template-columns:38px minmax(0,1fr);gap:11px;padding:17px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--paper) 95%,var(--ink))}
+.dues-workspace .dues-action-icon{grid-row:span 2;display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:color-mix(in srgb,var(--primary) 10%,var(--paper));color:var(--primary);font-size:20px;font-weight:700}
+.dues-workspace .dues-action h3{margin:0 0 4px;font-size:.96rem}
+.dues-workspace .dues-action p{margin:0;color:var(--muted);line-height:1.45;font-size:.78rem}
+.dues-workspace .dues-action>.button{grid-column:2;justify-self:start;min-height:42px;margin:4px 0 0;white-space:normal}
+.dues-workspace .dues-register{scroll-margin-top:15px}
+.dues-workspace .dues-analysis{scroll-margin-top:15px;margin:24px 0}
+.dues-workspace .dues-analysis>.dues-section-head{padding:0 3px}
+.dues-workspace .dues-filter-panel{padding:16px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--paper) 96%,var(--ink))}
+.dues-workspace .dues-search{display:grid;gap:7px;width:100%;margin-bottom:15px}
+.dues-workspace .dues-search>span{font-size:.8rem;font-weight:700}
+.dues-workspace .dues-search input{box-sizing:border-box;width:100%;min-height:46px;max-width:100%;border-radius:12px}
+.dues-workspace .dues-filter-row{display:flex;gap:18px;align-items:start;justify-content:space-between;flex-wrap:wrap}
+.dues-workspace .dues-filter-group{padding:0;margin:0;border:0;min-width:0}
+.dues-workspace .dues-filter-group legend{padding:0 0 6px;font-size:.76rem;color:var(--muted);font-weight:650}
+.dues-workspace .dues-pills{display:flex;gap:5px;flex-wrap:wrap}
+.dues-workspace .dues-pill{min-height:39px;padding:7px 12px;border:1px solid var(--line);border-radius:11px;background:var(--paper);color:var(--ink);font:inherit;font-size:.81rem;font-weight:650;cursor:pointer}
+.dues-workspace .dues-pill[aria-pressed="true"]{background:var(--primary);color:#fff;border-color:var(--primary)}
+.dues-workspace .dues-pill:hover:not([aria-pressed="true"]){border-color:var(--primary)}
+.dues-workspace .dues-more-filters{margin-top:13px;border-top:1px solid var(--line);padding-top:10px}
+.dues-workspace .dues-more-filters>summary{cursor:pointer;display:list-item;font-size:.8rem;font-weight:650;min-height:34px;padding-top:7px}
+.dues-workspace .dues-more-filters .ay-charge-filters{margin:9px 0;grid-template-columns:repeat(3,minmax(0,1fr))}
+.dues-workspace .dues-more-filters .field{min-width:0}
+.dues-workspace .ay-charge-toolbar{margin:15px 0 9px}
+.dues-workspace .ay-charge-toolbar .fine{margin:0}
+.dues-workspace .dues-view-toggle{display:flex;gap:5px}
+.dues-workspace .dues-view-toggle .button{min-height:37px;border-radius:10px;margin:0}
+.dues-workspace .dues-view-toggle [aria-pressed="true"]{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 10%,var(--paper));color:var(--primary)}
+.dues-workspace .charge-compact-rows{display:grid;gap:9px}
+.dues-workspace .charge-compact-item{border:1px solid var(--line);border-radius:14px;background:var(--paper);overflow:hidden}
+.dues-workspace .charge-compact-item[open]{border-color:color-mix(in srgb,var(--primary) 55%,var(--line))}
+.dues-workspace .charge-compact-item>summary{display:grid;grid-template-columns:50px minmax(0,1fr) minmax(85px,auto) 16px;gap:12px;align-items:center;min-height:68px;padding:13px 15px;list-style:none;cursor:pointer}
+.dues-workspace .charge-compact-item>summary::-webkit-details-marker{display:none}
+.dues-workspace .charge-compact-item>summary:focus-visible{outline:3px solid var(--primary);outline-offset:-3px}
+.dues-workspace .dues-unit-badge{display:grid;place-items:center;min-height:38px;padding:3px 6px;border-radius:9px;background:color-mix(in srgb,var(--ink) 5%,var(--paper));font-weight:800;font-size:.82rem;white-space:nowrap}
+.dues-workspace .dues-charge-copy{min-width:0;display:flex;flex-direction:column;gap:5px}
+.dues-workspace .dues-charge-copy>strong{font-size:.88rem;line-height:1.35;overflow-wrap:anywhere}
+.dues-workspace .dues-charge-copy>small{font-size:.74rem;line-height:1.35;color:var(--muted);overflow-wrap:anywhere}
+.dues-workspace .dues-charge-right{text-align:right;min-width:0;display:flex;flex-direction:column;gap:5px}
+.dues-workspace .dues-charge-right>strong{font-size:.99rem;font-weight:800;line-height:1.3;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dues-workspace .dues-charge-right>small{font-size:.73rem;color:var(--muted)}
+.dues-workspace .charge-compact-chevron{transition:transform .15s;opacity:.65}
+.dues-workspace .charge-compact-item[open] .charge-compact-chevron{transform:rotate(180deg)}
+.dues-workspace .charge-compact-details{border-top:1px solid var(--line);padding:14px 15px}
+.dues-workspace .dues-detail-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 15px}
+.dues-workspace .dues-detail-values>div{min-width:0}
+.dues-workspace .dues-detail-values dt{font-size:.74rem;color:var(--muted)}
+.dues-workspace .dues-detail-values dd{font-weight:750;font-variant-numeric:tabular-nums;margin:3px 0 0;overflow-wrap:anywhere}
+.dues-workspace .charge-compact-details .row-actions{margin:0;gap:7px}
+.dues-workspace .charge-compact-details .button{min-height:42px}
+.dues-workspace .dues-no-results{text-align:center;padding:28px 10px;border:1px dashed var(--line);border-radius:14px}
+.dues-workspace .dues-no-results .button{margin:0 auto}
+.dues-workspace .dues-fold{scroll-margin-top:15px}
+.dues-workspace .dues-fold>summary{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;min-height:40px}
+.dues-workspace .dues-fold>summary>.muted{font-size:.78rem;font-weight:400}
+.dues-workspace .dues-fold[open]>summary{margin-bottom:15px}
+.dues-workspace .dues-extra-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.dues-workspace .dues-extra-actions>.button{min-height:42px}
+.dues-workspace .dues-extra-actions:empty{display:none}
+.dues-workspace .ay-charge-pagination{margin-top:13px}
+@media(max-width:850px){.dues-workspace .dues-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dues-workspace .dues-kpi-primary{grid-column:1/-1}.dues-workspace .dues-action-grid{grid-template-columns:1fr}}
+@media(max-width:520px){
+ .dues-workspace .dues-kpis{gap:8px}
+ .dues-workspace .dues-kpi{padding:15px 13px;border-radius:15px}
+ .dues-workspace .dues-kpi-primary{padding:19px}
+ .dues-workspace .dues-kpi:not(.dues-kpi-primary)>strong{font-size:1.6rem}
+ .dues-workspace .dues-filter-panel{padding:12px}
+ .dues-workspace .dues-filter-row{gap:12px}
+ .dues-workspace .dues-pill{padding:7px 10px}
+ .dues-workspace .dues-more-filters .ay-charge-filters{grid-template-columns:1fr}
+ .dues-workspace .dues-register{padding:17px 13px}
+ .dues-workspace .charge-compact-item>summary{grid-template-columns:40px minmax(0,1fr) auto 11px;padding:12px 9px;gap:8px}
+ .dues-workspace .dues-unit-badge{min-height:34px;padding:2px 3px;font-size:.74rem}
+ .dues-workspace .dues-charge-copy>strong{font-size:.82rem}
+ .dues-workspace .dues-charge-copy>small{font-size:.7rem}
+ .dues-workspace .dues-charge-right>strong{font-size:.83rem;white-space:normal}
+ .dues-workspace .dues-detail-values{gap:6px}
+ .dues-workspace .dues-detail-values dd{font-size:.86rem}
+ .dues-workspace .ay-charge-toolbar{align-items:center}
+ .dues-workspace .dues-action{padding:13px}
+}
+@media(prefers-reduced-motion:reduce){.dues-workspace .charge-compact-chevron{transition:none}}
+@media print{.dues-workspace .dues-jump,.dues-workspace .dues-filter-panel,.dues-workspace .dues-view-toggle,.dues-workspace .dues-extra-actions{display:none!important}}
