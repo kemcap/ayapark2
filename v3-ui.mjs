@@ -1,6 +1,6 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
 import {claimReminderTasks} from './due-reminders.mjs?v=5.10.0';
-import {chargeDraftPanel} from './charge-drafts.mjs?v=perf1';
+import {chargeDraftPanel} from './charge-drafts.mjs?v=archivefix-20261102';
 import {categoryBalanceSummary} from './category-balance-ui.mjs?v=perf1';
 import {registrationStatus} from './person-status.mjs?v=5.10.0';
 import {apartmentAmounts} from './seven-ux.mjs?v=perf1';
