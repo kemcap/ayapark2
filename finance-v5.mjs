@@ -25,7 +25,8 @@ export function selectedUnits(d,p){
 export function batchPreview(d,p){
  const units=selectedUnits(d,p),rows=distribute(p.cents,units.map(u=>u.id),p.distribution,p.weights);
  const levy=p.debt_group==='capital'&&p.liability_on;
- return rows.map(row=>{const link=d.links.find(l=>l.id===p.debtors?.[row.unit_id]&&l.unit_id===row.unit_id&&(levy?l.role==='owner':['owner','tenant'].includes(l.role))&&financeLinkAt(l,levy||p.due_on,{historical:!!levy}));if(!link)throw Error('Her daire için sorumlu kişiyi seçin.');return {...row,link_id:link.id,person_id:link.person_id};});
+ const monthly=p.category==null||p.category===''&&p.distribution==='per_unit';
+ return rows.map(row=>{const link=d.links.find(l=>l.id===p.debtors?.[row.unit_id]&&l.unit_id===row.unit_id&&(monthly?['owner','tenant'].includes(l.role):l.role==='owner')&&financeLinkAt(l,levy||p.due_on,{historical:!!levy}));if(!link)throw Error('Her daire için sorumlu kişiyi seçin.');return {...row,link_id:link.id,person_id:link.person_id};});
 }
 export function paymentPlan(d,{entry_id,unit_id,person_id,group}){
  const entry=d.transactions.find(t=>t.id===entry_id);if(!entry||entry.cents<=0||entry.reversal_of||d.transactions.some(t=>t.reversal_of===entry_id))throw Error('Geçerli tahsilat bulunamadı.');
