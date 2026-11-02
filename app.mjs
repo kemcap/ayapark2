@@ -1,3 +1,4 @@
+import {dashboardFinancePatch} from './dashboard-finance-refresh.mjs?v=20261102';
 import {createBrowserAlerts} from './browser-alerts.mjs?v=4';
 import {createPrivacyGate} from './privacy-gate.mjs?v=3';
 import {preserveViewFocus} from './ui-focus.mjs?v=5.10.1';
@@ -89,7 +90,7 @@ const accessRequestUi=bindAccessRequests({api,getState:()=>state,invite:id=>invi
 async function loadPushStatuses(){if(state.mode!=='connected'||!can(state,'admin'))return;try{const r=await api.rpc('ay10_person_push_status',{p_site:state.data.site.id});state.pushStatus=Object.fromEntries((Array.isArray(r)?r:[]).map(x=>[x.person_id,x]));render();}catch(error){console.warn('Push statuses unavailable',error);}}
 async function loadPersonLogins(){if(state.mode!=='connected'||!can(state,'admin'))return;try{state.personLogins=await api.rpc('ay8_person_last_logins');render();}catch(error){console.warn('Login-Übersicht nicht verfügbar',error);}}
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null,importController=null;
-let lastFinancialLoad=0;
+let lastFinancialLoad=0,financialRefreshBusy=false;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
 function isAccessPreview(){return ['connected','demo'].includes(state.mode)&&mayPreview(state.fullData)&&allowedPreviewRoles(state.fullData).includes(state.viewRole)&&state.viewRole!==nativePreviewRole(state.fullData);}
@@ -171,7 +172,7 @@ function render(focus=false){
  if(focus)$('content').focus({preventScroll:true});else restoreFocus();
 }
 function recordAppEvent(event,page=null){if(state.mode!=='connected'||!state.data?.site?.id||isAccessPreview())return;void api.rpc('ay8_record_app_event',{p_site:state.data.site.id,p_event:event,p_page:page}).catch(()=>{});}
-function navigate(page){recordAppEvent('page_view',page);clearTimeout(peopleSearchTimer);mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});if(page==='overview'&&state.mode==='connected'&&!isAccessPreview()&&!writeBusy&&Date.now()-lastFinancialLoad>15000)void reload().catch(()=>{state.stale=true;render();});}
+function navigate(page){recordAppEvent('page_view',page);clearTimeout(peopleSearchTimer);mobileNavGroup=null;state.page=page;state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.bankPage=0;render(true);window.scrollTo({top:0,behavior:'instant'});if(page==='overview'&&state.mode==='connected'&&!isAccessPreview()&&!writeBusy&&Date.now()-lastFinancialLoad>3000)void refreshDashboardFinance().catch(()=>{});}
 const closingUI=periodClosings({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,onSaved:reload});
 const releaseUI=reportReleases({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),community:()=>state.mode==='connected'&&!isAccessPreview()&&(can(state,'finance')||state.data.communityAccess===true),site:()=>state.data.site.id,language:getLanguage});
 const levyUI=levyReviews({rpc:(name,args)=>api.rpc(name,args),admin:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),connected:()=>state.mode==='connected'&&!isAccessPreview(),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:reload});
@@ -181,6 +182,33 @@ const tasksUI=managementTasks({rpc:(name,args)=>api.rpc(name,args),allowed:()=>s
 const holdUI=claimHoldReview({rpc:(name,args)=>api.rpc(name,args),allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),site:()=>state.data.site.id,language:getLanguage,data:()=>state.data,onSaved:async()=>{await reload();if(detailView?.action==='charge_detail'&&$('detailDialog').open)showDetail(chargeWithReceipts(detailView.id));}});
 function closeDialogs(){holdUI.close();tasksUI.close();archiveUI.close();closingUI.close();releaseUI.close();levyUI.close();budgetUI.close();personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');for(const id of ['detailDialog','actionDialog','importDialog','urgentDialog','notificationsDialog','inviteDialog'])if($(id).open)$(id).close();$('detailContent').textContent='';$('actionFields').textContent='';}
 async function reload(){const stop=beginLoading($('contextText'));try{const attempt=epoch,loaded=await api.load();if(attempt!==epoch||state.mode!=='connected')throw Error(tr("Oturum değişti."));if(nativePreviewRole(state.fullData)!==nativePreviewRole(loaded)){state.viewRole=nativePreviewRole(loaded)||'resident';state.previewSelection='';}state.fullData=null;state.data={...loaded,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};state.stale=false;lastFinancialLoad=Date.now();render();}finally{stop();}}
+async function refreshDashboardFinance(){
+ if(financialRefreshBusy||state.mode!=='connected'||isAccessPreview()||!state.data?.site?.id)return;
+ const site=state.data.site.id,attempt=epoch;
+ financialRefreshBusy=true;
+ try{
+  const [summary,workspace]=await Promise.all([
+   api.rpc('ay3_financial_summary',{p_site:site}),
+   api.rpc('ay5_workspace',{p_site:site})
+  ]);
+  if(attempt!==epoch||state.mode!=='connected'||state.data?.site?.id!==site)return;
+  // Recompute both money cards from the same fresh response, not an old UI snapshot.
+  const base=state.fullData||state.data;
+  const next=dashboardFinancePatch(base,summary,workspace);
+  state.fullData=null;
+  state.data={...next,loadedAt:new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Istanbul'})};
+  state.stale=false;state.financialRefreshError='';
+  lastFinancialLoad=Date.now();
+  render();
+ }catch(error){
+  if(attempt===epoch&&state.mode==='connected'){
+   state.financialRefreshError=error.message||'Finance data could not be loaded';
+   state.stale=true;render();
+   throw error;
+  }
+ }finally{financialRefreshBusy=false;}
+}
+
 async function sendImportantPush(result,payload){
  // Server verifies priority, target, publishing window, site and sender authorization.
  const id=result?.id||result?.announcement_id||payload?.id;
@@ -474,7 +502,7 @@ document.addEventListener('click',async event=>{
   if(action==='claims_detail'){if(state.data.role!=='resident'||state.data.communityAccess===false)return;detailView={action};return showDetail(residentClaimsDetail(state));}
   if(action==='reload_activity'){await loadActivityFeed();return;}
   if(action==='audit_page'){if(can(state,'admin'))await loadAuditPage(Number(b.dataset.page));return;}
-  if(action==='refresh_dashboard'){if(state.mode!=='connected'||isAccessPreview())return;try{await reload();toast(tr('Kayıtlar güncellendi.'));}catch(error){state.stale=true;render();toast(tr('Veriler yenilenemedi. Ekranda önceki okuma var.'));}return;}
+  if(action==='refresh_dashboard'){if(state.mode!=='connected'||isAccessPreview())return;try{await refreshDashboardFinance();toast(tr('Kayıtlar güncellendi.'));}catch(error){toast(tr('Veriler yenilenemedi. Ekranda önceki okuma var.'));}return;}
   if(action==='review_selected'){await reviewSelected();return;}
   if(action==='recover_person'){adminRecoveryUi.open(b.dataset.id);return;}
   if(action==='invite_person'){invitationUi.open(b.dataset.id);return;}
@@ -923,8 +951,9 @@ $('actionForm').addEventListener('invalid',event=>{event.preventDefault();const 
 
 document.addEventListener('input',event=>{if(event.target.closest('#actionFields')&&financeActions.includes(formAction?.action)&&event.target.name!=='confirmed'){delete formAction.context.previewSignature;if($('financePreview'))$('financePreview').textContent='';const c=$('actionFields').querySelector('[name="confirmed"]');if(c)c.checked=false;}});
 let autoRefreshBusy=false,lastAutoRefresh=Date.now();
-async function refreshWhenIdle(){if(autoRefreshBusy||state.mode!=='connected'||document.visibilityState!=='visible'||writeBusy||loginBusy||document.querySelector('dialog[open]')||Date.now()-lastAutoRefresh<30000||document.activeElement?.matches('input,textarea,select'))return;autoRefreshBusy=true;lastAutoRefresh=Date.now();try{await reload();}catch{state.stale=true;}finally{autoRefreshBusy=false;}}
+async function refreshWhenIdle(){if(autoRefreshBusy||state.mode!=='connected'||document.visibilityState!=='visible'||writeBusy||loginBusy||document.querySelector('dialog[open]')||Date.now()-lastAutoRefresh<30000||document.activeElement?.matches('input,textarea,select'))return;autoRefreshBusy=true;lastAutoRefresh=Date.now();try{if(state.page==='overview'&&!isAccessPreview())await refreshDashboardFinance();else await reload();}catch{state.stale=true;}finally{autoRefreshBusy=false;}}
 setInterval(()=>void refreshWhenIdle(),90000);window.addEventListener('focus',()=>void refreshWhenIdle());document.addEventListener('visibilitychange',()=>void refreshWhenIdle());
+window.addEventListener('pageshow',event=>{if(event.persisted&&state.mode==='connected'&&state.page==='overview')void refreshDashboardFinance().catch(()=>{});});
 
 window.addEventListener('scroll',event=>{if(mobileNavGroup!==null&&closeMenuOnScroll(event,$('nav'))){mobileNavGroup=null;renderNavigation();}},{passive:true,capture:true});
 
