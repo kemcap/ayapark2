@@ -6,6 +6,8 @@ on:
       - 'v3-ui.mjs'
       - 'finance-forms.mjs'
       - 'tests/dashboard-reconciliation.test.mjs'
+      - 'tests/dashboard-finance-refresh.test.mjs'
+      - 'dashboard-finance-refresh.mjs'
       - '.github/workflows/dashboard-reconciliation-checks.yml'
 permissions:
   contents: read
@@ -20,5 +22,5 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: node --check app.mjs && node --check v3-ui.mjs && node --check finance-forms.mjs
-      - run: node --test tests/dashboard-reconciliation.test.mjs tests/overview-account-summary.test.mjs tests/unit-finance-dashboard.test.mjs tests/v5.test.mjs
+      - run: node --check app.mjs && node --check v3-ui.mjs && node --check finance-forms.mjs && node --check dashboard-finance-refresh.mjs
+      - run: node --test tests/dashboard-finance-refresh.test.mjs tests/dashboard-reconciliation.test.mjs tests/overview-account-summary.test.mjs tests/unit-finance-dashboard.test.mjs tests/v5.test.mjs
