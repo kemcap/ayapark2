@@ -42,5 +42,5 @@ test('finance preview signatures remain binding and require new approval after a
  const app=readFileSync(new URL('../app.mjs',import.meta.url),'utf8');
  assert.match(app,/await updateFinancePreview\(\)/);
  assert.match(app,/confirm\.checked=false/);
- assert.match(app,/data-action="refresh_dashboard"/);
+ assert.match(app,/if\(action==='refresh_dashboard'\)/);
 });
