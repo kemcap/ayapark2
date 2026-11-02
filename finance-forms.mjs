@@ -17,8 +17,8 @@ export function buildFinanceForm(s,action,args={}){
   body=(monthly?'':select('category','Kategori',chargeCategories.map(x=>[x,x]),chargeCategories[0]))+input('label','Açıklama','text',monthly?s.period+' '+tr('Aidat'):'','required maxlength="200"')+amount()+input('due_on','Vade','date',s.period+'-01','required')+
    select('scope','Daire seçimi',[['all','Tüm daireler'],['A','Yalnız A Blok'],['B','Yalnız B Blok'],['selected','Seçili daireler']],'all')+
    (monthly?'<input name="distribution" type="hidden" value="per_unit">':select('distribution','Dağıtım',[['total','Toplamı paylaştır'],['per_unit','Daire başına sabit tutar'],['shares','Arsa payına göre']],'total'))+
-   select('debtor_rule','Sorumlu önerisi',[['occupant','Kiracı varsa kiracı, yoksa ev sahibi'],['owner','Ev sahibi'],['tenant','Kiracı']],'occupant')+
-   `<details class="finance-targets"><summary>${tr('Daireler ve sorumlu kişiler')}</summary><p>${tr('Önerileri kontrol edin. Kategori tek başına sorumlu kişiyi belirlemez.')}</p>${d.units.map(u=>`<section class="finance-target" data-finance-unit="${e(u.id)}" data-block-code="${e(u.block)}"><strong>${e(u.code)}</strong>${check('unit_ids',u.code,u.id)}${select('debtor:'+u.id,'Sorumlu kişi',[['','Kişi seçin.'],...d.links.filter(l=>l.unit_id===u.id&&['owner','tenant'].includes(l.role)&&financeLinkAt(l,s.period+'-01')).map(l=>[l.id,personName(d,l.person_id)+' · '+tr(l.role==='owner'?'Ev sahibi':'Kiracı')])])}${check('exclude', 'Hariç tut',u.id)}${input('exclude_reason:'+u.id,'Gerekçe')}${input('weight:'+u.id,'Arsa payı (tam sayı)','number','','min="1" max="1000000000"')}</section>`).join('')}</details>`+
+   (monthly?select('debtor_rule','Sorumlu önerisi',[['occupant','Kiracı varsa kiracı, yoksa ev sahibi'],['owner','Ev sahibi'],['tenant','Kiracı']],'occupant'):'<input type="hidden" name="debtor_rule" value="owner">')+
+   `<details class="finance-targets"><summary>${tr('Daireler ve sorumlu kişiler')} · <span data-debtor-count></span></summary><p>${monthly?tr('Aylık aidat: dolu dairede kiracı, boş dairede malik. Birden çok kişi varsa seçin.'):tr('Bu ek borç için malik sorumludur. Birden çok malik varsa seçin.')}</p>${d.units.map(u=>`<section class="finance-target" data-finance-unit="${e(u.id)}" data-block-code="${e(u.block)}"><strong>${e(u.code)}</strong>${check('unit_ids',u.code,u.id)}${select('debtor:'+u.id,'Sorumlu kişi',[['','Kişi seçin.'],...d.links.filter(l=>l.unit_id===u.id&&['owner','tenant'].includes(l.role)&&financeLinkAt(l,s.period+'-01')).map(l=>[l.id,personName(d,l.person_id)+' · '+tr(l.role==='owner'?'Ev sahibi':'Kiracı')])])}${check('exclude', 'Hariç tut',u.id)}${input('exclude_reason:'+u.id,'Gerekçe')}${input('weight:'+u.id,'Arsa payı (tam sayı)','number','','min="1" max="1000000000"')}</section>`).join('')}</details>`+
    select('debt_group','Borç grubu',groups,'general')+(monthly?'':'<div data-levy-date hidden><label class="field">'+((getLanguage()==='tr'?('Kontrol edilen sorumluluk tarihi'):(uiText("Geprüfter Verantwortlichkeitszeitpunkt",getLanguage()))))+'<input name="liability_on" type="date"></label><p>'+((getLanguage()==='tr'?('Ek ödemede malik açıkça seçilir. Eski malik için belgeli dönem gerekir; borç otomatik aktarılmaz.'):(uiText("Bei Sonderumlagen Eigentümer ausdrücklich wählen. Frühere Eigentümer nur mit belegtem Zeitraum; keine automatische Schuldübertragung.",getLanguage()))))+'</p></div>')+input('basis_ref','Karar / dayanak referansı','text','','required minlength="3" maxlength="200"')+
    `<details><summary>${tr('Gelişmiş seçenekler')}</summary>${input('period_from','Dönem başlangıcı','date')}${input('period_to','Dönem bitişi','date')}</details>`;
   if(monthly&&(s.mode==='demo'?d.role==='super':d.capabilities?.admin))body+=`<details><summary>${tr('İstisnalar')}</summary>${exceptionList(d)}<p>${tr('Ücret / huzur hakkı aidattan otomatik düşülmez. Ayrı gider veya açıkça onaylanan ayrı işlem gerekir.')}</p><button type="button" class="button" data-action="monthly_exception">${tr('İstisna ekle')}</button></details>`;
@@ -41,7 +41,8 @@ export function updateFinanceForm(root,d,changed=''){
  const action=root.dataset.financeAction;if(!action)return;
  const val=n=>root.querySelector(`[name="${n}"]`)?.value||'';
  if(['batch_charge','monthly_v5'].includes(action)){
-  const levy=action==='batch_charge'&&val('debt_group')==='capital',scope=val('scope'),mode=val('distribution'),rule=val('debtor_rule'),date=levy?val('liability_on'):val('due_on');
+  const levy=action==='batch_charge'&&val('debt_group')==='capital',monthly=action==='monthly_v5',scope=val('scope'),mode=val('distribution'),rule=monthly?val('debtor_rule'):'owner',date=levy?val('liability_on'):val('due_on');
+  let unresolved=0,autoSelected=0;
   const dateBlock=root.querySelector('[data-levy-date]');if(dateBlock){dateBlock.hidden=!levy;dateBlock.querySelector('input').required=levy;}
   for(const section of root.querySelectorAll('[data-finance-unit]')){
    const id=section.dataset.financeUnit,selected=scope==='all'||scope==='selected'||scope===section.dataset.blockCode;section.hidden=!selected;
@@ -49,9 +50,20 @@ export function updateFinanceForm(root,d,changed=''){
    const weights=section.querySelector(`[name="weight:${id}"]`);weights.closest('label').hidden=mode!=='shares';
    const reason=section.querySelector(`[name="exclude_reason:${id}"]`);reason.closest('label').hidden=!section.querySelector('[name="exclude"]').checked;
    const target=section.querySelector('select');if(!changed||['debtor_rule','due_on','liability_on','debt_group'].includes(changed)){
-    const ls=d.links.filter(l=>l.unit_id===id&&date&&financeLinkAt(l,date,{historical:levy})&&(levy?l.role==='owner':['owner','tenant'].includes(l.role)));const role=rule==='occupant'?(ls.some(l=>l.role==='tenant')?'tenant':'owner'):rule;const eligible=ls.filter(l=>l.role===role);target.innerHTML=`<option value="">${tr('Kişi seçin.')}</option>`+ls.map(l=>`<option value="${e(l.id)}">${e(personName(d,l.person_id))} · ${tr(l.role==='owner'?'Ev sahibi':'Kiracı')}</option>`).join('');target.value=levy?'':eligible.length===1?eligible[0].id:'';
+    const unit=d.units.find(u=>u.id===id);const occupied=unit?.occupancy_status==='occupied'||unit?.occupancy==='occupied';
+    const ls=d.links.filter(l=>l.unit_id===id&&date&&financeLinkAt(l,date,{historical:levy})&&(monthly?['owner','tenant'].includes(l.role):l.role==='owner'));
+    const preferred=rule==='occupant'?(occupied&&ls.some(l=>l.role==='tenant')?'tenant':'owner'):rule;
+    const eligible=ls.filter(l=>l.role===preferred);
+    const previous=target.value;
+    target.innerHTML=`<option value="">${tr('Kişi seçin.')}</option>`+ls.map(l=>`<option value="${e(l.id)}">${e(personName(d,l.person_id))} · ${tr(l.role==='owner'?'Ev sahibi':'Kiracı')}</option>`).join('');
+    target.value=changed&&changed!=='debtor_rule'&&ls.some(l=>l.id===previous)?previous:eligible.length===1?eligible[0].id:'';
+   }
+   if(!section.hidden&&!section.querySelector('[name="exclude"]').checked&&(scope!=='selected'||section.querySelector('[name="unit_ids"]').checked)){
+    if(target.value)autoSelected++;else unresolved++;
    }
   }
+  const count=root.querySelector('[data-debtor-count]');if(count)count.textContent=unresolved?`${unresolved} ${getLanguage()==='tr'?'seçim gerekli':'Zuordnungen offen'}`:`${autoSelected} ${getLanguage()==='tr'?'atandı':'zugeordnet'}`;
+  const details=root.querySelector('.finance-targets');if(details&&unresolved)details.open=true;
  }else if(action==='monthly_exception'){
   const person=root.querySelector('[name="person_id"]'),old=person.value,unit=val('unit_id');
   if(!changed||changed==='unit_id'){const ids=[...new Set(d.links.filter(l=>l.unit_id===unit).map(l=>l.person_id))];person.innerHTML=`<option value="">${tr('Dairenin tamamı')}</option>`+ids.map(id=>`<option value="${e(id)}">${e(personName(d,id))}</option>`).join('');if(ids.includes(old))person.value=old;}
