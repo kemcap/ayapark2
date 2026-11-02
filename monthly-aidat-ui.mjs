@@ -29,7 +29,7 @@ export function monthlyAidatSettings(){
  <p class="fine">${escape(t.manual)}</p>
  <button type="submit" class="button" ${saving||pending||!apiContext?'disabled':''}>${escape(saving?t.loading:t.save)}</button></form>
  ${pending?`<p role="status">${escape(t.loading)}</p>`:''}
- ${error?`<p role="alert" class="error">${escape(error)}</p>`:''}
+ ${error?`<p role="alert" class="error">${escape(error)} <button type="button" class="button" data-ay13-retry>${escape(lang().save)}</button></p>`:''}
  ${saved?`<p role="status">${escape(saved)}</p>`:''}
  ${last?`<details><summary>${escape(t.run)}: ${escape(last.month)} · ${escape(t.created)}: ${Number(last.created)||0} · ${escape(t.skipped)}: ${Number(last.skipped)||0}</summary>
  <ul>${(last.issues||[]).map(x=>`<li>${escape(x.unit)}: ${escape(x.reason)}${x.candidates!=null?' ('+Number(x.candidates)+')':''}</li>`).join('')}</ul></details>`:''}
@@ -38,6 +38,10 @@ export function monthlyAidatSettings(){
 export function initializeMonthlyAidatSettings(context){
  apiContext=context;
  if(installed)return;installed=true;
+ document.addEventListener('click',event=>{
+  if(!event.target.closest('[data-ay13-retry]')||!apiContext?.allowed())return;
+  siteLoaded=null;error='';ensureMonthlyAidatSettings();
+ });
  document.addEventListener('submit',async event=>{
   if(event.target?.id!=='ay13MonthlyForm')return;
   event.preventDefault();
@@ -60,6 +64,6 @@ export function ensureMonthlyAidatSettings(){
  siteLoaded=site;pending=true;error='';saved='';
  void apiContext.rpc('ay13_monthly_aidat_settings',{p_site:site})
   .then(r=>{if(siteLoaded===site){config=r;draft=null;}})
-  .catch(e=>{if(siteLoaded===site){siteLoaded=null;error=e.message||lang().error;}})
+  .catch(e=>{if(siteLoaded===site){error=e.message||lang().error;}})
   .finally(()=>{pending=false;apiContext.onChange();});
 }
