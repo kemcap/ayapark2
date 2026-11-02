@@ -112,6 +112,7 @@ function render(focus=false){
   if(mayPreview(state.fullData)){if(!allowedPreviewRoles(state.fullData).includes(state.viewRole))state.viewRole=nativePreviewRole(state.fullData);state.data=previewProjection(state.fullData,state.viewRole,state.previewSelection||'');}
  }else if(state.mode==='demo'){if(!state.demoFullData||state.data.role==='super'){state.demoFullData=state.data;state.demoFullData.serverRole='manager';}state.fullData=state.demoFullData;state.data=previewProjection(state.fullData,state.viewRole||'super',state.previewSelection||'');}else{state.fullData=null;state.demoFullData=null;state.viewRole='super';state.previewSelection='';}
 
+ if(state.mode==='connected'&&Array.isArray(state.data?.chargeDrafts))state.data.chargeDrafts=state.data.chargeDrafts.filter(d=>d.status!=='archived');
  document.documentElement.lang=getLanguage();
  $('languageToggle').hidden=false;$('languageToggle').innerHTML='<img class="flag" alt="" src="./assets/'+getLanguage()+'.svg?v=uk1"> <span class="language-code">'+getLanguage().toUpperCase()+'</span>';$('languageToggle').title=tr('Dili değiştir')+' · Türkçe → Deutsch → English';$('languageToggle').setAttribute('aria-label',$('languageToggle').title);
  if(!pages(state).includes(state.page))state.page='overview';
