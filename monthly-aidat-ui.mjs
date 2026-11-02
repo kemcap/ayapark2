@@ -8,7 +8,7 @@ const labels={
 };
 const lang=()=>labels[getLanguage()]||labels.tr;
 const formatTL=c=>c==null?'':(Number(c)/100).toLocaleString(getLanguage()==='en'?'en-GB':getLanguage()==='de'?'de-DE':'tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const parseAmount=s=>{const v=String(s||'').trim();if(!/^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/.test(v))return NaN;const [whole,part='']=v.replaceAll('.','').split(',');const n=Number(BigInt(whole)*100n+BigInt(part.padEnd(2,'0')));return Number.isSafeInteger(n)?n:NaN;};
+export const parseAmount=s=>{const v=String(s||'').trim();if(!/^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/.test(v))return NaN;const [whole,part='']=v.replaceAll('.','').split(',');const n=Number(BigInt(whole)*100n+BigInt(part.padEnd(2,'0')));return Number.isSafeInteger(n)?n:NaN;};
 let apiContext=null,siteLoaded=null,pending=false,saving=false,error='',saved='',config=null,draft=null,installed=false;
 export function monthlyAidatSettings(){
  const t=lang(),c=draft||config||{},enabled=Boolean(c.enabled),amount=typeof c.amount_cents==='number'||typeof c.amount_cents==='string'?formatTL(c.amount_cents):'';
