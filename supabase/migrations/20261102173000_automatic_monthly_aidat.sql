@@ -101,7 +101,7 @@ DECLARE
   u public.site_units;
   debtor public.ay3_links;
   ex public.ay5_monthly_exceptions;
-  month_on date;
+  period_month date;
   due_on date;
   last_day date;
   target_role text;
@@ -111,20 +111,20 @@ DECLARE
   issues jsonb;
   ref text;
 BEGIN
-  month_on := date_trunc('month',now() AT TIME ZONE 'Europe/Istanbul')::date;
-  last_day := (month_on + interval '1 month - 1 day')::date;
+  period_month := date_trunc('month',now() AT TIME ZONE 'Europe/Istanbul')::date;
+  last_day := (period_month + interval '1 month - 1 day')::date;
   FOR cfg IN SELECT * FROM public.ay13_monthly_aidat_settings
-             WHERE enabled AND starts_month<=month_on
+             WHERE enabled AND starts_month<=period_month
   LOOP
-    PERFORM pg_advisory_xact_lock(hashtextextended('ay13-run:'||cfg.site_id::text||':'||month_on::text,0));
-    IF EXISTS (SELECT 1 FROM ay2_private.ay13_monthly_runs WHERE site_id=cfg.site_id AND month_on=month_on)
+    PERFORM pg_advisory_xact_lock(hashtextextended('ay13-run:'||cfg.site_id::text||':'||period_month::text,0));
+    IF EXISTS (SELECT 1 FROM ay2_private.ay13_monthly_runs WHERE site_id=cfg.site_id AND month_on=period_month)
     THEN CONTINUE; END IF;
     -- If a configured administrator has lost the role, do not silently keep issuing charges.
     IF NOT EXISTS(SELECT 1 FROM public.site_staff_memberships
        WHERE site_id=cfg.site_id AND user_id=cfg.updated_by AND role='manager')
     THEN CONTINUE; END IF;
-    due_on:=make_date(extract(year from month_on)::int,extract(month from month_on)::int,cfg.due_day);
-    ref:='monthly:'||month_on::text;
+    due_on:=make_date(extract(year from period_month)::int,extract(month from period_month)::int,cfg.due_day);
+    ref:='monthly:'||period_month::text;
     made:=0;skipped:=0;issues:='[]'::jsonb;
     FOR u IN SELECT * FROM public.site_units WHERE site_id=cfg.site_id ORDER BY code
     LOOP
@@ -134,8 +134,8 @@ BEGIN
       OR EXISTS(SELECT 1 FROM public.ay2_charges c
           WHERE c.site_id=cfg.site_id AND c.unit_id=u.id AND c.category='Aidat'
           AND c.void_reason IS NULL AND
-          ((c.due_on BETWEEN month_on AND last_day AND c.debt_group IN ('general','legacy'))
-            OR (c.period_from<=last_day AND c.period_to>=month_on AND c.debt_group IN ('general','legacy'))))
+          ((c.due_on BETWEEN period_month AND last_day AND c.debt_group IN ('general','legacy'))
+            OR (c.period_from<=last_day AND c.period_to>=period_month AND c.debt_group IN ('general','legacy'))))
       THEN skipped:=skipped+1;issues:=issues||jsonb_build_array(jsonb_build_object('unit',u.code,'reason','already_exists'));CONTINUE;END IF;
       target_role:=cfg.debtor_rule;
       IF target_role='occupant' THEN
@@ -177,9 +177,9 @@ BEGIN
         site_id,unit_id,category,label,due_on,cents,payer,reference,created_by,
         person_id,link_id,period_from,period_to,debt_group,distribution_basis
       ) VALUES(
-        cfg.site_id,u.id,'Aidat',to_char(month_on,'YYYY-MM')||' Aidat',
+        cfg.site_id,u.id,'Aidat',to_char(period_month,'YYYY-MM')||' Aidat',
         due_on,cfg.amount_cents,debtor.role,ref,cfg.updated_by,
-        debtor.person_id,debtor.id,month_on,last_day,'general',
+        debtor.person_id,debtor.id,period_month,last_day,'general',
         jsonb_build_object('distribution','per_unit','basis_ref',cfg.basis_ref,'automated',true)
       ) ON CONFLICT(site_id,unit_id,reference) DO NOTHING;
       IF FOUND THEN made:=made+1;ELSE
@@ -188,7 +188,7 @@ BEGIN
       END IF;
     END LOOP;
     INSERT INTO ay2_private.ay13_monthly_runs(site_id,month_on,created_count,skipped_count,issues)
-    VALUES(cfg.site_id,month_on,made,skipped,issues);
+    VALUES(cfg.site_id,period_month,made,skipped,issues);
   END LOOP;
   RETURN made;
 END; $$;
