@@ -1,3 +1,4 @@
+import {initializeMonthlyAidatSettings,ensureMonthlyAidatSettings} from './monthly-aidat-ui.mjs?v=20261102';
 import {createBrowserAlerts} from './browser-alerts.mjs?v=4';
 import {createPrivacyGate} from './privacy-gate.mjs?v=3';
 import {preserveViewFocus} from './ui-focus.mjs?v=5.10.1';
@@ -88,6 +89,12 @@ const adminRecoveryUi=bindAdminRecovery({api,getState:()=>state});
 const accessRequestUi=bindAccessRequests({api,getState:()=>state,invite:id=>invitationUi.open(id)});
 async function loadPushStatuses(){if(state.mode!=='connected'||!can(state,'admin'))return;try{const r=await api.rpc('ay10_person_push_status',{p_site:state.data.site.id});state.pushStatus=Object.fromEntries((Array.isArray(r)?r:[]).map(x=>[x.person_id,x]));render();}catch(error){console.warn('Push statuses unavailable',error);}}
 async function loadPersonLogins(){if(state.mode!=='connected'||!can(state,'admin'))return;try{state.personLogins=await api.rpc('ay8_person_last_logins');render();}catch(error){console.warn('Login-Übersicht nicht verfügbar',error);}}
+initializeMonthlyAidatSettings({
+ rpc:(name,args)=>api.rpc(name,args),
+ site:()=>state.data?.site?.id,
+ allowed:()=>state.mode==='connected'&&!isAccessPreview()&&can(state,'admin'),
+ onChange:()=>render()
+});
 let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null,importController=null;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
@@ -161,6 +168,7 @@ function render(focus=false){
  if(state.mode==='connected'&&state.page==='settings')$('content').insertAdjacentHTML('afterbegin','<div class="ay-privacy-settings-link"><a href="./privacy-policy.html" target="_blank" rel="noopener noreferrer"><span aria-hidden="true" class="ay-privacy-document-icon">▤</span><span class="ay-privacy-document-copy"><strong>'+(getLanguage()==='de'?'Gesamten Vertrag lesen (30 Artikel)':getLanguage()==='en'?'Read full agreement (30 articles)':'Sözleşmenin tamamını oku (30 madde)')+'</strong><small>'+(getLanguage()==='de'?'Vollständiges Dokument öffnen':getLanguage()==='en'?'Open full document':'Tam metni aç ve incele')+'</small></span><span aria-hidden="true" class="ay-privacy-document-arrow">↗</span></a></div>');
  if(appearanceWasOpen&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;
  if(state.mode==='connected'&&state.page==='settings')browserAlerts.mount();
+ if(state.mode==='connected'&&state.page==='settings'&&!isAccessPreview()&&can(state,'admin'))ensureMonthlyAidatSettings();
  addExportControls();const previewBar=$('accessPreviewBanner');previewBar.innerHTML=previewBanner(state);previewBar.hidden=!isAccessPreview();labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
  document.dispatchEvent(new CustomEvent('ay5:view',{detail:{resident:own,page:state.page,mode:state.mode}}));
  for(const card of document.querySelectorAll('.summary-grid .card')){const links=card.querySelectorAll('a[href]');if(links.length===1&&!card.querySelector('button,input,select')){card.classList.add('stretched-card');links[0].setAttribute('aria-label',(card.querySelector('h2')?.textContent||'')+': '+links[0].textContent);}}
