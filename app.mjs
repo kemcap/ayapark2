@@ -227,6 +227,7 @@ async function mutateInner(action,payload){
   await reload();return result;
  }
 
+ if(action==='draft_archive'){if(isAccessPreview()||state.mode!=='connected'||!can(state,'admin'))throw Error('Access denied');const result=await api.rpc('ay3_archive_charge_draft',{p_site:state.data.site.id,p_id:payload.id});await reload();return result;}
  if(action==='draft_decision'){if(isAccessPreview()||state.mode!=='connected'||!can(state,'admin'))throw Error('Access denied');const r=await api.rpc('ay3_decide_charge_draft',{p_site:state.data.site.id,p_id:payload.id,p_approve:payload.approve});await reload();return r;}
  if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
  if(state.mode==='demo'&&action==='user_access')return {ok:true};
@@ -357,6 +358,10 @@ function addExportControls(){
  if(state.mode==='signedout')return;
  if(state.mode==='connected'&&!isAccessPreview()){const b=$('content').querySelector('[data-action=budget]');if(b){b.textContent=(getLanguage()==='tr'?('Bütçe ve nakit planı'):(uiText("Budget & Liquidität",getLanguage())));const p=b.closest('section')?.querySelector('p');if(p)p.textContent=(getLanguage()==='tr'?('Güncel ayrıntılı planı ve nakit öngörüsünü bütçe planında görebilirsiniz.'):(uiText("Den aktuellen Detailplan und die Liquiditätsvorschau findest du in der Budgetplanung.",getLanguage())));}else if(state.page==='dues'&&can(state,'finance'))$('content').insertAdjacentHTML('beforeend','<section class="card">'+button((getLanguage()==='tr'?('Bütçe ve nakit planı'):(uiText("Budget & Liquidität",getLanguage()))),'budget_plan')+'</section>');}
  if(state.page==='dues'&&state.mode==='connected'&&!isAccessPreview())$('content').insertAdjacentHTML('beforeend','<section class="card">'+button((getLanguage()==='tr'?('Ek ödeme taslaklarını gör'):(uiText("Sonderumlagenentwürfe ansehen",getLanguage()))),'levy_owner')+(can(state,'admin')?button((getLanguage()==='tr'?('Ek ödemeleri incele'):(uiText("Sonderumlagen prüfen",getLanguage()))),'levy_manage'):'')+'</section>');
+ if(state.page==='dues'&&state.mode==='connected'&&can(state,'admin')){
+  const rejected=(state.data.chargeDrafts||[]).filter(x=>x.status==='rejected');
+  if(rejected.length)$('content').insertAdjacentHTML('beforeend','<section class="card"><h3>'+ (getLanguage()==='tr'?'Reddedilen taslaklar':'Abgelehnte Entwürfe')+'</h3><p class="fine">'+(getLanguage()==='tr'?'Arşivleme sadece taslağı listeden kaldırır; işlem geçmişi korunur.':'Archivieren entfernt den Entwurf aus der Arbeitsliste; der Prüfverlauf bleibt erhalten.')+'</p>'+rejected.map(d=>'<div class="row-actions"><span>'+e(d.payload?.label||d.action||'Entwurf')+' · '+e(d.created_at?.slice(0,10)||'')+'</span><button type="button" class="button small" data-draft-archive="'+e(d.id)+'">'+(getLanguage()==='tr'?'Listeden kaldır':'Aus Liste entfernen')+'</button></div>').join('')+'</section>');
+ }
  for(const b of $('content').querySelectorAll('[data-draft-decision=approve]'))if(state.data.chargeDrafts?.find(d=>d.id===b.dataset.id)?.payload?.debt_group==='capital')b.textContent=(getLanguage()==='tr'?('Karar incelemesini aç'):(uiText("Beschlussprüfung öffnen",getLanguage())));
  if(state.page==='reports'&&(can(state,'finance')||state.data.communityAccess===true)){
   if(state.mode==='connected'&&!isAccessPreview())$('content').insertAdjacentHTML('beforeend','<section class="card">'+button((getLanguage()==='tr'?('Site üyelerine paylaşılan özetler'):(uiText("Freigegebene Gemeinschaftsübersichten",getLanguage()))),'community_releases')+(can(state,'admin')?button((getLanguage()==='tr'?('Toplam paylaşımlarını yönet'):(uiText("Summenfreigaben verwalten",getLanguage()))),'report_releases'):'')+'</section>');
@@ -956,6 +961,8 @@ setInterval(()=>void refreshWhenIdle(),90000);window.addEventListener('focus',()
 window.addEventListener('pageshow',event=>{if(event.persisted&&state.mode==='connected'&&state.page==='overview')void refreshDashboardFinance().catch(()=>{});});
 
 window.addEventListener('scroll',event=>{if(mobileNavGroup!==null&&closeMenuOnScroll(event,$('nav'))){mobileNavGroup=null;renderNavigation();}},{passive:true,capture:true});
+
+document.addEventListener('click',async event=>{const b=event.target.closest('[data-draft-archive]');if(!b||writeBusy)return;const question=getLanguage()==='tr'?'Reddedilen taslak listeden kaldırılsın mı?':'Abgelehnten Entwurf aus der Arbeitsliste entfernen?';if(!confirm(question))return;try{writeBusy=true;b.disabled=true;await mutate('draft_archive',{id:b.dataset.draftArchive});}catch(error){toast(error.message);}finally{writeBusy=false;b.disabled=false;}});
 
 document.addEventListener('click',async event=>{const button=event.target.closest('[data-draft-decision]');if(!button||writeBusy)return;if(button.dataset.draftDecision==='approve'&&state.data.chargeDrafts?.find(d=>d.id===button.dataset.id)?.payload?.debt_group==='capital'){await levyUI.openAdmin();return;}try{writeBusy=true;button.disabled=true;await mutate('draft_decision',{id:button.dataset.id,approve:button.dataset.draftDecision==='approve'});}catch(error){toast(error.message);}finally{writeBusy=false;button.disabled=false;}});
 
