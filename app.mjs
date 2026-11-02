@@ -468,7 +468,7 @@ document.addEventListener('click',async event=>{
  const testDelete=event.target.closest('[data-action="delete_test_notification"]');if(testDelete){if(state.data.role!=='super')return;const id=testDelete.dataset.id;if(id==='local-test-notification'){localTest=null;localTestRead=false;}else{localTestQueue=localTestQueue.filter(x=>x.id!==id);localTestReceipts.delete(id);}updateNotifications();return;}
  const notice=event.target.closest('[data-notification]');if(notice){openNotification(notificationCenter(notificationData()).find(a=>a.id===notice.dataset.notification));return;}
  const previewButton=event.target.closest('[data-finance-preview]');
- if(previewButton&&formAction){try{previewButton.disabled=true;const {action,context}=formAction,payload=financePayload(action,new FormData($('actionForm')),context,{previewing:true});const value=action==='auto_allocate'&&state.mode==='connected'?await api.rpc('ay5_payment_plan',{p_site:state.data.site.id,p_payload:payload}):localFinancePreview(state.data,action,payload);context.preview=value;context.previewSignature=JSON.stringify(payload);$('financePreview').innerHTML=financePreviewMarkup(state.data,action,value);labelTables();$('actionMessage').textContent='';}catch(error){$('actionMessage').textContent=tr(error.message);}finally{previewButton.disabled=false;}return;}
+ if(previewButton&&formAction){try{previewButton.disabled=true;await updateFinancePreview();$('actionMessage').textContent='';}catch(error){$('actionMessage').textContent=tr(error.message);}finally{previewButton.disabled=false;}return;}
  const b=event.target.closest('[data-action]');if(!b)return;const action=b.dataset.action;
  try{
   if(action==='claims_detail'){if(state.data.role!=='resident'||state.data.communityAccess===false)return;detailView={action};return showDetail(residentClaimsDetail(state));}
@@ -630,11 +630,39 @@ function restoreParentForm(back){showForm(back.action,back.args);for(const node 
 function cancelActionForm(){if(writeBusy)return;const back=formAction?.back;$('actionDialog').close();if(back){restoreParentForm(back);return;}const origin=formAction?.origin;if(origin?.action==='unit')showDetail(linkedUnitDetail(origin.id));else if(origin?.action==='person_manage')showDetail(personManager(state,origin.id));}
 $('cancelAction').addEventListener('click',cancelActionForm);
 $('actionDialog').addEventListener('cancel',event=>{event.preventDefault();cancelActionForm();});
+async function updateFinancePreview(){
+ if(!formAction)throw Error(tr('Önizleme bulunamadı.'));
+ const activeForm=formAction,{action,context}=activeForm;
+ const payload=financePayload(action,new FormData($('actionForm')),context,{previewing:true});
+ const value=action==='auto_allocate'&&state.mode==='connected'
+  ?await api.rpc('ay5_payment_plan',{p_site:state.data.site.id,p_payload:payload})
+  :localFinancePreview(state.data,action,payload);
+ if(formAction!==activeForm)throw Error(tr('Oturum değişti.'));
+ context.preview=value;
+ context.previewSignature=JSON.stringify(payload);
+ $('financePreview').innerHTML=financePreviewMarkup(state.data,action,value);
+ labelTables();
+}
 $('actionForm').addEventListener('submit',async event=>{
  event.preventDefault();if(writeBusy||!formAction)return;const attempt=epoch;let stopLoading=()=>{};
  try{
   $('actionMessage').textContent='';$('actionMessage').classList.remove('error');
   const {action,context}=formAction;
+  if(['batch_charge','monthly_v5','auto_allocate'].includes(action)){
+   const proposal=financePayload(action,new FormData($('actionForm')),context,{previewing:true});
+   if(!context.preview||context.previewSignature!==JSON.stringify(proposal)){
+    await updateFinancePreview();
+    const confirm=$('actionFields').querySelector('[name="confirmed"]');
+    if(confirm)confirm.checked=false;
+    $('actionMessage').textContent=(getLanguage()==='tr'
+     ?'Önizleme yenilendi. Lütfen daireleri ve tutarları kontrol edip onay kutusunu işaretleyin.'
+     :getLanguage()==='de'
+     ?'Vorschau aktualisiert. Bitte Wohnungen und Beträge prüfen und danach das Bestätigungsfeld aktivieren.'
+     :'Preview updated. Please review the apartments and amounts, then check the confirmation box.');
+    $('financePreview')?.scrollIntoView({block:'nearest',behavior:'smooth'});
+    return;
+   }
+  }
   const payload=payloadFor(action,new FormData($('actionForm')),context);
   writeBusy=true;$('saveAction').disabled=true;$('cancelAction').disabled=true;$('actionMessage').textContent='';stopLoading=beginLoading($('actionMessage'),tr('Kaydediliyor…'));
   await mutate(action==='ignore_staged'?'confirm_staged':action,payload);
