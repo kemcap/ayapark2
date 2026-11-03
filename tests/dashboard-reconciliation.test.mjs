@@ -22,7 +22,7 @@ test('dashboard shows ledger balance without subtracting resident credits a seco
  assert.match(balance,/2026-11-02/);
  const overview=overviewV3({mode:'demo',data:d});
  assert(overview.includes(money(720000)),'unapplied credits must be displayed separately');
- assert.match(overview,/Henüz mahsup edilmemiş alacaklar/);
+ assert.match(overview,/Henüz mahsup edilmemiş ödemeler/);
  assert.match(overview,/Alacaklar başka kişilerin borçlarından düşülmez/);
  assert(overview.includes(money(6542312)));
 });

@@ -55,3 +55,17 @@ test('financial indicators remain non-interactive and broken in-page hash routes
  assert.match(html,/<details id="dues-payments"/,'payment accordion must still be available');
  setLanguage('tr');
 });
+
+
+test('unapplied received payments are not mislabeled as overpayments in DE, TR, or EN',()=>{
+ const s=state('super');
+ s.data.credits=[{id:'test-credit',unit_id:s.data.units[0].id,person_id:s.data.persons?.[0]?.id||'',cents:360000,debt_group:'legacy',void_reason:null}];
+ const expected={de:'Noch nicht verrechnete Zahlungen',tr:'Henüz mahsup edilmemiş ödemeler',en:'Unapplied payments'};
+ for(const [lang,label] of Object.entries(expected)){
+  setLanguage(lang);
+  const html=duesV3(s);
+  assert.match(html,new RegExp(label));
+  assert.doesNotMatch(html,/Fazla ödemeler/);
+ }
+ setLanguage('tr');
+});
