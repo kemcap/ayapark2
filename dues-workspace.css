@@ -1,22 +1,20 @@
 /* Aidat & Forderungen workspace; scoped to preserve the existing AYAPARK design. */
 .dues-workspace{min-width:0}
 .dues-workspace .dues-overline{font-size:.7rem;letter-spacing:.12em;font-weight:800;color:var(--muted)}
-.dues-workspace .dues-kpis{display:grid;grid-template-columns:1.32fr 1fr 1fr;gap:12px;margin:0 0 18px}
-.dues-workspace .dues-kpi{min-width:0;display:flex;flex-direction:column;gap:8px;padding:19px 20px;border:1px solid var(--line);border-radius:19px;background:var(--paper)}
+.dues-workspace .dues-kpis{display:grid;grid-template-columns:1.32fr 1fr 1fr;gap:0;margin:0 0 22px;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.dues-workspace .dues-kpi{min-width:0;display:flex;flex-direction:column;gap:8px;padding:14px 20px;border:0;border-right:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none;cursor:default}
 .dues-workspace .dues-kpi>span{font-size:.85rem;font-weight:650;color:var(--muted)}
 .dues-workspace .dues-kpi>strong{font-size:clamp(1.55rem,2.6vw,2rem);font-weight:800;line-height:1.15;letter-spacing:-.03em;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .dues-workspace .dues-kpi>small{font-size:.76rem;line-height:1.45;color:var(--muted)}
-.dues-workspace .dues-kpi-primary{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 7%,var(--paper));}
-.dues-workspace .dues-jump{display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:thin;margin:0 0 20px;padding:2px 0 7px}
-.dues-workspace .dues-jump a{display:inline-flex;align-items:center;justify-content:center;min-height:39px;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-size:.83rem;font-weight:650;color:var(--ink);text-decoration:none;white-space:nowrap}
-.dues-workspace .dues-jump a:hover,.dues-workspace .dues-jump a:focus-visible{border-color:var(--primary);color:var(--primary)}
+.dues-workspace .dues-kpi-primary{background:transparent}
+.dues-workspace .dues-kpi:last-child{border-right:0}
 .dues-workspace .dues-section-head{display:flex;align-items:start;justify-content:space-between;gap:15px;margin-bottom:18px}
 .dues-workspace .dues-section-head h2{margin:5px 0 6px;font-size:clamp(1.1rem,2vw,1.34rem);line-height:1.3}
 .dues-workspace .dues-section-head p{margin:0;max-width:57ch;font-size:.87rem;color:var(--muted);line-height:1.5}
 .dues-workspace .dues-create{margin-bottom:19px}
 .dues-workspace .dues-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.dues-workspace .dues-action{min-width:0;display:grid;grid-template-columns:38px minmax(0,1fr);gap:11px;padding:17px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--paper) 95%,var(--ink))}
-.dues-workspace .dues-action-icon{grid-row:span 2;display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:color-mix(in srgb,var(--primary) 10%,var(--paper));color:var(--primary);font-size:20px;font-weight:700}
+.dues-workspace .dues-action{min-width:0;display:grid;grid-template-columns:28px minmax(0,1fr);gap:11px;padding:17px 5px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none;cursor:default}
+.dues-workspace .dues-action-icon{grid-row:span 2;display:grid;place-items:center;width:26px;height:32px;background:transparent;color:var(--muted);font-size:20px;font-weight:700}
 .dues-workspace .dues-action h3{margin:0 0 4px;font-size:.96rem}
 .dues-workspace .dues-action p{margin:0;color:var(--muted);line-height:1.45;font-size:.78rem}
 .dues-workspace .dues-action>.button{grid-column:2;justify-self:start;min-height:42px;margin:4px 0 0;white-space:normal}
@@ -68,18 +66,22 @@
 .dues-workspace .dues-no-results{text-align:center;padding:28px 10px;border:1px dashed var(--line);border-radius:14px}
 .dues-workspace .dues-no-results .button{margin:0 auto}
 .dues-workspace .dues-fold{scroll-margin-top:15px}
-.dues-workspace .dues-fold>summary{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;min-height:40px}
+.dues-workspace .dues-fold>summary{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;min-height:40px;list-style:none}
+.dues-workspace .dues-fold>summary::-webkit-details-marker{display:none}
+.dues-workspace .dues-fold>summary::after{content:'⌄';font-size:1.3rem;line-height:1;margin-left:auto;color:var(--primary);transition:transform .15s}
+.dues-workspace .dues-fold[open]>summary::after{transform:rotate(180deg)}
+.dues-workspace .dues-fold>summary:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:5px}
 .dues-workspace .dues-fold>summary>.muted{font-size:.78rem;font-weight:400}
 .dues-workspace .dues-fold[open]>summary{margin-bottom:15px}
 .dues-workspace .dues-extra-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 .dues-workspace .dues-extra-actions>.button{min-height:42px}
 .dues-workspace .dues-extra-actions:empty{display:none}
 .dues-workspace .ay-charge-pagination{margin-top:13px}
-@media(max-width:850px){.dues-workspace .dues-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dues-workspace .dues-kpi-primary{grid-column:1/-1}.dues-workspace .dues-action-grid{grid-template-columns:1fr}}
+@media(max-width:850px){.dues-workspace .dues-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dues-workspace .dues-kpi-primary{grid-column:1/-1;border-right:0;border-bottom:1px solid var(--line)}.dues-workspace .dues-action-grid{grid-template-columns:1fr}}
 @media(max-width:520px){
- .dues-workspace .dues-kpis{gap:8px}
- .dues-workspace .dues-kpi{padding:15px 13px;border-radius:15px}
- .dues-workspace .dues-kpi-primary{padding:19px}
+ .dues-workspace .dues-kpis{gap:0}
+ .dues-workspace .dues-kpi{padding:14px 12px;border-radius:0}
+ .dues-workspace .dues-kpi-primary{padding:15px 12px}
  .dues-workspace .dues-kpi:not(.dues-kpi-primary)>strong{font-size:1.6rem}
  .dues-workspace .dues-filter-panel{padding:12px}
  .dues-workspace .dues-filter-row{gap:12px}
@@ -94,7 +96,7 @@
  .dues-workspace .dues-detail-values{gap:6px}
  .dues-workspace .dues-detail-values dd{font-size:.86rem}
  .dues-workspace .ay-charge-toolbar{align-items:center}
- .dues-workspace .dues-action{padding:13px}
+ .dues-workspace .dues-action{padding:14px 3px}
 }
-@media(prefers-reduced-motion:reduce){.dues-workspace .charge-compact-chevron{transition:none}}
-@media print{.dues-workspace .dues-jump,.dues-workspace .dues-filter-panel,.dues-workspace .dues-view-toggle,.dues-workspace .dues-extra-actions{display:none!important}}
+@media(prefers-reduced-motion:reduce){.dues-workspace .charge-compact-chevron,.dues-workspace .dues-fold>summary::after{transition:none}}
+@media print{.dues-workspace .dues-filter-panel,.dues-workspace .dues-view-toggle,.dues-workspace .dues-extra-actions{display:none!important}}

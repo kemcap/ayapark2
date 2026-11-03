@@ -38,3 +38,18 @@ test('authorized managers see distinct monthly-dues and other-charge actions',()
  assert.match(translated,/Search apartment, person or charge/);
  setLanguage('tr');
 });
+
+
+test('financial indicators remain non-interactive and broken in-page hash routes are absent',()=>{
+ setLanguage('de');
+ const html=duesV3(state('super'));
+ assert.doesNotMatch(html,/class="dues-jump"/);
+ assert.doesNotMatch(html,/href="#dues-/);
+ const summary=html.match(/<section class="dues-kpis"[\s\S]*?<\/section>/)?.[0];
+ assert.ok(summary,'financial indicators must be visible');
+ assert.equal((summary.match(/<(?:button|a)\b|role="button"|tabindex=/g)||[]).length,0,'summary numbers must not be actions');
+ assert.match(html,/data-action="monthly_v5"/,'monthly dues action must remain available');
+ assert.match(html,/data-action="batch_charge"/,'other charge action must remain available');
+ assert.match(html,/<details id="dues-payments"/,'payment accordion must still be available');
+ setLanguage('tr');
+});
