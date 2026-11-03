@@ -43,7 +43,9 @@ test('authorized managers see distinct monthly-dues and other-charge actions',()
 test('financial indicators remain non-interactive and broken in-page hash routes are absent',()=>{
  setLanguage('de');
  const html=duesV3(state('super'));
- assert.doesNotMatch(html,/class="dues-jump"/);
+ assert.match(html,/class="dues-jump"/);
+ for(const id of ['dues-claims','dues-payments','dues-analysis','dues-create'])
+  assert.match(html,new RegExp('data-dues-jump="'+id+'"'),'button should target '+id);
  assert.doesNotMatch(html,/href="#dues-/);
  const summary=html.match(/<section class="dues-kpis"[\s\S]*?<\/section>/)?.[0];
  assert.ok(summary,'financial indicators must be visible');
