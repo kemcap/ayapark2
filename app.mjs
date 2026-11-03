@@ -583,7 +583,23 @@ $('languageToggle').addEventListener('click',()=>{
  }
  updateConditionalForm();document.dispatchEvent(new Event('ay2:languagechange'));
 });
-window.addEventListener('hashchange',()=>{if(location.hash==='#content'){$('content').focus();history.replaceState(null,'','#'+state.page);return;}navigate(location.hash.slice(1));});
+window.addEventListener('hashchange',()=>{
+ const legacySection=/^#(dues-(?:claims|payments|analysis|create))$/.exec(location.hash);
+ if(legacySection){
+  // Last-resort guard for old cached jump links, even if their click was not intercepted.
+  if(state.page!=='dues')navigate('dues');
+  else history.replaceState(null,'','#dues');
+  const section=document.getElementById(legacySection[1]);
+  if(section){
+   if(legacySection[1]==='dues-payments')section.open=true;
+   if(legacySection[1]==='dues-analysis')section.querySelector('details.category-balance-summary')?.setAttribute('open','');
+   section.scrollIntoView({behavior:'auto',block:'start'});
+  }
+  return;
+ }
+ if(location.hash==='#content'){$('content').focus();history.replaceState(null,'','#'+state.page);return;}
+ navigate(location.hash.slice(1));
+});
 function changePreviewRole(role,selection){if(writeBusy||loginBusy||!mayPreview(state.fullData)||!allowedPreviewRoles(state.fullData).includes(role))return;closeDialogs();state.viewRole=role;if(selection!==undefined)state.previewSelection=selection;else if(role==='resident')state.previewSelection=residentPreviewOptions(state.fullData)[0]?.id||'';state.page='overview';state.filter={q:'',block:'all',status:'all',type:'all',period:'all',preset:'all',from:'',to:''};state.reportFilter={preset:'all'};render(true);}
 $('roleSelect').addEventListener('change',event=>changePreviewRole(event.target.value));
 $('residentPreviewSelect').addEventListener('change',event=>changePreviewRole('resident',event.target.value));
