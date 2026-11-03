@@ -100,3 +100,13 @@
 }
 @media(prefers-reduced-motion:reduce){.dues-workspace .charge-compact-chevron,.dues-workspace .dues-fold>summary::after{transition:none}}
 @media print{.dues-workspace .dues-filter-panel,.dues-workspace .dues-view-toggle,.dues-workspace .dues-extra-actions{display:none!important}}
+
+
+/* Actual in-page navigation; all four controls stay on the current route. */
+.dues-workspace .dues-jump{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 20px}
+.dues-workspace .dues-jump button{min-width:0;min-height:44px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--paper);color:var(--ink);font:inherit;font-size:.83rem;font-weight:700;line-height:1.3;white-space:normal;cursor:pointer}
+.dues-workspace .dues-jump button:hover{border-color:var(--primary);color:var(--primary)}
+.dues-workspace .dues-jump button:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+.dues-workspace #dues-create,.dues-workspace #dues-claims,.dues-workspace #dues-analysis,.dues-workspace #dues-payments{scroll-margin-top:22px}
+@media(max-width:690px){.dues-workspace .dues-jump{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.dues-workspace .dues-jump button{min-height:46px;font-size:.8rem}}
+@media print{.dues-workspace .dues-jump{display:none!important}}
