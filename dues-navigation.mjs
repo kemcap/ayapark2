@@ -14,7 +14,7 @@ export function handleDuesNavigationClick(event,doc=typeof document==='undefined
  if(id==='dues-payments')target.open=true;
  if(id==='dues-analysis')target.querySelector?.('details.category-balance-summary')?.setAttribute('open','');
  const reduced=typeof window!=='undefined'&&window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
- target.scrollIntoView?.({behavior:reduced?'instant':'smooth',block:'start'});
+ target.scrollIntoView?.({behavior:reduced?'auto':'smooth',block:'start'});
  target.setAttribute?.('tabindex','-1');
  target.focus?.({preventScroll:true});
  return true;
