@@ -34,20 +34,21 @@ import {apartmentInfo} from './apartment-info.mjs?v=perf1';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=perf1';
 import {updateAssignmentForm} from './assignments.mjs?v=20261104-owner-history';
 import {suggestedOwnerEnd} from './owner-history.mjs?v=20261104';
-import {personManager} from './people-ui.mjs?v=20261104-owner-history';
+import {personManager} from './people-ui.mjs?v=20261104-history-collapse';
+import {renderHistoryPreview} from './history-preview.mjs?v=20261104';
 import {bindInvitations} from './invite-ui.mjs?v=perf1';
 import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=perf1';
 import {bindInstall} from './install.mjs?v=perf1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.10.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261104-owner-history';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261104-history-collapse';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=perf1';
 import {template} from './v3-import.mjs?v=perf1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=perf1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=perf1';
 import {AyaparkApi} from './api.mjs?v=20261104-owner-history';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261104-owner-history';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261104-history-collapse';
 import {buildForm,payloadFor} from './forms.mjs?v=20261104-owner-history';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
@@ -574,7 +575,7 @@ document.addEventListener('click',async event=>{
    $('detailDialog').classList.add('person-unit-drawer');
    return showDetail(linkedUnitDetail(id));
   }
-  if(action==='person_login_logs'){if(state.mode!=='connected'||!can(state,'admin'))return;const p=state.data.persons.find(x=>x.id===b.dataset.id);if(!p)return;showDetail('<h2 id="detailTitle">'+e(p.full_name)+'</h2><p role="status">Protokolle werden geladen…</p>');try{const result=await api.rpc('ay8_person_login_logs',{p_person:p.id,p_limit:500});const fmt=t=>t?new Intl.DateTimeFormat('de-DE',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Istanbul'}).format(new Date(t)):'—';const rows=Array.isArray(result?.events)?result.events:[];const logins=rows.filter(x=>x.kind==='Anmeldung');const recent=logins.filter(x=>x.occurred_at&&Date.now()-new Date(x.occurred_at).getTime()<30*86400000);showDetail('<h2 id="detailTitle">'+e(p.full_name)+'</h2><p>Letzter Login: '+e(fmt(result?.last_login))+'</p><p>Dokumentierte Sitzungsstarts: '+logins.length+' · Davon letzte 30 Tage: '+recent.length+'</p><p class="fine">Zeiten: Türkiye · Vorhandene historische Logs · Sitzungsende nur bei verlässlichem Ereignis</p><div class="person-login-events">'+(rows.map(x=>'<article class="person-login-event"><small>'+e(fmt(x.occurred_at))+' · '+e(x.kind||'Ereignis')+'</small><p>'+e(x.details||'—')+'</p></article>').join('')||'<p>Keine bisherigen Ereignisse vorhanden.</p>')+'</div>');}catch(error){showDetail('<h2 id="detailTitle">'+e(p.full_name)+'</h2><p role="alert">'+e(error.message||'Protokolle nicht verfügbar')+'</p>');}return;}
+  if(action==='person_login_logs'){if(state.mode!=='connected'||!can(state,'admin'))return;const p=state.data.persons.find(x=>x.id===b.dataset.id);if(!p)return;showDetail('<h2 id="detailTitle">'+e(p.full_name)+'</h2><p role="status">Protokolle werden geladen…</p>');try{const result=await api.rpc('ay8_person_login_logs',{p_person:p.id,p_limit:500});const fmt=t=>t?new Intl.DateTimeFormat('de-DE',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Istanbul'}).format(new Date(t)):'—';const rows=Array.isArray(result?.events)?result.events:[];const logins=rows.filter(x=>x.kind==='Anmeldung');const recent=logins.filter(x=>x.occurred_at&&Date.now()-new Date(x.occurred_at).getTime()<30*86400000);showDetail('<h2 id="detailTitle">'+e(p.full_name)+'</h2><p>Letzter Login: '+e(fmt(result?.last_login))+'</p><p>Dokumentierte Sitzungsstarts: '+logins.length+' · Davon letzte 30 Tage: '+recent.length+'</p><p class="fine">Zeiten: Türkiye · Vorhandene historische Logs · Sitzungsende nur bei verlässlichem Ereignis</p><div class="person-login-events">'+(renderHistoryPreview(rows,x=>'<article class="person-login-event"><small>'+e(fmt(x.occurred_at))+' · '+e(x.kind||'Ereignis')+'</small><p>'+e(x.details||'—')+'</p></article>')||'<p>Keine bisherigen Ereignisse vorhanden.</p>')+'</div>');}catch(error){showDetail('<h2 id="detailTitle">'+e(p.full_name)+'</h2><p role="alert">'+e(error.message||'Protokolle nicht verfügbar')+'</p>');}return;}
   if(action==='person_manage'){personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');detailView={action,id:b.dataset.id};return showDetail(personManager(state,b.dataset.id));}
   if(action==='unit'){personUnitReturn=null;$('detailDialog').classList.remove('person-unit-drawer');detailView={action,id:b.dataset.id};return showDetail(unitDetail(state,b.dataset.id));}
   if(action==='transaction'){if(can(state,'finance')){detailView={action,id:b.dataset.id};showDetail(transactionDetail(state,b.dataset.id));}return;}
