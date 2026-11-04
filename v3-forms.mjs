@@ -1,5 +1,5 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {buildAssignmentForm,assignmentPayload} from './assignments.mjs?v=20261104-owner-history';
+import {buildAssignmentForm,assignmentPayload} from './assignments.mjs?v=20261105-owner-transfer';
 import {effectiveOccupancy} from './relationships.mjs?v=perf1';
 import {announcementTime,validateAnnouncement} from './announcement-validation.mjs?v=5.10.0';
 import {t as tr,getLanguage} from './i18n.mjs?v=5.10.0';
