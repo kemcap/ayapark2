@@ -11,7 +11,7 @@ export function suggestedOwnerEnd(links,unit,startsOn,personId=null){
  return later?dayBefore(later):null;
 }
 export function displayedOwnerEnd(links,link){
- if(link.ends_on)return {date:link.ends_on,automatic:false};
+ if(link.ends_on)return {date:link.ends_on,automatic:link.ends_on_auto===true};
  if(link.role!=='owner'||!link.starts_on||link.active)return {date:null,automatic:false};
  const date=suggestedOwnerEnd(links,link.unit_id,link.starts_on,link.person_id);
  return {date,automatic:!!date};
