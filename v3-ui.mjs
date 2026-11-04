@@ -140,7 +140,8 @@ export function unitDetailV3(s,id){
  const firstOwnerDate=currentOwnerLinks.length===1?currentOwnerLinks[0].starts_on:null;
  const namedOwner=ownerNames.length?ownerNames.join(', '):loc('Nicht angegeben','Belirtilmedi','Not specified');
  const contact=l=>assignmentCard(s,l,false,{showAmount:false});
- const personList=canManage?`${contacts.map(contact).join('')||`<p class="muted">${tr('Henüz kişi eklenmedi.')}</p>`}<div class="row-actions">${button(tr('Kişi ekle'),'assignment_add',`data-unit="${e(id)}"`)}</div>`:`<div class="ay-unit-people-summary">${groups.map(g=>`<div class="ay-unit-person-row"><span>${e(g.label)}</span><strong>${e(g.names.join(', '))}</strong></div>`).join('')||`<p class="muted">${loc('Keine Personenangaben verfügbar','Kişi bilgileri yok','No person details available')}</p>`}</div>`;
+ const transferButton=canManage&&currentOwnerLinks.length===1?button(loc('Eigentümerwechsel','Malik değişimi','Ownership transfer'),'assignment_owner_transfer',`data-id="${e(currentOwnerLinks[0].id)}" data-unit="${e(id)}"`):'';
+ const personList=canManage?`${contacts.map(contact).join('')||`<p class="muted">${tr('Henüz kişi eklenmedi.')}</p>`}<div class="row-actions">${button(tr('Kişi ekle'),'assignment_add',`data-unit="${e(id)}"`)}${transferButton}</div>`:`<div class="ay-unit-people-summary">${groups.map(g=>`<div class="ay-unit-person-row"><span>${e(g.label)}</span><strong>${e(g.names.join(', '))}</strong></div>`).join('')||`<p class="muted">${loc('Keine Personenangaben verfügbar','Kişi bilgileri yok','No person details available')}</p>`}</div>`;
  const formerOwners=history.filter(l=>l.role==='owner');
  const uniqueFormerOwners=newestHistoryFirst([...new Map(formerOwners.map(l=>[l.person_id+'|'+(l.starts_on||''),l])).values()]);
  const ownerIssues=ownerHistoryIssues(d.links,id);
