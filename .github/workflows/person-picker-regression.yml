@@ -10,7 +10,7 @@ on:
       - 'app.mjs'
       - 'styles.css'
       - 'index.html'
-      - 'qa/people-management-browser.mjs'
+      - 'qa/person-picker-click-browser.mjs'
       - '.github/workflows/person-picker-regression.yml'
 
 permissions:
@@ -37,4 +37,4 @@ jobs:
       - name: Install browser runtime
         run: npx playwright install --with-deps chromium
       - name: Browser person selection and accessibility
-        run: node qa/people-management-browser.mjs
+        run: node qa/person-picker-click-browser.mjs
