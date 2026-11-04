@@ -45,7 +45,7 @@ export function updateAssignmentForm(container,d,changed=''){
  }
  const role=container.querySelector('[name="role"]')?.value,start=container.querySelector('[name="starts_on"]')?.value,end=container.querySelector('[name="ends_on"]');
  if(end){
-  const unit=container.dataset.unit||container.querySelector('[name="unit_id"]')?.value;
+  const unit=container.querySelector('[name="unit_id"]')?.value||container.dataset.unit;
   const person=container.querySelector('[name="person_id"]')?.value||null;
   const computed=role==='historical_owner'?suggestedOwnerEnd(d.links,unit,start,person):null;
   const note=container.querySelector('[data-owner-auto-note]');
