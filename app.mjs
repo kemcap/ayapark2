@@ -32,7 +32,7 @@ import {enhanceTables} from './ui-accessibility.mjs?v=5.10.1';
 import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.10.1';
 import {apartmentInfo} from './apartment-info.mjs?v=perf1';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=perf1';
-import {updateAssignmentForm} from './assignments.mjs?v=perf1';
+import {updateAssignmentForm} from './assignments.mjs?v=20261104-person-picker-fix';
 import {personManager} from './people-ui.mjs?v=pushstatus1';
 import {bindInvitations} from './invite-ui.mjs?v=perf1';
 import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=perf1';
@@ -47,7 +47,7 @@ import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=per
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=perf1';
 import {AyaparkApi} from './api.mjs?v=draft-archive-allow-20261102';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=logs2';
-import {buildForm,payloadFor} from './forms.mjs?v=perf1';
+import {buildForm,payloadFor} from './forms.mjs?v=20261104-person-picker-fix';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
