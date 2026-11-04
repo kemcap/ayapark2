@@ -13,7 +13,7 @@ test('overview keeps all 20 apartment cards and shows B block before A block',()
   assert.match(html,/class="main-grid overview-main-grid"/);
   assert.equal((html.match(/class="building-block"/g)||[]).length,2);
   assert.equal((html.match(/class="unit-card-grid"/g)||[]).length,2);
-  assert.equal((html.match(/class="apartment-card"/g)||[]).length,20);
+  assert.equal((html.match(/class="apartment-card ay-unit-compact-card"/g)||[]).length,20);
   assert.match(html,/data-action="unit"/);
   const groups=[...html.matchAll(/<section class="building-block"><h3>([AB])\s/g)].map(x=>x[1]);
   assert.deepEqual(groups,['B','A'],'B must be left of A, never sorted A first');
