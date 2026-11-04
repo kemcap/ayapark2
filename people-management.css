@@ -60,3 +60,14 @@
 .person-login-event{padding:10px 0;border-bottom:1px solid var(--line,#dce1e8)}
 .person-login-event small{color:var(--muted,#657083)}
 .person-login-event p{margin:3px 0 0;overflow-wrap:anywhere}
+
+/* Automatic historical ownership dates must be visible yet non-editable. */
+.assignment-form input.owner-auto-date{background:var(--surface-muted,#e9edf1);color:var(--muted,#576273);border-style:dashed;cursor:not-allowed;opacity:.82}
+.assignment-form [data-owner-auto-note]{display:block;color:var(--muted,#576273);font-size:.78rem;margin-top:4px}
+.owner-history-summary{padding:12px 14px;margin:12px 0;border:1px solid var(--border-color,#ccd1d8);border-radius:12px}
+.owner-history-summary h3{font-size:1rem;margin:0 0 8px}
+.owner-history-rows{display:grid;gap:7px;margin:8px 0}
+.owner-history-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;font-size:.91rem}
+.owner-history-row span{color:var(--muted,#576273)}
+.owner-auto-label{font-size:.74rem;font-style:italic}
+.former-unit-reference{opacity:.82}
