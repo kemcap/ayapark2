@@ -1,11 +1,11 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
-import {taskOptions} from './task-permissions.mjs?v=5.10.0';
+import {taskOptions} from './task-permissions.mjs?v=20261105-owner-transfer';
 import {buildFinanceForm,financePayload} from './finance-forms.mjs?v=perf1';
 import {buildV3Form,payloadV3} from './v3-forms.mjs?v=20261105-owner-transfer';
 import {t as tr,getLanguage} from './i18n.mjs?v=5.10.0';
 
 import {escapeHtml as e,money,randomId} from './core.mjs?v=perf1';
-import {remaining,unassigned} from './ledger.mjs?v=perf1';
+import {remaining,unassigned} from './ledger.mjs?v=20261105-owner-transfer';
 import {personName,creditAvailable} from './v3-domain.mjs?v=perf1';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 export const field=(name,label,type='text',value='',attrs='')=>`<label class="field">${tr(label)}<input name="${name}" type="${type}" value="${e(value)}" ${attrs}></label>`;
