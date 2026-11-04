@@ -1,0 +1,40 @@
+name: Existing person picker regression
+
+on:
+  pull_request:
+    paths:
+      - 'person-picker.mjs'
+      - 'assignments.mjs'
+      - 'v3-forms.mjs'
+      - 'forms.mjs'
+      - 'app.mjs'
+      - 'styles.css'
+      - 'index.html'
+      - 'qa/person-picker-click-browser.mjs'
+      - '.github/workflows/person-picker-regression.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  picker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Check changed module syntax
+        run: |
+          node --check person-picker.mjs
+          node --check assignments.mjs
+          node --check app.mjs
+      - name: Matching existing people regression
+        run: node --test tests/people-management.test.mjs
+      - name: Install browser runtime
+        run: npx playwright install --with-deps chromium
+      - name: Browser person selection and accessibility
+        run: node qa/person-picker-click-browser.mjs
