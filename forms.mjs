@@ -1,6 +1,6 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
 import {taskOptions} from './task-permissions.mjs?v=20261105-owner-transfer';
-import {buildFinanceForm,financePayload} from './finance-forms.mjs?v=perf1';
+import {buildFinanceForm,financePayload} from './finance-forms.mjs?v=open-period-20261102';
 import {buildV3Form,payloadV3} from './v3-forms.mjs?v=20261105-owner-transfer';
 import {t as tr,getLanguage} from './i18n.mjs?v=5.10.0';
 
