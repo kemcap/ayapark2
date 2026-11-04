@@ -158,7 +158,7 @@ export function unitDetailV3(s,id){
   ['overview',loc('Übersicht','Genel bakış','Overview'),'unitCurrent'],
   ['people',loc('Personen','Kişiler','People'),'unitPeople'],
   ['finances',loc('Finanzen','Mali durum','Finances'),'unitFinances'],
-  ['history',loc('Verlauf','Geçmiş','History'),'unitHistory']
+  ...(canManage?[['history',loc('Verlauf','Geçmiş','History'),'unitHistory']]:[])
  ];
  const tabs=`<div class="detail-tabs ay-unit-tabs" role="tablist" aria-label="${e(loc('Wohnungsbereiche','Daire bölümleri','Apartment sections'))}">${sections.map(([key,label,section],i)=>`<button type="button" class="button" role="tab" id="unitTab-${key}" data-tab="${key}" aria-controls="${section}" aria-selected="${i===0}" aria-pressed="${i===0}" tabindex="${i===0?'0':'-1'}">${e(label)}</button>`).join('')}</div>`;
  const personOpen=d.role==='resident'?financialList.reduce((n,c)=>n+Math.max(0,remaining(d,c)),0):buckets.currentOpen;
