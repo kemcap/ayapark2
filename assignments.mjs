@@ -3,6 +3,7 @@ import {fieldError} from './ui-feedback.mjs?v=5.10.1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,randomId} from './core.mjs?v=perf1';
 import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=perf1';
+import {suggestedOwnerEnd} from './owner-history.mjs?v=20261104';
 export const assignmentRoles=[['owner','Ev sahibi'],['tenant','Kiracı'],['representative','Temsilci']];
 export const historicalRoles=[['historical_owner','Eski Ev Sahibi'],['historical_tenant','Eski Kiracı'],['historical_representative','Eski Temsilci']];
 export const removalReasons=role=>[['mistake','Yanlışlıkla eklendi'],['ended',role==='owner'?'Mülkiyet ilişkisi sona erdi':role==='tenant'?'Kiracılık sona erdi':'Temsilcilik sona erdi'],['other','Diğer neden']];
@@ -10,7 +11,7 @@ const select=(name,label,options,value='')=>`<label class="field">${tr(label)}<s
 const field=(name,label,type='text',value='',attrs='')=>`<label class="field">${tr(label)}<input name="${name}" aria-label="${e(tr(label))}" type="${type}" value="${e(value)}" ${attrs}></label>`;
 const notes=value=>`<label class="field">${tr('Notlar (isteğe bağlı)')}<textarea name="notes" rows="3" maxlength="5000">${e(value||'')}</textarea></label>`;
 const personFields=p=>field('first_name','Ad','text',p?.first_name||'','required maxlength="75"')+field('last_name','Soyad','text',p?.last_name||'','required maxlength="75"')+field('phone','Telefon (isteğe bağlı)','tel',p?.phone||'','maxlength="60"')+field('email','E-posta (isteğe bağlı)','email',p?.email||'','maxlength="254"')+notes(p?.notes);
-const dates=l=>`<details class="assignment-more"><summary>${tr('Diğer bilgiler (isteğe bağlı)')}</summary><p class="fine">${tr('Tarihler yalnızca bilgi içindir. Güncel rolü veya dairenin kullanımını değiştirmez.')}</p>${field('starts_on','Başlangıç (isteğe bağlı)','date',l?.starts_on||'')}${field('ends_on','Bitiş (isteğe bağlı)','date',l?.ends_on||'')}</details>`;
+const dates=l=>`<details class="assignment-more"><summary>${tr('Diğer bilgiler (isteğe bağlı)')}</summary><p class="fine">${tr('Tarihler yalnızca bilgi içindir. Güncel rolü veya dairenin kullanımını değiştirmez.')}</p>${field('starts_on','Başlangıç (isteğe bağlı)','date',l?.starts_on||'')}<label class="field">${tr('Bitiş (isteğe bağlı)')}<input name="ends_on" type="date" value="${e(l?.ends_on||'')}"><small data-owner-auto-note hidden>${tr('Automatisch: ein Tag vor dem nächsten Eigentümer')}</small></label></details>`;
 export function buildAssignmentForm(d,action,args={}){
  const l=d.links.find(x=>x.id===args.id),p=d.persons.find(x=>x.id===(l?.person_id||args.person));
  if(action!=='assignment_add'&&!l)throw Error(tr('Kayıt bulunamadı.'));
@@ -32,7 +33,7 @@ export function buildAssignmentForm(d,action,args={}){
    select('role','Dairedeki rol',[...assignmentRoles,...historicalRoles],'tenant')+dates(null);
  }
  if(['assignment_add','assignment_edit','assignment_restore'].includes(action))body+=`<details><summary>${tr('Temsilci bildirim yetkisi')}</summary><p>${tr('Yalnızca temsilci rolü için. Ek borç oluşturmaz.')}</p><label class="check-field"><input type="checkbox" name="mandate_owners" ${l?.mandates?.includes('owners')?'checked':''}>${tr('Malik duyurularını alabilir')}</label><label class="check-field"><input type="checkbox" name="mandate_residents" ${l?.mandates?.includes('residents')?'checked':''}>${tr('Sakin duyurularını alabilir')}</label></details>`;
- return {title,body:`<div class="assignment-form">${body}</div>`,context};
+ return {title,body:`<div class="assignment-form" data-unit="${e(unit)}">${body}</div>`,context};
 }
 export function updateAssignmentForm(container,d,changed=''){
  const mode=container.querySelector('[name="person_mode"]:checked')?.value;
@@ -41,6 +42,16 @@ export function updateAssignmentForm(container,d,changed=''){
   for(const node of old.querySelectorAll('input,select'))node.disabled=fresh;
   for(const node of newFields.querySelectorAll('input,textarea')){node.disabled=!fresh;node.required=fresh&&['first_name','last_name'].includes(node.name);}
   bindPersonPicker(container,d.persons);
+ }
+ const role=container.querySelector('[name="role"]')?.value,start=container.querySelector('[name="starts_on"]')?.value,end=container.querySelector('[name="ends_on"]');
+ if(end){
+  const unit=container.querySelector('[name="unit_id"]')?.value||container.dataset.unit;
+  const person=container.querySelector('[name="person_id"]')?.value||null;
+  const computed=role==='historical_owner'?suggestedOwnerEnd(d.links,unit,start,person):null;
+  const note=container.querySelector('[data-owner-auto-note]');
+  if(computed){end.value=computed;end.readOnly=true;end.dataset.ownerAuto='true';end.classList.add('owner-auto-date');end.setAttribute('aria-readonly','true');}
+  else {if(end.dataset.ownerAuto==='true')end.value='';end.readOnly=false;end.dataset.ownerAuto='false';end.classList.remove('owner-auto-date');end.removeAttribute('aria-readonly');}
+  if(note)note.hidden=!computed;
  }
  const reason=container.querySelector('[name="reason"]'),note=container.querySelector('#removalNote');if(reason&&note){note.hidden=reason.value!=='other';note.querySelector('input').disabled=note.hidden;}
 }

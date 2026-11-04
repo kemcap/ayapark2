@@ -1,0 +1,32 @@
+name: Owner history date & conflict regression
+on:
+  push:
+    branches: [fix/owner-history-auto-ends-20261104]
+  pull_request:
+    paths:
+      - 'owner-history.mjs'
+      - 'assignments.mjs'
+      - 'people-ui.mjs'
+      - 'v3-ui.mjs'
+      - 'app.mjs'
+      - 'api.mjs'
+      - 'tests/ownership-periods.test.mjs'
+      - '.github/workflows/owner-history-regression.yml'
+jobs:
+  owner-history:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check syntax
+        run: |
+          node --check owner-history.mjs
+          node --check assignments.mjs
+          node --check people-ui.mjs
+          node --check v3-ui.mjs
+          node --check app.mjs
+          node --check api.mjs
+      - name: Ownership regression
+        run: node --test tests/ownership-periods.test.mjs

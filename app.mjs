@@ -32,22 +32,23 @@ import {enhanceTables} from './ui-accessibility.mjs?v=5.10.1';
 import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.10.1';
 import {apartmentInfo} from './apartment-info.mjs?v=perf1';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=perf1';
-import {updateAssignmentForm} from './assignments.mjs?v=perf1';
-import {personManager} from './people-ui.mjs?v=pushstatus1';
+import {updateAssignmentForm} from './assignments.mjs?v=20261104-owner-history';
+import {suggestedOwnerEnd} from './owner-history.mjs?v=20261104';
+import {personManager} from './people-ui.mjs?v=20261104-owner-history';
 import {bindInvitations} from './invite-ui.mjs?v=perf1';
 import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=perf1';
 import {bindInstall} from './install.mjs?v=perf1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.10.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=credit-labels-20261103';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261104-owner-history';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=perf1';
 import {template} from './v3-import.mjs?v=perf1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=perf1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=perf1';
-import {AyaparkApi} from './api.mjs?v=draft-archive-allow-20261102';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=logs2';
-import {buildForm,payloadFor} from './forms.mjs?v=perf1';
+import {AyaparkApi} from './api.mjs?v=20261104-owner-history';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261104-owner-history';
+import {buildForm,payloadFor} from './forms.mjs?v=20261104-owner-history';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -520,6 +521,45 @@ document.addEventListener('click',async event=>{
    if(!window.confirm(msg))return;
    if($('actionDialog').open)$('actionDialog').close();
    b.disabled=true;try{await api.rpc('ay11_delete_announcement',{p_site:state.data.site.id,p_announcement:item.id});await reload();toast(getLanguage()==='tr'?'Duyuru silindi.':getLanguage()==='en'?'Announcement deleted.':'Mitteilung gelöscht.');}catch(error){b.disabled=false;toast(error.message||'Silme işlemi başarısız.');}return;
+  }
+  if(action==='owner_history_period_edit'){
+   if(isAccessPreview()||state.mode!=='connected'||!can(state,'people'))return;
+   const l=state.data.links.find(x=>x.id===b.dataset.id&&x.role==='owner'&&!x.active&&x.archive_reason!=='duplicate_history');
+   if(!l)return;
+   const suggested=suggestedOwnerEnd(state.data.links,l.unit_id,l.starts_on,l.person_id);
+   const language=getLanguage();
+   const message=language==='tr'?'Önceki malikin bitiş tarihini YYYY-AA-GG olarak düzeltin. Sonraki malik başlamadan önce olmalı.':language==='en'?'Correct the former owner end date (YYYY-MM-DD). It must precede the next owner start.':'Enddatum des früheren Eigentümers korrigieren (JJJJ-MM-TT). Es muss vor dem Beginn des nächsten Eigentümers liegen.';
+   const answer=window.prompt(message,suggested||l.ends_on||'');
+   if(answer===null)return;
+   const value=answer.trim();
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(value)){toast(language==='tr'?'Geçerli bir tarih girin.':'Bitte ein gültiges Datum (JJJJ-MM-TT) eingeben.');return;}
+   b.disabled=true;
+   try{
+    await api.rpc('ay3_correct_owner_history_end',{p_site:state.data.site.id,p_link:l.id,p_ends_on:value,p_expected_revision:l.revision});
+    await reload();detailView={action:'unit',id:l.unit_id};showDetail(linkedUnitDetail(l.unit_id));
+    toast(language==='tr'?'Bitiş tarihi düzeltildi.':language==='en'?'End date corrected.':'Enddatum korrigiert.');
+   }finally{b.disabled=false;}
+   return;
+  }
+  if(action==='owner_history_reconcile'){
+   if(isAccessPreview()||state.mode!=='connected'||!can(state,'people'))return;
+   const unit=b.dataset.unit;
+   if(!state.data.units.some(u=>u.id===unit))return;
+   const args={p_site:state.data.site.id,p_unit:unit,p_apply:false};
+   b.disabled=true;
+   try{
+    const preview=await api.rpc('ay3_reconcile_owner_history',args);
+    const total=(preview?.automatic_ends||0)+(preview?.duplicates||0);
+    const language=getLanguage();
+    if(!total){toast(language==='tr'?'Otomatik düzeltilecek kayıt bulunamadı.':language==='en'?'No safe automatic corrections found.':'Keine sicher automatisch korrigierbaren Einträge gefunden.');return;}
+    const description=language==='tr'?'Otomatik bitiş tarihleri: '+(preview.automatic_ends||0)+' · Mükerrer kayıtlar: '+(preview.duplicates||0)+'\nFinans kayıtları değiştirilmeyecek. Düzeltmeleri onaylıyor musunuz?':language==='en'?'Automatic end dates: '+(preview.automatic_ends||0)+' · Duplicate links: '+(preview.duplicates||0)+'\nFinancial records will not be changed. Apply these corrections?':'Automatische Enddaten: '+(preview.automatic_ends||0)+' · Dubletten: '+(preview.duplicates||0)+'\nFinanzbuchungen bleiben unverändert. Korrekturen bestätigen?';
+    if(!window.confirm(description))return;
+    const result=await api.rpc('ay3_reconcile_owner_history',{...args,p_apply:true});
+    await reload();detailView={action:'unit',id:unit};showDetail(linkedUnitDetail(unit));
+    toast(language==='tr'?'Mülkiyet geçmişi düzeltildi.':language==='en'?'Owner history updated.':'Eigentümerverlauf korrigiert.');
+    if(result?.unresolved)toast(language==='tr'?'Bazı çakışmalar için manuel kontrol gerekli.':'Einige Überschneidungen müssen noch manuell geprüft werden.');
+   }finally{b.disabled=false;}
+   return;
   }
   if(action==='person_unit_back'){returnFromPersonUnit();return;}
   if(action==='person_unit'){
