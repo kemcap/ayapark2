@@ -1,13 +1,14 @@
 -- AYA PARK 2: ownership periods are inferred from successor start dates.
 -- Financial charges and allocations are never rewritten here.
 -- Historical duplicates are preserved as inactive, annotated records after explicit confirmation.
+ALTER TABLE public.ay3_links ADD COLUMN IF NOT EXISTS ends_on_auto boolean NOT NULL DEFAULT false;
 CREATE OR REPLACE FUNCTION public.ay3_add_historical_assignment(p_site uuid,p_payload jsonb)
 RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER SET search_path TO ''
 AS $function$
 DECLARE
  v_person uuid;v_unit uuid;v_role text;v_id uuid;v_first text;v_last text;
- v_start date;v_end date;v_successor date;v_updated integer:=0;
+ v_start date;v_end date;v_successor date;v_updated integer:=0;v_end_auto boolean:=false;
 BEGIN
  IF NOT ay2_private.can(p_site,'people') THEN RAISE EXCEPTION 'Bu işlem için yetkiniz yok.' USING errcode='42501';END IF;
  v_unit:=nullif(p_payload->>'unit_id','')::uuid;v_role:=p_payload->>'role';
@@ -41,11 +42,11 @@ BEGIN
    IF v_end IS NOT NULL AND v_end>=v_successor THEN
     RAISE EXCEPTION 'Eigentumszeitraum überlappt den folgenden Eigentümer. Bitte Zeitraum korrigieren.' USING errcode='P0001';
    END IF;
-   v_end:=coalesce(v_end,v_successor-1);
+   IF v_end IS NULL THEN v_end:=v_successor-1;v_end_auto:=true;END IF;
   END IF;
  END IF;
- INSERT INTO public.ay3_links(site_id,unit_id,person_id,role,active,archived_at,archive_reason,archive_note,starts_on,ends_on,primary_contact,mandates)
- VALUES(p_site,v_unit,v_person,v_role,false,now(),'historical_import',left(coalesce(p_payload->>'archive_note',''),500),v_start,v_end,false,'{}')
+ INSERT INTO public.ay3_links(site_id,unit_id,person_id,role,active,archived_at,archive_reason,archive_note,starts_on,ends_on,ends_on_auto,primary_contact,mandates)
+ VALUES(p_site,v_unit,v_person,v_role,false,now(),'historical_import',left(coalesce(p_payload->>'archive_note',''),500),v_start,v_end,v_end_auto,false,'{}')
  RETURNING id INTO v_id;
  -- Only unset ends on imported, archived owner rows are filled. Never alter a manually supplied end.
  IF v_role='owner' AND v_start IS NOT NULL THEN
@@ -58,7 +59,7 @@ BEGIN
      AND h.active=false AND h.starts_on IS NOT NULL AND h.ends_on IS NULL
    GROUP BY h.id
   )
-  UPDATE public.ay3_links h SET ends_on=f.inferred_end,updated_at=now(),revision=h.revision+1
+  UPDATE public.ay3_links h SET ends_on=f.inferred_end,ends_on_auto=true,updated_at=now(),revision=h.revision+1
   FROM following f WHERE h.id=f.id AND f.inferred_end IS NOT NULL;
   GET DIAGNOSTICS v_updated=ROW_COUNT;
  END IF;
@@ -129,7 +130,7 @@ BEGIN
      AND h.starts_on IS NOT NULL AND h.ends_on IS NULL
    GROUP BY h.id
   )
-  UPDATE public.ay3_links h SET ends_on=f.inferred_end,updated_at=now(),revision=h.revision+1
+  UPDATE public.ay3_links h SET ends_on=f.inferred_end,ends_on_auto=true,updated_at=now(),revision=h.revision+1
   FROM following f WHERE h.id=f.id AND f.inferred_end IS NOT NULL;
   GET DIAGNOSTICS v_changed_ends=ROW_COUNT;
   IF v_changed_dupes+v_changed_ends>0 THEN
