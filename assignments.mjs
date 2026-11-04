@@ -1,4 +1,4 @@
-import {personPicker,bindPersonPicker} from './person-picker.mjs?v=perf1';
+import {personPicker,bindPersonPicker} from './person-picker.mjs?v=20261104-person-picker-fix';
 import {fieldError} from './ui-feedback.mjs?v=5.10.1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,randomId} from './core.mjs?v=perf1';
