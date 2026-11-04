@@ -7,7 +7,7 @@ import {uiText} from './language-text.mjs?v=5.10.0';
 import {claimHoldReview} from './claim-hold-ui.mjs?v=perf1';
 import {managementTasks} from './management-tasks-ui.mjs?v=perf1';
 import {privateArchive} from './archive-ui.mjs?v=perf1';
-import {budgetPlanning} from './budget-planning-ui.mjs?v=perf1';
+import {budgetPlanning} from './budget-planning-ui.mjs?v=20261105-owner-transfer';
 import {levyReviews} from './levy-review-ui.mjs?v=perf1';
 import {reportReleases} from './report-release-ui.mjs?v=perf1';
 import {periodClosings} from './period-closing-ui.mjs?v=perf1';
@@ -17,39 +17,39 @@ import {readBankFile} from './bank-file-reader.mjs?v=5.10.0';
 import {bankFileMessage} from './bank-file-adapters.mjs?v=5.10.0';
 import {reviewImport} from './import-review.mjs?v=5.9.33';
 import {contactError} from './contact-requests.mjs?v=perf1';
-import {mayUseTaskAction} from './task-permissions.mjs?v=5.10.0';
+import {mayUseTaskAction} from './task-permissions.mjs?v=20261105-owner-transfer';
 import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.10.0';
 import {bindAccessRequests} from './access-request-ui.mjs?v=perf1';
-import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=perf1';
+import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=20261105-owner-transfer';
 import {installSmartHeader} from './smart-header.mjs?v=5.9.49';
 import {expenseDistributionPanel} from './expense-distribution-ui.mjs?v=perf1';
 import {incomeExpenseChart} from './finance-charts.mjs?v=perf1';
-import {prepareV5Demo} from './finance-demo.mjs?v=perf1';
-import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=open-period-20261102';
-import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=cleartests1';
+import {prepareV5Demo} from './finance-demo.mjs?v=20261105-owner-transfer';
+import {financeActions,financePayload,localFinancePreview,financePreviewMarkup,updateFinanceForm} from './finance-forms.mjs?v=20261105-owner-transfer';
+import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,notificationTitle,notificationBody,testAnnouncement,notificationCenter,notificationExpired} from './notifications.mjs?v=20261105-owner-transfer';
 import {bindDesign} from './design.mjs?v=5.10.0';
 import {enhanceTables} from './ui-accessibility.mjs?v=5.10.1';
 import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.10.1';
-import {apartmentInfo} from './apartment-info.mjs?v=perf1';
+import {apartmentInfo} from './apartment-info.mjs?v=20261105-owner-transfer';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=perf1';
-import {updateAssignmentForm} from './assignments.mjs?v=20261104-owner-history';
+import {updateAssignmentForm} from './assignments.mjs?v=20261105-owner-transfer';
 import {suggestedOwnerEnd} from './owner-history.mjs?v=20261104';
-import {personManager} from './people-ui.mjs?v=20261104-history-collapse';
+import {personManager} from './people-ui.mjs?v=20261105-owner-transfer';
 import {renderHistoryPreview} from './history-preview.mjs?v=20261104';
 import {bindInvitations} from './invite-ui.mjs?v=perf1';
-import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=perf1';
-import {bindInstall} from './install.mjs?v=perf1';
+import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=20261105-owner-transfer';
+import {bindInstall} from './install.mjs?v=20261105-owner-transfer';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.10.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261104-apartment-ux';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261105-owner-transfer';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=perf1';
 import {template} from './v3-import.mjs?v=perf1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=perf1';
-import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=perf1';
-import {AyaparkApi} from './api.mjs?v=20261104-owner-history';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261104-apartment-ux';
-import {buildForm,payloadFor} from './forms.mjs?v=20261104-owner-history';
+import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=20261105-owner-transfer';
+import {AyaparkApi} from './api.mjs?v=20261105-owner-transfer';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261105-owner-transfer';
+import {buildForm,payloadFor} from './forms.mjs?v=20261105-owner-transfer';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -96,7 +96,7 @@ let lastFinancialLoad=0,financialRefreshBusy=false;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
 function isAccessPreview(){return ['connected','demo'].includes(state.mode)&&mayPreview(state.fullData)&&allowedPreviewRoles(state.fullData).includes(state.viewRole)&&state.viewRole!==nativePreviewRole(state.fullData);}
-const activityNames={app_open:'App geöffnet',login:'Angemeldet',sign_in:'Angemeldet',logout:'Abgemeldet',announcement:'Mitteilung erstellt oder geändert',person:'Personendaten bearbeitet',person_purge:'Person gelöscht',assignment_add:'Wohnungszuordnung hinzugefügt',assignment_edit:'Wohnungszuordnung geändert',assignment_remove:'Wohnungszuordnung entfernt',invite_created:'Einladung erstellt',payment_purpose_reclassification:'Zahlungszweck geändert',import:'Daten importiert',review_checked:'Prüfung durchgeführt',expense_category_correction:'Ausgabenkategorie korrigiert',phone_login_verified:'Anmeldung bestätigt',whatsapp_invite_activated:'Einladungszugang aktiviert'};
+const activityNames={app_open:'App geöffnet',login:'Angemeldet',sign_in:'Angemeldet',logout:'Abgemeldet',announcement:'Mitteilung erstellt oder geändert',person:'Personendaten bearbeitet',person_purge:'Person gelöscht',assignment_owner_transfer:'Eigentümerwechsel durchgeführt',assignment_add:'Wohnungszuordnung hinzugefügt',assignment_edit:'Wohnungszuordnung geändert',assignment_remove:'Wohnungszuordnung entfernt',invite_created:'Einladung erstellt',payment_purpose_reclassification:'Zahlungszweck geändert',import:'Daten importiert',review_checked:'Prüfung durchgeführt',expense_category_correction:'Ausgabenkategorie korrigiert',phone_login_verified:'Anmeldung bestätigt',whatsapp_invite_activated:'Einladungszugang aktiviert'};
 function renderLogDataPage(){
  const people=(state.data.persons||[]).filter(p=>!p.archived_at&&p.auth_user_id).sort((a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'tr'));
  const peopleHtml='<details class="ay-log-people-fold"><summary>Personen ('+people.length+')</summary><div class="ay-logdata-people">'+people.map(p=>'<button class="ay-logdata-person" type="button" data-action="person_login_logs" data-id="'+e(p.id)+'"><span><strong>'+e(p.full_name||'—')+'</strong><small>'+e(p.email||'Registrierter Zugang')+'</small></span><span aria-hidden="true">›</span></button>').join('')+'</div></details>';
@@ -342,7 +342,7 @@ async function mutateInner(action,payload){
  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
  return result;
 }
-function permissionFor(action){return ['entry','classify_entry','bind_charge','budget','monthly_exception','disable_exception','reverse','unallocate','void_charge','void_credit','user_access','staff_remove','person_lifecycle','person_restore','settings','permissions','publish_report'].includes(action)?'admin':['assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_category','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
+function permissionFor(action){return ['entry','classify_entry','bind_charge','budget','monthly_exception','disable_exception','reverse','unallocate','void_charge','void_credit','user_access','staff_remove','person_lifecycle','person_restore','settings','permissions','publish_report'].includes(action)?'admin':['assignment_owner_transfer','assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_category','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
 function showForm(action,args={}){
  if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
  if(writeBusy)throw Error(tr("Önce devam eden işlemin tamamlanmasını bekleyin."));
@@ -352,7 +352,7 @@ function showForm(action,args={}){
  const built=buildForm(state,action,{period:state.period,...args});
  if($('detailDialog').open)$('detailDialog').close();
  formAction={action,args,context:built.context,origin};$('actionFields').dataset.financeAction=financeActions.includes(action)?action:'';
- $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(action)?'<p class="info-strip">'+((getLanguage()==='tr'?('Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.'):(uiText("Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.",getLanguage()))))+'</p>':'')+built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=action==='person_lifecycle'?((getLanguage()==='tr'?('İşlemi onayla'):(uiText("Aktion bestätigen",getLanguage())))):action==='person_restore'?((getLanguage()==='tr'?('Arşivden çıkar'):(uiText("Wiederherstellen",getLanguage())))):tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');if(['batch_charge','monthly_v5'].includes(action))$('saveAction').textContent=(getLanguage()==='tr'?('Taslağı gönder'):(uiText("Entwurf einreichen",getLanguage())));$('actionDialog').showModal();updateConditionalForm();if(action==='provider')updateProviderCategorySelection();if(financeActions.includes(action))updateFinanceForm($('actionFields'),state.data);updateAnnouncementTargets();
+ $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(action)?'<p class="info-strip">'+((getLanguage()==='tr'?('Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.'):(uiText("Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.",getLanguage()))))+'</p>':'')+built.body;$('actionMessage').textContent='';$('actionMessage').classList.remove('error');$('saveAction').textContent=action==='person_lifecycle'?((getLanguage()==='tr'?('İşlemi onayla'):(uiText("Aktion bestätigen",getLanguage())))):action==='person_restore'?((getLanguage()==='tr'?('Arşivden çıkar'):(uiText("Wiederherstellen",getLanguage())))):tr(action==='staff_remove'?'Üyeyi kaldır':action==='assignment_owner_transfer'?((getLanguage()==='tr'?'Malik değişimini onayla':uiText('Eigentümerwechsel bestätigen',getLanguage()))):action==='assignment_remove'?'Kaldırmayı onayla':action==='assignment_restore'?'Geri getir':'Kaydet');if(['batch_charge','monthly_v5'].includes(action))$('saveAction').textContent=(getLanguage()==='tr'?('Taslağı gönder'):(uiText("Entwurf einreichen",getLanguage())));$('actionDialog').showModal();updateConditionalForm();if(action==='provider')updateProviderCategorySelection();if(financeActions.includes(action))updateFinanceForm($('actionFields'),state.data);updateAnnouncementTargets();
 }
 function exportOptions(){return {language:getLanguage(),demo:state.mode==='demo'||isAccessPreview(),canFinance:can(state,'finance')};}
 function reportExportModel(){const range=selectedRange(state,'report'),error=rangeError(range);if(error)throw Error(error);return summaryExport(state.data,financialSeries(state.data,range,state.reportGroup||'year'),{...exportOptions(),range});}

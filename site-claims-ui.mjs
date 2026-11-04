@@ -2,7 +2,7 @@ import {uiText} from './language-text.mjs?v=5.10.0';
 import {getLanguage} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as escape,money} from './core.mjs?v=perf1';
 import {scopedCharges} from './v3-domain.mjs?v=perf1';
-import {remaining} from './ledger.mjs?v=perf1';
+import {remaining} from './ledger.mjs?v=20261105-owner-transfer';
 
 const labels={
  own:['Dairenin açık borçları','Offene Forderungen zur Wohnung'],

@@ -1,5 +1,5 @@
 import {escapeHtml as e} from './core.mjs?v=perf1';
-import {remaining,paid} from './ledger.mjs?v=perf1';
+import {remaining,paid} from './ledger.mjs?v=20261105-owner-transfer';
 import {locale} from './i18n.mjs?v=5.10.0';
 
 const state={q:'',status:'all',block:'all',unit:'all',period:'all',sort:'new',page:1,view:'compact'};

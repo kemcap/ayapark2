@@ -1,4 +1,4 @@
-import {receives} from './notifications.mjs?v=perf1';
+import {receives} from './notifications.mjs?v=20261105-owner-transfer';
 import {escapeHtml as e} from './core.mjs?v=perf1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {activeAt} from './v3-domain.mjs?v=perf1';

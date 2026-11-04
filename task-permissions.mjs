@@ -15,7 +15,7 @@ export function mayUseTaskAction(data,action){
  const keys=['batch_charge','monthly_v5'].includes(action)?['charges_prepare']:
  ['allocate','auto_allocate','credit','match_rule'].includes(action)?['bank_reconcile']:
  action==='announcement'?['announcements_publish']:
- ['assignment_add','assignment_remove','assignment_restore','link','edit_link','end_link','unlink','relationship_change','switch_tenant','occupancy','invite_person'].includes(action)?['occupancy_invite']:
+ ['assignment_owner_transfer','assignment_add','assignment_remove','assignment_restore','link','edit_link','end_link','unlink','relationship_change','switch_tenant','occupancy','invite_person'].includes(action)?['occupancy_invite']:
  action==='assignment_edit'?['people_manage','occupancy_invite']:
  ['person','provider','provider_note'].includes(action)?['people_manage']:[];
  return keys.some(k=>grant.tasks.includes(k));

@@ -1,15 +1,15 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
 import {registrationStatus} from './person-status.mjs?v=5.10.0';
-import {apartmentAmounts} from './seven-ux.mjs?v=perf1';
+import {apartmentAmounts} from './seven-ux.mjs?v=20261105-owner-transfer';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money} from './core.mjs?v=perf1';
 import {activeAt,personName} from './v3-domain.mjs?v=perf1';
 import {displayedOwnerEnd,ownerHistoryIssues} from './owner-history.mjs?v=20261104';
 import {renderHistoryPreview,newestHistoryFirst} from './history-preview.mjs?v=20261104';
-import {can,heading,card,button,badge,date} from './ui.mjs?v=perf1';
-import {remaining} from './ledger.mjs?v=perf1';
-import {roleLabel} from './v3-ui.mjs?v=perf1';
-import {removalReasons} from './assignments.mjs?v=20261104-owner-history';
+import {can,heading,card,button,badge,date} from './ui.mjs?v=20261105-owner-transfer';
+import {remaining} from './ledger.mjs?v=20261105-owner-transfer';
+import {roleLabel} from './v3-ui.mjs?v=20261105-owner-transfer';
+import {removalReasons} from './assignments.mjs?v=20261105-owner-transfer';
 import {recoveryEligible} from './admin-recovery-ui.mjs?v=5.10.0';
 import {inviteEligible} from './invite-ui.mjs?v=perf1';
 import {getLanguage} from './i18n.mjs?v=5.10.0';
@@ -30,7 +30,7 @@ export const linkedUnitButton=(s,l)=>{
  return button(unit.code,'person_unit',`data-id="${e(unit.id)}" data-person="${e(l.person_id)}" aria-label="${e(label)}"`);
 };
 export function assignmentCard(s,l,showUnit=false,{showAmount=true}={}){
- const d=s.data,period=displayedOwnerEnd(d.links,l),p=d.persons.find(p=>p.id===l.person_id),current=activeAt(l),oldDebt=!activeAt(l)&&can(s,'finance')?(d.charges||[]).filter(c=>c.link_id===l.id&&!c.void_reason).reduce((sum,c)=>sum+remaining(d,c),0):0,reason=removalReasons(l.role).find(([v])=>v===l.archive_reason)?.[1]||(l.archive_reason==='role_changed'?'Rol değiştirildi':'Önceki kayıt');
+ const d=s.data,period=displayedOwnerEnd(d.links,l),p=d.persons.find(p=>p.id===l.person_id),current=activeAt(l),oldDebt=!activeAt(l)&&can(s,'finance')?(d.charges||[]).filter(c=>c.link_id===l.id&&!c.void_reason).reduce((sum,c)=>sum+remaining(d,c),0):0,reason=removalReasons(l.role).find(([v])=>v===l.archive_reason)?.[1]||(l.archive_reason==='role_changed'?'Rol değiştirildi':l.archive_reason==='ownership_transfer'?(getLanguage()==='tr'?'Mülkiyet devredildi':getLanguage()==='en'?'Ownership transferred':'Eigentum übertragen'):'Önceki kayıt');
  const ownerEndConflict=!current&&l.role==='owner'&&ownerHistoryIssues(d.links,l.unit_id).overlaps.includes(l.id);
  return `<article class="person-card assignment-card"><div class="row">${role(l)}<strong>${e(p?.full_name||personName(d,l.person_id))}</strong>${p?registrationStatus(p)+loginLink(s,p):''}${showAmount&&(apartmentAmounts(d,l.unit_id).persons.get(l.person_id)||0)>0?`<small class="person-open-amount">${money(apartmentAmounts(d,l.unit_id).persons.get(l.person_id))} ${tr('açık')}</small>`:''}${showUnit?`<span class="person-unit-reference">${linkedUnitButton(s,l)}</span>`:''}${!current?badge(tr('Arşiv'),'neutral'):''}</div>${p?.phone||p?.email?`<p>${e(p.phone||'')} ${e(p.email||'')}</p>`:''}${p?.notes?`<p class="pre-wrap">${e(p.notes)}</p>`:''}${l.responsibility?`<p>${e(l.responsibility)}</p>`:''}${l.primary_contact?badge(tr('İlk aranacak kişi')):''}${l.starts_on||period.date?`<p class="fine">${tr('Bilgi tarihleri')}: ${l.starts_on?date(l.starts_on):'—'} – ${period.date?date(period.date):'—'}${period.automatic?' · '+tr('Automatisch berechnet'):''}</p>`:''}${!current?`<p class="fine">${e(tr(reason))}${l.archived_at?' · '+date(l.archived_at):''}${l.archive_note?' · '+e(l.archive_note):''}</p>`:''}${oldDebt>0?`<p class="former-person-debt"><strong>${tr('Eski kişiye ait açık borç')}:</strong> ${money(oldDebt)}</p>`:''}${can(s,'people')?`<div class="row-actions">${current?button(tr('Düzenle'),'assignment_edit',`data-id="${e(l.id)}"`)+button(tr('Kaldır'),'assignment_remove',`data-id="${e(l.id)}"`):p?.archived_at?'':button(tr('Geri getir'),'assignment_restore',`data-id="${e(l.id)}"`)}${ownerEndConflict?button(tr('Zeitraum korrigieren'),'owner_history_period_edit',`data-id="${e(l.id)}" data-unit="${e(l.unit_id)}"`):''}${p?personDeleteButton(s,p):''}${p?invitationButton(s,p):''}</div>`:''}</article>`;
 }

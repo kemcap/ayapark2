@@ -1,4 +1,4 @@
-import {remaining} from './ledger.mjs?v=perf1';
+import {remaining} from './ledger.mjs?v=20261105-owner-transfer';
 import {scopedCharges} from './v3-domain.mjs?v=perf1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 export function apartmentAmounts(d,unitId){

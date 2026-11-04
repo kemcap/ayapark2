@@ -1,0 +1,29 @@
+name: Owner transfer tests
+on:
+  pull_request:
+    paths:
+      - 'assignments.mjs'
+      - 'api.mjs'
+      - 'app.mjs'
+      - 'v3-ui.mjs'
+      - 'tests/owner-transfer.test.mjs'
+      - 'supabase/migrations/*owner_transfer*'
+  push:
+    branches: [feature/owner-transfer-tenant-20261105]
+jobs:
+  owner-transfer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check edited JavaScript
+        run: |
+          for f in assignments.mjs api.mjs app.mjs task-permissions.mjs v3-forms.mjs forms.mjs v3-ledger.mjs v3-ui.mjs ui.mjs people-ui.mjs ledger.mjs; do node --check "$f"; done
+      - name: Owner transfer regressions
+        run: node --test tests/owner-transfer.test.mjs
+      - name: Existing ownership history tests
+        run: node --test tests/ownership-periods.test.mjs
+      - name: Shared browser module identity
+        run: node --test tests/module-graph.test.mjs

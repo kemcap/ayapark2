@@ -1,5 +1,5 @@
 import {activeAt,scopedCharges} from './v3-domain.mjs?v=perf1';
-import {remaining} from './ledger.mjs?v=perf1';
+import {remaining} from './ledger.mjs?v=20261105-owner-transfer';
 
 // A unit balance is not a personal debt. Classify only by stored debtor/link identity,
 // never by ownership dates alone and never transfer a charge to a successor.
