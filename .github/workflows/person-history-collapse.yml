@@ -1,0 +1,26 @@
+name: Person history progressive disclosure
+on:
+  push:
+    branches: [feat/collapsible-person-history-20261104]
+  pull_request:
+    paths:
+      - 'history-preview.mjs'
+      - 'people-ui.mjs'
+      - 'v3-ui.mjs'
+      - 'tests/person-history-collapse.test.mjs'
+      - '.github/workflows/person-history-collapse.yml'
+jobs:
+  targeted:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate modules
+        run: |
+          node --check history-preview.mjs
+          node --check people-ui.mjs
+          node --check v3-ui.mjs
+      - name: Test history truncation, languages and ordering
+        run: node --test tests/person-history-collapse.test.mjs
