@@ -59,3 +59,7 @@
  .ay-unit-old-alert .text-button{width:100%}
 }
 @media(max-width:340px){.ay-unit-top-metrics{grid-template-columns:1fr}}
+
+.ay-unit-history-people{border:1px solid var(--line);border-radius:12px;padding:10px 13px;min-width:0}
+.ay-unit-history-people>summary{cursor:pointer;font-size:13px;font-weight:700;min-height:40px;padding:10px 0;color:var(--primary)}
+.ay-unit-history-people[open]>summary{border-bottom:1px solid var(--line);margin-bottom:12px}
