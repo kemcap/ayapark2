@@ -1,9 +1,10 @@
 import {personPicker,bindPersonPicker} from './person-picker.mjs?v=20261104-person-picker-fix';
 import {fieldError} from './ui-feedback.mjs?v=5.10.1';
-import {t as tr} from './i18n.mjs?v=5.10.0';
+import {t as tr,getLanguage} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,randomId} from './core.mjs?v=perf1';
-import {activeAt,dateValid,norm,personName} from './v3-domain.mjs?v=perf1';
-import {suggestedOwnerEnd} from './owner-history.mjs?v=20261104';
+import {activeAt,dateValid,norm,personName,today} from './v3-domain.mjs?v=perf1';
+import {suggestedOwnerEnd,dayBefore} from './owner-history.mjs?v=20261104';
+const transferText=(de,trText,en)=>getLanguage()==='tr'?trText:getLanguage()==='en'?en:de;
 export const assignmentRoles=[['owner','Ev sahibi'],['tenant','Kiracı'],['representative','Temsilci']];
 export const historicalRoles=[['historical_owner','Eski Ev Sahibi'],['historical_tenant','Eski Kiracı'],['historical_representative','Eski Temsilci']];
 export const removalReasons=role=>[['mistake','Yanlışlıkla eklendi'],['ended',role==='owner'?'Mülkiyet ilişkisi sona erdi':role==='tenant'?'Kiracılık sona erdi':'Temsilcilik sona erdi'],['other','Diğer neden']];
@@ -19,7 +20,22 @@ export function buildAssignmentForm(d,action,args={}){
  const unitName=d.units.find(u=>u.id===unit)?.code||'',role=assignmentRoles.find(([v])=>v===l?.role)?.[1]||'';
  const intro=`<p class="assignment-context"><strong>${e(unitName)}</strong>${p?' · '+e(p.full_name):''}${role?' · '+e(tr(role)):''}</p>`;
  let title,body;
- if(action==='assignment_remove'){
+ if(action==='assignment_owner_transfer'){
+  if(l?.role!=='owner'||!activeAt(l))throw Error(transferText('Aktuellen Eigentümer auswählen.','Güncel maliki seçin.','Select the current owner.'));
+  const activeOwners=d.links.filter(x=>x.unit_id===unit&&x.role==='owner'&&activeAt(x));
+  if(activeOwners.length!==1)throw Error(transferText('Mehrere Eigentümer: Anteile zuerst einzeln prüfen.','Birden fazla malik: Önce payları kontrol edin.','Multiple owners: review their shares first.'));
+  title=transferText('Eigentümerwechsel','Malik değişimi','Ownership transfer');
+  const candidatePeople=d.persons.filter(x=>x.id!==l.person_id&&!x.archived_at);
+  body=intro+
+   `<p class="info-strip">${transferText('Der bisherige Eigentümer wird im Verlauf gespeichert. Seine Person und seine Finanzdaten bleiben erhalten.','Önceki malik geçmişte saklanır. Kişi ve mali kayıtlar korunur.','The former owner remains in history. The person and financial records are preserved.')}</p>`+
+   `<fieldset class="person-choice"><legend>${transferText('Neuer Eigentümer','Yeni malik','New owner')}</legend><label><input type="radio" name="person_mode" value="existing" checked>${transferText('Vorhandene Person auswählen','Kayıtlı kişi seç','Select existing person')}</label><label><input type="radio" name="person_mode" value="new">${transferText('Neue Person anlegen','Yeni kişi oluştur','Create new person')}</label></fieldset>`+
+   `<div id="existingPersonFields">${personPicker(candidatePeople)}</div><div id="newPersonFields" hidden>${personFields(null)}</div>`+
+   field('effective_on',transferText('Eigentumsübergang am','Mülkiyet devir tarihi','Ownership transfer date'),'date',today(),`required max="${today()}"`)+
+   `<label class="check-field"><input type="checkbox" name="keep_as_tenant" checked>${transferText('Bisheriger Eigentümer bleibt als Mieter in der Wohnung','Eski malik dairede kiracı olarak kalıyor','Former owner remains in the apartment as tenant')}</label>`+
+   `<label class="check-field"><input type="checkbox" name="confirmation" required>${transferText('Eigentümerwechsel und unveränderte Finanzhistorie bestätigen','Malik değişimini ve mali kayıtların korunmasını onaylıyorum','Confirm ownership change and preservation of financial history')}</label>`+
+   `<p class="fine">${transferText('Keine automatische Schuldübertragung. Bei mehreren Eigentümern ist eine separate Prüfung erforderlich.','Borçlar otomatik devredilmez. Birden fazla malik varsa ayrı inceleme gerekir.','Debts are not automatically transferred. Multiple owners require a separate review.')}</p>`;
+ }
+ else if(action==='assignment_remove'){
   title=tr('Rolü kaldır');body=intro+select('reason','Kaldırma nedeni',[['','Neden seçin'],...removalReasons(l.role)])+`<div id="removalNote" hidden>${field('note','Not (isteğe bağlı)','text','','maxlength="500"')}</div><p class="fine">${tr('Yalnızca bu dairedeki rol kaldırılır. Kişi, diğer roller ve açık borçlar korunur. İşlem geçmişte saklanır.')}</p>`;
  }else if(action==='assignment_restore'){
   title=tr('Rolü geri getir');body=intro+`<p>${tr('Bu rol yeniden güncel olarak eklenecek. Önceki kayıt geçmişte korunur.')}</p>`;
@@ -33,7 +49,7 @@ export function buildAssignmentForm(d,action,args={}){
    select('role','Dairedeki rol',[...assignmentRoles,...historicalRoles],'tenant')+dates(null);
  }
  if(['assignment_add','assignment_edit','assignment_restore'].includes(action))body+=`<details><summary>${tr('Temsilci bildirim yetkisi')}</summary><p>${tr('Yalnızca temsilci rolü için. Ek borç oluşturmaz.')}</p><label class="check-field"><input type="checkbox" name="mandate_owners" ${l?.mandates?.includes('owners')?'checked':''}>${tr('Malik duyurularını alabilir')}</label><label class="check-field"><input type="checkbox" name="mandate_residents" ${l?.mandates?.includes('residents')?'checked':''}>${tr('Sakin duyurularını alabilir')}</label></details>`;
- return {title,body:`<div class="assignment-form" data-unit="${e(unit)}">${body}</div>`,context};
+ return {title,body:`<div class="assignment-form" data-unit="${e(unit)}" data-former-owner="${e(action==='assignment_owner_transfer'?l.person_id:'')}">${body}</div>`,context};
 }
 export function updateAssignmentForm(container,d,changed=''){
  const mode=container.querySelector('[name="person_mode"]:checked')?.value;
@@ -41,7 +57,7 @@ export function updateAssignmentForm(container,d,changed=''){
   const fresh=mode==='new',old=container.querySelector('#existingPersonFields'),newFields=container.querySelector('#newPersonFields');old.hidden=fresh;newFields.hidden=!fresh;
   for(const node of old.querySelectorAll('input,select'))node.disabled=fresh;
   for(const node of newFields.querySelectorAll('input,textarea')){node.disabled=!fresh;node.required=fresh&&['first_name','last_name'].includes(node.name);}
-  bindPersonPicker(container,d.persons);
+  bindPersonPicker(container,container.dataset.formerOwner?d.persons.filter(p=>p.id!==container.dataset.formerOwner):d.persons);
  }
  const role=container.querySelector('[name="role"]')?.value,start=container.querySelector('[name="starts_on"]')?.value,end=container.querySelector('[name="ends_on"]');
  if(end){
@@ -56,6 +72,21 @@ export function updateAssignmentForm(container,d,changed=''){
  const reason=container.querySelector('[name="reason"]'),note=container.querySelector('#removalNote');if(reason&&note){note.hidden=reason.value!=='other';note.querySelector('input').disabled=note.hidden;}
 }
 export function assignmentPayload(action,form,ctx){
+ if(action==='assignment_owner_transfer'){
+  const effective_on=String(form.get('effective_on')||'').trim();
+  const new_person=form.get('person_mode')==='new';
+  const new_owner_id=new_person?null:String(form.get('person_id')||'').trim()||null;
+  const first_name=String(form.get('first_name')||'').trim();
+  const last_name=String(form.get('last_name')||'').trim();
+  if(!dateValid(effective_on)||effective_on>today())throw fieldError(transferText('Gültiges Datum bis heute wählen.','Bugüne kadar geçerli bir tarih seçin.','Choose a valid date up to today.'),'effective_on');
+  if(!new_person&&!new_owner_id)throw fieldError(tr('Kişi seçin.'),'person_id');
+  if(new_owner_id===ctx.person_id)throw fieldError(transferText('Bitte eine andere Person auswählen.','Farklı bir kişi seçin.','Select a different person.'),'person_id');
+  if(new_person&&(!first_name||!last_name))throw fieldError(tr('Ad ve soyad gerekli.'),!first_name?'first_name':'last_name');
+  if(!form.has('confirmation'))throw fieldError(transferText('Bitte Wechsel bestätigen.','Lütfen devri onaylayın.','Please confirm the transfer.'),'confirmation');
+  return {request_id:ctx.request_id,id:ctx.id,unit_id:ctx.unit_id,revision:ctx.revision,
+   effective_on,keep_as_tenant:form.has('keep_as_tenant'),confirmation:true,new_person,new_owner_id,
+   ...(new_person?{first_name,last_name,phone:String(form.get('phone')||'').trim(),email:String(form.get('email')||'').trim(),notes:String(form.get('notes')||'').trim()}: {})};
+ }
  const p={request_id:ctx.request_id,id:ctx.id,unit_id:ctx.unit_id,revision:ctx.revision};for(const[k,v]of form)if(k!=='person_search')p[k]=String(v).trim();
  if(action==='assignment_add'){p.new_person=p.person_mode==='new';if(!p.new_person&&!p.person_id)throw fieldError(tr('Kişi seçin.'),'person_id');}
  if(action==='assignment_edit'||action==='assignment_add'&&p.new_person){if(!p.first_name||!p.last_name)throw fieldError(tr('Ad ve soyad gerekli.'),!p.first_name?'first_name':'last_name');}
@@ -74,6 +105,7 @@ export function applyAssignmentDemo(d,action,p){
  const clone=structuredClone(d),result=changeDemo(clone,action,p);Object.assign(d,clone);return result;
 }
 function changeDemo(d,action,p){
+ if(action==='assignment_owner_transfer')return demoOwnerTransfer(d,p);
  const l=d.links.find(x=>x.id===p.id),before=l?{...l}:null;
  if(action!=='assignment_add'&&!l)throw Error(tr('Kayıt bulunamadı.'));
  if(l&&p.revision!==undefined&&Number(p.revision)!==(l.revision??1))throw Error(tr('Kayıt değişti. Görünümü yenileyip tekrar deneyin.'));
@@ -97,4 +129,35 @@ function changeDemo(d,action,p){
  }
  const changed=d.links.find(x=>x.id===id);if(changed&&p.mandates)changed.mandates=changed.role==='representative'?[...new Set(p.mandates)]:[];
  d.audit.unshift({id:randomId(),action,at:new Date().toISOString(),details:{request_id:p.request_id,before,after:changed?{...changed}:null,reason:p.reason,note:p.note,person_id:pid}});return {ok:true,id};
+}
+
+function demoOwnerTransfer(d,p){
+ const former=d.links.find(l=>l.id===p.id&&l.unit_id===p.unit_id&&l.role==='owner'&&activeAt(l));
+ if(!former)throw Error('Current owner not found');
+ if(Number(p.revision)!==(former.revision??1))throw Error('Assignment changed; refresh.');
+ if(!dateValid(p.effective_on)||p.effective_on>today()||former.starts_on&&p.effective_on<=former.starts_on)throw Error('Invalid transfer date');
+ if(d.links.filter(l=>l.unit_id===p.unit_id&&l.role==='owner'&&activeAt(l)).length!==1)throw Error('Multiple owners: manual review required');
+ let newOwner=p.new_person?null:d.persons.find(x=>x.id===p.new_owner_id&&!x.archived_at);
+ if(p.new_person){
+  if(!p.first_name||!p.last_name)throw Error('New owner name required');
+  newOwner={id:randomId(),first_name:p.first_name,last_name:p.last_name,full_name:p.first_name+' '+p.last_name,
+   phone:p.phone||'',email:p.email||'',notes:p.notes||'',language:'tr'};
+  d.persons.push(newOwner);
+ }
+ if(!newOwner||newOwner.id===former.person_id)throw Error('Choose another owner');
+ const before={...former};
+ Object.assign(former,{active:false,ends_on:dayBefore(p.effective_on),ends_on_auto:false,
+   archive_reason:'ownership_transfer',archived_at:new Date().toISOString(),revision:(former.revision??1)+1});
+ const newLink={id:randomId(),unit_id:former.unit_id,person_id:newOwner.id,role:'owner',
+   starts_on:p.effective_on,ends_on:null,active:true,revision:1};
+ d.links.push(newLink);
+ let tenant=d.links.find(l=>l.unit_id===former.unit_id&&l.person_id===former.person_id&&l.role==='tenant'&&activeAt(l));
+ if(p.keep_as_tenant&&!tenant){
+  tenant={id:randomId(),unit_id:former.unit_id,person_id:former.person_id,role:'tenant',
+   starts_on:p.effective_on,ends_on:null,active:true,revision:1};
+  d.links.push(tenant);
+ }
+ d.audit.unshift({id:randomId(),action:'assignment_owner_transfer',at:new Date().toISOString(),
+   details:{request_id:p.request_id,before,after:newLink,tenant_id:p.keep_as_tenant?tenant?.id:null}});
+ return {ok:true,new_owner_link_id:newLink.id,tenant_link_id:p.keep_as_tenant?tenant?.id:null};
 }
