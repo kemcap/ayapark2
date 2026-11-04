@@ -17,5 +17,6 @@ test('each active browser module has one identity across app and recovery entry 
   for(const match of source.matchAll(/(?:from\s*|import\s*\(?\s*)['"](\.\.?\/[^'"]+\.mjs(?:\?[^'"]*)?)['"]/g))queue.push(new URL(match[1],url));
  }
  assert(identities.size>25,'walk the actual application graph, including shared renderers');
- for(const [path,keys] of identities)assert.equal(keys.size,1,`${path} is loaded with conflicting cache keys: ${[...keys]}`);
+ const duplicates=[...identities].filter(([,keys])=>keys.size>1).map(([path,keys])=>`${path} is loaded with conflicting cache keys: ${[...keys].join(', ')}`);
+ assert.deepEqual(duplicates,[],duplicates.join('\n'));
 });
