@@ -1,0 +1,30 @@
+name: Apartment UX and debtor grouping
+on:
+  push:
+    branches: [feat/apartment-detail-ux-split-20261104]
+  pull_request:
+    paths:
+      - 'v3-ui.mjs'
+      - 'app.mjs'
+      - 'ui.mjs'
+      - 'unit-debt-view.mjs'
+      - 'apartment-detail-ux.css'
+      - 'tests/unit-debt-view.test.mjs'
+      - 'tests/apartment-detail-ux.test.mjs'
+      - '.github/workflows/apartment-ux-regression.yml'
+jobs:
+  targeted:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax checks
+        run: |
+          node --check app.mjs
+          node --check v3-ui.mjs
+          node --check ui.mjs
+          node --check unit-debt-view.mjs
+      - name: Validate apartment UX and financial attribution
+        run: node --test tests/unit-debt-view.test.mjs tests/apartment-detail-ux.test.mjs tests/ownership-periods.test.mjs

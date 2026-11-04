@@ -20,7 +20,7 @@ test('authorized apartment view retains both debtors with no management actions'
  assert(unitDetailV3(s,'A-4').includes('₺7.200,00'));
 });
 test('management still separates previous debts from the current apartment balance',()=>{
- const html=unitDetailV3(state(),'A-4');assert(html.includes('₺3.600,00'));assert(html.includes('₺7.200,00'));assert(html.includes('Önceki sakinlerden kalan'));
+ const html=unitDetailV3(state(),'A-4');assert(html.includes('₺3.600,00'));assert(html.includes('₺7.200,00'));assert(html.includes('Önceki kişilerin borçları'));
 });
 test('the new CSV format rejects signed income and expense but preserves kuruş and direction',()=>{
  for(const [income,expense] of [['-10',''],['+10',''],['','-10'],['','+10']])assert.throws(()=>parseImport(csv(income,expense)),/pozitif/);

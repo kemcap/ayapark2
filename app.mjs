@@ -41,14 +41,14 @@ import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,
 import {bindInstall} from './install.mjs?v=perf1';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.10.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261104-history-collapse';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261104-apartment-ux';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=perf1';
 import {template} from './v3-import.mjs?v=perf1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=perf1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=perf1';
 import {AyaparkApi} from './api.mjs?v=20261104-owner-history';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261104-history-collapse';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261104-apartment-ux';
 import {buildForm,payloadFor} from './forms.mjs?v=20261104-owner-history';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
@@ -428,6 +428,25 @@ function staged(){
  const rows=state.data.staged.filter(x=>!x.confirmed_charge&&!x.ignored_reason);
  showDetail(`<div class="dialog-kicker">${tr("DEVİR KONTROLÜ")}</div><h2 id="detailTitle">${tr("Eski bakiye kayıtları")}</h2><div class="muted">${info('Eski yönetimden kalan tutarları aktarmadan önce kontrol edin.','Her kayıtta daireyi, dönemi ve ödemenin yapılıp yapılmadığını kontrol edin. Aynı borcu iki kez kaydetmeyin. Yalnızca onayladığınız kayıtlar borç olarak işlenir.')}</div><div class="table-wrap"><table><thead><tr><th>${tr("Kişi / Kaynak daire")}</th><th class="numeric">${tr("Tutar")}</th><th>${tr("Kontrol")}</th><th>${tr("İşlem")}</th></tr></thead><tbody>${rows.map(r=>{const check=analyzeStage(r,state.data);return `<tr><td>${e(r.person_label)}<small class="block-small">${e(r.unit_hint||tr("Daire belirtilmedi"))} · ${r.kind==='enforcement'?tr("İcra listesi"):tr("Genel liste")}</small></td><td class="numeric">${money(Number(r.cents))}</td><td>${check.suggestedCode?e(check.suggestedCode)+' · '+(check.basis==='document'?tr("Belgede"):tr("Banka önerisi")):tr("Blok teyidi gerekli")}${check.paymentCandidates.length?`<small class="block-small error">${tr("Sonraki tahsilatı inceleyin")}</small>`:''}${check.overlaps.length?`<small class="block-small error">${tr("Başka devir kaydı da var")}</small>`:''}</td><td>${button(tr("Teyit et"),'confirm_staged',`data-id="${e(r.id)}"`)}${button(tr("Hariç tut"),'ignore_staged',`data-id="${e(r.id)}"`)}</td></tr>`;}).join('')||`<tr><td colspan="4">${tr("Bekleyen devir kaydı yok.")}</td></tr>`}</tbody></table></div>`);
 }
+function selectUnitTab(key,{focus=false}={}){
+ const dialog=$('detailDialog'),panels=[...dialog.querySelectorAll('[data-unit-panel]')];
+ const target=panels.find(panel=>panel.dataset.unitPanel===key);
+ if(!target)return false;
+ for(const panel of panels)panel.hidden=panel!==target;
+ for(const tab of dialog.querySelectorAll('.ay-unit-tabs [data-tab]')){
+  const active=tab.dataset.tab===key;
+  tab.setAttribute('aria-selected',String(active));
+  tab.setAttribute('aria-pressed',String(active));
+  tab.tabIndex=active?0:-1;
+  if(active&&focus)tab.focus({preventScroll:true});
+ }
+ return true;
+}
+document.addEventListener('keydown',event=>{
+ const current=event.target.closest('#detailDialog .ay-unit-tabs [data-tab]');if(!current||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+ const tabs=[...$('detailDialog').querySelectorAll('.ay-unit-tabs [data-tab]')],i=tabs.indexOf(current),next=event.key==='Home'?0:event.key==='End'?tabs.length-1:(i+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+ event.preventDefault();selectUnitTab(tabs[next].dataset.tab,{focus:true});
+});
 function downloadCsv(filename,rows){const cell=v=>'"'+String(v??'').replaceAll('"','""')+'"';const safe=v=>/^[=+@\-\t\r]/.test(String(v))?"'"+v:v;const csv='\uFEFF'+rows.map(r=>r.map(v=>cell(typeof v==='number'?v.toLocaleString('tr-TR',{useGrouping:false,maximumFractionDigits:2}):safe(v))).join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function exportReport(){
  const model=reportExportModel();downloadCsv('ayapark2-mali-rapor.csv',[model.columns,...model.rows.map(row=>row.map(v=>v&&typeof v==='object'?v.moneyCents/100:v))]);
@@ -452,7 +471,7 @@ document.addEventListener('click',async event=>{
   returnFromPersonUnit();
   return;
  }
- if(event.target.closest('.unit-history-link')){event.preventDefault();if($('unitPaymentHistory')){$('unitPaymentHistory').open=true;$('unitPaymentHistory').scrollIntoView({block:'start'});$('unitPaymentHistory').focus({preventScroll:true});}return;}
+ if(event.target.closest('.unit-history-link')){event.preventDefault();selectUnitTab('finances');if($('unitPaymentHistory')){$('unitPaymentHistory').open=true;$('unitPaymentHistory').scrollIntoView({block:'start'});$('unitPaymentHistory').focus({preventScroll:true});}return;}
  if(event.target.closest('[data-preview-return]')){changePreviewRole(nativePreviewRole(state.fullData));return;}
  if(event.target.closest('[data-reset-appearance]')){resetPreferences(state.mode==='connected'?api:null,message=>{const el=$('preferenceStatus');if(el)el.textContent=message;});applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));const panel=document.querySelector('.appearance-settings');if(panel)panel.open=true;document.querySelector('[data-reset-appearance]')?.focus();return;}
  const navToggle=event.target.closest('#nav [data-nav-group]');
@@ -477,7 +496,8 @@ document.addEventListener('click',async event=>{
   applyApartmentQuickFilters();
   return;
  }
- const tab=event.target.closest('[data-tab]');if(tab){const history=tab.dataset.tab==='history';$('unitCurrent').hidden=history;$('unitHistory').hidden=!history;for(const node of document.querySelectorAll('[data-tab]'))node.setAttribute('aria-pressed',String(node===tab));return;}
+ const jumpTab=event.target.closest('#detailDialog [data-go-unit-tab]');if(jumpTab){selectUnitTab(jumpTab.dataset.goUnitTab);return;}
+  const tab=event.target.closest('#detailDialog .ay-unit-tabs [data-tab]');if(tab){selectUnitTab(tab.dataset.tab);return;}
  const changeChart=event.target.closest('[data-finance-chart-view]');
  if(changeChart){
   const view=changeChart.dataset.financeChartView;

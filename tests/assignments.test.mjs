@@ -35,10 +35,11 @@ test('archived assignment uses former role labels, preserves old debt and keeps 
  assert(html.includes('Eski kiracı'));
  assert(html.includes('Eski kişiye ait açık borç'));
  assert(html.includes('₺6.620,00'));
- const current=html.slice(html.indexOf('<section id="unitCurrent">'),html.indexOf('<section id="unitHistory"'));
- assert(!current.includes('Historical balance'));
- const history=html.slice(html.indexOf('<section id="unitHistory"'));
- assert(history.includes('Historical balance'));
+ const overview=html.slice(html.indexOf('id="unitCurrent"'),html.indexOf('id="unitPeople"'));
+ assert(!overview.includes('Historical balance'));
+ const finance=html.slice(html.indexOf('id="unitFinances"'),html.indexOf('id="unitHistory"'));
+ assert(finance.includes('Historical balance'));
+ const history=html.slice(html.indexOf('id="unitHistory"'));
  assert(history.includes('Eski kiracı'));
 });
 test('former ownership and representation are labeled explicitly in the history',()=>{

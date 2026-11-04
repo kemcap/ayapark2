@@ -1,0 +1,65 @@
+/* AYA PARK 2 – apartment detail progressive disclosure. Uses existing design tokens. */
+.ay-unit-compact-card .apartment-open{align-items:stretch;text-align:left;min-width:0}
+.ay-unit-compact-card .apartment-heading{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ay-unit-tile-person{display:grid;gap:4px;padding:13px 16px 6px;min-width:0}
+.ay-unit-tile-person small,.ay-unit-tile-finance small{font-size:11px;font-weight:600;color:var(--muted);line-height:1.45}
+.ay-unit-tile-person strong{font-size:14px;color:var(--ink);line-height:1.45;overflow-wrap:anywhere}
+.ay-unit-tile-secondary{padding:2px 16px 8px;font-size:11px;line-height:1.45;color:var(--muted);overflow-wrap:anywhere}
+.ay-unit-tile-finance{display:grid;gap:5px;margin:8px 16px 0;padding-top:12px;border-top:1px solid var(--line);min-width:0}
+.ay-unit-tile-finance strong{font-size:clamp(17px,2vw,21px);font-weight:750;line-height:1.2;font-variant-numeric:tabular-nums;color:var(--ink);overflow-wrap:anywhere}
+.ay-unit-tile-history,.ay-unit-tile-review{display:block;padding:9px 16px 2px;font-size:11px;line-height:1.45;color:var(--muted);overflow-wrap:anywhere}
+.ay-unit-tile-history{color:var(--warning-text,var(--muted))}
+.ay-unit-tile-review{color:var(--warning-text,var(--muted))}
+.ay-unit-compact-card .apartment-open-cue{margin-top:12px}
+.ay-unit-detail{display:grid;gap:14px;min-width:0;max-width:100%}
+.ay-unit-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0}
+.ay-unit-detail-heading h2{margin:0}
+.ay-unit-top-metrics{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:10px}
+.ay-unit-metric{border:1px solid var(--line);border-radius:13px;background:var(--paper);padding:15px;min-width:0;display:grid;align-content:start;gap:6px}
+.ay-unit-metric>span{color:var(--muted);font-size:11px;font-weight:650;line-height:1.45}
+.ay-unit-metric>strong{font-size:clamp(15px,2.1vw,19px);line-height:1.32;color:var(--ink);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.ay-unit-metric>small{color:var(--muted);font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+.ay-unit-old-alert,.ay-unit-review-note{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--soft)}
+.ay-unit-old-alert strong,.ay-unit-review-note strong{font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.ay-unit-old-alert p,.ay-unit-review-note p{margin:4px 0 0;color:var(--muted);font-size:11px;line-height:1.6}
+.ay-unit-old-alert .text-button,.ay-unit-panel>.text-button{font-size:12px;min-height:40px;white-space:normal;text-align:left}
+.ay-unit-review-note{background:transparent}
+.ay-unit-tabs{display:flex!important;gap:4px!important;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;max-width:100%;padding:4px 0!important;margin:0!important;border-bottom:1px solid var(--line)}
+.ay-unit-tabs [data-tab]{flex:1 0 auto;border:none!important;border-bottom:3px solid transparent!important;border-radius:8px 8px 0 0!important;background:transparent!important;color:var(--muted)!important;box-shadow:none!important;padding:11px 10px!important;font-size:12px!important;font-weight:700;min-width:0;min-height:44px;white-space:nowrap}
+.ay-unit-tabs [data-tab][aria-selected="true"]{color:var(--primary)!important;border-bottom-color:var(--primary)!important;background:var(--soft)!important}
+.ay-unit-tabs [data-tab]:focus-visible{outline:2px solid var(--focus,var(--primary));outline-offset:-3px}
+.ay-unit-panel{display:grid;gap:12px;min-width:0;padding:6px 0 16px}
+.ay-unit-panel[hidden]{display:none!important}
+.ay-unit-panel>h3{font-size:17px;margin:0 0 3px}
+.ay-unit-overview-rows,.ay-unit-people-summary{border:1px solid var(--line);border-radius:12px;padding:4px 15px;background:var(--paper);min-width:0}
+.ay-unit-overview-rows>div,.ay-unit-person-row{display:flex;justify-content:space-between;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line);min-width:0}
+.ay-unit-overview-rows>div:last-child,.ay-unit-person-row:last-child{border-bottom:none}
+.ay-unit-overview-rows span,.ay-unit-person-row span{color:var(--muted);font-size:12px;line-height:1.45}
+.ay-unit-overview-rows strong,.ay-unit-person-row strong{font-size:12px;text-align:right;line-height:1.45;overflow-wrap:anywhere}
+.ay-unit-help{color:var(--muted);font-size:12px;line-height:1.65;margin:0}
+.ay-unit-panel .assignment-card{min-width:0}
+.ay-unit-section-heading{display:flex;align-items:start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ay-unit-section-heading h3{font-size:16px;margin:0}
+.ay-unit-section-heading>strong{font-size:17px;font-variant-numeric:tabular-nums}
+.ay-unit-old-finance{display:grid;gap:12px;border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--paper);min-width:0}
+.ay-unit-old-person{display:flex;align-items:start;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:12px 0;min-width:0}
+.ay-unit-old-person>span{display:grid;gap:4px;min-width:0}
+.ay-unit-old-person strong{font-size:13px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.ay-unit-old-person small{font-size:11px;color:var(--muted)}
+.ay-unit-old-items{border-top:1px solid var(--line);padding-top:8px;min-width:0}
+.ay-unit-old-items>summary{cursor:pointer;font-size:12px;font-weight:650;min-height:38px;padding:8px 0}
+.ay-unit-history-people{display:grid;gap:10px}
+.ay-unit-history-people h3{font-size:15px;margin:0}
+.ay-unit-panel .uf-finance{min-width:0}
+@media(max-width:480px){
+ .ay-unit-top-metrics{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
+ .ay-unit-metric{padding:12px 10px}
+ .ay-unit-metric>strong{font-size:15px}
+ .ay-unit-tabs [data-tab]{padding:10px 8px!important;font-size:11px!important}
+ .ay-unit-old-alert .text-button{width:100%}
+}
+@media(max-width:340px){.ay-unit-top-metrics{grid-template-columns:1fr}}
+
+.ay-unit-history-people{border:1px solid var(--line);border-radius:12px;padding:10px 13px;min-width:0}
+.ay-unit-history-people>summary{cursor:pointer;font-size:13px;font-weight:700;min-height:40px;padding:10px 0;color:var(--primary)}
+.ay-unit-history-people[open]>summary{border-bottom:1px solid var(--line);margin-bottom:12px}
