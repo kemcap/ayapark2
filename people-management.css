@@ -72,3 +72,21 @@
 .owner-history-row span{color:var(--muted,#576273)}
 .owner-auto-label{font-size:.74rem;font-style:italic}
 .former-unit-reference{opacity:.82}
+
+/* Compact, accessible history disclosure (person cards, owner periods, unit history and login logs). */
+.history-fold{width:100%;min-width:0;margin:.5rem 0 0}
+.history-fold>summary{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:42px;padding:.45rem .7rem;border:1px solid var(--border-color,var(--line,#d1d5db));border-radius:10px;color:var(--primary,var(--accent,#275c85));background:transparent;cursor:pointer;font:inherit;font-size:.85rem;font-weight:650;list-style:none;overflow-wrap:anywhere}
+.history-fold>summary::-webkit-details-marker{display:none}
+.history-fold>summary::after{content:'⌄';flex-shrink:0;font-size:1.1rem;line-height:1;transition:transform .15s ease}
+.history-fold[open]>summary::after{transform:rotate(180deg)}
+.history-fold>summary:hover{background:var(--surface-muted,#64748b0e)}
+.history-fold>summary:focus-visible{outline:2px solid var(--primary,#2563eb);outline-offset:2px}
+.history-fold .history-collapse-label{display:none}
+.history-fold[open] .history-expand-label{display:none}
+.history-fold[open] .history-collapse-label{display:inline}
+.history-fold-content{display:grid;gap:.65rem;margin-top:.65rem}
+.history-fold-inline{flex:1 1 100%}
+.history-fold-inline .history-fold-content{display:flex;flex-wrap:wrap;gap:.45rem .7rem}
+.owner-history-rows .history-fold-content{gap:7px}
+#unitHistory>.history-fold-content>.assignment-card,.assignment-history .history-fold-content>.assignment-card{min-width:0}
+@media(prefers-reduced-motion:reduce){.history-fold>summary::after{transition:none}}
