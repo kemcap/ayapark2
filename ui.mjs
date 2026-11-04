@@ -1,7 +1,7 @@
 import {dateFormatter} from './formatters.mjs?v=1';
 import {lawPage} from './law-info.mjs?v=perf1';
 import {decorateModernPage} from './modern-ui.mjs?v=5.10.0';
-import {settingsPage} from './settings-ui.mjs?v=perf1';
+import {settingsPage} from './settings-ui.mjs?v=20261105-owner-transfer';
 import {effectiveOccupancy} from './relationships.mjs?v=perf1';
 import {peoplePage} from './people-ui.mjs?v=20261105-owner-transfer';
 
