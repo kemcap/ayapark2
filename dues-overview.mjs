@@ -1,4 +1,4 @@
-import {remaining,paid} from './ledger.mjs?v=perf1';
+import {remaining,paid} from './ledger.mjs?v=20261105-owner-transfer';
 
 /**
  * Derived financial indicators for the already-authorized list of charges.
