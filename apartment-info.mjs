@@ -1,7 +1,7 @@
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {money} from './core.mjs?v=perf1';
-import {can} from './ui.mjs?v=perf1';
-import {remaining,unassigned} from './ledger.mjs?v=perf1';
+import {can} from './ui.mjs?v=20261105-owner-transfer';
+import {remaining,unassigned} from './ledger.mjs?v=20261105-owner-transfer';
 import {scopedCharges,personLinks,personName,suggestUnits,creditAvailable,isReversed} from './v3-domain.mjs?v=perf1';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 export const openUnitCharges=(s,u)=>scopedCharges(s.data).filter(c=>c.unit_id===u.id&&!c.void_reason&&remaining(s.data,c)>0);
