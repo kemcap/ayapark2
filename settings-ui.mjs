@@ -1,7 +1,7 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
 import {contactPanel} from './contact-requests.mjs?v=perf1';
 import {taskOptions} from './task-permissions.mjs?v=20261105-owner-transfer';
-import {previewControls} from './access-preview.mjs?v=perf1';
+import {previewControls} from './access-preview.mjs?v=20261105-owner-transfer';
 import {testControls} from './notifications.mjs?v=20261105-owner-transfer';
 import {t as tr,locale} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e} from './core.mjs?v=perf1';
