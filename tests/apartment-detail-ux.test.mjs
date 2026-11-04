@@ -39,6 +39,7 @@ test('resident view avoids former owner names and former owner debt details',()=
  assert.doesNotMatch(html,/2\.400,00/);
  assert.doesNotMatch(html,/owner-old-charge/);
  assert.match(html,/data-unit-panel="overview"/);
+ assert.doesNotMatch(html,/data-tab="history"/);
 });
 test('compact tile no longer renders per-person financial amounts or every role by default',()=>{
  setLanguage('tr');const {s,unit}=fixture();
