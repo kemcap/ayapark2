@@ -1,5 +1,5 @@
 import {isFinanceV5,demoFinanceCommand} from './finance-demo.mjs?v=perf1';
-import {enrichDemo,demoV3,bindDemoCharge} from './v3-ledger.mjs?v=perf1';
+import {enrichDemo,demoV3,bindDemoCharge} from './v3-ledger.mjs?v=20261105-owner-transfer';
 import {creditAvailable,buildSummaryDays,withPaymentIndex} from './v3-domain.mjs?v=perf1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {demoData as base,summarize,randomId} from './core.mjs?v=perf1';
