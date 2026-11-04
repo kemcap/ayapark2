@@ -1,6 +1,6 @@
 import {uiText} from './language-text.mjs?v=5.10.0';
 import {registrationStatus} from './person-status.mjs?v=5.10.0';
-import {apartmentAmounts} from './seven-ux.mjs?v=perf1';
+import {apartmentAmounts} from './seven-ux.mjs?v=20261105-owner-transfer';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money} from './core.mjs?v=perf1';
 import {activeAt,personName} from './v3-domain.mjs?v=perf1';
