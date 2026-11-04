@@ -1,4 +1,4 @@
-import {applyAssignmentDemo} from './assignments.mjs?v=perf1';
+import {applyAssignmentDemo} from './assignments.mjs?v=20261105-owner-transfer';
 import {randomId} from './core.mjs?v=perf1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {activeAt,personLinks,today,effectivePayer,buildSummaryDays,creditAvailable} from './v3-domain.mjs?v=perf1';
