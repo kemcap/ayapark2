@@ -6,10 +6,10 @@ import {t as tr,getLanguage} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,randomId,money} from './core.mjs?v=perf1';
 import {field,buildLegacyForm,payloadLegacy} from './forms.mjs?v=20261105-owner-transfer';
 import {today,personName,personLinks,activeAt,dateValid} from './v3-domain.mjs?v=perf1';
-import {roleLabel} from './v3-ui.mjs?v=20261105-owner-transfer';
+import {roleLabel} from './v3-ui.mjs?v=20261105-provider-directory';
 import {providerCategoryChoices,providerServices} from './provider-categories.mjs?v=5.9.53';
 
-const loc=(de,trText)=>(getLanguage()==='tr'?(trText):(uiText(de,getLanguage())));
+const loc=(de,trText,enText)=>(getLanguage()==='tr'?trText:getLanguage()==='en'&&enText?enText:uiText(de,getLanguage()));
 const sel=(name,label,options,value='')=>`<label class="field">${tr(label)}<select name="${name}">${options.map(([v,l])=>`<option value="${e(v)}" ${v===value?'selected':''}>${e(l)}</option>`).join('')}</select></label>`;
 const text=(name,label,value='')=>`<label class="field">${tr(label)}<textarea name="${name}" maxlength="5000" rows="3">${e(value)}</textarea></label>`;
 const check=(name,label,checked=false)=>`<label class="check-field"><input type="checkbox" name="${name}" ${checked?'checked':''}>${tr(label)}</label>`;
@@ -88,18 +88,19 @@ export function buildV3Form(s,action,args={}){
 
  }
  else if(action==='provider'){
-  const p=d.providers.find(p=>p.id===args.id),selected=new Set(p?providerServices(p):[]),choices=providerCategoryChoices(d);
-  const isSelected=x=>selected.has(x.name)||!p&&!selected.size&&x.name==='Temizlik';
+  const p=d.providers.find(p=>p.id===args.id),selected=new Set(p?providerServices(p):[]),choices=providerCategoryChoices(d).sort((a,b)=>tr(a.name).localeCompare(tr(b.name),getLanguage()));
+  const isSelected=x=>selected.has(x.name);
   const initialSelection=choices.filter(isSelected).length;
-  const notes=(d.providerNotes||[]).filter(n=>n.provider_id===p?.id).sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+  const notes=(d.providerNotes||[]).filter(n=>n.provider_id===p?.id).sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''));
   const latest=notes[0];
   title=loc(p?'Dienstleister bearbeiten':'Dienstleister hinzufügen',p?'Hizmet veren düzenle':'Hizmet veren ekle');
   body=field('name',tr('Firma / kişi'),'text',p?.name||'','required maxlength="150"')
-    +'<fieldset class="provider-category-choices" aria-describedby="providerCategoryHelp"><legend>'+loc('Dienstleistungen','Hizmet kategorileri')+'</legend>'
-    +'<div class="provider-category-intro"><p>'+loc('Wähle eine oder mehrere passende Kategorien.','Bir veya birden fazla uygun kategori seç.')+'</p>'
-    +'<output id="providerCategorySelectionCount" class="provider-category-count" aria-live="polite" aria-atomic="true">'+initialSelection+' / 8 '+loc('ausgewählt','seçildi')+'</output></div>'
+    +'<fieldset class="provider-category-choices" aria-describedby="providerCategoryHelp"><legend>'+loc('Dienstleistungen','Hizmet kategorileri','Services')+'</legend>'
+    +'<details class="provider-category-disclosure"><summary class="provider-category-toggle"><span class="provider-category-toggle-title">'+loc('Kategorien auswählen','Kategorileri seç','Choose categories')+'</span><output id="providerCategorySelectionCount" class="provider-category-count" aria-live="polite" aria-atomic="true">'+initialSelection+' / 8 '+loc('ausgewählt','seçildi','selected')+'</output><span class="provider-category-chevron" aria-hidden="true">⌄</span></summary>'
+    +'<div class="provider-category-panel"><div class="provider-category-intro"><p>'+loc('Wähle eine oder mehrere passende Kategorien.','Bir veya birden fazla uygun kategori seç.','Choose one or more suitable categories.')+'</p></div>'
     +'<div class="provider-category-grid">'+choices.map(x=>'<label class="provider-category-option"><input type="checkbox" name="categories" value="'+e(x.name)+'" '+(isSelected(x)?'checked':'')+'><span class="provider-category-option-name">'+e(tr(x.name))+'</span><span class="provider-category-check" aria-hidden="true"></span></label>').join('')+'</div>'
-    +'<p class="provider-category-help" id="providerCategoryHelp">'+loc('Mindestens eine, maximal acht Kategorien. Weitere Kategorien kannst du über „Kategorien verwalten“ anlegen.','En az bir, en fazla sekiz kategori. Yeni kategorileri „Kategorileri yönet“ bölümünden ekleyebilirsin.')+'</p></fieldset>'
+    +'<div class="provider-category-create"><label class="field" for="providerNewCategory">'+loc('Neue Kategorie','Yeni kategori','New category')+'</label><div class="provider-category-create-row"><input id="providerNewCategory" type="text" maxlength="60" autocomplete="off" placeholder="'+loc('Kategoriename eingeben','Kategori adı gir','Enter a category name')+'"><button type="button" class="button small" data-provider-category-add>'+loc('Hinzufügen','Ekle','Add')+'</button></div><p class="fine">'+loc('Neue Kategorien werden sofort gespeichert und ausgewählt.','Yeni kategoriler hemen kaydedilir ve seçilir.','New categories are saved and selected immediately.')+'</p></div>'
+    +'<p class="provider-category-help" id="providerCategoryHelp">'+loc('Mindestens eine, maximal acht Kategorien auswählen.','En az bir, en fazla sekiz kategori seç.','Select at least one and no more than eight categories.')+'</p></div></details></fieldset>'
     +field('contact',tr('Yetkili'),'text',p?.contact||'','maxlength="150"')
     +field('phone',tr('Telefon'),'tel',p?.phone||'','maxlength="60"')
     +field('email',tr('E-posta'),'email',p?.email||'','maxlength="254"')
