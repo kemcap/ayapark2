@@ -4,7 +4,7 @@
  display:block;
  min-inline-size:0;
  margin:16px 0 20px;
- padding:18px;
+ padding:9px 12px 12px;
  border:1px solid var(--line);
  border-radius:16px;
  background:var(--paper);
@@ -44,10 +44,9 @@
  color:var(--red, #a33f32);
 }
 .provider-category-grid {
- display:grid;
- grid-template-columns:repeat(2,minmax(0,1fr));
- grid-auto-rows:minmax(50px,auto);
- gap:9px;
+ display:flex;
+ flex-direction:column;
+ gap:8px;
  min-inline-size:0;
 }
 .provider-category-option {
@@ -134,8 +133,8 @@
  color:var(--muted);
 }
 @container provider-categories (max-width:410px) {
- .provider-category-grid {grid-template-columns:minmax(0,1fr);}
  .provider-category-option {min-block-size:48px;}
+ .provider-category-panel {padding:10px;}
 }
 @media(max-width:560px) {
  .provider-category-choices{padding:13px;}
@@ -147,3 +146,42 @@
 .provider-service-tags{display:flex;gap:6px;flex-wrap:wrap}
 .provider-service-tag{display:inline-flex;font-size:11px;font-weight:650;padding:5px 9px;border-radius:999px;border:1px solid var(--line);background:var(--soft);max-width:100%;overflow-wrap:anywhere}
 #providerCategoryExisting[hidden],#providerCategoryName[hidden]{display:none!important}
+
+/* Compact provider category disclosure, preserving the existing palette. */
+.provider-category-disclosure{margin:3px 0 0;border:1px solid var(--line);border-radius:12px;background:var(--tile-bg,var(--soft));overflow:hidden}
+.provider-category-toggle{list-style:none;display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 13px;cursor:pointer;color:var(--ink);font-size:13px}
+.provider-category-toggle::-webkit-details-marker{display:none}
+.provider-category-toggle:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
+.provider-category-toggle-title{flex:1;min-width:0;font-weight:700}
+.provider-category-chevron{flex:0 0 auto;font-size:21px;line-height:1;transition:transform .18s ease}
+.provider-category-disclosure[open] .provider-category-chevron{transform:rotate(180deg)}
+.provider-category-panel{padding:14px;border-top:1px solid var(--line);background:var(--paper)}
+.provider-category-panel .provider-category-intro{margin:0 0 12px}
+.provider-category-grid{width:100%}
+.provider-category-create{margin-top:15px;padding-top:13px;border-top:1px solid var(--line)}
+.provider-category-create .field{display:block;margin:0 0 6px;font-size:13px;font-weight:650;color:var(--ink)}
+.provider-category-create-row{display:flex;gap:8px;align-items:stretch}
+.provider-category-create-row input{flex:1;min-width:0;width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:var(--paper);color:var(--ink);font:inherit}
+.provider-category-create-row .button{flex:0 0 auto;min-height:42px}
+.provider-category-create .fine{margin:7px 0 0}
+.provider-category-choices .provider-category-help{margin:11px 0 0}
+.provider-category-count[data-invalid="true"]{color:var(--red,#a33f32)}
+/* Clear, touch-friendly contact actions with soft colors in both themes. */
+.provider-grid .provider-contact-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;font-weight:650;border-width:1px;border-style:solid;transition:background-color .16s ease,border-color .16s ease,transform .16s ease}
+.provider-grid .provider-contact-button .provider-contact-icon{width:17px;height:17px;flex-shrink:0}
+.provider-grid .provider-contact-call{background:#e9f2ff;border-color:#b8d1f4;color:#285d97}
+.provider-grid .provider-contact-call:hover{background:#d9eaff;border-color:#81ade4;color:#204e81}
+.provider-grid .provider-contact-whatsapp{background:#e8f7ec;border-color:#b6dec1;color:#247446}
+.provider-grid .provider-contact-whatsapp:hover{background:#d4f0dc;border-color:#7bbd91;color:#195c35}
+.provider-grid [data-action="provider_detail"]{background:#f1ebfa;border-color:#d9c7ed;color:#604589}
+.provider-grid [data-action="provider_detail"]:hover{background:#e8dcf6;border-color:#c4a9e1}
+.provider-grid [data-action="provider"]{background:#fff3e5;border-color:#ecd5b2;color:#805821}
+.provider-grid [data-action="provider"]:hover{background:#ffead0;border-color:#dfbb8a}
+:root[data-theme="dark"] .provider-grid .provider-contact-call{background:#253c53;border-color:#486d91;color:#c4dffb}
+:root[data-theme="dark"] .provider-grid .provider-contact-whatsapp{background:#203f32;border-color:#427d58;color:#b3edc4}
+:root[data-theme="dark"] .provider-grid [data-action="provider_detail"]{background:#373045;border-color:#62517f;color:#ddc9fb}
+:root[data-theme="dark"] .provider-grid [data-action="provider"]{background:#493a29;border-color:#84643c;color:#f2d2a4}
+:root[data-theme="dark"] .provider-grid .provider-contact-call:hover{background:#32506d}
+:root[data-theme="dark"] .provider-grid .provider-contact-whatsapp:hover{background:#2b503d}
+@media(max-width:560px){.provider-category-create-row{flex-wrap:wrap}.provider-category-create-row .button{width:100%}}
+@media(prefers-reduced-motion:reduce){.provider-category-chevron,.provider-grid .provider-contact-button{transition:none}}
