@@ -11,7 +11,7 @@ const existing={
   providerNotes:[],persons:[],links:[]
  }
 };
-test('service picker displays uniform accessible category cards, retaining existing choices',()=>{
+test('service picker keeps existing choices behind a compact disclosure',()=>{
  const previous=getLanguage();
  try{
   setLanguage('de');
@@ -28,14 +28,17 @@ test('service picker displays uniform accessible category cards, retaining exist
  }finally{setLanguage(previous);}
 });
 
-test('new provider retains the preselected cleaning category',()=>{
+test('new provider starts with no category selected',()=>{
  const previous=getLanguage();
  try{
   setLanguage('tr');
   const state={data:{...existing.data,providers:[],providerCategories:[{id:'1',name:'Temizlik'},{id:'2',name:'Elektrik'}]}};
   const form=buildV3Form(state,'provider');
-  assert.match(form.body,/value="Temizlik" checked/);
-  assert.match(form.body,/1 \/ 8 seçildi/);
+  assert.doesNotMatch(form.body,/value="Temizlik" checked/);
+  assert.match(form.body,/class="provider-category-disclosure"/);
+  assert.match(form.body,/data-provider-category-add/);
+  assert.match(form.body,/id="providerNewCategory"/);
+  assert.match(form.body,/0 \/ 8 seçildi/);
  }finally{setLanguage(previous);}
 });
 
@@ -53,12 +56,15 @@ test('layout is responsive and keyboard-focus accessible without altering unrela
  const css=await readFile(new URL('../provider-categories.css',import.meta.url),'utf8');
  const app=await readFile(new URL('../app.mjs?v=5.10.0',import.meta.url),'utf8');
  const index=await readFile(new URL('../index.html',import.meta.url),'utf8');
- assert.match(css,/\.provider-category-grid\s*\{[\s\S]*?display:grid;[\s\S]*?grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+ assert.match(css,/\.provider-category-grid\s*\{[\s\S]*?display:flex;[\s\S]*?flex-direction:column/);
+ assert.match(css,/\.provider-category-toggle\{/);
+ assert.match(css,/\.provider-contact-call\{/);
+ assert.match(css,/\.provider-contact-whatsapp\{/);
  assert.match(css,/@container provider-categories \(max-width:410px\)/);
  assert.match(css,/\.provider-category-option:has\(input:checked\)/);
  assert.match(css,/\.provider-category-option:has\(input:focus-visible\)/);
  assert.match(css,/prefers-reduced-motion:reduce/);
  assert.match(app,/function updateProviderCategorySelection\(\)/);
  assert.match(app,/event\.target\.name==='categories'.*updateProviderCategorySelection\(\)/);
- assert.match(index,/provider-categories\.css\?v=5\.9\.56/);
+ assert.match(index,/provider-categories\.css\?v=20261105-provider-directory/);
 });

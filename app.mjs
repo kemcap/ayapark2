@@ -49,7 +49,7 @@ import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=per
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=20261105-owner-transfer';
 import {AyaparkApi} from './api.mjs?v=20261105-owner-transfer';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261105-owner-transfer';
-import {buildForm,payloadFor} from './forms.mjs?v=20261105-owner-transfer';
+import {buildForm,payloadFor} from './forms.mjs?v=20261105-provider-directory';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -525,6 +525,40 @@ document.addEventListener('click',async event=>{
  const notice=event.target.closest('[data-notification]');if(notice){openNotification(notificationCenter(notificationData()).find(a=>a.id===notice.dataset.notification));return;}
  const previewButton=event.target.closest('[data-finance-preview]');
  if(previewButton&&formAction){try{previewButton.disabled=true;await updateFinancePreview();$('actionMessage').textContent='';}catch(error){$('actionMessage').textContent=tr(error.message);}finally{previewButton.disabled=false;}return;}
+ const categoryAdd=event.target.closest('[data-provider-category-add]');
+ if(categoryAdd){
+  event.preventDefault();
+  if(writeBusy||formAction?.action!=='provider'||!$('actionDialog').open)return;
+  const root=$('actionFields'),field=root.querySelector('#providerNewCategory'),grid=root.querySelector('.provider-category-grid');
+  const name=String(field?.value||'').trim(),lang=getLanguage();
+  const message=(de,trText,en)=>lang==='tr'?trText:lang==='en'?en:de;
+  if(!name||name.length>60||/\p{Cc}/u.test(name)){
+   toast(message('Bitte einen gültigen Kategorienamen (1–60 Zeichen) eingeben.','Geçerli bir kategori adı (1–60 karakter) girin.','Enter a valid category name (1–60 characters).'));field?.focus();return;
+  }
+  const checks=[...root.querySelectorAll('input[name="categories"]')],existing=checks.find(input=>input.value.toLocaleLowerCase('tr-TR')===name.toLocaleLowerCase('tr-TR'));
+  if(checks.filter(input=>input.checked).length>=8&&!existing?.checked){
+   toast(message('Maximal acht Kategorien möglich.','En fazla sekiz kategori seçilebilir.','You can select up to eight categories.'));return;
+  }
+  if(existing){existing.checked=true;field.value='';updateProviderCategorySelection();existing.focus();return;}
+  const attempt=epoch;
+  categoryAdd.disabled=true;writeBusy=true;
+  try{
+   const result=await mutate('provider_category',{operation:'add',name,category_id:''});
+   if(attempt!==epoch||!$('actionDialog').open||formAction?.action!=='provider')return;
+   state.data.providerCategories??=[];
+   if(!state.data.providerCategories.some(c=>c.name.toLocaleLowerCase('tr-TR')===name.toLocaleLowerCase('tr-TR')))state.data.providerCategories.push({id:result?.id||'',name});
+   const label=document.createElement('label');label.className='provider-category-option';
+   const input=document.createElement('input');input.type='checkbox';input.name='categories';input.value=name;input.checked=true;
+   const caption=document.createElement('span');caption.className='provider-category-option-name';caption.textContent=tr(name);
+   const check=document.createElement('span');check.className='provider-category-check';check.setAttribute('aria-hidden','true');
+   label.append(input,caption,check);grid.append(label);
+   grid.replaceChildren(...[...grid.children].sort((a,b)=>a.querySelector('.provider-category-option-name').textContent.localeCompare(b.querySelector('.provider-category-option-name').textContent,getLanguage())));
+   root.querySelector('.provider-category-disclosure').open=true;field.value='';updateProviderCategorySelection();
+   toast(message('Kategorie gespeichert und ausgewählt.','Kategori kaydedildi ve seçildi.','Category saved and selected.'));
+  }catch(error){toast(tr(error.message));}
+  finally{writeBusy=false;categoryAdd.disabled=false;}
+  return;
+ }
  const b=event.target.closest('[data-action]');if(!b)return;const action=b.dataset.action;
  try{
   if(action==='claims_detail'){if(state.data.role!=='resident'||state.data.communityAccess===false)return;detailView={action};return showDetail(residentClaimsDetail(state));}
@@ -630,7 +664,8 @@ document.addEventListener('click',async event=>{
  }catch(error){toast(error.message);}
 });
 $('languageToggle').addEventListener('click',()=>{
- const controls=Array.from($('actionFields').querySelectorAll('input,select,textarea')).map(node=>({name:node.name,value:node.value,checked:node.checked}));
+ const controls=Array.from($('actionFields').querySelectorAll('input,select,textarea')).map(node=>({name:node.name,id:node.id,type:node.type,value:node.value,checked:node.checked}));
+ const categoryMenuOpen=$('actionFields').querySelector('.provider-category-disclosure')?.open||false;
  changePreference('language',nextLanguage(getLanguage()),state.mode==='connected'?api:null);applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));
  if($('detailDialog').open&&detailView){
   if(detailView.action==='staged')staged();
@@ -640,7 +675,8 @@ $('languageToggle').addEventListener('click',()=>{
   const built=buildForm(state,formAction.action,{period:state.period,...formAction.args});
   $('actionTitle').textContent=built.title;$('actionFields').innerHTML=(['batch_charge','monthly_v5'].includes(formAction.action)?'<p class="info-strip">'+((getLanguage()==='tr'?('Taslak gönderilir. Borçlar yalnızca Süper Admin onayıyla oluşur.'):(uiText("Sie reichen einen Entwurf ein. Erst die Superadmin-Freigabe erzeugt Forderungen.",getLanguage()))))+'</p>':'')+built.body;
   if(formAction.action.startsWith('assignment_'))updateAssignmentForm($('actionFields'),state.data);
-  for(const saved of controls){const node=$('actionFields').querySelector(`[name="${saved.name}"]`);if(node){node.value=saved.value;if(node.type==='checkbox')node.checked=saved.checked;}}
+  for(const saved of controls){const node=saved.name==='categories'&&saved.type==='checkbox'?[...$('actionFields').querySelectorAll('input[name="categories"]')].find(n=>n.value===saved.value):saved.id?document.getElementById(saved.id):$('actionFields').querySelector(`[name="${saved.name}"]`);if(node){if(node.type==='checkbox')node.checked=saved.checked;else node.value=saved.value;}}
+  if(formAction.action==='provider'){const disclosure=$('actionFields').querySelector('.provider-category-disclosure');if(disclosure)disclosure.open=categoryMenuOpen;updateProviderCategorySelection();}
  }
  updateConditionalForm();document.dispatchEvent(new Event('ay2:languagechange'));
 });
@@ -778,7 +814,7 @@ $('actionForm').addEventListener('submit',async event=>{
   writeBusy=true;$('saveAction').disabled=true;$('cancelAction').disabled=true;$('actionMessage').textContent='';stopLoading=beginLoading($('actionMessage'),tr('Kaydediliyor…'));
   await mutate(action==='ignore_staged'?'confirm_staged':action,payload);
   if(attempt!==epoch)return;const back=formAction.back;writeBusy=false;$('actionDialog').close();if(back)restoreParentForm(back);if(!state.stale&&formAction.origin){const origin=formAction.origin;if(origin.action==='unit')showDetail(linkedUnitDetail(origin.id));else if(origin.action==='person_manage')showDetail(personManager(state,origin.id));}toast(state.stale?tr("Kaydedildi; görünüm yenilenemedi. Sayfayı yeniden açın."):state.mode==='demo'?tr("Örnek çalışma alanında kaydedildi."):tr("Kayıt tamamlandı."));
- }catch(error){if(attempt===epoch){error.message=tr(error.message);showFormError($('actionForm'),$('actionMessage'),error);}}
+ }catch(error){if(attempt===epoch){if(formAction?.action==='provider'&&!$('actionFields').querySelector('input[name="categories"]:checked')){const disclosure=$('actionFields').querySelector('.provider-category-disclosure');if(disclosure)disclosure.open=true;const counter=$('actionFields').querySelector('#providerCategorySelectionCount');if(counter)counter.dataset.invalid='true';}error.message=tr(error.message);showFormError($('actionForm'),$('actionMessage'),error);}}
  finally{stopLoading();writeBusy=false;$('saveAction').disabled=false;$('cancelAction').disabled=false;}
 });
 document.addEventListener('ay2:themechanged',event=>changePreference('theme',event.detail,state.mode==='connected'?api:null));
@@ -923,8 +959,8 @@ function updateProviderCategorySelection(){
  const root=$('actionFields'),output=root?.querySelector('#providerCategorySelectionCount');
  if(!output)return;
  const count=root.querySelectorAll('input[name="categories"]:checked').length;
- output.textContent=(getLanguage()==='tr'?(count+' / 8 seçildi'):(count+uiText(" von 8 ausgewählt",getLanguage())));
- output.dataset.invalid=String(count<1||count>8);
+ output.textContent=count+' / 8 '+(getLanguage()==='tr'?'seçildi':getLanguage()==='en'?'selected':'ausgewählt');
+ output.dataset.invalid=String(count>8);
 }
 function updateConditionalForm(changed=''){
  if(formAction?.action==='provider_category'){
