@@ -3,9 +3,9 @@ import {lawPage} from './law-info.mjs?v=perf1';
 import {decorateModernPage} from './modern-ui.mjs?v=5.10.0';
 import {settingsPage} from './settings-ui.mjs?v=20261105-owner-transfer';
 import {effectiveOccupancy} from './relationships.mjs?v=perf1';
-import {peoplePage} from './people-ui.mjs?v=20261105-provider-directory';
+import {peoplePage} from './people-ui.mjs?v=20261105-owner-transfer';
 
-import {charges,duesV3,directoryV3,overviewV3,bankV3,reportV3,announcementsV3,providersV3,filteredUnitsV3,unitDetailV3,transactionDetailV3,transactionTableV3} from './v3-ui.mjs?v=20261105-provider-directory';
+import {charges,duesV3,directoryV3,overviewV3,bankV3,reportV3,announcementsV3,providersV3,filteredUnitsV3,unitDetailV3,transactionDetailV3,transactionTableV3} from './v3-ui.mjs?v=20261105-owner-transfer';
 import {t as tr,locale} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName} from './core.mjs?v=perf1';
 import {paid,remaining,unassigned,monthlySummary,withLedgerIndex} from './ledger.mjs?v=20261105-owner-transfer';
