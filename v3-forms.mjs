@@ -91,7 +91,7 @@ export function buildV3Form(s,action,args={}){
   const p=d.providers.find(p=>p.id===args.id),selected=new Set(p?providerServices(p):[]),choices=providerCategoryChoices(d).sort((a,b)=>tr(a.name).localeCompare(tr(b.name),getLanguage()));
   const isSelected=x=>selected.has(x.name);
   const initialSelection=choices.filter(isSelected).length;
-  const notes=(d.providerNotes||[]).filter(n=>n.provider_id===p?.id).sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''));
+  const notes=(d.providerNotes||[]).filter(n=>n.provider_id===p?.id).sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
   const latest=notes[0];
   title=loc(p?'Dienstleister bearbeiten':'Dienstleister hinzufügen',p?'Hizmet veren düzenle':'Hizmet veren ekle');
   body=field('name',tr('Firma / kişi'),'text',p?.name||'','required maxlength="150"')
