@@ -63,3 +63,16 @@ test('database migration includes protected RPCs, backfill, and note update audi
  assert.match(sql,/not ay2_private\.can\(p_site,'people'\)/);
  assert.match(sql,/alter table public\.ay3_provider_categories enable row level security/);
 });
+
+test('provider cards show colored call and WhatsApp buttons with recognizable icons',async()=>{
+ const withPhone={...d,providers:[{...d.providers[0],phone:'+90 555 555 00 00'}]};
+ const html=providersV3({mode:'connected',data:withPhone,page:'providers',providerQuery:'',providerCategory:'all'});
+ assert.match(html,/class="button provider-contact-button provider-contact-call"/);
+ assert.match(html,/href="tel:\+905555550000"/);
+ assert.match(html,/class="button provider-contact-button provider-contact-whatsapp"/);
+ assert.match(html,/https:\/\/wa\.me\/905555550000/);
+ assert.equal((html.match(/provider-contact-icon/g)||[]).length,2);
+ const css=await readFile(new URL('../provider-categories.css',import.meta.url),'utf8');
+ assert.match(css,/provider-contact-call\{background:#e9f2ff/);
+ assert.match(css,/provider-contact-whatsapp\{background:#e8f7ec/);
+});
