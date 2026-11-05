@@ -1,0 +1,29 @@
+name: Provider directory regression checks
+on:
+  pull_request:
+    paths:
+      - 'app.mjs'
+      - 'forms.mjs'
+      - 'v3-forms.mjs'
+      - 'v3-ui.mjs'
+      - 'provider-categories.css'
+      - 'index.html'
+      - 'tests/provider-categories.test.mjs'
+      - 'tests/provider-category-picker-layout.test.mjs'
+      - '.github/workflows/provider-directory-regression.yml'
+jobs:
+  provider-directory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax checks
+        run: |
+          node --check app.mjs
+          node --check forms.mjs
+          node --check v3-forms.mjs
+          node --check v3-ui.mjs
+      - name: Service provider tests
+        run: node --test tests/provider-categories.test.mjs tests/provider-category-picker-layout.test.mjs
