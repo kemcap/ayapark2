@@ -30,26 +30,26 @@ import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,not
 import {bindDesign} from './design.mjs?v=5.10.0';
 import {enhanceTables} from './ui-accessibility.mjs?v=5.10.1';
 import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.10.1';
-import {apartmentInfo} from './apartment-info.mjs?v=20261105-owner-transfer';
+import {apartmentInfo} from './apartment-info.mjs?v=20261112-audit';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=perf1';
 import {updateAssignmentForm} from './assignments.mjs?v=20261105-owner-transfer';
 import {suggestedOwnerEnd} from './owner-history.mjs?v=20261104';
-import {personManager} from './people-ui.mjs?v=20261105-owner-transfer';
+import {personManager} from './people-ui.mjs?v=20261112-audit';
 import {renderHistoryPreview} from './history-preview.mjs?v=20261104';
 import {bindInvitations} from './invite-ui.mjs?v=perf1';
-import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=20261105-owner-transfer';
+import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=20261112-audit';
 import {bindInstall} from './install.mjs?v=20261105-owner-transfer';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.10.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261105-owner-transfer';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261112-audit';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=perf1';
 import {template} from './v3-import.mjs?v=perf1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=perf1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=20261105-owner-transfer';
-import {AyaparkApi} from './api.mjs?v=20261105-owner-transfer';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261105-owner-transfer';
-import {buildForm,payloadFor} from './forms.mjs?v=20261105-provider-directory';
+import {AyaparkApi} from './api.mjs?v=20261112-audit';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261112-audit';
+import {buildForm,payloadFor} from './forms.mjs?v=20261112-audit';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -934,9 +934,12 @@ async function previewImportFile(options={}){
   const loaded=await readBankFile(file,{...options,signal:importController.signal,onProgress:(page,total)=>{if(generation===fileGeneration)$('importPreview').textContent=((getLanguage()==='tr'?('PDF sayfası '):(uiText("PDF-Seite ",getLanguage()))))+page+' / '+total;}});if(generation!==fileGeneration)return;
   if(loaded.sheets){$('importPreview').innerHTML=`<label class="field">${(getLanguage()==='tr'?('Çalışma sayfası seçin – yalnızca seçilen sayfa aktarılır'):(uiText("Tabellenblatt auswählen – es wird nur dieses Blatt importiert",getLanguage())))}<select id="bankSheetSelect"><option value="">${(getLanguage()==='tr'?('Lütfen seçin'):(uiText("Bitte auswählen",getLanguage())))}</option>${loaded.sheets.map(name=>`<option value="${e(name)}">${e(name)}</option>`).join('')}</select></label>`;$('bankSheetSelect').addEventListener('change',event=>{if(event.target.value)void previewImportFile({sheet:event.target.value});});return;}
   const raw=loaded.raw;
-  const parsed=parseCsv(raw);const sourceReview=reviewImport(parsed.entries);if(!sourceReview.mayImport)throw Error((getLanguage()==='tr'?('Ara bakiyeler hareketlerle uyuşmuyor. Kaynak dosyadaki tutarları, ücretleri ve sıralamayı kontrol edin. Hiçbir kayıt aktarılmadı.'):(uiText("Die laufenden Salden passen nicht zu den Bewegungen. Bitte prüfe Beträge, Gebühren und Reihenfolge der Quelldatei. Es wurde nichts importiert.",getLanguage()))));const digest=loaded.digest||await sha256(raw);if(generation!==fileGeneration)return;
+  const parsed=parseCsv(raw);const sourceReview=reviewImport(parsed.entries);
+  const identities=new Set(parsed.entries.map(t=>JSON.stringify([t.date,t.cents,t.reference||'',t.reference?null:t.desc,t.reference?null:t.balance_cents??null])));
+  const possibleDuplicates=parsed.entries.length-identities.size;
+  if(!sourceReview.mayImport)throw Error((getLanguage()==='tr'?('Ara bakiyeler hareketlerle uyuşmuyor. Kaynak dosyadaki tutarları, ücretleri ve sıralamayı kontrol edin. Hiçbir kayıt aktarılmadı.'):(uiText("Die laufenden Salden passen nicht zu den Bewegungen. Bitte prüfe Beträge, Gebühren und Reihenfolge der Quelldatei. Es wurde nichts importiert.",getLanguage()))));const digest=loaded.digest||await sha256(raw);if(generation!==fileGeneration)return;
   importPayload={source:file.name,digest,entries:parsed.entries.map(t=>({date:t.date,desc:t.desc,cents:t.cents,category:'Diğer',reference:t.reference||'',balance_cents:t.balance_cents,counterparty:t.counterparty||'',iban:t.iban||'',unit_hint:t.unit_hint||''}))};
-  $('importPreview').innerHTML=`${loaded.metadata?.format==='pdf'?`<p>PDF · ${loaded.metadata.pages} ${(getLanguage()==='tr'?('sayfa okundu'):(uiText("Seiten gelesen",getLanguage())))}${loaded.metadata.identifiersRemoved?' · '+((getLanguage()==='tr'?('işaretli kimlik/vergi numaraları çıkarıldı'):(uiText("markierte Identitäts-/Steuernummern entfernt",getLanguage())))):''}</p>`:loaded.metadata?.sheet?`<p>${(getLanguage()==='tr'?('Çalışma sayfası'):(uiText("Tabellenblatt",getLanguage())))}: ${e(loaded.metadata.sheet)}</p>`:''}<strong>${parsed.entries.length}${tr(" satır · ")}${parsed.duplicates}${tr(" dosya içi olası tekrar")}</strong><p role="status">${(getLanguage()==='tr'?(sourceReview.status==='consistent'?'Ara bakiyeler hareketlerle uyumlu.':sourceReview.status==='partial'?'Mevcut ara bakiyeler uyumlu; bazı bakiye bilgileri eksik.':'Bakiye kontrolü yapılamıyor: en az iki ara bakiye gerekli.'):(sourceReview.status==='consistent'?uiText("Laufende Salden stimmen überein.",getLanguage()):sourceReview.status==='partial'?uiText("Vorhandene Salden stimmen überein; Saldoangaben fehlen teilweise.",getLanguage()):uiText("Kein Saldoabgleich möglich: mindestens zwei laufende Salden werden benötigt.",getLanguage())))}</p><p>${(getLanguage()==='tr'?('Gelir'):(uiText("Einnahmen",getLanguage())))}: ${money(sourceReview.incomeCents)} · ${(getLanguage()==='tr'?('Gider'):(uiText("Ausgaben",getLanguage())))}: ${money(sourceReview.expenseCents)} · ${(getLanguage()==='tr'?('Net'):(uiText("Netto",getLanguage())))}: ${money(sourceReview.netCents)}</p><p class="fine">${(getLanguage()==='tr'?('Açılış bakiyesi ve kaynağın eksiksizliği ayrıca kontrol edilmelidir.'):(uiText("Der Anfangssaldo und die Vollständigkeit der Quelle müssen separat geprüft werden.",getLanguage())))}</p><p class="fine">${tr("Henüz kayıt oluşturulmadı. Sunucu aynı hareketleri tekrar kaydetmez. Banka referansı bulunmayan aynı tarih/açıklama/tutarlı CSV satırları tekrar kabul edilmez; ayrı gerçek hareketler için bankanın referanslı kaydını kullanın.")}</p><div class="table-wrap"><table><caption>${tr("İlk 5 satır")}</caption><thead><tr><th>${tr("Tarih")}</th><th>${tr("Açıklama")}</th><th>${tr("Tutar")}</th></tr></thead><tbody>${parsed.entries.slice(0,5).map(t=>`<tr><td>${e(t.date)}</td><td>${e(t.desc)}</td><td>${money(t.cents)}</td></tr>`).join('')}</tbody></table></div>`;
+  $('importPreview').innerHTML=`${loaded.metadata?.format==='pdf'?`<p>PDF · ${loaded.metadata.pages} ${(getLanguage()==='tr'?('sayfa okundu'):(uiText("Seiten gelesen",getLanguage())))}${loaded.metadata.identifiersRemoved?' · '+((getLanguage()==='tr'?('işaretli kimlik/vergi numaraları çıkarıldı'):(uiText("markierte Identitäts-/Steuernummern entfernt",getLanguage())))):''}</p>`:loaded.metadata?.sheet?`<p>${(getLanguage()==='tr'?('Çalışma sayfası'):(uiText("Tabellenblatt",getLanguage())))}: ${e(loaded.metadata.sheet)}</p>`:''}<strong>${parsed.entries.length}${tr(" satır · ")}${possibleDuplicates}${tr(" dosya içi olası tekrar")}</strong><p role="status">${(getLanguage()==='tr'?(sourceReview.status==='consistent'?'Ara bakiyeler hareketlerle uyumlu.':sourceReview.status==='partial'?'Mevcut ara bakiyeler uyumlu; bazı bakiye bilgileri eksik.':'Bakiye kontrolü yapılamıyor: en az iki ara bakiye gerekli.'):(sourceReview.status==='consistent'?uiText("Laufende Salden stimmen überein.",getLanguage()):sourceReview.status==='partial'?uiText("Vorhandene Salden stimmen überein; Saldoangaben fehlen teilweise.",getLanguage()):uiText("Kein Saldoabgleich möglich: mindestens zwei laufende Salden werden benötigt.",getLanguage())))}</p><p>${(getLanguage()==='tr'?('Gelir'):(uiText("Einnahmen",getLanguage())))}: ${money(sourceReview.incomeCents)} · ${(getLanguage()==='tr'?('Gider'):(uiText("Ausgaben",getLanguage())))}: ${money(sourceReview.expenseCents)} · ${(getLanguage()==='tr'?('Net'):(uiText("Netto",getLanguage())))}: ${money(sourceReview.netCents)}</p><p class="fine">${(getLanguage()==='tr'?('Açılış bakiyesi ve kaynağın eksiksizliği ayrıca kontrol edilmelidir.'):(uiText("Der Anfangssaldo und die Vollständigkeit der Quelle müssen separat geprüft werden.",getLanguage())))}</p><p class="fine">${({tr:'Henüz kayıt oluşturulmadı. Banka referansı yoksa, ara bakiye aynı görünen farklı hareketleri ayırır.',de:'Die Vorschau speichert keine Buchungen. Fehlt die Bankreferenz, unterscheidet der laufende Saldo gleichlautende Buchungen.',en:'The preview saves no transactions. When a bank reference is missing, the running balance distinguishes otherwise identical transactions.'})[getLanguage()]}</p><div class="table-wrap"><table><caption>${tr("İlk 5 satır")}</caption><thead><tr><th>${tr("Tarih")}</th><th>${tr("Açıklama")}</th><th>${tr("Tutar")}</th></tr></thead><tbody>${parsed.entries.slice(0,5).map(t=>`<tr><td>${e(t.date)}</td><td>${e(t.desc)}</td><td>${money(t.cents)}</td></tr>`).join('')}</tbody></table></div>`;
   $('commitImport').disabled=false;
  }catch(error){if(generation===fileGeneration&&error.name!=='AbortError')$('importPreview').textContent=error.code?bankFileMessage(error,getLanguage()):error.message;}
 }
@@ -944,7 +947,13 @@ $('csvFile').addEventListener('change',()=>void previewImportFile());
 $('commitImport').addEventListener('click',async()=>{
  if(!importPayload||writeBusy)return;const attempt=epoch,payload=importPayload;writeBusy=true;$('commitImport').disabled=true;
  try{const r=await mutate('import',payload);if(attempt!==epoch)return;importPayload=null;$('importPreview').textContent=`${r.inserted}${tr(" hareket kaydedildi, ")}${r.duplicates}${tr(" tekrar atlandı.")}${state.stale?tr(" Görünümü yenileyin."):''}`;$('importPreview').append(document.createElement('p'));$('importPreview').insertAdjacentHTML('beforeend',button(tr('Ödemeleri kontrol et'),'review_import'));toast(tr("Dosya kontrolü ve aktarımı tamamlandı."));}
- catch(error){if(attempt===epoch){$('importPreview').textContent=error.message;$('commitImport').disabled=false;}}
+ catch(error){if(attempt===epoch){
+  const ambiguous='Eski banka kaydı eşleştirilemedi. Referans veya önceki bakiye bilgisi gerekiyor.';
+  $('importPreview').textContent=error.message===ambiguous
+   ? ({tr:ambiguous,de:'Ein älterer Umsatz lässt sich nicht eindeutig zuordnen. Bitte prüfe die Bankreferenz oder den laufenden Saldo im früheren Auszug.',en:'An older transaction could not be matched reliably. Check the bank reference or running balance in the earlier statement.'})[getLanguage()]
+   : error.message;
+  $('commitImport').disabled=false;
+ }}
  finally{writeBusy=false;}
 });
 $('importDialog').addEventListener('cancel',event=>{if(writeBusy)event.preventDefault();});

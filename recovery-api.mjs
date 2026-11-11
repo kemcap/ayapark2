@@ -1,4 +1,4 @@
-import {AyaparkApi} from './api.mjs?v=20261105-owner-transfer';
+import {AyaparkApi} from './api.mjs?v=20261112-audit';
 
 // Recovery sessions stay in memory. This client never reads apartment or finance data.
 export class RecoveryApi extends AyaparkApi {
