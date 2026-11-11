@@ -1,0 +1,89 @@
+name: AyaPark 2 - One-time encrypted Supabase config backup
+on:
+  push:
+    branches: [feature/phase1-restore-preflight-20261030]
+    paths: [.github/workflows/phase1-supabase-config-backup.yml]
+permissions:
+  contents: read
+jobs:
+  snapshot-config:
+    if: github.repository == 'kemcap/ayapark2'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Install encryption and Google Drive tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends age rclone
+      - name: Export, encrypt, upload and read back
+        shell: bash
+        env:
+          SUPABASE_MANAGEMENT_TOKEN: ${{ secrets.AY_CONFIG_SUPABASE_TOKEN }}
+          RCLONE_CONFIG_B64: ${{ secrets.AY_BACKUP_RCLONE_CONFIG_B64 }}
+        run: |
+          set -Eeuo pipefail
+          umask 077
+          test -n "${SUPABASE_MANAGEMENT_TOKEN:-}"
+          test -n "${RCLONE_CONFIG_B64:-}"
+          scratch="$(mktemp -d)"
+          trap 'rm -rf "$scratch"' EXIT
+          chmod 700 "$scratch"
+          mkdir -m 700 "$scratch/config"
+          export RCLONE_CONFIG="$scratch/rclone.conf"
+          printf '%s' "$RCLONE_CONFIG_B64" | base64 --decode > "$RCLONE_CONFIG"
+          unset RCLONE_CONFIG_B64
+          chmod 600 "$RCLONE_CONFIG"
+          python3 - "$scratch/config" <<'PY'
+          import datetime, hashlib, json, os, pathlib, ssl, sys
+          from urllib.request import Request, build_opener, HTTPSHandler, HTTPRedirectHandler
+          from urllib.error import HTTPError
+          ref='eisozwhhinqszfikemot'
+          base='https://api.supabase.com'
+          endpoints={
+              'project':f'/v1/projects/{ref}',
+              'auth_config':f'/v1/projects/{ref}/config/auth',
+              'data_api_config':f'/v1/projects/{ref}/postgrest',
+              'realtime_config':f'/v1/projects/{ref}/config/realtime',
+              'storage_config':f'/v1/projects/{ref}/config/storage',
+              'edge_functions':f'/v1/projects/{ref}/functions'}
+          class NoRedirect(HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl): return None
+          opener=build_opener(HTTPSHandler(context=ssl.create_default_context()),NoRedirect())
+          target=pathlib.Path(sys.argv[1])
+          status={'project':ref,'captured_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'entries':{},'scope':'Supabase Management API, GET only','not_included':['unrecoverable original secrets','database rows','git source','external provider credentials']}
+          count=0
+          for name,path in endpoints.items():
+              req=Request(base+path,headers={'Authorization':'Bearer '+os.environ['SUPABASE_MANAGEMENT_TOKEN'],'Accept':'application/json'},method='GET')
+              try:
+                  with opener.open(req,timeout=30) as response:
+                      raw=response.read(5*1024*1024+1)
+                  if len(raw)>5*1024*1024: raise ValueError('size')
+                  obj=json.loads(raw)
+                  if not isinstance(obj,(dict,list)): raise ValueError('structure')
+                  if name=='project' and isinstance(obj,dict):
+                      if (obj.get('ref') or obj.get('id')) != ref: raise ValueError('project mismatch')
+                  payload=(json.dumps(obj,indent=2,sort_keys=True,ensure_ascii=False)+'\n').encode()
+                  with (target/(name+'.json')).open('xb') as out: out.write(payload)
+                  status['entries'][name]={'status':'backed_up','sha256':hashlib.sha256(payload).hexdigest(),'bytes':len(payload)}
+                  count+=1
+              except HTTPError as error:
+                  status['entries'][name]={'status':'unavailable','http_status':error.code}
+              except (ValueError,OSError) as error:
+                  status['entries'][name]={'status':'error','kind':type(error).__name__}
+          status['successful_sections']=count
+          status['expected_sections']=len(endpoints)
+          (target/'manifest.json').write_text(json.dumps(status,indent=2,sort_keys=True)+'\n')
+          print(f'Configuration exported: {count}/{len(endpoints)} sections (contents withheld)')
+          if count != len(endpoints):
+              raise SystemExit('Incomplete export; no file uploaded')
+          PY
+          unset SUPABASE_MANAGEMENT_TOKEN
+          timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+          name="ayapark2-supabase-config-${timestamp}-${GITHUB_RUN_ID}.tar.gz.age"
+          tar -C "$scratch" -czf - config | age -r 'age1amttspnqe7l3sdk3g4c725qgr0ta5a7x4as5fjd782wlkvvpjvmselx87p' -o "$scratch/$name"
+          test -s "$scratch/$name"
+          target="drive:AyaPark2-Backups/$name"
+          rclone copyto "$scratch/$name" "$target" --retries 3 --low-level-retries 5
+          local_sha="$(sha256sum "$scratch/$name" | awk '{print $1}')"
+          remote_sha="$(rclone cat "$target" | sha256sum | awk '{print $1}')"
+          test "$local_sha" = "$remote_sha"
+          echo "ENCRYPTED CONFIG BACKUP VERIFIED: $target"
+          echo "CIPHERTEXT SHA-256: $local_sha"
