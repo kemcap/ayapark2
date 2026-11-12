@@ -128,3 +128,28 @@ test('UI uses one chart module, local re-render, accessible keyboard and reduced
  assert.match(css,/:focus-visible/);
  assert.match(index,/finance-charts\.css\?v=[\d.]+/);
 });
+
+
+test('expense legend shows the highest category without a clipped inner scroll area',async()=>{
+ const previous=getLanguage();
+ try{
+  setLanguage('tr');
+  const expenses={summaryDays:[{
+   date:'2026-05-01',income_cents:0,expense_cents:66988233,
+   categories:{Temizlik:8110000,Diğer:23298233,Vidanjör:35580000}
+  }],transactions:[]};
+  const model=expenseDistributionModel(expenses,{},'2026');
+  assert.deepEqual(model.categories.map(([name])=>name),['Vidanjör','Diğer','Temizlik']);
+  const html=expenseDistributionPanel({data:expenses,expenseDistributionYear:'2026'},{});
+  const legendStart=html.indexOf('class="fch-donut-legend"');
+  const detailStart=html.indexOf('class="expense-distribution-items"');
+  const first=html.indexOf('data-chart-label="Vidanjör"',legendStart);
+  const second=html.indexOf('data-chart-label="Diğer"',legendStart);
+  const third=html.indexOf('data-chart-label="Temizlik"',legendStart);
+  assert(legendStart>=0&&first>legendStart&&second>first&&third>second&&detailStart>third);
+  assert.match(html,/class="expense-distribution-item-name">Vidanjör<\/span>/);
+  const css=await readFile(new URL('../finance-charts.css',import.meta.url),'utf8');
+  assert.match(css,/\.fch-donut-legend\{[^}]*max-height:none;overflow:visible/);
+  assert.doesNotMatch(css,/\.fch-donut-legend\{[^}]*max-height:\d+px/);
+ }finally{setLanguage(previous);}
+});

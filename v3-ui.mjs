@@ -193,7 +193,7 @@ export function announcementsV3(s){
  const items=rows.map(a=>{
   try{
    const id=e(String(a.id||'')),title=e(notificationTitle(a)||a.title||'—');
-   const subtitle=date(a.created_at)+' · '+e(a.author_label||tr('Yönetim'));
+   const subtitle=date(a.created_at)+' · '+e(a.author_label||tr('Yönetim'))+' · '+e(notificationState(a));
    const content='<p class="pre-wrap">'+e(notificationBody(a)||a.body||'')+'</p>';
    const open='<button type="button" class="button" data-notification="'+id+'">'+tr('Aç / Okudum')+'</button>';
    const controls=manage?'<div class="ay-announcement-management-actions">'+button(tr('Düzenle'),'announcement','data-id="'+id+'"')+(isAdmin?'<button type="button" class="button ay-announcement-delete" data-action="delete_announcement" data-id="'+id+'">'+(lang==='de'?'Mitteilung löschen':lang==='en'?'Delete announcement':'Duyuruyu sil')+'</button>':'')+'</div>':'';
