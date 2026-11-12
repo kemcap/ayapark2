@@ -1,5 +1,5 @@
-import {overviewAccountCard,unitMapV3} from './v3-ui.mjs?v=20261112-audit';
-import {card} from './ui.mjs?v=20261112-audit';
+import {overviewAccountCard,unitMapV3} from './v3-ui.mjs?v=20261112-resident-balance';
+import {card} from './ui.mjs?v=20261112-resident-balance';
 import {money,escapeHtml as e} from './core.mjs?v=perf1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {remaining} from './ledger.mjs?v=perf1';

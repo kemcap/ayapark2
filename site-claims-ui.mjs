@@ -8,6 +8,7 @@ const labels={
  own:['Dairenin açık borçları','Offene Forderungen zur Wohnung'],
  ownMany:['Dairelerimin açık borçları','Offene Forderungen zu Ihren Wohnungen'],
  site:['Sitenin Toplam Alacakları','Offene Forderungen der gesamten Wohnanlage'],
+ balance:['Site Hesap Bakiyesi','Kontostand der Wohnanlage','Site account balance'],
  ownNote:['Erişim yetkiniz olan dairelerin borçları; bu tutarın tamamı size ait olmayabilir.','Forderungen zu Ihren Wohnungen – unabhängig davon, wer diese schuldet.'],
  siteNote:['Sitedeki 20 dairenin tüm açık borçları dahildir. Bu tutar kişisel borcunuz değildir.','Enthält alle 20 Wohnungen – keine persönliche Schuldsumme.'],
  notAdd:['Bu iki tutar toplanmaz.','Beide Beträge dürfen nicht addiert werden.'],
@@ -33,7 +34,12 @@ const labels={
  itemDetail:['Borç detayları','Forderungsdetails'],
  none:['Bu dairede açık borç yok.','Keine offenen Forderungen für diese Wohnung.']
 };
-const text=(id)=>getLanguage()==='tr'?(labels[id]?.[0]||id):uiText(labels[id]?.[1]||id,getLanguage());
+const text=(id)=>{
+ const language=getLanguage(), label=labels[id];
+ if(language==='tr')return label?.[0]||id;
+ if(language==='en'&&label?.[2])return label[2];
+ return uiText(label?.[1]||id,language);
+};
 const valid=value=>Number.isSafeInteger(value)&&value>=0;
 
 const roleText=role=>text(({owner:'roleOwner',tenant:'roleTenant',representative:'roleRepresentative',debtor:'roleDebtor'})[role]||'');
@@ -59,14 +65,13 @@ export function residentClaimsDetail(s){
  return `<div class="dialog-kicker">AYAPARK 2</div><h2 id="detailTitle">${text('detailTitle')}</h2><p class="fine">${text('detailNote')}</p><div class="claim-unit-detail-list">${body||`<p>${text('none')}</p>`}</div>`;
 }
 export function residentClaimsCards(s){
- const stats=s.data.siteClaims;
+ const {siteClaims:stats,summaryBalance,ownIds}=s.data;
  const owned=valid(stats?.own_total_cents)?money(stats.own_total_cents):text('unavailable');
  const site=valid(stats?.site_total_cents)?money(stats.site_total_cents):text('unavailable');
- const count=stats?.site_unit_count??20;
- const ownCount=(s.data.ownIds||[]).length;
- const hint=text('siteNote').replace('20',String(count));
- return `<article class="card claim-metric"><div class="card-head"><div><h2>${text(ownCount>1?'ownMany':'own')}</h2><p>${text('ownNote')}</p></div></div><strong class="large-amount">${owned}</strong></article>`+
- `<article class="card claim-metric"><div class="card-head"><div><h2>${text('site')}</h2><p>${hint}</p></div></div><strong class="large-amount">${site}</strong><small>${text('notAdd')}</small></article>`;
+ const ownCount=ownIds?.length||0;
+ const metric=(label,amount)=>`<article class="card claim-metric"><h2>${text(label)}</h2><strong class="large-amount">${amount}</strong></article>`;
+ return `<article class="card claim-metric"><h2>${text(ownCount>1?'ownMany':'own')}</h2><p>${text('ownNote')}</p><strong class="large-amount">${owned}</strong></article>`+
+ `<div class="resident-site-metrics">${metric('site',site)}${metric('balance',money(summaryBalance))}</div>`;
 }
 export function residentClaimsPanel(s,{dashboard=false}={}){
  if(s.data.role!=='resident'||s.data.communityAccess===false)return '';
@@ -77,5 +82,5 @@ export function residentClaimsPanel(s,{dashboard=false}={}){
   ?`<p class="fine">${text('pending')}: <strong>${stats.unmatched_entry_count}</strong> · ${money(stats.unmatched_entry_cents)}. ${text('pendingNote')}</p>`:'';
  const staged=stats?.pending_source_count>0
   ?`<p class="fine">${text('staged')}: <strong>${stats.pending_source_count}</strong>. ${text('stagedNote')}</p>`:'';
- return `<section class="resident-claims-panel ${dashboard?'resident-dashboard-claims':''}" aria-label="${text('site')}"><div class="summary-grid">${residentClaimsCards(s)}</div>${breakdown}<div class="claims-notes"><p class="fine">${text('source')} ${text('notAdd')}</p>${pending}${staged}</div></section>`;
+ return `<section class="resident-claims-panel ${dashboard?'resident-dashboard-claims':''}" aria-label="${text('site')}"><div class="resident-claims-grid">${residentClaimsCards(s)}</div>${breakdown}<div class="claims-notes"><p class="fine">${text('siteNote').replace('20',String(stats?.site_unit_count??20))} ${text('source')} ${text('notAdd')}</p>${pending}${staged}</div></section>`;
 }

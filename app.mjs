@@ -30,26 +30,26 @@ import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,not
 import {bindDesign} from './design.mjs?v=5.10.0';
 import {enhanceTables} from './ui-accessibility.mjs?v=5.10.1';
 import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.10.1';
-import {apartmentInfo} from './apartment-info.mjs?v=20261112-audit';
+import {apartmentInfo} from './apartment-info.mjs?v=20261112-resident-balance';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=perf1';
 import {updateAssignmentForm} from './assignments.mjs?v=20261105-owner-transfer';
 import {suggestedOwnerEnd} from './owner-history.mjs?v=20261104';
-import {personManager} from './people-ui.mjs?v=20261112-audit';
+import {personManager} from './people-ui.mjs?v=20261112-resident-balance';
 import {renderHistoryPreview} from './history-preview.mjs?v=20261104';
 import {bindInvitations} from './invite-ui.mjs?v=perf1';
 import {mayPreview,nativePreviewRole,allowedPreviewRoles,residentPreviewOptions,previewProjection,previewBanner} from './access-preview.mjs?v=20261112-audit';
 import {bindInstall} from './install.mjs?v=20261105-owner-transfer';
 import {bindPasswordEyes} from './password-eye.mjs?v=5.10.1';
 import {sha256} from './hash.mjs?v=5.8.1';
-import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261112-audit';
+import {navigation,nextMobileNavGroup,unitResults,chargeDetail,providerDetail,info,residentClaimsDetail} from './v3-ui.mjs?v=20261112-resident-balance';
 import {rangeError,selectedRange,filteredTransactions,financialSeries,buildSummaryDays,announcementActive,acknowledgementKey} from './v3-domain.mjs?v=perf1';
 import {template} from './v3-import.mjs?v=perf1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=perf1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=20261105-owner-transfer';
 import {AyaparkApi} from './api.mjs?v=20261112-audit';
-import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261112-audit';
-import {buildForm,payloadFor} from './forms.mjs?v=20261112-audit';
+import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261112-resident-balance';
+import {buildForm,payloadFor} from './forms.mjs?v=20261112-resident-balance';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 const IS_PREVIEW=document.querySelector('meta[name="ayapark-stage"]')?.content==='preview';
 const $=id=>document.getElementById(id),api=new AyaparkApi(undefined,{previewOnly:IS_PREVIEW,persist:!IS_PREVIEW});
@@ -1019,7 +1019,7 @@ document.addEventListener('pointerout',event=>{if(event.target.closest('dialog')
 document.addEventListener('focusin',event=>{if(event.target.closest('dialog'))return;const el=event.target.closest('.info-help');if(el&&window.matchMedia('(hover:hover)').matches&&!el.open){el.dataset.focusOpen='1';el.open=true;}});
 document.addEventListener('focusout',event=>{if(event.target.closest('dialog'))return;const el=event.target.closest('.info-help');if(el?.dataset.focusOpen&&!el.contains(event.relatedTarget)){el.open=false;delete el.dataset.focusOpen;}});
 
-function applyAmountPrivacy(){if(!preferences().hideAmounts)return;for(const node of document.querySelectorAll('.apartment-balance,.numeric,.money-pair dd,.detail-grid strong,.metric strong,.report-total strong,.amount,.review-item strong,.compact-info,.debt-card strong,.bookkeeping-details strong')){if(/(?:TL|₺|TRY)/.test(node.textContent)){node.classList.add('amount-private');node.tabIndex=0;node.setAttribute('role','button');node.setAttribute('aria-label',tr('Tutarı göster'));}}}
+function applyAmountPrivacy(){if(!preferences().hideAmounts)return;for(const node of document.querySelectorAll('.apartment-balance,.numeric,.money-pair dd,.detail-grid strong,.metric strong,.report-total strong,.amount,.review-item strong,.compact-info,.debt-card strong,.bookkeeping-details strong,.resident-site-metrics .large-amount')){if(/(?:TL|₺|TRY)/.test(node.textContent)){node.classList.add('amount-private');node.tabIndex=0;node.setAttribute('role','button');node.setAttribute('aria-label',tr('Tutarı göster'));}}}
 document.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)&&event.target.classList.contains('amount-private')){event.preventDefault();event.target.click();}});
 async function loadAuditPage(page=0){
  if(state.auditLoading||!can(state,'admin'))return;

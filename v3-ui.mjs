@@ -9,8 +9,8 @@ import {apartmentAmounts} from './seven-ux.mjs?v=20261105-owner-transfer';
 import {financePanel} from './finance-forms.mjs?v=20261105-owner-transfer';
 import {notificationTitle,notificationBody,hasRead,receives,notificationCenter,notificationState,notificationExpired} from './notifications.mjs?v=20261105-owner-transfer';
 import {compactReview,reviewPanel} from './review-ui.mjs?v=perf1';
-import {apartmentInfo,unitDebtCategory} from './apartment-info.mjs?v=20261112-audit';
-import {assignmentCard,invitationButton} from './people-ui.mjs?v=20261112-audit';
+import {apartmentInfo,unitDebtCategory} from './apartment-info.mjs?v=20261112-resident-balance';
+import {assignmentCard,invitationButton} from './people-ui.mjs?v=20261112-resident-balance';
 import {displayedOwnerEnd,ownerHistoryIssues} from './owner-history.mjs?v=20261104';
 import {renderHistoryPreview,newestHistoryFirst} from './history-preview.mjs?v=20261104';
 import {unitDebtBuckets,formerDebtGroups} from './unit-debt-view.mjs?v=20261105-owner-transfer';
@@ -23,8 +23,8 @@ import {t as tr,locale} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money} from './core.mjs?v=perf1';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 import {remaining,paid,unassigned} from './ledger.mjs?v=20261105-owner-transfer';
-import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs?v=20261112-audit';
-import {residentClaimsPanel,residentClaimsDetail} from './site-claims-ui.mjs?v=20261105-owner-transfer';
+import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs?v=20261112-resident-balance';
+import {residentClaimsPanel,residentClaimsDetail} from './site-claims-ui.mjs?v=20261112-resident-balance';
 
 export {residentClaimsDetail};
 import {norm,today,activeAt,personLinks,personName,scopedCharges,filteredTransactions,selectedRange,rangeError,financialSeries,buildSummaryDays,announcementActive,announcementStatus,suggestUnits,creditAvailable,isReversed,acknowledgementKey,unitSearchMatches} from './v3-domain.mjs?v=perf1';
@@ -202,7 +202,7 @@ export function announcementsV3(s){
  }).join('');
  return headingHtml+(items||'<p class="muted">'+tr('Henüz duyuru yok.')+'</p>');
 }
-export function overviewAccountCard(s){
+export function overviewAccountCard(s,{showBalance=true}={}){
  const d=s.data;
  const opening=d.summaryOpening??d.opening;
  // Balance stays the current account balance; only inflow/outflow figures are rolling 12-month values.
@@ -217,7 +217,7 @@ export function overviewAccountCard(s){
  const period=locale().slice(0,2)==='tr'?'Son 12 ay':uiText('Letzte 12 Monate',locale().slice(0,2));
  return '<section class="overview-account-compact card" aria-label="'+e(header)+'">'+
  '<div class="overview-account-heading"><h2>'+e(header)+'</h2><span>'+e(period)+'</span></div>'+
- '<div class="overview-account-primary"><small>'+tr('Kayıtlara göre mevcut hesap bakiyesi')+'</small><strong class="large-amount">'+money(balance)+'</strong></div>'+
+ (showBalance?'<div class="overview-account-primary"><small>'+tr('Kayıtlara göre mevcut hesap bakiyesi')+'</small><strong class="large-amount">'+money(balance)+'</strong></div>':'')+
  '<div class="overview-account-figures">'+
  '<div><small>'+tr('Gelir')+'</small><strong>'+money(totals?.income??null)+'</strong></div>'+
  '<div><small>'+tr('Gider')+'</small><strong>'+money(totals?.expense??null)+'</strong></div></div>'+
@@ -237,7 +237,7 @@ export function overviewV3(s){const personalReminders=s.data.role==='resident'?c
    '<section class="resident-home-debts">'+residentClaimsPanel(s,{dashboard:true})+
    card(apartmentDebtTitle(),tr('Tutar, ödeme ve kalan borç.'),charges(s,list))+'</section>'+
    '<section class="resident-home-announcements">'+announcements+'</section>'+
-   '<section class="resident-home-finance">'+overviewAccountCard(s)+'</section>'+
+   '<section class="resident-home-finance">'+overviewAccountCard(s,{showBalance:false})+'</section>'+
    '<section class="resident-home-tasks">'+reminders+'</section>'+
    '</div>'+categoryBalanceSummary(s);
  }
