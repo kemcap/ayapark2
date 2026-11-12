@@ -1,5 +1,12 @@
 .resident-claims-panel { margin: 0 0 1.25rem; }
-.resident-claims-panel .summary-grid { margin-bottom: .7rem; }
+.resident-claims-grid,
+.resident-site-metrics { display:grid; gap:clamp(.5rem,2vw,1rem); min-width:0; }
+.resident-claims-grid { grid-template-columns:repeat(3,minmax(0,1fr)); margin-bottom:.7rem; }
+.resident-site-metrics { grid-column:span 2; grid-template-columns:repeat(2,minmax(0,1fr)); }
+.resident-claims-grid .claim-metric { min-width:0; margin:0; padding:clamp(.625rem,2vw,1.15rem); }
+.resident-claims-grid .claim-metric h2 { margin:0; font-size:1rem; line-height:1.3; overflow-wrap:anywhere; }
+.resident-claims-grid .claim-metric p { margin:.35rem 0; color:var(--muted); }
+.resident-site-metrics .claim-metric { display:flex; flex-direction:column; justify-content:space-between; }
 .claim-metric .large-amount { display: block; margin: .7rem 0 .3rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .claim-metric small { display:block; line-height: 1.5; }
 .claim-breakdown { margin: .65rem 0; }
@@ -9,8 +16,7 @@
 .claims-notes { margin: .3rem .25rem .65rem; }
 .claims-notes .fine { margin: .45rem 0; }
 @media (max-width: 600px) {
- .resident-claims-panel .summary-grid { display: grid; grid-template-columns: minmax(0,1fr); }
- .claim-metric .large-amount { font-size: clamp(1.45rem,5vw,2rem); }
+ .resident-claims-grid>.claim-metric .large-amount { font-size:clamp(1.45rem,5vw,2rem); }
 }
 
 /* Apartment-level claim summary opens a fully attributed, resident-scoped detail dialog. */
@@ -37,17 +43,13 @@
 :root[data-design] .main-grid.resident-main-grid{grid-template-columns:minmax(0,1fr)}
 .resident-apartments{margin:0 0 1.25rem;min-width:0}
 @media(max-width:900px){
- :root[data-design] .resident-claims-panel>.summary-grid,
  :root[data-design] .resident-apartments .building-plan,
  :root[data-design] .resident-apartments .unit-card-grid{display:grid;grid-template-columns:minmax(0,1fr);width:100%;min-width:0}
- :root[data-design] .resident-claims-panel .claim-metric{width:100%;min-width:0;box-sizing:border-box}
+ .resident-claims-grid { grid-template-columns:minmax(0,1fr); }
+ .resident-site-metrics { grid-column:1; }
+ .resident-claims-grid .resident-site-metrics>.claim-metric .large-amount { font-size:clamp(1.125rem,3.7vw,1.6rem); }
 }
 
-@media(max-width:900px){
- :root[data-design] .resident-claims-panel.resident-dashboard-claims>.summary-grid{grid-template-columns:minmax(0,1fr)}
- :root[data-design] .resident-claims-panel.resident-dashboard-claims>.summary-grid .card-head h2{font-size:1rem}
- :root[data-design] .resident-claims-panel.resident-dashboard-claims>.summary-grid .card-head p{font-size:.9rem}
-}
 .main-grid.resident-main-grid>div{min-width:0}
 @media(max-width:900px){
  .balance-toggle-action,.balance-toggle-action .balance-total{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
