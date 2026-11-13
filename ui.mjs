@@ -3,9 +3,9 @@ import {lawPage} from './law-info.mjs?v=perf1';
 import {decorateModernPage} from './modern-ui.mjs?v=5.10.0';
 import {settingsPage} from './settings-ui.mjs?v=20261112-audit';
 import {effectiveOccupancy} from './relationships.mjs?v=perf1';
-import {peoplePage} from './people-ui.mjs?v=20261112-resident-balance';
+import {peoplePage} from './people-ui.mjs?v=20261113-finance-colors';
 
-import {charges,duesV3,directoryV3,overviewV3,bankV3,reportV3,announcementsV3,providersV3,filteredUnitsV3,unitDetailV3,transactionDetailV3,transactionTableV3} from './v3-ui.mjs?v=20261112-resident-balance';
+import {charges,duesV3,directoryV3,overviewV3,bankV3,reportV3,announcementsV3,providersV3,filteredUnitsV3,unitDetailV3,transactionDetailV3,transactionTableV3} from './v3-ui.mjs?v=20261113-finance-colors';
 import {t as tr,locale} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName} from './core.mjs?v=perf1';
 import {paid,remaining,unassigned,monthlySummary,withLedgerIndex} from './ledger.mjs?v=20261105-owner-transfer';
@@ -21,7 +21,7 @@ export const demo=s=>s.mode==='demo';
 export const badge=(text,kind='')=>`<span class="badge ${kind}">${e(text)}</span>`;
 export const button=(text,action,args='',primary=false)=>`<button class="button ${primary?'primary':''}" data-action="${action}" ${args}>${text}</button>`;
 export const link=(p,text)=>`<a class="text-button" href="#${p}">${text}${icon('arrow')}</a>`;
-export const card=(title,sub,body,action='')=>`<article class="card"><div class="card-head"><div><h2>${title}</h2><p>${sub}</p></div>${action}</div>${body}</article>`;
+export const card=(title,sub,body,action='',tone='')=>`<article class="card${tone?' '+tone:''}"><div class="card-head"><div><h2>${title}</h2><p>${sub}</p></div>${action}</div>${body}</article>`;
 export const empty=(title,desc)=>`<div class="empty"><div class="icon-box">${icon('reports')}</div><h3>${title}</h3><p>${desc}</p></div>`;
 export function heading(s,title,desc,actions=''){return `<div class="print-only">Ayapark 2 · ${demo(s)?tr("ÖRNEK VERİLER — RESMİ RAPOR DEĞİLDİR"):tr("Hesap dökümü")} · ${date(new Date())}</div><div class="page-heading"><div><div class="eyebrow">${demo(s)?tr("ÖRNEK DÖNEM · EKİM 2026"):'AYAPARK 2 · '+roleName(s.data.role).toLocaleUpperCase(locale())}</div><h1>${title}</h1><p>${desc}</p></div><div class="heading-actions">${actions}</div></div>`;}
 export const metric=(label,value,note,i='reports',amber=false)=>`<div class="metric"><div class="meta">${label}<span class="icon-box ${amber?'amber':''}">${icon(i)}</span></div><strong>${value}</strong><small>${note}</small></div>`;

@@ -1,5 +1,5 @@
-import {overviewAccountCard,unitMapV3} from './v3-ui.mjs?v=20261112-resident-balance';
-import {card} from './ui.mjs?v=20261112-resident-balance';
+import {overviewAccountCard,unitMapV3} from './v3-ui.mjs?v=20261113-finance-colors';
+import {card} from './ui.mjs?v=20261113-finance-colors';
 import {money,escapeHtml as e} from './core.mjs?v=perf1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {remaining} from './ledger.mjs?v=perf1';
@@ -17,13 +17,13 @@ export function managementHomePreview(s){
  const notices=(d.announcements||[]).filter(announcementActive);
  const unitCount=(d.units||[]).length;
  const balance=d.summaryBalance??(d.opening==null?null:Number(d.opening)+(d.transactions||[]).reduce((n,x)=>n+Number(x.cents||0),0));
- const stat=(label,value,href)=>`<a class="ay-preview-stat" href="#${href}"><small>${e(label)}</small><strong>${e(value)}</strong><span aria-hidden="true">↗</span></a>`;
+ const stat=(label,value,href,tone='')=>`<a class="ay-preview-stat${tone?' '+tone:''}" href="#${href}"><small>${e(label)}</small><strong>${e(value)}</strong><span aria-hidden="true">↗</span></a>`;
  const notice=`<a class="ay-preview-notice" href="#announcements"><span class="ay-preview-bell" aria-hidden="true">◉</span><span><strong>${tr('Duyurular')}</strong><small>${notices.length?notices.length+' '+tr('duyuru'):'Yeni duyuru yok'}</small></span><b>${notices.length}</b><span aria-hidden="true">›</span></a>`;
  return `<div class="ay-preview-management">
  <header class="ay-preview-heading"><div><h1>Siteniz bugün nasıl?</h1><p>Güncel mali durum, bekleyen işlemler ve site bilgileri.</p></div><span class="ay-preview-label">Yeni düzen · Test</span></header>
  <section class="ay-preview-stats" aria-label="Genel göstergeler">
- ${stat('Site bakiyesi',money(balance),'reports')}
- ${stat('Açık alacaklar',money(open),'dues')}
+ ${stat('Site bakiyesi',money(balance),'reports','site-account-balance')}
+ ${stat('Açık alacaklar',money(open),'dues','site-receivables')}
  ${stat('Bekleyen kayıtlar',String(pending),'dues')}
  ${stat('Daireler',String(unitCount),'units')}
  </section>
