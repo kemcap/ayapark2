@@ -78,7 +78,7 @@ test('resident pages place the site account balance after the total claims',asyn
  const cards=residentClaimsCards(state);
  const html=residentClaimsPanel(state);
  assert.match(cards,/Açık|alacak|borç/i);
- assert.equal((cards.match(/class="card claim-metric"/g)||[]).length,3);
+ assert.equal((cards.match(/class="card claim-metric[^"]*"/g)||[]).length,3);
  assert.match(cards,/resident-site-metrics.*Sitenin Toplam Alacakları.*Site Hesap Bakiyesi.*1\.234,56/);
  assert.match(residentClaimsCards({data:{...data,summaryBalance:null}}),/Site Hesap Bakiyesi<\/h2><strong[^>]*>—/);
  assert.match(residentClaimsCards({data:{...data,summaryBalance:-123456}}),/Site Hesap Bakiyesi.*-₺1\.234,56/);

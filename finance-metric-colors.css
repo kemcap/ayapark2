@@ -1,0 +1,49 @@
+/* Use the existing palette for the same financial figures across roles and views. */
+.site-account-balance {
+ --finance-metric-bg: var(--modern-lime, #dcf58b);
+ --finance-metric-ink: #1b2d24;
+ --finance-metric-border: #9caf62;
+}
+.site-receivables {
+ --finance-metric-bg: var(--orange-bg);
+ --finance-metric-ink: var(--orange);
+ --finance-metric-border: var(--debt-line);
+}
+:is(.site-account-balance,.site-receivables) {
+ background: var(--finance-metric-bg);
+ border-color: var(--finance-metric-border);
+ color: var(--finance-metric-ink);
+}
+:is(.site-account-balance,.site-receivables) :is(h2,small,strong,span,p) {
+ color: inherit;
+}
+:root[data-design] .summary-grid > .site-receivables,
+:root[data-design] .report-metrics > .site-account-balance,
+.dues-workspace .dues-kpi.site-receivables,
+.category-balance-summary .site-receivables {
+ background: var(--finance-metric-bg);
+ border-color: var(--finance-metric-border);
+ color: var(--finance-metric-ink);
+}
+:root[data-design] .summary-grid > .site-receivables :is(h2,.large-amount),
+:root[data-design] .report-metrics > .site-account-balance small,
+.dues-workspace .dues-kpi.site-receivables > :is(span,small),
+.category-balance-summary .site-receivables strong {
+ color: inherit;
+}
+.overview-account-primary.site-account-balance, .dues-kpi.site-receivables {
+ border-radius: 12px;
+}
+.overview-account-primary.site-account-balance { padding: 12px 14px; }
+.finance-amount-inline, .balance-total.site-receivables { padding: .2em .45em; border-radius: .4em; }
+.category-balance-summary .balance-mobile-total.site-receivables { padding: .45em .65em; border-radius: .5em; }
+.unit-debt-amount,
+.ay-unit-tile-finance > .unit-debt-amount,
+.ay-unit-metric > .unit-debt-amount,
+.ay-unit-overview-rows .unit-debt-amount,
+.category-balance-summary .unit-debt-amount {
+ color: var(--red);
+}
+@media (forced-colors: active) {
+ :is(.site-account-balance,.site-receivables) { border: 1px solid CanvasText; }
+}

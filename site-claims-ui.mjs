@@ -59,8 +59,8 @@ export function residentClaimsDetail(s){
  const body=units.map(unit=>{
   const rows=open.filter(c=>c.unit_id===unit.id).sort((a,b)=>String(a.due_on||'').localeCompare(String(b.due_on||'')));
   const sum=rows.reduce((n,c)=>n+remaining(d,c),0);
-  const items=rows.map(c=>`<div class="claim-debt-row"><div class="claim-debt-main"><strong>${escape(c.label||c.category||'—')}</strong><small>${text('responsible')}: ${escape(debtorLabel(d,c))}</small><small>${text('due')}: ${dueText(c.due_on)}</small></div><div class="claim-debt-actions"><strong>${money(remaining(d,c))}</strong><button type="button" class="button" data-action="charge_detail" data-id="${escape(c.id)}">${text('itemDetail')}</button></div></div>`).join('');
-  return `<section class="claim-unit-details"><div class="claim-unit-head"><h3>${escape(unit.code)}</h3><strong>${money(sum)}</strong></div>${items||`<p class="muted">${text('none')}</p>`}</section>`;
+  const items=rows.map(c=>`<div class="claim-debt-row"><div class="claim-debt-main"><strong>${escape(c.label||c.category||'—')}</strong><small>${text('responsible')}: ${escape(debtorLabel(d,c))}</small><small>${text('due')}: ${dueText(c.due_on)}</small></div><div class="claim-debt-actions"><strong class="unit-debt-amount">${money(remaining(d,c))}</strong><button type="button" class="button" data-action="charge_detail" data-id="${escape(c.id)}">${text('itemDetail')}</button></div></div>`).join('');
+  return `<section class="claim-unit-details"><div class="claim-unit-head"><h3>${escape(unit.code)}</h3><strong${sum>0?' class="unit-debt-amount"':''}>${money(sum)}</strong></div>${items||`<p class="muted">${text('none')}</p>`}</section>`;
  }).join('');
  return `<div class="dialog-kicker">AYAPARK 2</div><h2 id="detailTitle">${text('detailTitle')}</h2><p class="fine">${text('detailNote')}</p><div class="claim-unit-detail-list">${body||`<p>${text('none')}</p>`}</div>`;
 }
@@ -69,9 +69,9 @@ export function residentClaimsCards(s){
  const owned=valid(stats?.own_total_cents)?money(stats.own_total_cents):text('unavailable');
  const site=valid(stats?.site_total_cents)?money(stats.site_total_cents):text('unavailable');
  const ownCount=ownIds?.length||0;
- const metric=(label,amount)=>`<article class="card claim-metric"><h2>${text(label)}</h2><strong class="large-amount">${amount}</strong></article>`;
- return `<article class="card claim-metric"><h2>${text(ownCount>1?'ownMany':'own')}</h2><p>${text('ownNote')}</p><strong class="large-amount">${owned}</strong></article>`+
- `<div class="resident-site-metrics">${metric('site',site)}${metric('balance',money(summaryBalance))}</div>`;
+ const metric=(label,amount,tone)=>`<article class="card claim-metric ${tone}"><h2>${text(label)}</h2><strong class="large-amount">${amount}</strong></article>`;
+ return `<article class="card claim-metric"><h2>${text(ownCount>1?'ownMany':'own')}</h2><p>${text('ownNote')}</p><strong class="large-amount${stats?.own_total_cents>0?' unit-debt-amount':''}">${owned}</strong></article>`+
+ `<div class="resident-site-metrics">${metric('site',site,'site-receivables')}${metric('balance',money(summaryBalance),'site-account-balance')}</div>`;
 }
 export function residentClaimsPanel(s,{dashboard=false}={}){
  if(s.data.role!=='resident'||s.data.communityAccess===false)return '';

@@ -18,10 +18,10 @@ try{
   const [{fullDemo},ui,i18n,{prepareV5Demo},pageUI]=await Promise.all([import('/ledger.mjs?v=5.10.0'),import('/v3-ui.mjs?v=5.10.0'),import('/i18n.mjs?v=5.10.0'),import('/finance-demo.mjs?v=5.10.0'),import('/ui.mjs?v=5.10.0')]);
   window.qaRender=({lang,view,design,theme,font,community=true,role='resident'})=>{
    i18n.setLanguage(lang);Object.assign(document.documentElement.dataset,{design,theme,palette:'park',contrast:'normal'});document.documentElement.style.fontSize=font+'px';
-   let d=prepareV5Demo(fullDemo());d.role=role;d.communityAccess=community;d.currentMember=true;d.managementRead=role==='staff';d.capabilities={admin:false,people:false,finance:false,announcements:false};d.taskGrants=[{user_id:'staff',tasks:[],management_read:true}];
-   d.charges=[{id:'owner-claim',unit_id:'A-4',person_id:'demo-owner',link_id:'demo-owner-link',payer:'owner',category:'Repair',label:'Synthetic owner repair',due_on:'2026-10-01',cents:10000},{id:'tenant-claim',unit_id:'A-4',person_id:'demo-tenant',link_id:'demo-tenant-link',payer:'tenant',category:'Aidat',label:'Synthetic tenant dues',due_on:'2026-10-01',cents:20000}];d.allocations=[{id:'owner-payment',charge_id:'owner-claim',entry_id:'synthetic-entry',cents:3000},{id:'tenant-payment',charge_id:'tenant-claim',entry_id:'synthetic-entry',cents:4000}];d.transactions=[{id:'synthetic-entry',cents:7000,date:'2026-10-15',desc:'Synthetic payment'}];d.siteClaims={own_total_cents:10000,site_total_cents:12658000,own_units:[{id:'A-4',code:'A-4',open_cents:10000}],site_unit_count:20};d.summaryBalance=14284050;
+   let d=prepareV5Demo(fullDemo());d.role=role;d.communityAccess=community;d.currentMember=true;d.managementRead=role==='staff';d.capabilities={admin:role==='super',people:role==='super',finance:role==='super',announcements:false};d.taskGrants=[{user_id:'staff',tasks:[],management_read:true}];
+   d.charges=[{id:'owner-claim',unit_id:'A-4',person_id:'demo-owner',link_id:'demo-owner-link',payer:'owner',category:'Repair',label:'Synthetic owner repair',due_on:'2026-10-01',cents:10000},{id:'tenant-claim',unit_id:'A-4',person_id:'demo-tenant',link_id:'demo-tenant-link',payer:'tenant',category:'Aidat',label:'Synthetic tenant dues',due_on:'2026-10-01',cents:20000}];d.allocations=[{id:'owner-payment',charge_id:'owner-claim',entry_id:'synthetic-entry',cents:3000},{id:'tenant-payment',charge_id:'tenant-claim',entry_id:'synthetic-entry',cents:4000}];d.transactions=[{id:'synthetic-entry',cents:7000,date:'2026-10-15',desc:'Synthetic payment'}];d.ownIds=['A-4'];d.ownPersonIds=['demo-tenant','demo-owner'];d.siteClaims={own_total_cents:10000,site_total_cents:12658000,own_units:[{id:'A-4',code:'A-4',open_cents:10000}],site_unit_count:20};d.summaryBalance=14284050;
    if(role==='resident')d.units=d.units.filter(x=>d.ownIds.includes(x.id));
-   const s={data:d,mode:'connected',page:view,period:'2026-10',filter:{q:'STALE FILTER',block:'B',status:'debt',type:'all',preset:'all'},reportFilter:{preset:'all'}};
+   const s={data:d,mode:'connected',page:view,period:'2026-10',filter:{q:role==='resident'?'STALE FILTER':'',block:role==='resident'?'B':'all',status:role==='resident'?'debt':'all',type:'all',preset:'all'},reportFilter:{preset:'all'}};
    window.scrollTo(0,0);window.qaState=s;document.querySelector('#content').innerHTML=pageUI.renderPage(s);
    document.querySelector('#content').onclick=e=>{const b=e.target.closest('[data-action="unit"]');if(b){document.querySelector('#detailContent').innerHTML=ui.unitDetailV3(s,b.dataset.id);document.querySelector('#detailDialog').showModal();}};
   };
@@ -47,10 +47,36 @@ try{
  for(const width of [375,1440]){
   await page.setViewportSize({width,height:1100});
   await page.evaluate(()=>qaRender({lang:'tr',view:'overview',design:'modern',theme:'dark',font:16}));
-  await page.locator('.resident-site-metrics').screenshot({path:resolve(resultsDir,'site-kartlari-'+width+'.png')});
+  await page.locator('.resident-claims-grid').screenshot({path:resolve(resultsDir,'site-kartlari-'+width+'.png')});
  }
  await page.evaluate(()=>qaRender({lang:'de',view:'units',design:'modern',theme:'light',font:16,community:false}));check('historical/resident fallback still has apartment card',await page.locator('.resident-apartments .apartment-open').count()===1);check('historical-only resident cannot see the balance card',await page.locator('.resident-site-metrics').count()===0);
  await page.evaluate(()=>qaRender({lang:'de',view:'units',design:'modern',theme:'light',font:16,role:'staff'}));check('management keeps existing search',await page.locator('#unitSearch').count()===1);check('read-only management has no assignment edit controls',await page.locator('[data-action="assignment_add"],[data-action="occupancy"],[data-action="auto_allocate"]').count()===0);
+ for(const theme of ['light','dark'])for(const design of ['classic','modern'])for(const [role,view,selectors] of [
+  ['resident','overview',['.resident-site-metrics .site-account-balance','.resident-site-metrics .site-receivables','.resident-claims-grid .unit-debt-amount']],
+  ['super','overview',['.overview-account-primary.site-account-balance','.summary-grid .site-receivables']],
+  ['super','reports',['.report-metrics .site-account-balance']],
+  ['super','dues',['.dues-kpi.site-receivables']],
+  ['super','units',['[data-id="A-4"] .unit-debt-amount']],
+ ]){
+  await page.evaluate(options=>qaRender(options),{lang:'tr',view,design,theme,font:16,role});
+  for(const selector of selectors){
+   const target=page.locator('#content '+selector).first();
+   check(selector+' is rendered',await target.count()===1);
+   const readable=await target.evaluate(node=>{
+    const isDebt=node.matches('.unit-debt-amount'), amount=isDebt?node:node.querySelector('strong');
+    const rgb=color=>color.match(/[\d.]+/g).slice(0,3).map(Number);
+    const tone=(name,fallback)=>{const value=getComputedStyle(node).getPropertyValue(name).trim()||fallback;const test=document.createElement('i');test.style.color=value;node.append(test);const resolved=getComputedStyle(test).color;test.remove();return resolved;};
+    const actual=isDebt?getComputedStyle(amount).color:getComputedStyle(node).backgroundColor;
+    const expected=isDebt?tone('--red'):node.matches('.site-account-balance')?tone('--modern-lime','#dcf58b'):tone('--orange-bg');
+    let background=node;
+    while(background.parentElement&&getComputedStyle(background).backgroundColor==='rgba(0, 0, 0, 0)')background=background.parentElement;
+    const luminance=color=>rgb(color).map(x=>x/255).map(x=>x<=0.04045?x/12.92:((x+0.055)/1.055)**2.4).reduce((sum,x,i)=>sum+x*[.2126,.7152,.0722][i],0);
+    const levels=[luminance(getComputedStyle(amount).color),luminance(getComputedStyle(background).backgroundColor)].sort((a,b)=>a-b);
+    return actual===expected&&(levels[1]+.05)/(levels[0]+.05)>=4.5;
+   });
+   check([theme,design,role,view,selector,'uses the intended palette with readable contrast'].join(' '),readable);
+  }
+ }
  check('no external transport',external.length===0);check('no JS errors',errors.length===0);
  const result={passed,failed:0,external,errors,scope:'synthetic actual renderers, full production stylesheet cascade, 320/375 enlarged text/430/768/1440, DE/TR/EN, Classic/Modern, resident overview/units, actual unit click, read-only management'};await writeFile(resolve(resultsDir,'resident-management-layout-browser.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
 }finally{await browser.close();}
