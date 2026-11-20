@@ -1,0 +1,28 @@
+name: Recovery API live smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/ay3-recovery-requests/index.ts'
+      - '.github/workflows/recovery-api-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test live recovery endpoint without submitting user data
+        shell: bash
+        run: |
+          set -euo pipefail
+          endpoint='https://eisozwhhinqszfikemot.supabase.co/functions/v1/ay3-recovery-requests'
+          code=$(curl --silent --show-error --output /tmp/ay-preflight --write-out '%{http_code}' -X OPTIONS "$endpoint" -H 'Origin: https://kemcap.github.io' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: apikey, content-type')
+          echo "CORS preflight HTTP $code"
+          test "$code" = "204"
+          code=$(curl --silent --show-error --output /tmp/ay-invalid --write-out '%{http_code}' -X POST "$endpoint" -H 'Origin: https://kemcap.github.io' -H 'Content-Type: application/json' --data '{"action":"submit","phone":"not-a-phone"}')
+          echo "Invalid phone HTTP $code"
+          test "$code" = "400"
+          code=$(curl --silent --show-error --output /tmp/ay-denied --write-out '%{http_code}' -X POST "$endpoint" -H 'Origin: https://kemcap.github.io' -H 'Content-Type: application/json' --data '{"action":"list"}')
+          echo "Unauthenticated listing HTTP $code"
+          test "$code" = "401"
