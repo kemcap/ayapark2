@@ -1,0 +1,33 @@
+name: Phone country login regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'auth-policy.mjs'
+      - 'api.mjs'
+      - 'app.mjs'
+      - 'index.html'
+      - 'phone-country-codes.mjs'
+      - 'tests/auth-phase3.test.mjs'
+      - 'tests/login-dialog.test.mjs'
+      - 'tests/phone-country-codes.test.mjs'
+      - '.github/workflows/auth-phone-country.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  phone-country-login:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check browser and shared auth modules
+        run: |
+          node --check app.mjs
+          node --check api.mjs
+          node --check auth-policy.mjs
+          node --check phone-country-codes.mjs
+      - name: Run auth and country-picker regression tests
+        run: node --test tests/auth-phase3.test.mjs tests/login-dialog.test.mjs tests/phone-country-codes.test.mjs
