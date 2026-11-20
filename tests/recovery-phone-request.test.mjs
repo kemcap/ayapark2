@@ -41,7 +41,7 @@ test('recovery queue is below the main page and not a dashboard card',()=>{
  assert.match(app,/combinedNotificationList\(notificationData\(\)\)/);
  assert.match(app,/phoneRecoveryUi\.openManager\(\)/);
  assert.match(ui,/s\.data\?\.role==='super'/);
- assert.match(ui,/s\.page==='persons'/);
+ assert.match(ui,/getState\(\)\.page==='persons'/);
  assert.match(ui,/if\(!openCount\(\)\|\|getState\(\)\.page!=='overview'\)return/);
  assert.match(ui,/action:'list'/);
  assert.match(ui,/action:'update'/);
@@ -80,6 +80,7 @@ test('recovery queue, bell and dashboard remain quiet with zero pending requests
  await ui.load({force:true});
  assert.equal(ui.openCount(),2);
  assert.match(ui.notificationHTML(),/data-recovery-notice/);
+ ui.hint();
  assert.match(content.html,/phoneRecoveryHint/);
  assert.equal(ui.openManager(),'persons');
  state.data.role='resident';ui.panel();ui.hint();
