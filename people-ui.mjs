@@ -14,6 +14,20 @@ import {recoveryEligible} from './admin-recovery-ui.mjs?v=5.10.0';
 import {inviteEligible} from './invite-ui.mjs?v=perf1';
 import {getLanguage} from './i18n.mjs?v=5.10.0';
 const loc=(de,trText)=>(getLanguage()==='tr'?(trText):(uiText(de,getLanguage())));
+const accountHelp=(s,p)=>{
+ if(s.data.role!=='super')return '';
+ const lang=getLanguage();
+ const copy=!p.auth_user_id?{
+  tr:'Bu kişiye bağlı giriş hesabı bulunamadı. Kişi bilgilerine e-posta eklemek tek başına giriş hesabı oluşturmaz. Mevcut hesap bağlantısını kontrol et.',
+  de:'Für diese Person ist kein Anmeldekonto verknüpft. Das Hinterlegen einer E-Mail bei den Kontaktdaten erstellt kein Anmeldekonto. Prüfe zuerst die vorhandene Kontoverknüpfung.',
+  en:'No sign-in account is linked to this person. Adding an email to contact details does not create a sign-in account. Check for an existing account link first.'
+ }:{
+  tr:'Giriş hesabı bağlı. Şifre yenileme, giriş hesabındaki e-posta adresine gönderilir; kişi bilgilerindeki adres farklı olabilir.',
+  de:'Ein Anmeldekonto ist verknüpft. Passwort-Links gehen an die E-Mail-Adresse des Anmeldekontos; sie kann von der Kontaktadresse abweichen.',
+  en:'A sign-in account is linked. Password reset links go to that account’s email, which may differ from the contact email.'
+ };
+ return '<p class="fine">'+e(copy[lang]||copy.tr)+'</p>';
+};
 const recoveryButton=(s,p,compact=false)=>!p.provisional&&recoveryEligible(s,p)?button(compact?loc('Erneuern','Yenile'):loc('Zugang wiederherstellen','Erişimi yenile'),'recover_person',`data-id="${e(p.id)}" aria-label="${e(loc('Zugang wiederherstellen: ','Erişimi yenile: ')+p.full_name)}"`):'';
 const managementRoleButton=(s,p)=>can(s,'admin')&&!p.archived_at&&!(s.data.staff||[]).some(m=>m.user_id===p.auth_user_id)?button(loc('Zur Verwaltung hinzufügen','Yönetime ekle'),'user_access',`data-person="${e(p.id)}"`):'';
 const personDeleteButton=(s,p)=>can(s,'admin')?button(loc('Person löschen','Kişiyi sil'),'person_lifecycle',`data-id="${e(p.id)}" data-destructive="true" title="${loc('Person löschen oder archivieren','Kişiyi sil veya arşivle')}"`):'';
@@ -56,5 +70,5 @@ export function personManager(s,id){
   ? (archived?button(loc('Wiederherstellen','Arşivden çıkar'),'person_restore',`data-id="${e(id)}"`):'')
     +personDeleteButton(s,p)
   :'';
- return `<h2 id="detailTitle">${e(p.full_name)}</h2>${archived?`<div class="info-strip"><strong>${loc('Archivierte Person','Arşivlenen kişi')}</strong><p>${e(p.archive_note||'—')}</p></div>`:''}<section class="person-card"><h3>${tr('Kişi bilgileri')}</h3><div class="person-login-inline">${registrationStatus(p)}${loginLink(s,p)}${pushStatus(s,p)}</div><p>${e(p.phone||'—')} · ${e(p.email||'—')}</p>${p.notes?`<p class="pre-wrap">${e(p.notes)}</p>`:''}${archived?'':button(tr('Kişi bilgilerini düzenle'),'person',`data-id="${e(id)}"`)} ${invitationButton(s,p)} ${managementRoleButton(s,p)} ${lifecycle}</section><section><div class="row"><h3>${tr('Güncel roller')}</h3>${archived?'':button(tr('Kişi ekle'),'assignment_add',`data-person="${e(id)}"`)}</div>${current.map(l=>assignmentCard(s,l,true)).join('')||`<p>${tr('Güncel daire bağlantısı yok.')}</p>`}</section>${history.length?`<details class="assignment-history"><summary>${tr('Önceki roller')} (${history.length})</summary>${renderHistoryPreview(history,l=>assignmentCard(s,l,true))}</details>`:''}`;
+ return `<h2 id="detailTitle">${e(p.full_name)}</h2>${archived?`<div class="info-strip"><strong>${loc('Archivierte Person','Arşivlenen kişi')}</strong><p>${e(p.archive_note||'—')}</p></div>`:''}<section class="person-card"><h3>${tr('Kişi bilgileri')}</h3><div class="person-login-inline">${registrationStatus(p)}${loginLink(s,p)}${pushStatus(s,p)}</div>${accountHelp(s,p)}<p>${e(p.phone||'—')} · ${e(p.email||'—')}</p>${p.notes?`<p class="pre-wrap">${e(p.notes)}</p>`:''}${archived?'':button(tr('Kişi bilgilerini düzenle'),'person',`data-id="${e(id)}"`)} ${invitationButton(s,p)} ${managementRoleButton(s,p)} ${lifecycle}</section><section><div class="row"><h3>${tr('Güncel roller')}</h3>${archived?'':button(tr('Kişi ekle'),'assignment_add',`data-person="${e(id)}"`)}</div>${current.map(l=>assignmentCard(s,l,true)).join('')||`<p>${tr('Güncel daire bağlantısı yok.')}</p>`}</section>${history.length?`<details class="assignment-history"><summary>${tr('Önceki roller')} (${history.length})</summary>${renderHistoryPreview(history,l=>assignmentCard(s,l,true))}</details>`:''}`;
 }
