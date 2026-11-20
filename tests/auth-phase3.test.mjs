@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {newPasswordError,classifyIdentifier} from '../auth-policy.mjs?v=5.8.1';
+import {newPasswordError,classifyIdentifier,loginWithCountry} from '../auth-policy.mjs?v=20261120-country-login';
 import {AyaparkApi} from '../api.mjs?v=5.10.0';
 import {passwordLoginHandler} from '../supabase/functions/ay3-password-login/handler.mjs';
 const session={access_token:'synthetic-access',refresh_token:'synthetic-refresh',expires_in:3600,user:{id:'existing-user'}};
@@ -7,6 +7,18 @@ function server(overrides={}){const calls=[];const options={enabled:true,origins
 const request=(data,extra={})=>new Request('https://backend.invalid/login',{method:'POST',headers:{Origin:'https://test.invalid','Content-Type':'application/json',...extra},body:JSON.stringify(data)});
 test('new passwords accept exactly six plain characters, preserve spaces and do not impose character classes',()=>{assert.equal(newPasswordError('abcdef'),null);assert.equal(newPasswordError('123456'),null);assert.equal(newPasswordError(' ab cd'),null);assert.equal(newPasswordError('abcde'),'short');assert.equal(newPasswordError('x'.repeat(257)),'long');});
 test('identifiers normalize Turkish and international phone formats while preserving email',()=>{for(const value of ['0532 123 45 67','5321234567','+90 (532) 123-45-67','00905321234567'])assert.deepEqual(classifyIdentifier(value),{kind:'phone',value:'+905321234567'});assert.equal(classifyIdentifier('Name@example.invalid').value,'Name@example.invalid');assert.equal(classifyIdentifier('5321234567@not-an-email'),null);});
+test('national numbers use selected country without rewriting international numbers or emails',()=>{
+ assert.equal(loginWithCountry('0151 12345678','49'),'+4915112345678');
+ assert.equal(loginWithCountry('15112345678','49'),'+4915112345678');
+ assert.equal(loginWithCountry('0532 1234567','90'),'+905321234567');
+ assert.equal(loginWithCountry('5321234567','90'),'+905321234567');
+ assert.equal(loginWithCountry('0676 1234567','43'),'+436761234567');
+ assert.equal(loginWithCountry('0049 151 12345678','90'),'0049 151 12345678');
+ assert.equal(loginWithCountry('+49 151 12345678','90'),'+49 151 12345678');
+ assert.equal(loginWithCountry('4915112345678','90'),'+4915112345678');
+ assert.equal(loginWithCountry('resident@example.invalid','49'),'resident@example.invalid');
+ assert.equal(loginWithCountry('015112345678',''),'015112345678');
+});
 test('verified phone login uses the existing account and never returns its email',async()=>{const {handler,calls}=server();const r=await handler(request({identifier:'05321234567',password:'abcdef'}));const data=await r.json();assert.equal(r.status,200);assert.equal(data.user.id,'existing-user');assert.equal(calls[0].email,'existing@example.invalid');assert(!JSON.stringify(data).includes('existing@example.invalid'));});
 test('unknown contacts and wrong passwords receive the same neutral response',async()=>{const unknown=server({admin:{limit:async()=>true,lookup:async()=>null}});const wrong=server({signIn:async()=>null});const a=await unknown.handler(request({identifier:'+905321234567',password:'abcdef'})),b=await wrong.handler(request({identifier:'+905321234567',password:'wrong'}));assert.equal(a.status,b.status);assert.deepEqual(await a.json(),await b.json());assert.equal(unknown.calls.length,1);});
 test('rate limiting and disabled/untrusted ingress stop before password verification',async()=>{for(const overrides of [{enabled:false},{clientIp:()=>null},{admin:{limit:async()=>false}}]){const {handler,calls}=server(overrides);const r=await handler(request({identifier:'+905321234567',password:'abcdef'}));assert([429,503].includes(r.status));assert.equal(calls.length,0);}});
@@ -15,4 +27,18 @@ test('binding requires an authenticated actor and explicit verification confirma
 test('infrastructure failures are not presented as a wrong password',async()=>{const {handler}=server({admin:{limit:async()=>{throw Error('database offline');}}});const r=await handler(request({identifier:'+905321234567',password:'abcdef'}));assert.equal(r.status,503);assert.equal((await r.json()).error,'service_unavailable');});
 test('client selects verified phone endpoint, preserves email login, and never falls back to another account',async()=>{const calls=[];const api=new AyaparkApi(async(url,init)=>{calls.push({url,body:JSON.parse(init.body||'{}')});return {ok:true,status:200,json:async()=>url.includes('/token')||url.includes('password-login')?session:{id:'existing-user'}};},{persist:false,verifiedPhoneLogin:true});await api.login('05321234567','abcdef');assert(calls[0].url.includes('ay3-password-login'));calls.length=0;await api.login('existing@example.invalid','abcdef');assert(calls[0].url.includes('grant_type=password'));const denied=new AyaparkApi(async()=>({ok:false,status:400,json:async()=>({error:'invalid_credentials'})}),{persist:false,verifiedPhoneLogin:true});await assert.rejects(denied.login('05321234567','abcdef'));assert.equal(denied.session,null);});
 
+test('country selection signs in to the existing phone alias without creating an account',async()=>{
+ const calls=[],api=new AyaparkApi(async(url,init)=>{
+  calls.push({url,body:JSON.parse(init.body||'{}')});
+  return {ok:true,status:200,json:async()=>url.includes('/token')?session:{id:'existing-user'}};
+ },{persist:false});
+ await api.login('0151 12345678','abcdef','49');
+ assert.equal(calls[0].body.email,'resident-4915112345678@ayapark2.invalid');
+ calls.length=0;
+ await api.login('0049 151 12345678','abcdef','90');
+ assert.equal(calls[0].body.email,'resident-4915112345678@ayapark2.invalid');
+ calls.length=0;
+ await api.login('existing@example.invalid','abcdef','49');
+ assert.equal(calls[0].body.email,'existing@example.invalid');
+});
 test('malformed JSON shapes and unknown actions are rejected as input errors',async()=>{for(const input of [null,[],42,{action:'delete'}]){const {handler,calls}=server();assert.equal((await handler(request(input))).status,400);assert.equal(calls.length,0);}});
