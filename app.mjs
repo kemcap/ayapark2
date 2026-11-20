@@ -48,6 +48,7 @@ import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=perf1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=20261105-owner-transfer';
 import {AyaparkApi} from './api.mjs?v=20261120-country-login';
+import {localizedCallingCountries,countryCallingCode,findCountryFromInternational} from './phone-country-codes.mjs?v=20261120-worldwide';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261113-finance-colors';
 import {buildForm,payloadFor} from './forms.mjs?v=20261113-finance-colors';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
@@ -843,22 +844,40 @@ $('loginDialog').addEventListener('close',()=>{
  selectLogin('password');
 });
 
-// Show the country dropdown for phone/password sign-in; explicit international
-// prefixes override this selection in the API and retain existing account IDs.
+// The selected territory is independent of the phone number text and is only
+// applied when that text is a national number (never to e-mail or +/00 input).
+const foldCountryName=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').toLocaleLowerCase();
+function fillLoginCountries(preferred=''){
+ const select=$('loginCountry'),query=foldCountryName($('loginCountrySearch').value.trim());
+ const selected=preferred||select.value||'TR';
+ let countries=localizedCallingCountries(getLanguage()).filter(c=>{
+  const haystack=foldCountryName([c.name,c.english,c.iso,c.code,'+'+c.code].join(' '));
+  return !query||haystack.includes(query);
+ });
+ // An exact dialing-code search should show that code ahead of partial matches.
+ if(/^\+?\d{1,4}$/.test(query)){
+  const exact=query.replace(/^\+/,'');
+  countries.sort((a,b)=>Number(b.code===exact)-Number(a.code===exact));
+ }
+ select.innerHTML=countries.length?countries.map(c=>'<option value="'+c.iso+'">'+e(c.flag+' +'+c.code+' · '+c.name)+'</option>').join(''):
+  '<option value="">'+e(getLanguage()==='de'?'Kein Land gefunden':getLanguage()==='en'?'No country found':'Ülke bulunamadı')+'</option>';
+ select.disabled=!countries.length;
+ if(countries.length)select.value=countries.some(c=>c.iso===selected)?selected:countries[0].iso;
+}
 function syncLoginCountry(){
  const value=$('email').value.trim();
  const show=loginMethod==='password'&&!value.includes('@');
- $('loginCountry').hidden=!show;
+ $('loginCountryPicker').hidden=!show;
  $('loginCountryHint').hidden=!show;
  if(show){
-  const digits=/^(?:\+|00)(\d+)/.exec(value)?.[1]||'';
-  if(digits){
-   for(const code of ['90','49','43','41','44','33','31','32','1']){
-    if(digits.startsWith(code)){$('loginCountry').value=code;break;}
-   }
+  const iso=findCountryFromInternational(value);
+  if(iso&&$('loginCountry').value!==iso){
+   $('loginCountrySearch').value='';
+   fillLoginCountries(iso);
   }
  }
 }
+$('loginCountrySearch').addEventListener('input',()=>fillLoginCountries());
 $('email').addEventListener('input',syncLoginCountry);
 // Dynamic labels cannot use captured static text nodes after textContent replaces them.
 // Refresh only wording: changing language must preserve input and verification state.
@@ -868,6 +887,9 @@ function updateLoginLanguage(){
  $('loginIdentifierLabel').textContent=tr(loginMethod==='password'?'Telefon veya e-posta':'E-posta');
  const lang=getLanguage();
  $('loginCountry').setAttribute('aria-label',lang==='de'?'Ländervorwahl':lang==='en'?'Country calling code':'Ülke kodu');
+ $('loginCountrySearch').setAttribute('aria-label',lang==='de'?'Land oder Vorwahl suchen':lang==='en'?'Search country or calling code':'Ülke veya telefon kodu ara');
+ $('loginCountrySearch').placeholder=lang==='de'?'Land / Vorwahl':lang==='en'?'Country / code':'Ülke / kod';
+ fillLoginCountries();
  $('loginCountryHint').textContent=lang==='de'?'Nummer ohne Landesvorwahl eingeben.':lang==='en'?'Enter the number without its country code.':'Numarayı ülke kodu olmadan girebilirsin.';
  $('codeHelp').textContent=tr(setup?'Şifre oluşturmak için e-postadaki kodu buraya gir. E-postadaki bağlantıyı açma.':'E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.');
  $('loginSubmit').textContent=tr(verified?'Şifreyi kaydet':setup?'Devam et':'Giriş yap');
@@ -917,7 +939,7 @@ $('loginForm').addEventListener('submit',async event=>{
    completeSignIn(pendingSetupLoaded);toast(tr('Şifren kaydedildi.'));return;
   }
   if(loginMethod==='code'||loginMethod==='setup')await api.verifyCode($('email').value.trim(),$('loginCode').value.trim());
-  else await api.login($('email').value.trim(),$('password').value,$('loginCountry').value);
+  else await api.login($('email').value.trim(),$('password').value,countryCallingCode($('loginCountry').value));
   $('password').value='';
   const loaded=await api.load();if(attempt!==epoch)return;
   if(loginMethod==='setup'){showFirstPasswordForm(loaded);return;}
