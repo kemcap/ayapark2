@@ -1,4 +1,4 @@
-import {english} from './english.mjs?v=5.10.0';
+import {english} from './english.mjs?v=20261120-recovery';
 // Only authored interface text is translated. Stored content is never sent to a service.
 export const german = {
  "Kaydetmek eski yetkileri bu beş görevle değiştirir. Seçilmeyen görevler kapalı kalır.": "Beim Speichern werden die bisherigen Rechte durch diese fünf Aufgaben ersetzt. Nicht ausgewählte Aufgaben bleiben gesperrt.",
@@ -819,7 +819,7 @@ Object.assign(german,{
  'Girişe dön':'Zur Anmeldung',
  'Dili değiştir':'Sprache wechseln',
  'Bağlantı gönderiliyor…':'Link wird angefordert …',
- 'Bu adresle kayıtlı bir hesap varsa yenileme bağlantısı gönderildi. Gelen kutunu ve spam klasörünü kontrol et.':'Falls für diese Adresse ein Konto besteht, wurde ein Link zum Zurücksetzen versendet. Prüfe auch deinen Spamordner.',
+ 'Şifre yenileme isteği alındı. Bu adres giriş hesabında kayıtlıysa bağlantı gönderilir. E-posta gelmezse spam klasörünü kontrol et; yine gelmezse adresin giriş hesabına tanımlı olup olmadığını site yönetimine sor.':'Die Anfrage wurde entgegengenommen. Falls diese Adresse für ein Anmeldekonto hinterlegt ist, wird ein Link versendet. Falls keine E-Mail ankommt, prüfe den Spamordner und frage die Hausverwaltung, ob die Adresse für dein Anmeldekonto hinterlegt ist.',
  'Bağlantı gönderilemedi. Biraz sonra tekrar dene.':'Der Link konnte nicht angefordert werden. Versuche es später erneut.',
  'Şifreler aynı değil.':'Die Passwörter stimmen nicht überein.',
  'Şifre kaydediliyor…':'Passwort wird gespeichert …',
