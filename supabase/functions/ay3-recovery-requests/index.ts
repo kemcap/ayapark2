@@ -36,9 +36,11 @@ Deno.serve(async req=>{
   if(typeof phone!=='string'||!/^\+[1-9][0-9]{9,14}$/.test(phone))return reply(400,{error:'invalid_request'},origin);
   const ip=Deno.env.get('AY_AUTH_TRUST_INGRESS_IP')==='true'?
    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim():null;
-  if(!ip)return reply(503,{error:'not_enabled'},origin);
   try{
-   const buckets=[['recovery-global:'+await signed('all'),100],['recovery-ip:'+await signed('ip:'+ip),5],['recovery-phone:'+await signed('phone:'+phone),3]] as const;
+   // Always enforce global and per-number throttling. Only use IP throttling
+   // if the trusted ingress IP setting is available; never trust client IP headers.
+   const buckets:[string,number][]=[['recovery-global:'+await signed('all'),100],['recovery-phone:'+await signed('phone:'+phone),3]];
+   if(ip)buckets.push(['recovery-ip:'+await signed('ip:'+ip),5]);
    for(const [bucket,limit] of buckets){if(!await rpc('ay_auth_login_limit',{p_bucket:bucket,p_limit:limit}))return reply(429,{error:'try_later'},origin);}
    const id=await rpc('ay_recovery_request_submit',{p_site:site,p_phone:phone});
    // No existence information is ever exposed. Only a new valid request creates a notification.
