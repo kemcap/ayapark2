@@ -1,0 +1,35 @@
+name: Password recovery request regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'reset.html'
+      - 'recovery.mjs'
+      - 'recovery-api.mjs'
+      - 'recovery.css'
+      - 'recovery-requests-ui.mjs'
+      - 'app.mjs'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/recovery-phone-request.test.mjs'
+      - '.github/workflows/recovery-request-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recovery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate front-end JavaScript
+        run: |
+          node --check app.mjs
+          node --check recovery.mjs
+          node --check recovery-api.mjs
+          node --check recovery-requests-ui.mjs
+          node --check sw.js
+      - name: Run targeted regression tests
+        run: node --test tests/recovery-phone-request.test.mjs tests/recovery-api.test.mjs tests/login-dialog.test.mjs tests/auth-phase3.test.mjs
