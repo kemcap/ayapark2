@@ -19,6 +19,7 @@ import {reviewImport} from './import-review.mjs?v=5.9.33';
 import {contactError} from './contact-requests.mjs?v=perf1';
 import {mayUseTaskAction} from './task-permissions.mjs?v=20261105-owner-transfer';
 import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.10.0';
+import {bindRecoveryRequests} from './recovery-requests-ui.mjs?v=20261120-phone-recovery';
 import {bindAccessRequests} from './access-request-ui.mjs?v=perf1';
 import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=20261105-owner-transfer';
 import {installSmartHeader} from './smart-header.mjs?v=5.9.49';
@@ -89,6 +90,7 @@ const invitationUi=bindInvitations({
  openPhoneLogin:(phone)=>{selectLogin('password');$('email').value=phone;syncLoginCountry();$('loginDialog').showModal();$('loginMessage').textContent=tr('Hesabın etkinleştirildi. Giriş bilgin ve yeni şifrenle giriş yap.');}
 });
 const adminRecoveryUi=bindAdminRecovery({api,getState:()=>state});
+const phoneRecoveryUi=bindRecoveryRequests({api,getState:()=>state,openRecovery:id=>adminRecoveryUi.open(id)});
 const accessRequestUi=bindAccessRequests({api,getState:()=>state,invite:id=>invitationUi.open(id)});
 async function loadPushStatuses(){if(state.mode!=='connected'||!can(state,'admin'))return;try{const r=await api.rpc('ay10_person_push_status',{p_site:state.data.site.id});state.pushStatus=Object.fromEntries((Array.isArray(r)?r:[]).map(x=>[x.person_id,x]));render();}catch(error){console.warn('Push statuses unavailable',error);}}
 async function loadPersonLogins(){if(state.mode!=='connected'||!can(state,'admin'))return;try{state.personLogins=await api.rpc('ay8_person_last_logins');render();}catch(error){console.warn('Login-Übersicht nicht verfügbar',error);}}
@@ -835,7 +837,7 @@ function completeSignIn(loaded){
  // Closing a completed login must not trigger the pending-login cancellation handler.
  loginBusy=false;pendingSetupLoaded=null;$('loginSubmit').disabled=false;
  if($('loginDialog').open)$('loginDialog').close();
- if(typeof invitationUi!=='undefined')invitationUi.clearUrl();$('loginForm').reset();navigate('overview');if(typeof accessRequestUi!=='undefined')void accessRequestUi.load();void syncPreferences(api,()=>{applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));});
+ if(typeof invitationUi!=='undefined')invitationUi.clearUrl();$('loginForm').reset();navigate('overview');if(typeof accessRequestUi!=='undefined')void accessRequestUi.load();void phoneRecoveryUi.load();void syncPreferences(api,()=>{applyStaticLanguage();render();document.dispatchEvent(new Event('ay2:languagechange'));});
 }
 
 $('loginDialog').addEventListener('close',()=>{
