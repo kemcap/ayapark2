@@ -19,7 +19,7 @@ function reply(status:number,data:Record<string,unknown>,origin:string){
 Deno.serve(async req=>{
  const origin=req.headers.get('Origin')||'';
  if(origin&&!origins.has(origin))return reply(403,{error:'access_denied'},origin);
- if(req.method==='OPTIONS')return reply(204,{},origin);
+ if(req.method==='OPTIONS')return new Response(null,{status:204,headers:{'Vary':'Origin','Access-Control-Allow-Origin':origins.has(origin)?origin:'','Access-Control-Allow-Headers':'authorization,apikey,content-type','Access-Control-Allow-Methods':'POST,OPTIONS'}});
  if(req.method!=='POST')return reply(405,{error:'invalid_request'},origin);
  if(!enabled)return reply(503,{error:'not_enabled'},origin);
  let body:any;
