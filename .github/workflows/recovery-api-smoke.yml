@@ -26,3 +26,8 @@ jobs:
           code=$(curl --silent --show-error --output /tmp/ay-denied --write-out '%{http_code}' -X POST "$endpoint" -H 'Origin: https://kemcap.github.io' -H 'Content-Type: application/json' --data '{"action":"list"}')
           echo "Unauthenticated listing HTTP $code"
           test "$code" = "401"
+          # An intentionally unassigned country-code number verifies the
+          # neutral request path without touching any real resident account.
+          code=$(curl --silent --show-error --output /tmp/ay-neutral --write-out '%{http_code}' -X POST "$endpoint" -H 'Origin: https://kemcap.github.io' -H 'Content-Type: application/json' --data '{"action":"submit","phone":"+999999999999999"}')
+          echo "Neutral unregistered phone HTTP $code"
+          test "$code" = "200"
