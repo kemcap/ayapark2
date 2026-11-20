@@ -11,7 +11,7 @@ $('recoveryLanguage').addEventListener('click',()=>{setLanguage(nextLanguage(get
 $('requestResetForm').addEventListener('submit',async event=>{
  event.preventDefault();if(busy)return;busy=true;$('requestResetButton').disabled=true;
  message('Bağlantı gönderiliyor…');
- try{await api.requestReset($('recoveryEmail').value.trim(),new URL('./reset.html',location.href).href);$('recoveryCodeEmail').value=$('recoveryEmail').value.trim();$('verifyRecoveryCodeForm').hidden=false;message('Bu adresle kayıtlı bir hesap varsa yenileme bağlantısı gönderildi. Gelen kutunu ve spam klasörünü kontrol et.');}
+ try{await api.requestReset($('recoveryEmail').value.trim(),new URL('./reset.html',location.href).href);$('recoveryCodeEmail').value=$('recoveryEmail').value.trim();$('verifyRecoveryCodeForm').hidden=false;message('Şifre yenileme isteği alındı. Bu adres giriş hesabında kayıtlıysa bağlantı gönderilir. E-posta gelmezse spam klasörünü kontrol et; yine gelmezse adresin giriş hesabına tanımlı olup olmadığını site yönetimine sor.');}
  catch(error){message(error.status===429?'Çok fazla deneme yapıldı. Biraz sonra tekrar deneyin.':'Bağlantı gönderilemedi. Biraz sonra tekrar dene.',true);}
  finally{busy=false;$('requestResetButton').disabled=false;}
 });
