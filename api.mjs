@@ -1,5 +1,5 @@
 import {archivePath,MAX_DOCUMENT_BYTES} from './archive-files.mjs?v=5.9.42';
-import {classifyIdentifier,newPasswordError} from './auth-policy.mjs?v=5.8.1';
+import {classifyIdentifier,newPasswordError,loginWithCountry} from './auth-policy.mjs?v=20261120-country-login';
 import {ENABLE_VERIFIED_PHONE_LOGIN} from './auth-features.mjs?v=5.8.1';
 import {t as tr} from './i18n.mjs?v=5.10.0';
 // Existing site tables are read-only; V2 mutations use a checked transactional RPC.
@@ -81,12 +81,13 @@ export class AyaparkApi {
   if(generation!==this.generation)throw Error(tr('Oturum değişti.'));
   return updated;
  }
- async login(email,password){
+ async login(email,password,countryCode=''){
   this.clear();const generation=this.generation;
-  const identifier=classifyIdentifier(email);
+  const resolved=loginWithCountry(email,countryCode);
+  const identifier=classifyIdentifier(resolved);
   const session=this.verifiedPhoneLogin&&identifier?.kind==='phone'
    ?await this.raw('/functions/v1/ay3-password-login','POST',{identifier:identifier.value,password})
-   :await this.raw('/auth/v1/token?grant_type=password','POST',{email:loginIdentifier(email),password});
+   :await this.raw('/auth/v1/token?grant_type=password','POST',{email:loginIdentifier(resolved),password});
   this.accept(session,generation);
   const user=await this.raw('/auth/v1/user','GET',undefined,this.session.access_token);
   if(generation!==this.generation)throw Error(tr("Oturum değişti."));
