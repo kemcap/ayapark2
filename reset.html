@@ -10,36 +10,56 @@
  <script src="./preferences-boot.js"></script>
  <script src="./theme.js?v=5.10.1"></script>
 <script src="./design-boot.js"></script><link rel="icon" href="./assets/buildings.svg" type="image/svg+xml">
- <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./recovery.css">
- <script type="module" src="./recovery.mjs?v=20261120-recovery"></script>
+ <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./recovery.css?v=20261120-phone-request">
+ <script type="module" src="./recovery.mjs?v=20261120-phone-request"></script>
 <link rel="stylesheet" href="./v4-ui.css?v=4.0">
 <link rel="stylesheet" href="./modern.css?v=5.1.0"><link rel="stylesheet" href="./v5-ui.css?v=5.1.0">
 </head>
 <body class="recovery-page">
  <header class="recovery-header"><a href="./" class="brand"><img class="brand-logo" src="./assets/ayapark2-header.webp" alt="Ayapark 2 bina fotoğrafı" width="46" height="46"><strong>AYAPARK 2</strong></a><div class="header-actions"><button id="recoveryLanguage" class="button language-toggle" type="button"></button><button id="themeToggle" class="button" type="button">◐</button></div></header>
  <main class="recovery-main"><section class="recovery-card" aria-labelledby="recoveryTitle">
-  <img class="recovery-logo" src="./assets/buildings.svg" alt="">
-  <div class="dialog-kicker">AYAPARK 2</div><h1 id="recoveryTitle">Şifre yenile</h1>
-  <p id="recoveryHelp" class="muted">Şifreni yenilemek için e-posta adresini yaz.</p>
+  <div class="dialog-kicker">AYA PARK 2</div>
+  <h1 id="recoveryTitle">Şifreni mi unuttun?</h1>
+  <p id="recoveryHelp" class="muted">Şifreni yenilemek için bir yöntem seç.</p>
+  <div id="recoveryMethodPicker" class="recovery-methods" role="group" aria-label="Şifre yenileme yöntemi">
+   <button id="recoveryEmailMethod" type="button" class="button" aria-pressed="true">E-posta</button>
+   <button id="recoveryPhoneMethod" type="button" class="button" aria-pressed="false">Telefon</button>
+  </div>
   <p id="recoveryStatus" role="status" aria-live="polite"></p>
   <form id="requestResetForm">
-   <label class="field">E-posta<input id="recoveryEmail" type="email" required autocomplete="username"></label>
+   <label class="field" for="recoveryEmail" id="recoveryEmailLabel">E-posta adresi</label>
+   <input id="recoveryEmail" type="email" required autocomplete="email">
    <button id="requestResetButton" class="button primary" type="submit">Yenileme bağlantısı gönder</button>
   </form>
+  <form id="requestPhoneResetForm" hidden>
+   <label class="field" for="recoveryPhone" id="recoveryPhoneLabel">Telefon numarası</label>
+   <div class="recovery-phone-row">
+    <select id="recoveryCountry" aria-label="Ülke kodu"><option value="TR">🇹🇷 +90 · Türkiye</option></select>
+    <input id="recoveryPhone" type="tel" inputmode="tel" autocomplete="tel-national" required maxlength="40" placeholder="05xx xxx xx xx">
+   </div>
+   <details class="recovery-country-filter"><summary id="recoveryCountryFindLabel">Ülke ara</summary><input id="recoveryCountrySearch" type="search" autocomplete="off" placeholder="Ülke veya kod" maxlength="60" aria-label="Ülke veya kod ara"></details>
+   <button id="requestPhoneResetButton" class="button primary" type="submit">Yönetimden bağlantı iste</button>
+  </form>
+  <section id="recoveryDonePanel" hidden aria-live="polite">
+   <h2 id="recoveryDoneTitle">Talep alındı</h2>
+   <p id="recoveryDoneText"></p>
+   <button id="recoveryCodeToggle" type="button" class="text-button" hidden>E-posta kodu kullan</button>
+  </section>
   <form id="verifyRecoveryCodeForm" hidden>
-   <p class="fine">Bağlantı çalışmıyorsa e-postadaki doğrulama kodunu kullanın.</p>
-   <label class="field">E-posta<input id="recoveryCodeEmail" type="email" required autocomplete="username"></label>
-   <label class="field">Doğrulama kodu<input id="recoveryCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10" required></label>
-   <button id="verifyRecoveryCodeButton" class="button" type="submit">Kodu doğrula</button>
+   <label class="field" for="recoveryCodeEmail" id="recoveryCodeEmailLabel">E-posta adresi</label>
+   <input id="recoveryCodeEmail" type="email" required autocomplete="email">
+   <label class="field" for="recoveryCode" id="recoveryCodeLabel">Doğrulama kodu</label>
+   <input id="recoveryCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10" required>
+   <button id="verifyRecoveryCodeButton" class="button primary" type="submit">Kodu doğrula</button>
   </form>
   <form id="newPasswordForm" hidden>
-   <label class="field" for="newPassword">Yeni şifre</label>
+   <label class="field" for="newPassword" id="newPasswordLabel">Yeni şifre</label>
    <div class="password-control"><input id="newPassword" type="password" required minlength="6" maxlength="256" autocomplete="new-password" aria-describedby="passwordHelp"><button class="button password-eye" type="button" data-password-eye="newPassword" aria-label="Şifreyi göster" aria-pressed="false"></button></div>
    <p class="fine" id="passwordHelp">En az 6 karakter kullan.</p>
-   <label class="field" for="confirmPassword">Yeni şifreyi tekrarla</label>
+   <label class="field" for="confirmPassword" id="confirmPasswordLabel">Yeni şifreyi tekrarla</label>
    <div class="password-control"><input id="confirmPassword" type="password" required minlength="6" maxlength="256" autocomplete="new-password"><button class="button password-eye" type="button" data-password-eye="confirmPassword" aria-label="Şifreyi göster" aria-pressed="false"></button></div>
    <button id="saveNewPassword" class="button primary" type="submit">Şifreyi kaydet</button>
   </form>
-  <a href="./" class="text-button recovery-back">Girişe dön</a><p class="fine">E-posta kullanmıyorsanız kimliğinizi doğrulamak ve kişisel yenileme bağlantısı almak için yönetime başvurun.</p>
+  <a href="./" class="text-button recovery-back" id="recoveryBack">Girişe dön</a>
  </section></main>
 </body></html>
