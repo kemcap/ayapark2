@@ -9,6 +9,9 @@ export class RecoveryApi extends AyaparkApi {
   if(target.protocol!=='https:')throw Error('Invalid recovery URL');
   await this.raw('/auth/v1/recover?redirect_to='+encodeURIComponent(target.href),'POST',{email});
  }
+ async requestPhoneReset(phone){
+  return this.raw('/functions/v1/ay3-recovery-requests','POST',{action:'submit',phone});
+ }
  async begin({accessToken,refreshToken,tokenHash,type}){
   this.clear();const generation=this.generation;
   if(type!=='recovery')throw Error('Invalid recovery link');
