@@ -19,7 +19,7 @@ import {reviewImport} from './import-review.mjs?v=5.9.33';
 import {contactError} from './contact-requests.mjs?v=perf1';
 import {mayUseTaskAction} from './task-permissions.mjs?v=20261105-owner-transfer';
 import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.10.0';
-import {bindRecoveryRequests} from './recovery-requests-ui.mjs?v=20261120-phone-recovery';
+import {bindRecoveryRequests} from './recovery-requests-ui.mjs?v=20261120-compact-bell';
 import {bindAccessRequests} from './access-request-ui.mjs?v=perf1';
 import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=20261105-owner-transfer';
 import {installSmartHeader} from './smart-header.mjs?v=5.9.49';
@@ -90,7 +90,7 @@ const invitationUi=bindInvitations({
  openPhoneLogin:(phone)=>{selectLogin('password');$('email').value=phone;syncLoginCountry();$('loginDialog').showModal();$('loginMessage').textContent=tr('Hesabın etkinleştirildi. Giriş bilgin ve yeni şifrenle giriş yap.');}
 });
 const adminRecoveryUi=bindAdminRecovery({api,getState:()=>state});
-const phoneRecoveryUi=bindRecoveryRequests({api,getState:()=>state,openRecovery:id=>adminRecoveryUi.open(id)});
+const phoneRecoveryUi=bindRecoveryRequests({api,getState:()=>state,openRecovery:id=>adminRecoveryUi.open(id),isPreview:()=>isAccessPreview(),onChange:()=>{updateNotifications();phoneRecoveryUi.hint();}});
 const accessRequestUi=bindAccessRequests({api,getState:()=>state,invite:id=>invitationUi.open(id)});
 async function loadPushStatuses(){if(state.mode!=='connected'||!can(state,'admin'))return;try{const r=await api.rpc('ay10_person_push_status',{p_site:state.data.site.id});state.pushStatus=Object.fromEntries((Array.isArray(r)?r:[]).map(x=>[x.person_id,x]));render();}catch(error){console.warn('Push statuses unavailable',error);}}
 async function loadPersonLogins(){if(state.mode!=='connected'||!can(state,'admin'))return;try{state.personLogins=await api.rpc('ay8_person_last_logins');render();}catch(error){console.warn('Login-Übersicht nicht verfügbar',error);}}
@@ -163,12 +163,14 @@ function render(focus=false){
  const logPage=state.page==='logdata'&&state.mode==='connected'&&can(state,'admin');
  const logBody=logPage?renderLogDataPage():'';
  $('content').innerHTML=state.mode==='signedout'?`<div class="login-welcome"><img src="./assets/ayapark2-modern-icon.svg?v=8" alt="Ayapark 2"><h1>AYAPARK 2</h1><p>${tr('Sitenize hoş geldiniz.')}</p></div>${invitationUi.landing()}`:(logPage?logBody:renderPage(state));
+ if(state.mode==='connected'&&!isAccessPreview()&&d.role==='super'&&state.page==='persons')$('content').insertAdjacentHTML('afterbegin',phoneRecoveryUi.shortcutHTML());
  if(state.mode!=='signedout'&&state.page==='reports'&&!can(state,'finance')&&state.data.communityAccess!==true)$('content').innerHTML='<section class="card"><h1>'+((getLanguage()==='tr'?('Mali özet erişime açık değil'):(uiText("Finanzübersicht nicht freigegeben",getLanguage()))))+'</h1><p>'+((getLanguage()==='tr'?('Bu erişim için ortak mali özetler açık değil. Kendi borç ve ödemeleriniz kişisel alanda kullanılabilir.'):(uiText("Für diesen Zugang sind keine gemeinsamen Finanzübersichten freigegeben. Eigene Forderungen und Zahlungen bleiben im persönlichen Bereich verfügbar.",getLanguage()))))+'</p></section>';
  if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview')$('content').insertAdjacentHTML('afterbegin','<div class="archive-toolbar"><button class="button" type="button" data-action="private_archive">'+((getLanguage()==='tr'?('Belgeler ve toplantılar'):(uiText("Dokumente & Versammlungen",getLanguage()))))+'</button></div>');
  if(state.mode==='connected'&&!isAccessPreview()&&state.page==='overview'&&['super','staff'].includes(d.role)){const tasks=d.taskWorkspace,c=tasks?.counts;document.querySelector('.archive-toolbar')?.insertAdjacentHTML('beforeend','<button class="button" type="button" data-action="management_tasks">'+((getLanguage()==='tr'?('Görevler ve tarihler'):(uiText("Aufgaben & Termine",getLanguage()))))+'</button><span role="status">'+(c?((getLanguage()==='tr'?('Gecikmiş: '+c.overdue+' · Bugün: '+c.today+' · Gelecek 7 gün: '+c.soon):(uiText("Überfällig: ",getLanguage())+c.overdue+uiText(" · Heute: ",getLanguage())+c.today+uiText(" · Nächste 7 Tage: ",getLanguage())+c.soon))):((getLanguage()==='tr'?('Görev durumu yok – listeyi açın.'):(uiText("Aufgabenstand nicht verfügbar – Liste öffnen.",getLanguage())))))+'</span>');}
  if(state.mode==='connected'&&state.page==='settings')$('content').insertAdjacentHTML('afterbegin','<div class="ay-privacy-settings-link"><a href="./privacy-policy.html" target="_blank" rel="noopener noreferrer"><span aria-hidden="true" class="ay-privacy-document-icon">▤</span><span class="ay-privacy-document-copy"><strong>'+(getLanguage()==='de'?'Gesamten Vertrag lesen (30 Artikel)':getLanguage()==='en'?'Read full agreement (30 articles)':'Sözleşmenin tamamını oku (30 madde)')+'</strong><small>'+(getLanguage()==='de'?'Vollständiges Dokument öffnen':getLanguage()==='en'?'Open full document':'Tam metni aç ve incele')+'</small></span><span aria-hidden="true" class="ay-privacy-document-arrow">↗</span></a></div>');
  if(appearanceWasOpen&&document.querySelector('.appearance-settings'))document.querySelector('.appearance-settings').open=true;
  if(state.mode==='connected'&&state.page==='settings')browserAlerts.mount();
+ phoneRecoveryUi.hint();
  addExportControls();const previewBar=$('accessPreviewBanner');previewBar.innerHTML=previewBanner(state);previewBar.hidden=!isAccessPreview();labelTables();applyAmountPrivacy();updateNotifications();checkUrgent();
  document.dispatchEvent(new CustomEvent('ay5:view',{detail:{resident:own,page:state.page,mode:state.mode}}));
  for(const card of document.querySelectorAll('.summary-grid .card')){const links=card.querySelectorAll('a[href]');if(links.length===1&&!card.querySelector('button,input,select')){card.classList.add('stretched-card');links[0].setAttribute('aria-label',(card.querySelector('h2')?.textContent||'')+': '+links[0].textContent);}}
@@ -456,10 +458,23 @@ function exportReport(){
 }
 const urgentShown=new Set();let localTest=null,localTestRead=false,popupSession='',importantLoginKeys=new Set(),popupBatch=[],localTestQueue=[],localTestReceipts=new Set();
 function notificationData(){const d=state.data;return {...d,userId:d.userId||'demo-user',announcements:[...(d.announcements||[]),...(localTest&&d.role==='super'?[localTest]:[]),...(d.role==='super'?localTestQueue:[])],acknowledgements:[...(d.acknowledgements||[]),...(localTestRead&&localTest?[{announcement_id:localTest.id,revision:localTest.revision,user_id:d.userId||'demo-user'}]:[]),...localTestQueue.filter(a=>localTestReceipts.has(a.id)).map(a=>({announcement_id:a.id,revision:a.revision,user_id:d.userId||'demo-user'}))]};}
-function updateNotifications(){const d=notificationData(),unread=unreadNotifications(d);$('notificationBell').hidden=state.mode==='signedout';$('notificationCount').hidden=!unread.length;$('notificationCount').textContent=unread.length>99?'99+':unread.length;$('notificationBell').setAttribute('aria-label',tr('Bildirimler')+' · '+unread.length);$('notificationsTitle').textContent=tr('Bildirimler');$('closeNotifications').textContent=tr('Kapat');if($('notificationsDialog').open)$('notificationsList').innerHTML=notificationList(d);}
+function combinedNotificationList(d){
+ const recovery=phoneRecoveryUi.notificationHTML();
+ const standard=notifications(d).length?notificationList(d):(recovery?'':notificationList(d));
+ return recovery+standard;
+}
+function updateNotifications(){
+ const d=notificationData(),unread=unreadNotifications(d),total=unread.length+phoneRecoveryUi.openCount();
+ $('notificationBell').hidden=state.mode==='signedout';
+ $('notificationCount').hidden=total===0;
+ $('notificationCount').textContent=total>99?'99+':total;
+ $('notificationBell').setAttribute('aria-label',tr('Bildirimler')+' · '+total);
+ $('notificationsTitle').textContent=tr('Bildirimler');$('closeNotifications').textContent=tr('Kapat');
+ if($('notificationsDialog').open)$('notificationsList').innerHTML=combinedNotificationList(d);
+}
 function openNotification(a,{progress=''}={}){if(!a)return;if($('notificationsDialog').open)$('notificationsDialog').close();$('urgentTitle').textContent=notificationTitle(a);$('urgentBody').textContent=notificationBody(a);$('urgentMeta').textContent=a.local_test?tr('Yalnızca Süper Admin testi'):new Date(a.created_at).toLocaleDateString((getLanguage()==='tr'?('tr-TR'):(uiText("de-DE",getLanguage()))))+(a.author_label?' · '+a.author_label:'');$('ackUrgent').dataset.id=a.id;$('ackUrgent').dataset.revision=a.revision||1;$('ackUrgent').dataset.key=acknowledgementKey(a);$('ackUrgent').textContent=tr(!announcementActive(a)||isAccessPreview()?'Kapat':'Okudum');$('urgentProgress').textContent=progress;$('urgentProgress').hidden=!progress;$('urgentDialog').dataset.required=a.priority==='urgent'&&announcementActive(a)&&!isAccessPreview()?'true':'false';$('ackUrgent').dataset.expired=String(!announcementActive(a)||isAccessPreview());if(a.priority!=='urgent')urgentShown.add(acknowledgementKey(a));if(!$('urgentDialog').open)$('urgentDialog').showModal();}
 function checkUrgent(){const key=state.mode+':'+(state.data.userId||'demo-user')+':'+epoch;if(key!==popupSession){popupSession=key;popupBatch=[];importantLoginKeys=new Set(unreadNotifications(notificationData()).filter(a=>a.priority==='important'&&a.popup_on_login).map(acknowledgementKey));}if(isAccessPreview()||state.mode==='signedout'||document.querySelector('dialog[open]'))return;const pending=unreadNotifications(notificationData()).filter(a=>(a.priority==='urgent'||a.priority==='important'&&a.popup_on_login&&importantLoginKeys.has(acknowledgementKey(a)))&&!urgentShown.has(acknowledgementKey(a)));if(!pending.length){popupBatch=[];return;}if(!popupBatch.length)popupBatch=pending.map(acknowledgementKey);else for(const a of pending)if(!popupBatch.includes(acknowledgementKey(a)))popupBatch.push(acknowledgementKey(a));const a=pending[0];openNotification(a,{progress:popupBatch.length>1?popupProgress(popupBatch,acknowledgementKey(a)):''});}
-$('notificationBell').addEventListener('click',()=>{$('notificationsList').innerHTML=notificationList(notificationData());$('notificationsDialog').showModal();});
+$('notificationBell').addEventListener('click',()=>{$('notificationsList').innerHTML=combinedNotificationList(notificationData());$('notificationsDialog').showModal();void phoneRecoveryUi.load();});
 $('closeNotifications').addEventListener('click',()=>$('notificationsDialog').close());
 $('ackUrgent').addEventListener('click',async()=>{const b=$('ackUrgent');b.disabled=true;try{if(b.dataset.expired==='true'){$('urgentDialog').close();return;}if(b.dataset.id.startsWith('local-test-notification')){if(state.data.role!=='super')throw Error(tr('Yetkiniz yok.'));if(b.dataset.id==='local-test-notification')localTestRead=true;else localTestReceipts.add(b.dataset.id);updateNotifications();}else await mutate('acknowledge',{id:b.dataset.id,revision:Number(b.dataset.revision)});urgentShown.add(b.dataset.key);$('urgentDialog').close();checkUrgent();}catch(error){toast(error.message);}finally{b.disabled=false;}});
 $('urgentDialog').addEventListener('cancel',event=>{if($('urgentDialog').dataset.required==='true')event.preventDefault();});
@@ -525,7 +540,16 @@ document.addEventListener('click',async event=>{
   updateNotifications();if($('notificationTestStatus'))$('notificationTestStatus').textContent=tr(action==='disable'?'Test devre dışı.':'Test hazır. Gerçek bildirim gönderilmedi.');return;
  }
  const testDelete=event.target.closest('[data-action="delete_test_notification"]');if(testDelete){if(state.data.role!=='super')return;const id=testDelete.dataset.id;if(id==='local-test-notification'){localTest=null;localTestRead=false;}else{localTestQueue=localTestQueue.filter(x=>x.id!==id);localTestReceipts.delete(id);}updateNotifications();return;}
- const notice=event.target.closest('[data-notification]');if(notice){openNotification(notificationCenter(notificationData()).find(a=>a.id===notice.dataset.notification));return;}
+ const recoveryShortcut=event.target.closest('[data-recovery-shortcut],[data-recovery-notice]');
+  if(recoveryShortcut){
+   if(state.mode!=='connected'||state.data.role!=='super'||isAccessPreview())return;
+   if($('notificationsDialog').open)$('notificationsDialog').close();
+   const destination=phoneRecoveryUi.openManager();
+   if(destination)navigate(destination);
+   phoneRecoveryUi.openManager();
+   return;
+  }
+  const notice=event.target.closest('[data-notification]');if(notice){openNotification(notificationCenter(notificationData()).find(a=>a.id===notice.dataset.notification));return;}
  const previewButton=event.target.closest('[data-finance-preview]');
  if(previewButton&&formAction){try{previewButton.disabled=true;await updateFinancePreview();$('actionMessage').textContent='';}catch(error){$('actionMessage').textContent=tr(error.message);}finally{previewButton.disabled=false;}return;}
  const categoryAdd=event.target.closest('[data-provider-category-add]');
