@@ -9,20 +9,34 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return {
 const flush=()=>new Promise(r=>setImmediate(r));
 function harness(){
  const elements=new Map(),calls={logout:0,load:0,restore:0,navigate:0,loginArgs:null};
+ const countries=[
+  {iso:'TR',code:'90',english:'Turkey',name:'Türkiye',flag:'🇹🇷'},
+  {iso:'DE',code:'49',english:'Germany',name:'Almanya',flag:'🇩🇪'},
+  {iso:'FR',code:'33',english:'France',name:'Fransa',flag:'🇫🇷'}
+ ];
  const $=id=>{if(!elements.has(id))elements.set(id,{value:'',open:false,disabled:false,classList:{remove(){},add(){}},listeners:{},addEventListener(type,fn){this.listeners[type]=fn;},setAttribute(){},showModal(){this.open=true;},close(){if(!this.open)return;this.open=false;queueMicrotask(()=>this.listeners.close?.());},reset(){},reportValidity(){return true;}});return elements.get(id);};
  const loaded={role:'super',transactions:[{date:'2026-10-01'}]};let saved=false;
  const api={async login(...args){calls.loginArgs=args;saved=true;},async verifyCode(){saved=true;},saved:()=>saved,async restore(){calls.restore++;return saved;},async load(){calls.load++;return loaded;},async logout(){calls.logout++;saved=false;}};
- const context=vm.createContext({$,api,nativePreviewRole:d=>d?.role==='super'?'super':d?.role==='staff'?'staff':null,state:{mode:'signedout'},epoch:0,loginBusy:false,loginMethod:'password',tr:s=>s,getLanguage:()=> 'tr',beginLoading:()=>()=>{},syncPreferences:async()=>{},hideLoginPassword(){},recordAppEvent(){},loadPersonLogins:async()=>{},loadPushStatuses:async()=>{},loadActivityFeed:async()=>{},browserAlerts:{scheduleReminder(){}},privacyGate:{check:async()=>{}},lastFinancialLoad:0,navigate(){calls.navigate++;},toast(){},URLSearchParams,Date,setTimeout(){},location:{hash:'',pathname:'/',search:''},history:{replaceState(){}}});
+ const context=vm.createContext({$,api,nativePreviewRole:d=>d?.role==='super'?'super':d?.role==='staff'?'staff':null,state:{mode:'signedout'},epoch:0,loginBusy:false,loginMethod:'password',tr:s=>s,getLanguage:()=> 'tr',e:s=>s,
+ localizedCallingCountries:()=>countries,
+ countryCallingCode:iso=>countries.find(c=>c.iso===iso)?.code||'',
+ findCountryFromInternational:value=>String(value).startsWith('+49')||String(value).startsWith('0049')?'DE':'',
+ beginLoading:()=>()=>{},syncPreferences:async()=>{},hideLoginPassword(){},recordAppEvent(){},loadPersonLogins:async()=>{},loadPushStatuses:async()=>{},loadActivityFeed:async()=>{},browserAlerts:{scheduleReminder(){}},privacyGate:{check:async()=>{}},lastFinancialLoad:0,navigate(){calls.navigate++;},toast(){},URLSearchParams,Date,setTimeout(){},location:{hash:'',pathname:'/',search:''},history:{replaceState(){}}});
  vm.runInContext(handlers+'\n'+restore,context);
  return {$,api,context,calls,loaded,submit:()=>$('loginForm').listeners.submit({preventDefault(){}}),restore:()=>vm.runInContext('resumeSession()',context)};
 }
 test('password login closes its dialog and keeps the verified session',async()=>{const h=harness();h.$('loginDialog').showModal();await h.submit();await flush();assert.equal(h.$('loginDialog').open,false);assert.equal(h.context.state.mode,'connected');assert.equal(h.api.saved(),true);assert.equal(h.calls.logout,0);assert.equal(h.$('loginSubmit').disabled,false);});
 test('password form sends selected country and leaves email mode unchanged',async()=>{
  const h=harness();
- h.$('loginCountry').value='49';h.$('email').value='0151 12345678';
+ h.$('loginCountry').value='DE';h.$('email').value='0151 12345678';
  await h.submit();await flush();
  assert.equal(h.calls.loginArgs[0],'0151 12345678');
  assert.equal(h.calls.loginArgs[2],'49');
+ const search=harness();search.$('loginCountrySearch').value='Germany';
+ search.$('loginCountrySearch').listeners.input();
+ assert.equal(search.$('loginCountry').value,'DE');
+ const international=harness();international.$('email').value='0049 15112345678';
+ international.$('email').listeners.input();assert.equal(international.$('loginCountry').value,'DE');
  const other=harness();other.$('email').value='resident@example.invalid';
  other.$('email').listeners.input();
  assert.equal(other.$('loginCountry').hidden,true);
