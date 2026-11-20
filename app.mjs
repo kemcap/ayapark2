@@ -47,7 +47,7 @@ import {template} from './v3-import.mjs?v=perf1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=perf1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=20261105-owner-transfer';
-import {AyaparkApi} from './api.mjs?v=20261112-audit';
+import {AyaparkApi} from './api.mjs?v=20261120-country-login';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261113-finance-colors';
 import {buildForm,payloadFor} from './forms.mjs?v=20261113-finance-colors';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
@@ -85,7 +85,7 @@ let peopleSearchTimer;
 const invitationUi=bindInvitations({
  api,getState:()=>state,rerender:()=>render(),
  onActivated:async({phone,password})=>{await api.login(phone,password);completeSignIn(await api.load());},
- openPhoneLogin:(phone)=>{selectLogin('password');$('email').value=phone;$('loginDialog').showModal();$('loginMessage').textContent=tr('Hesabın etkinleştirildi. Giriş bilgin ve yeni şifrenle giriş yap.');}
+ openPhoneLogin:(phone)=>{selectLogin('password');$('email').value=phone;syncLoginCountry();$('loginDialog').showModal();$('loginMessage').textContent=tr('Hesabın etkinleştirildi. Giriş bilgin ve yeni şifrenle giriş yap.');}
 });
 const adminRecoveryUi=bindAdminRecovery({api,getState:()=>state});
 const accessRequestUi=bindAccessRequests({api,getState:()=>state,invite:id=>invitationUi.open(id)});
@@ -843,12 +843,32 @@ $('loginDialog').addEventListener('close',()=>{
  selectLogin('password');
 });
 
+// Show the country dropdown for phone/password sign-in; explicit international
+// prefixes override this selection in the API and retain existing account IDs.
+function syncLoginCountry(){
+ const value=$('email').value.trim();
+ const show=loginMethod==='password'&&!value.includes('@');
+ $('loginCountry').hidden=!show;
+ $('loginCountryHint').hidden=!show;
+ if(show){
+  const digits=/^(?:\+|00)(\d+)/.exec(value)?.[1]||'';
+  if(digits){
+   for(const code of ['90','49','43','41','44','33','31','32','1']){
+    if(digits.startsWith(code)){$('loginCountry').value=code;break;}
+   }
+  }
+ }
+}
+$('email').addEventListener('input',syncLoginCountry);
 // Dynamic labels cannot use captured static text nodes after textContent replaces them.
 // Refresh only wording: changing language must preserve input and verification state.
 function updateLoginLanguage(){
  const setup=loginMethod==='setup',verified=loginMethod==='setup_password';
  $('loginTitle').textContent=tr(setup||verified?'Şifre oluştur':'Sitenize hoş geldiniz.');
  $('loginIdentifierLabel').textContent=tr(loginMethod==='password'?'Telefon veya e-posta':'E-posta');
+ const lang=getLanguage();
+ $('loginCountry').setAttribute('aria-label',lang==='de'?'Ländervorwahl':lang==='en'?'Country calling code':'Ülke kodu');
+ $('loginCountryHint').textContent=lang==='de'?'Nummer ohne Landesvorwahl eingeben.':lang==='en'?'Enter the number without its country code.':'Numarayı ülke kodu olmadan girebilirsin.';
  $('codeHelp').textContent=tr(setup?'Şifre oluşturmak için e-postadaki kodu buraya gir. E-postadaki bağlantıyı açma.':'E-postadaki kodu girin veya giriş bağlantısını açın. Yeni kullanıcı erişimini yönetim tanımlar.');
  $('loginSubmit').textContent=tr(verified?'Şifreyi kaydet':setup?'Devam et':'Giriş yap');
 }
@@ -860,7 +880,7 @@ function selectLogin(method){
  $('setupPassword').required=false;$('setupPasswordConfirm').required=false;
  $('usePassword').setAttribute('aria-pressed',String(method==='password'));
  $('useCode').setAttribute('aria-pressed',String(code));
- updateLoginLanguage();
+ updateLoginLanguage();syncLoginCountry();
  hideLoginPassword();$('password').value='';$('loginCode').value='';
  $('setupPassword').value='';$('setupPasswordConfirm').value='';$('loginMessage').textContent='';
 }
@@ -897,7 +917,7 @@ $('loginForm').addEventListener('submit',async event=>{
    completeSignIn(pendingSetupLoaded);toast(tr('Şifren kaydedildi.'));return;
   }
   if(loginMethod==='code'||loginMethod==='setup')await api.verifyCode($('email').value.trim(),$('loginCode').value.trim());
-  else await api.login($('email').value.trim(),$('password').value);
+  else await api.login($('email').value.trim(),$('password').value,$('loginCountry').value);
   $('password').value='';
   const loaded=await api.load();if(attempt!==epoch)return;
   if(loginMethod==='setup'){showFirstPasswordForm(loaded);return;}
