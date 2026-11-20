@@ -1617,3 +1617,19 @@ dialog #detailTitle:focus{outline:none}
 .person-record{position:relative;display:flex;flex-direction:column;min-width:0}.person-record .card-head{align-items:flex-start;gap:.65rem}.person-record .card-head>div:first-child{min-width:0}.person-record h2{overflow-wrap:anywhere}.person-record-invite{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.35rem}.person-record-invite .button{font-size:.75rem;padding:.45rem .65rem;min-height:44px;white-space:normal}.person-record-footer{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:.4rem;padding-top:.75rem;margin-top:auto}.person-record-footer .button:not(.person-record-edit),.person-record-invite .button{position:relative;z-index:2}.person-record-edit::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:1}.person-record:has(.person-record-edit:focus-visible){outline:3px solid var(--accent,#258258);outline-offset:3px}.assignment-card .row-actions{flex-wrap:wrap;gap:.4rem}.assignment-card .row-actions .button{min-height:44px;white-space:normal}.apartment-invitations{padding:0 .75rem .75rem}.apartment-invitations:empty{display:none}.apartment-invitations .row-actions{flex-wrap:wrap;justify-content:flex-end}.apartment-invitations .row-actions small{margin-inline-end:auto}.apartment-invitations .button{font-size:.75rem;min-height:44px;white-space:normal}
 
 .person-record .card-head{display:grid;grid-template-columns:minmax(0,1fr) auto}.person-record-invite{max-width:10rem}
+
+/* Quiet password-request UX: people section keeps the queue collapsed. */
+#phoneRecoveryRequestsPanel[hidden]{display:none!important}
+.ay-recovery-shortcut{display:flex;justify-content:flex-end;margin:0 0 10px}
+.ay-recovery-shortcut .button{font-size:13px;min-height:38px}
+.ay-recovery-management{margin:18px clamp(12px,3vw,24px) 26px;border:1px solid var(--line);border-radius:12px;background:var(--paper);overflow:hidden}
+.ay-recovery-management>summary{list-style-position:inside;cursor:pointer;display:flex;align-items:center;gap:8px;padding:14px 16px;font-weight:600;font-size:14px;min-height:48px}
+.ay-recovery-management>summary:focus-visible{outline:2px solid var(--focus);outline-offset:-3px}
+.ay-recovery-management-body{padding:0 16px 16px;border-top:1px solid var(--line)}
+.ay-recovery-management-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:10px}
+.ay-recovery-management-head .fine{margin:4px 0}
+.ay-recovery-management .ay-recovery-count{vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:11px;padding:0 6px;font-size:11px;font-weight:700;color:var(--ink);background:var(--soft);border:1px solid var(--line)}
+.ay-recovery-hint{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--line);border-left:2px solid var(--primary);border-radius:9px;background:var(--paper);padding:8px 12px;margin:0 0 12px;font-size:12px;color:var(--muted);line-height:1.5}
+.ay-recovery-hint .text-button{font-size:12px;min-height:34px;padding:4px 6px}
+.ay-recovery-notice{min-height:56px}
+@media(max-width:560px){.ay-recovery-management{margin:14px 12px 20px}.ay-recovery-management-body{padding:0 12px 12px}.ay-recovery-hint{margin:0 8px 10px}}
