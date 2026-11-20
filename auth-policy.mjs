@@ -15,16 +15,26 @@ export function normalizePhone(input){
 }
 // Apply selected country only to national numbers; preserve international input and emails.
 export function loginWithCountry(input,countryCode){
- const raw=String(input||'').trim();
- if(!/^(90|49|43|41|44|33|31|32|1)$/.test(String(countryCode||''))||!raw||raw.includes('@')||!/^[+()\d\s./-]+$/.test(raw))return raw;
+ const raw=String(input||'').trim(),code=String(countryCode||'');
+ if(!/^[1-9]\d{0,3}$/.test(code)||!raw||raw.includes('@')||!/^[+()\d\s./-]+$/.test(raw))return raw;
+ // A country is only applied to national numbers; + and 00 always win.
  if(raw.startsWith('+')||raw.startsWith('00'))return raw;
  const digits=raw.replace(/\D/g,'');
  if(digits.length<6||digits.length>15)return raw;
- if(digits.startsWith('0'))return digits.length>1?'+'+countryCode+digits.slice(1):raw;
- // Preserve existing bare international dialing prefixes used by older accounts.
+ // Italy's national trunk 0 is part of the international subscriber number.
+ if(digits.startsWith('0'))return digits.length>1?'+'+code+(code==='39'?digits:digits.slice(1)):raw;
+ // NANP Caribbean islands use +1 plus a three-digit area prefix. Accept
+ // both 7-digit local and 10-digit area+local numbers with territory selected.
+ if(/^1\d{3}$/.test(code)){
+  if(digits.startsWith(code)&&digits.length>=11)return '+'+digits;
+  if(digits.startsWith(code.slice(1))&&digits.length===10)return '+1'+digits;
+  if(digits.startsWith('1')&&digits.length===11)return '+'+digits;
+ }
+ if(digits.startsWith(code)&&digits.length>=code.length+9)return '+'+digits;
+ // Keep existing bare international prefixes, previously accepted by login.
  if(digits.length>=11&&/^(90|49|43|41|44|33|31|32)/.test(digits))return '+'+digits;
- if(countryCode==='1'&&digits.startsWith('1')&&digits.length===11)return '+'+digits;
- return '+'+countryCode+digits;
+ if(code==='1'&&digits.startsWith('1')&&digits.length===11)return '+'+digits;
+ return '+'+code+digits;
 }
 export function classifyIdentifier(input){
  const raw=String(input||'').trim();if(raw.length<=254&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw))return {kind:'email',value:raw};
