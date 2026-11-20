@@ -986,6 +986,12 @@ dialog p {
 .error {
   color:var(--red)
 }
+.login-identifier-row{display:grid;grid-template-columns:118px minmax(0,1fr);align-items:stretch;gap:9px;min-width:0}
+.login-identifier-row #loginCountry{width:100%;min-width:0;min-height:44px;font-size:14px;padding-inline:8px 22px}
+.login-identifier-row #email{width:100%;min-width:0;min-height:44px;box-sizing:border-box}
+.login-identifier-row #loginCountry[hidden]{display:none}
+.login-identifier-row:has(#loginCountry[hidden]){grid-template-columns:minmax(0,1fr)}
+#loginCountryHint{margin:0;line-height:1.5}
 #loginMessage {
   margin-top:15px
 }
