@@ -8,15 +8,27 @@ const restore=source.slice(source.indexOf('async function resumeSession()'),sour
 const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};};
 const flush=()=>new Promise(r=>setImmediate(r));
 function harness(){
- const elements=new Map(),calls={logout:0,load:0,restore:0,navigate:0};
+ const elements=new Map(),calls={logout:0,load:0,restore:0,navigate:0,loginArgs:null};
  const $=id=>{if(!elements.has(id))elements.set(id,{value:'',open:false,disabled:false,classList:{remove(){},add(){}},listeners:{},addEventListener(type,fn){this.listeners[type]=fn;},setAttribute(){},showModal(){this.open=true;},close(){if(!this.open)return;this.open=false;queueMicrotask(()=>this.listeners.close?.());},reset(){},reportValidity(){return true;}});return elements.get(id);};
  const loaded={role:'super',transactions:[{date:'2026-10-01'}]};let saved=false;
- const api={async login(){saved=true;},async verifyCode(){saved=true;},saved:()=>saved,async restore(){calls.restore++;return saved;},async load(){calls.load++;return loaded;},async logout(){calls.logout++;saved=false;}};
- const context=vm.createContext({$,api,nativePreviewRole:d=>d?.role==='super'?'super':d?.role==='staff'?'staff':null,state:{mode:'signedout'},epoch:0,loginBusy:false,loginMethod:'password',tr:s=>s,beginLoading:()=>()=>{},syncPreferences:async()=>{},hideLoginPassword(){},recordAppEvent(){},loadPersonLogins:async()=>{},loadPushStatuses:async()=>{},loadActivityFeed:async()=>{},browserAlerts:{scheduleReminder(){}},privacyGate:{check:async()=>{}},lastFinancialLoad:0,navigate(){calls.navigate++;},toast(){},URLSearchParams,Date,setTimeout(){},location:{hash:'',pathname:'/',search:''},history:{replaceState(){}}});
+ const api={async login(...args){calls.loginArgs=args;saved=true;},async verifyCode(){saved=true;},saved:()=>saved,async restore(){calls.restore++;return saved;},async load(){calls.load++;return loaded;},async logout(){calls.logout++;saved=false;}};
+ const context=vm.createContext({$,api,nativePreviewRole:d=>d?.role==='super'?'super':d?.role==='staff'?'staff':null,state:{mode:'signedout'},epoch:0,loginBusy:false,loginMethod:'password',tr:s=>s,getLanguage:()=> 'tr',beginLoading:()=>()=>{},syncPreferences:async()=>{},hideLoginPassword(){},recordAppEvent(){},loadPersonLogins:async()=>{},loadPushStatuses:async()=>{},loadActivityFeed:async()=>{},browserAlerts:{scheduleReminder(){}},privacyGate:{check:async()=>{}},lastFinancialLoad:0,navigate(){calls.navigate++;},toast(){},URLSearchParams,Date,setTimeout(){},location:{hash:'',pathname:'/',search:''},history:{replaceState(){}}});
  vm.runInContext(handlers+'\n'+restore,context);
  return {$,api,context,calls,loaded,submit:()=>$('loginForm').listeners.submit({preventDefault(){}}),restore:()=>vm.runInContext('resumeSession()',context)};
 }
 test('password login closes its dialog and keeps the verified session',async()=>{const h=harness();h.$('loginDialog').showModal();await h.submit();await flush();assert.equal(h.$('loginDialog').open,false);assert.equal(h.context.state.mode,'connected');assert.equal(h.api.saved(),true);assert.equal(h.calls.logout,0);assert.equal(h.$('loginSubmit').disabled,false);});
+test('password form sends selected country and leaves email mode unchanged',async()=>{
+ const h=harness();
+ h.$('loginCountry').value='49';h.$('email').value='0151 12345678';
+ await h.submit();await flush();
+ assert.equal(h.calls.loginArgs[0],'0151 12345678');
+ assert.equal(h.calls.loginArgs[2],'49');
+ const other=harness();other.$('email').value='resident@example.invalid';
+ other.$('email').listeners.input();
+ assert.equal(other.$('loginCountry').hidden,true);
+ other.$('useCode').listeners.click();
+ assert.equal(other.$('loginCountry').hidden,true);
+});
 test('restoring a session while the login dialog is open dismisses it',async()=>{const h=harness(),pending=deferred();h.api.restore=()=>pending.promise;const result=h.restore();h.$('loginDialog').showModal();pending.resolve(true);await result;await flush();assert.equal(h.context.state.mode,'connected');assert.equal(h.$('loginDialog').open,false);assert.equal(h.calls.logout,0);});
 test('background restore cannot supersede a manual login in progress',async()=>{const h=harness(),pending=deferred();h.api.load=async()=>{h.calls.load++;return pending.promise;};h.$('loginDialog').showModal();const result=h.submit();await flush();const background=h.restore(),restores=h.calls.restore;pending.resolve(h.loaded);await Promise.all([result,background]);await flush();assert.equal(restores,0);assert.equal(h.$('loginDialog').open,false);assert.equal(h.context.state.mode,'connected');assert.equal(h.$('loginSubmit').disabled,false);assert.equal(h.calls.logout,0);});
 test('failed login keeps the dialog open and shows its error',async()=>{const h=harness();h.api.login=async()=>{throw Error('Invalid credentials');};h.$('loginDialog').showModal();await h.submit();assert.equal(h.$('loginDialog').open,true);assert.equal(h.$('loginMessage').textContent,'Invalid credentials');assert.equal(h.context.state.mode,'signedout');assert.equal(h.$('loginSubmit').disabled,false);});
