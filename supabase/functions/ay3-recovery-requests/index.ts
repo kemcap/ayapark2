@@ -39,8 +39,8 @@ Deno.serve(async req=>{
   try{
    // Always enforce global and per-number throttling. Only use IP throttling
    // if the trusted ingress IP setting is available; never trust client IP headers.
-   const buckets:[string,number][]=[['recovery-global:'+await signed('all'),100],['recovery-phone:'+await signed('phone:'+phone),3]];
-   if(ip)buckets.push(['recovery-ip:'+await signed('ip:'+ip),5]);
+   const buckets:[string,number][]=[['global:'+await signed('all'),100],['phone:'+await signed('phone:'+phone),3]];
+   if(ip)buckets.push(['ip:'+await signed('ip:'+ip),5]);
    for(const [bucket,limit] of buckets){if(!await rpc('ay_auth_login_limit',{p_bucket:bucket,p_limit:limit}))return reply(429,{error:'try_later'},origin);}
    const id=await rpc('ay_recovery_request_submit',{p_site:site,p_phone:phone});
    // No existence information is ever exposed. Only a new valid request creates a notification.
