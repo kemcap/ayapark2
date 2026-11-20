@@ -39,9 +39,9 @@ test('password form sends selected country and leaves email mode unchanged',asyn
  international.$('email').listeners.input();assert.equal(international.$('loginCountry').value,'DE');
  const other=harness();other.$('email').value='resident@example.invalid';
  other.$('email').listeners.input();
- assert.equal(other.$('loginCountry').hidden,true);
+ assert.equal(other.$('loginCountryPicker').hidden,true);
  other.$('useCode').listeners.click();
- assert.equal(other.$('loginCountry').hidden,true);
+ assert.equal(other.$('loginCountryPicker').hidden,true);
 });
 test('restoring a session while the login dialog is open dismisses it',async()=>{const h=harness(),pending=deferred();h.api.restore=()=>pending.promise;const result=h.restore();h.$('loginDialog').showModal();pending.resolve(true);await result;await flush();assert.equal(h.context.state.mode,'connected');assert.equal(h.$('loginDialog').open,false);assert.equal(h.calls.logout,0);});
 test('background restore cannot supersede a manual login in progress',async()=>{const h=harness(),pending=deferred();h.api.load=async()=>{h.calls.load++;return pending.promise;};h.$('loginDialog').showModal();const result=h.submit();await flush();const background=h.restore(),restores=h.calls.restore;pending.resolve(h.loaded);await Promise.all([result,background]);await flush();assert.equal(restores,0);assert.equal(h.$('loginDialog').open,false);assert.equal(h.context.state.mode,'connected');assert.equal(h.$('loginSubmit').disabled,false);assert.equal(h.calls.logout,0);});
