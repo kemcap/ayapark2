@@ -18,6 +18,12 @@ test('national numbers use selected country without rewriting international numb
  assert.equal(loginWithCountry('4915112345678','90'),'+4915112345678');
  assert.equal(loginWithCountry('resident@example.invalid','49'),'resident@example.invalid');
  assert.equal(loginWithCountry('015112345678',''),'015112345678');
+ assert.equal(loginWithCountry('0212345678','39'),'+390212345678');
+ assert.equal(loginWithCountry('555 1234','1242'),'+12425551234');
+ assert.equal(loginWithCountry('242 555 1234','1242'),'+12425551234');
+ assert.equal(loginWithCountry('0555 2345','383'),'+3835552345');
+ assert.equal(loginWithCountry('987654321','91'),'+91987654321');
+ assert.equal(loginWithCountry('0123456789','212'),'+212123456789');
 });
 test('verified phone login uses the existing account and never returns its email',async()=>{const {handler,calls}=server();const r=await handler(request({identifier:'05321234567',password:'abcdef'}));const data=await r.json();assert.equal(r.status,200);assert.equal(data.user.id,'existing-user');assert.equal(calls[0].email,'existing@example.invalid');assert(!JSON.stringify(data).includes('existing@example.invalid'));});
 test('unknown contacts and wrong passwords receive the same neutral response',async()=>{const unknown=server({admin:{limit:async()=>true,lookup:async()=>null}});const wrong=server({signIn:async()=>null});const a=await unknown.handler(request({identifier:'+905321234567',password:'abcdef'})),b=await wrong.handler(request({identifier:'+905321234567',password:'wrong'}));assert.equal(a.status,b.status);assert.deepEqual(await a.json(),await b.json());assert.equal(unknown.calls.length,1);});
