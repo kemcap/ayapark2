@@ -757,7 +757,7 @@ export const english = {
  "Zur Anmeldung": "Back to sign-in",
  "Sprache wechseln": "Change language",
  "Link wird angefordert …": "Requesting link…",
- "Falls für diese Adresse ein Konto besteht, wurde ein Link zum Zurücksetzen versendet. Prüfe auch deinen Spamordner.": "If an account exists for this address, a password reset link has been sent. Check your inbox and spam folder.",
+ "Die Anfrage wurde entgegengenommen. Falls diese Adresse für ein Anmeldekonto hinterlegt ist, wird ein Link versendet. Falls keine E-Mail ankommt, prüfe den Spamordner und frage die Hausverwaltung, ob die Adresse für dein Anmeldekonto hinterlegt ist.": "Your request was received. If this address is linked to a sign-in account, a reset link will be sent. If no email arrives, check spam and ask management whether this address is registered for your sign-in account.",
  "Der Link konnte nicht angefordert werden. Versuche es später erneut.": "The link could not be requested. Please try again later.",
  "Die Passwörter stimmen nicht überein.": "The passwords do not match.",
  "Passwort wird gespeichert …": "Saving password…",
