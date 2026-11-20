@@ -16,7 +16,7 @@ export function bindRecoveryRequests({api,getState,openRecovery}){
  const when=date=>{try{return new Intl.DateTimeFormat(getLanguage()==='tr'?'tr-TR':getLanguage()==='de'?'de-DE':'en-GB',{dateStyle:'short',timeStyle:'short',timeZone:'Europe/Istanbul'}).format(new Date(date));}catch{return '';}};
  function panel(){
   if(!root)return;
-  root.hidden=!eligible();if(root.hidden)return;
+  root.hidden=!eligible();if(root.hidden){root.replaceChildren();return;}
   const x=lang();
   root.innerHTML='<section class="card ay-recovery-admin"><header class="ay-recovery-admin-head"><h2>🔐 '+e(x.heading)+(count?' <span class="ay-recovery-count">'+count+'</span>':'')+'</h2><button type="button" class="button small" data-phone-recovery="refresh">'+e(x.reload)+'</button></header><p class="fine">'+e(x.intro)+'</p>'+
    (error?'<p role="alert">'+e(error)+'</p>':'')+
@@ -25,11 +25,12 @@ export function bindRecoveryRequests({api,getState,openRecovery}){
    '</section>';
  }
  async function load(){
-  if(!eligible()){panel();return;}
+  if(!eligible()){serial++;rows=[];count=0;lastLoad=0;panel();return;}
+  const userId=getState().data.userId;
   const id=++serial;loading=true;error='';panel();
   try{
    const result=await api.raw('/functions/v1/ay3-recovery-requests','POST',{action:'list'},await api.token());
-   if(id!==serial)return;rows=Array.isArray(result?.requests)?result.requests:[];count=Number(result?.open)||0;lastLoad=Date.now();
+   if(id!==serial||!eligible()||getState().data.userId!==userId)return;rows=Array.isArray(result?.requests)?result.requests:[];count=Number(result?.open)||0;lastLoad=Date.now();
   }catch{if(id===serial)error=lang().failed;}
   finally{if(id===serial){loading=false;panel();}}
  }
@@ -46,7 +47,7 @@ export function bindRecoveryRequests({api,getState,openRecovery}){
   finally{updating=false;btn.disabled=false;}
  });
  document.addEventListener('ay5:view',()=>{
-  if(!eligible()){panel();return;}
+  if(!eligible()){serial++;rows=[];count=0;lastLoad=0;panel();return;}
   panel();if(!loading&&Date.now()-lastLoad>15000)void load();
  });
  document.addEventListener('ay2:languagechange',panel);
