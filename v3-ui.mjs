@@ -328,7 +328,7 @@ function unitFinancePanel(s,u,list,historicFinance='',reviewMarkup=''){
   '<div class="uf-current-summary"><span>'+t('Neue Forderungen','Yeni borçlar')+': '+money(currentGross)+'</span><strong'+(currentOpen>0?' class="unit-debt-amount"':'')+'>'+t('Offen','Kalan')+': '+money(currentOpen)+'</strong></div>'+
   (currentRows||'<p class="uf-empty">'+t('Alle laufenden Forderungen beglichen.','Tüm güncel borçlar ödendi.')+'</p>')+
   (paidCurrentRows?'<details class="uf-current-paid"><summary>'+t('Bereits bezahlte laufende Forderungen','Ödenen güncel borçlar')+' ('+currentPaid.length+')</summary>'+paidCurrentRows+'</details>':'')+'</section>':'';
- const credits=(d.credits||[]).filter(x=>!x.void_reason&&x.unit_id===u.id);
+ const credits=(d.credits||[]).filter(x=>!x.void_reason&&x.unit_id===u.id&&(d.role!=='resident'||(d.ownPersonIds||[]).includes(x.person_id)));
  const creditSum=credits.reduce((n,x)=>n+Number(x.cents||0),0);
  const byEntry=new Map();
  for(const a of allocations){
@@ -369,14 +369,14 @@ function unitFinancePanel(s,u,list,historicFinance='',reviewMarkup=''){
  };
  const outstandingMarkup=openClaims.map(claimRow).join('')||'<p class="muted">'+loc3('Keine offenen Forderungen','Açık borç bulunmuyor','No outstanding charges')+'</p>';
  const paidMarkup=paidClaims.length?'<details class="ay-finance-settled"><summary>'+loc3('Beglichene Posten','Ödenmiş kayıtlar','Settled charges')+' ('+paidClaims.length+')</summary>'+paidClaims.map(claimRow).join('')+'</details>':'';
- const creditMarkup=credits.length?'<section class="ay-finance-unapplied"><h4>'+loc3('Noch nicht verrechnete Guthaben','Henüz mahsup edilmemiş alacaklar','Unapplied credits')+'</h4><p class="fine">'+loc3('Diese Beträge sind nicht von offenen Forderungen abgezogen.','Bu tutarlar açık borçlardan düşülmemiştir.','These amounts have not reduced outstanding charges.')+'</p>'+credits.map(c=>'<div class="ay-finance-credit-row"><span>'+esc(c.person_id?personName(d,c.person_id):loc3('Nicht zugeordnet','Kişi belirlenmedi','Unassigned'))+'</span><strong>'+money(c.cents)+'</strong></div>').join('')+'</section>':'';
+ const creditMarkup=credits.length?'<section class="ay-finance-unapplied"><h4>'+loc3('Noch nicht verrechnete Zahlung / Guthaben','Henüz mahsup edilmemiş ödeme / alacak','Unapplied payment / credit')+'</h4><p class="fine">'+loc3('Diese Beträge sind nicht von offenen Forderungen abgezogen.','Bu tutarlar açık borçlardan düşülmemiştir.','These amounts have not reduced outstanding charges.')+'</p>'+credits.map(c=>'<div class="ay-finance-credit-row"><span>'+esc(c.person_id?personName(d,c.person_id):loc3('Nicht zugeordnet','Kişi belirlenmedi','Unassigned'))+'</span><strong>'+money(c.cents)+'</strong></div>').join('')+'</section>':'';
  const reviewCount=(reviewMarkup.match(/class="review-item"/g)||[]).length;
  const financeTabs='<div class="ay-finance-tabs" role="tablist" aria-label="'+loc3('Finanzbereiche','Mali durum bölümleri','Finance sections')+'">'+[
   ['debts',loc3('Forderungen','Borçlar','Charges')],
   ['payments',loc3('Zahlungen','Ödemeler','Payments')],
   ['history',loc3('Übergabe & Verlauf','Devir & Geçmiş','Transfer & History')]
  ].map(([id,label],index)=>'<button type="button" class="button" role="tab" data-unit-finance-view="'+id+'" aria-selected="'+(index===0)+'" aria-controls="ayFinancePanel-'+id+'" tabindex="'+(index===0?'0':'-1')+'">'+label+'</button>').join('')+'</div>';
- return '<section class="uf-finance ay-finance-workspace" aria-label="'+loc3('Finanzübersicht der Wohnung','Daire finans özeti','Apartment financial overview')+'">'+
+ return '<section class="uf-finance" aria-label="'+loc3('Finanzübersicht der Wohnung','Daire finans özeti','Apartment financial overview')+'"><div class="ay-finance-workspace">'+
   '<div class="ay-finance-total"><span>'+loc3('Erfasste offene Forderungen','Kayıtlı toplam açık alacak','Recorded outstanding charges')+'</span><strong'+(visibleTotal>0?' class="unit-debt-amount"':'')+'>'+money(visibleTotal)+'</strong><small>'+loc3('Summe der hier sichtbaren offenen Forderungen; keinem Bewohner automatisch zugeordnet.','Bu görünümdeki açık kayıtların toplamıdır; herhangi bir sakine otomatik yüklenmez.','Sum of visible outstanding claims; not automatically assigned to a resident.')+'</small></div>'+financeTabs+
   '<section class="ay-finance-view" data-unit-finance-panel="debts" id="ayFinancePanel-debts" role="tabpanel">'+
    '<div class="ay-finance-section-heading"><h4>'+loc3('Offene Forderungen','Açık borç kalemleri','Outstanding charges')+'</h4><span>'+openClaims.length+' '+loc3('Einträge','kayıt','records')+'</span></div>'+
@@ -391,6 +391,7 @@ function unitFinancePanel(s,u,list,historicFinance='',reviewMarkup=''){
   '<section class="ay-finance-view" data-unit-finance-panel="history" id="ayFinancePanel-history" role="tabpanel" hidden>'+
    (legacyBlock||'<p class="muted">'+loc3('Keine übernommenen Altforderungen','Devralınan eski borç bulunmuyor','No transferred legacy charges')+'</p>')+
    historicFinance+
+   (currentBlock?'<details class="ay-finance-old-current"><summary>'+loc3('Zusätzliche Altdarstellung: laufende Forderungen','Ek ayrıntı: güncel yönetim tahakkukları','Extra detail: current management charges')+'</summary>'+currentBlock+'</details>':'')+
    '<button type="button" class="button" data-go-unit-tab="history">'+loc3('Eigentümer- und Personenverlauf ansehen','Malik ve kişi geçmişini gör','View owner and person history')+'</button>'+
-  '</section></section>';
+  '</section></div></section>';
 }
