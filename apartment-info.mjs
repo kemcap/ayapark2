@@ -1,6 +1,6 @@
 import {t as tr} from './i18n.mjs?v=5.10.0';
 import {money} from './core.mjs?v=perf1';
-import {can} from './ui.mjs?v=20261122-filters-correct';
+import {can} from './ui.mjs?v=20261122-reassign-charge';
 import {remaining,unassigned} from './ledger.mjs?v=20261105-owner-transfer';
 import {scopedCharges,personLinks,personName,suggestUnits,creditAvailable,isReversed} from './v3-domain.mjs?v=perf1';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
