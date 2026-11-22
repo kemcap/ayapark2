@@ -5,6 +5,10 @@ on:
     paths:
       - 'v3-ui.mjs'
       - 'app.mjs'
+      - 'language-text.mjs'
+      - 'access-request-policy.mjs'
+      - 'recovery-api.mjs'
+      - 'tests/password-setup.test.mjs'
       - 'ui.mjs'
       - 'index.html'
       - 'unit-finance.css'
