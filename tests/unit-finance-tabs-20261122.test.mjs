@@ -40,7 +40,7 @@ test('A5 finance preserves real-world example math and three tabs without writin
  assert(html.includes(money(360000)),'current tenant subtotal is present');
  assert.equal((html.match(/class="ay-finance-claim"/g)||[]).length,4);
  assert((html.match(/data-action="bind_charge"/g)||[]).length>=3);
- assert.match(html,/Original/); // Original source breakdown accessible
+ assert.match(html,/Orijinal borçları/); // Original source breakdown accessible
  assert.match(html,/class="uf-legacy"/);
  assert.match(html,/data-go-finance-view="debts"/);
  assert.equal(JSON.stringify({charges:d.charges,allocations:d.allocations,credits:d.credits}),before);
