@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {AyaparkApi} from '../api.mjs?v=5.10.0';
 import {t,setLanguage,getLanguage} from '../i18n.mjs?v=5.10.0';
+import {localizedCallingCountries,findCountryFromInternational} from '../phone-country-codes.mjs';
 
 test('recovery callback at root goes to reset page with credentials preserved',()=>{
  const script=readFileSync(new URL('../recovery-redirect.js',import.meta.url),'utf8');
@@ -59,7 +60,7 @@ function harness(){
   async logout(){calls.logout++;},saved(){return null;}
  };
  const context=vm.createContext({$,api,nativePreviewRole:d=>d?.role==='super'?'super':d?.role==='staff'?'staff':null,state:{mode:'signedout'},epoch:0,loginBusy:false,loginMethod:'password',
-  tr:t,getLanguage,beginLoading:()=>()=>{},syncPreferences:async()=>{},hideLoginPassword(){},
+  tr:t,getLanguage,localizedCallingCountries,findCountryFromInternational,e:String,beginLoading:()=>()=>{},syncPreferences:async()=>{},hideLoginPassword(){},
   navigate(){},toast(){},URLSearchParams,Date,setTimeout(){},location:{hash:'',pathname:'/',search:''},
   history:{replaceState(){}},applyStaticLanguage(){},render(){},document:{dispatchEvent(){}},Event});
  vm.runInContext(handlers,context);
