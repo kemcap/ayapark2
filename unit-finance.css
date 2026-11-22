@@ -129,3 +129,13 @@
  .ay-unit-detail .ay-finance-filter-controls{grid-template-columns:minmax(0,1fr)}
  .ay-unit-detail .ay-payment-match-actions{max-width:51%}
 }
+
+
+/* Superadmin-only charge responsibility correction. */
+.ay-unit-detail .ay-reassign-blocked{display:inline-grid;gap:4px;min-width:0}
+.ay-unit-detail .ay-reassign-blocked .button:disabled{opacity:.56;cursor:not-allowed}
+.ay-unit-detail .ay-reassign-blocked small{font-size:11px;line-height:1.5;max-width:240px;color:var(--muted)}
+.ay-charge-debtor-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}
+.ay-reassign-preview{padding:13px;display:grid;gap:7px;border:1px solid var(--line);background:var(--soft);border-radius:12px;color:var(--ink);line-height:1.45;font-size:13px}
+.ay-reassign-preview>span{font-size:12px;color:var(--muted)}
+.ay-reassign-preview>span>strong{color:var(--ink)}
