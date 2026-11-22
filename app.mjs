@@ -343,12 +343,25 @@ async function mutateInner(action,payload){
   const attempt=epoch,result=await api.rpc('ay3_add_historical_assignment',{p_site:state.data.site.id,p_payload:payload});if(attempt!==epoch)throw Error(tr('Oturum değişti.'));
   try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}return result;
  }
+ if(state.mode==='demo'&&action==='reassign_charge'){
+  if(!can(state,'admin'))throw Error(tr('Bu işlem için yetkiniz yok.'));
+  const d=state.data,c=d.charges.find(c=>c.id===payload.charge_id&&!c.void_reason);
+  const l=d.links.find(l=>l.id===payload.link_id&&l.unit_id===c?.unit_id&&['owner','tenant'].includes(l.role));
+  if(!c||!c.person_id||!l||!payload.confirmation||String(payload.reason||'').trim().length<5)throw Error(tr('Sorumlu değişikliği geçersiz.'));
+  if(c.person_id!==payload.expected_person_id||(c.link_id||null)!==(payload.expected_link_id||null))throw Error(tr('Bu borcun sorumlusu değişmiş. Yeniden kontrol edin.'));
+  if((d.allocations||[]).some(a=>a.charge_id===c.id&&!a.void_reason))throw Error(tr('Önce ödeme eşleştirmelerini düzeltin.'));
+  if(l.person_id===c.person_id)throw Error(tr('Başka sorumlu kişi seçin.'));
+  const previous=c.person_id;
+  c.person_id=l.person_id;c.link_id=l.id;
+  d.audit??=[];d.audit.push({action:'reassign_charge',entity_id:c.id,details:{old_person_id:previous,new_person_id:l.person_id,reason:payload.reason},at:new Date().toISOString()});
+  refreshDebts(d);render();return {ok:true,id:c.id};
+ }
  if(state.mode==='demo'){const r=demoCommand(state.data,action,payload);state.data.transactions.sort((a,b)=>b.date.localeCompare(a.date));refreshDebts(state.data);render();return r;}
  const attempt=epoch,result=await api.command(state.data.site.id,action,payload);if(action==='announcement'&&payload.published===true){void sendImportantPush(result,payload).catch(error=>console.warn('Push dispatch:',error.message));}if(attempt!==epoch)throw Error(tr("Oturum değişti."));
  try{await reload();}catch(error){if(attempt!==epoch)throw error;state.stale=true;render();}
  return result;
 }
-function permissionFor(action){return ['entry','classify_entry','bind_charge','budget','monthly_exception','disable_exception','reverse','unallocate','void_charge','void_credit','user_access','staff_remove','person_lifecycle','person_restore','settings','permissions','publish_report'].includes(action)?'admin':['assignment_owner_transfer','assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_category','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
+function permissionFor(action){return ['entry','classify_entry','bind_charge','reassign_charge','budget','monthly_exception','disable_exception','reverse','unallocate','void_charge','void_credit','user_access','staff_remove','person_lifecycle','person_restore','settings','permissions','publish_report'].includes(action)?'admin':['assignment_owner_transfer','assignment_add','assignment_edit','assignment_remove','assignment_restore','person','person_link','link','edit_link','occupancy','end_link','unlink','switch_tenant','provider','provider_category','provider_note'].includes(action)?'people':action==='announcement'?'announcements':action==='import'?'import':'finance';}
 function showForm(action,args={}){
  if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
  if(writeBusy)throw Error(tr("Önce devam eden işlemin tamamlanmasını bekleyin."));
@@ -896,7 +909,7 @@ $('actionForm').addEventListener('submit',async event=>{
    }
   }
   if(back)restoreParentForm(back);
-  if(!state.stale&&finishedForm.origin){const origin=finishedForm.origin;if(origin.action==='unit')showDetail(linkedUnitDetail(origin.id));else if(origin.action==='person_manage')showDetail(personManager(state,origin.id));}
+  if(!state.stale&&finishedForm.origin){const origin=finishedForm.origin;if(origin.action==='unit')showDetail(linkedUnitDetail(origin.id));else if(origin.action==='person_manage')showDetail(personManager(state,origin.id));else if(origin.action==='charge_detail')showDetail(chargeWithReceipts(origin.id));}
   if(!state.stale&&finishedForm.context?.correction_unit&&finishedForm.origin?.action==='unit'){selectUnitTab('finances');selectUnitFinanceView('payments');}
   toast(state.stale?tr("Kaydedildi; görünüm yenilenemedi. Sayfayı yeniden açın."):state.mode==='demo'?tr("Örnek çalışma alanında kaydedildi."):tr("Kayıt tamamlandı."));
  }catch(error){if(attempt===epoch){if(formAction?.action==='provider'&&!$('actionFields').querySelector('input[name="categories"]:checked')){const disclosure=$('actionFields').querySelector('.provider-category-disclosure');if(disclosure)disclosure.open=true;const counter=$('actionFields').querySelector('#providerCategorySelectionCount');if(counter)counter.dataset.invalid='true';}error.message=tr(error.message);showFormError($('actionForm'),$('actionMessage'),error);}}
