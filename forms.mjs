@@ -55,6 +55,8 @@ export function payloadLegacy(action,form,context){
   p.cents=action==='entry'&&get('direction')==='out'?-cents:cents;if(action==='settings')p.opening_cents=cents;
  }
  if(['reverse','unallocate','void_charge','ignore_staged'].includes(action)&&get('reason').length<3)throw Error(tr("En az üç karakterlik gerekçe yazın."));
+ if(action==='unallocate'){delete p.unit;delete p.entry;delete p.charge;}
+ if(action==='allocate'){delete p.correction_unit;delete p.unit;delete p.entry;delete p.charge;}
  if(action==='person'){p.active=context.id?bool('active'):true;if(!p.full_name)throw Error(tr("Ad soyad gerekli."));}
  if(action==='announcement')p.published=bool('published');
  if(action==='permissions'){p.user_id=context.id;if(bool('task_mode')){p.tasks=taskOptions().map(([key])=>key).filter(bool);p.management_read=bool('management_read');}else p.capabilities=['finance','import','people','announcements'].filter(bool);}
