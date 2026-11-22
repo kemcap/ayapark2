@@ -10,7 +10,7 @@ import {financePanel} from './finance-forms.mjs?v=20261105-owner-transfer';
 import {notificationTitle,notificationBody,hasRead,receives,notificationCenter,notificationState,notificationExpired} from './notifications.mjs?v=20261105-owner-transfer';
 import {compactReview,reviewPanel} from './review-ui.mjs?v=perf1';
 import {apartmentInfo,unitDebtCategory} from './apartment-info.mjs?v=20261113-finance-colors';
-import {assignmentCard,invitationButton} from './people-ui.mjs?v=20261113-finance-colors';
+import {assignmentCard,invitationButton} from './people-ui.mjs?v=20261122-filters-correct';
 import {displayedOwnerEnd,ownerHistoryIssues} from './owner-history.mjs?v=20261104';
 import {renderHistoryPreview,newestHistoryFirst} from './history-preview.mjs?v=20261104';
 import {unitDebtBuckets,formerDebtGroups} from './unit-debt-view.mjs?v=20261105-owner-transfer';
@@ -23,7 +23,7 @@ import {t as tr,locale} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money} from './core.mjs?v=perf1';
 import {analyzeStage} from './reconcile.mjs?v=5.10.0';
 import {remaining,paid,unassigned} from './ledger.mjs?v=20261105-owner-transfer';
-import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs?v=20261113-finance-colors';
+import {can,card,heading,button,badge,date,icon,empty,visible,allocationTable} from './ui.mjs?v=20261122-filters-correct';
 import {residentClaimsPanel,residentClaimsDetail} from './site-claims-ui.mjs?v=20261113-finance-colors';
 
 export {residentClaimsDetail};
