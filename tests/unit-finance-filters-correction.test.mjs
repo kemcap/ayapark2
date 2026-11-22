@@ -73,7 +73,7 @@ test('a correction requires a reason and confirmation and never edits the bank r
  setLanguage('tr');const {s}=fixture();
  const form=buildLegacyForm(s,'unallocate',{id:'match1',unit:'A5',entry:'bank1'});
  assert.match(form.body,/Dues/);
- assert.match(form.body,/Eşleştirmeyi/);
+ assert.match(form.body,/Mevcut eşleştirme/);
  assert.match(form.body,/name="reason"/);
  assert.throws(()=>payloadLegacy('unallocate',new FormData(),form.context));
  const values=new FormData();values.set('reason','Yanlış dönem');values.set('confirmation','on');
