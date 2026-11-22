@@ -83,6 +83,8 @@ test('a correction requires a reason and confirmation and never edits the bank r
  assert.equal(payload.unit,undefined);
  assert.equal(payload.entry,undefined);
  assert.equal(payload.cents,undefined);
+ // The entry becomes available only after the confirmed allocation has been voided.
+ s.data.allocations.find(a=>a.id==='match1').void_reason='Test correction';
  const reassign=buildLegacyForm(s,'allocate',{entry:'bank1',unit:'A5',amount:'20,00',correction_unit:'A5'});
  assert.match(reassign.body,/value="bank1" selected/);
  assert.match(reassign.body,/value="20,00"/);
