@@ -27,6 +27,10 @@ jobs:
           node --check app.mjs
           node --check ui.mjs
           node --check unit-debt-view.mjs
+      - name: Install pinned dependencies
+        run: npm ci
       - name: Run apartment accounting and UI regression
         run: |
           node --test tests/unit-finance-tabs-20261122.test.mjs tests/apartment-detail-ux.test.mjs tests/legacy-finance-view.test.mjs tests/unit-finance-dashboard.test.mjs tests/unit-debt-view.test.mjs tests/unit-debt-visibility.test.mjs
+      - name: Run complete application unit-test suite
+        run: npm test
