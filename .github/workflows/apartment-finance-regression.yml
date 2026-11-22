@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - 'v3-ui.mjs'
+      - 'api.mjs'
+      - 'database/ay3_reassign_charge_guarded_audit.sql'
+      - 'tests/charge-reassignment.test.mjs'
       - 'app.mjs'
       - 'language-text.mjs'
       - 'access-request-policy.mjs'
@@ -33,6 +36,8 @@ jobs:
       - name: Validate JavaScript
         run: |
           node --check v3-ui.mjs
+          node --check api.mjs
+          node --check v3-forms.mjs
           node --check app.mjs
           node --check ui.mjs
           node --check unit-debt-view.mjs
@@ -42,6 +47,6 @@ jobs:
         run: npm ci
       - name: Run apartment accounting and UI regression
         run: |
-          node --test tests/unit-finance-filters-correction.test.mjs tests/unit-finance-tabs-20261122.test.mjs tests/apartment-detail-ux.test.mjs tests/legacy-finance-view.test.mjs tests/unit-finance-dashboard.test.mjs tests/unit-debt-view.test.mjs tests/unit-debt-visibility.test.mjs
+          node --test tests/charge-reassignment.test.mjs tests/unit-finance-filters-correction.test.mjs tests/unit-finance-tabs-20261122.test.mjs tests/apartment-detail-ux.test.mjs tests/legacy-finance-view.test.mjs tests/unit-finance-dashboard.test.mjs tests/unit-debt-view.test.mjs tests/unit-debt-visibility.test.mjs
       - name: Run complete application unit-test suite
         run: npm test
