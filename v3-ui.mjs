@@ -340,7 +340,7 @@ function unitFinancePanel(s,u,list,historicFinance='',reviewMarkup=''){
  const paymentRows=[...byEntry.values()].sort((a,b)=>entryDate(b).localeCompare(entryDate(a))||String(a.entry?.id||'').localeCompare(String(b.entry?.id||''))).map(p=>{
    const booked=entryDate(p),person=p.entry?.sender_name||p.entry?.sender||t('Zahler nicht verfügbar','Ödeyen bilgisi yok');
    const lineItems=p.items.map(({c,a})=>{
-    const correction=can(s,'admin')?'<button type="button" class="button small ay-allocation-correct" data-action="unallocate" data-id="'+esc(a.id)+'">'+(locale().slice(0,2)==='tr'?'Eşleştirmeyi düzelt':locale().slice(0,2)==='en'?'Correct allocation':'Zuordnung korrigieren')+'</button>':'';
+    const correction=can(s,'admin')?'<button type="button" class="button small ay-allocation-correct" data-action="unallocate" data-id="'+esc(a.id)+'" data-entry="'+esc(a.entry_id||'')+'" data-unit="'+esc(u.id)+'">'+(locale().slice(0,2)==='tr'?'Eşleştirmeyi düzelt':locale().slice(0,2)==='en'?'Correct allocation':'Zuordnung korrigieren')+'</button>':'';
     return '<li class="ay-payment-match"><span>'+esc(c.category||c.label||'—')+' · '+esc(subject(c).name)+(c.period_from?' · '+date(c.period_from):'')+'</span><span class="ay-payment-match-actions"><strong>'+money(a.cents)+'</strong>'+correction+'</span></li>';
    }).join('');
    const shared=p.entry&&Number(p.entry.cents)!==p.sum?'<small>'+t('Für diese Wohnung verrechnet','Bu daireye mahsup edilen')+': '+money(p.sum)+(can(s,'finance')?' · '+t('Gesamtüberweisung','Toplam havale')+': '+money(p.entry.cents):'')+'</small>':'';
