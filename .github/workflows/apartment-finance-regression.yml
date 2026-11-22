@@ -1,0 +1,32 @@
+name: Apartment finance workspace regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'v3-ui.mjs'
+      - 'app.mjs'
+      - 'ui.mjs'
+      - 'index.html'
+      - 'unit-finance.css'
+      - 'tests/unit-finance-tabs-20261122.test.mjs'
+      - '.github/workflows/apartment-finance-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  finance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate JavaScript
+        run: |
+          node --check v3-ui.mjs
+          node --check app.mjs
+          node --check ui.mjs
+          node --check unit-debt-view.mjs
+      - name: Run apartment accounting and UI regression
+        run: |
+          node --test tests/unit-finance-tabs-20261122.test.mjs tests/apartment-detail-ux.test.mjs tests/legacy-finance-view.test.mjs tests/unit-finance-dashboard.test.mjs tests/unit-debt-view.test.mjs tests/unit-debt-visibility.test.mjs
