@@ -1,4 +1,4 @@
-import {english} from './english.mjs?v=5.10.0';
+import {english} from './english.mjs?v=20261120-recovery';
 // Exact lookup for developer-authored interface text only, never user or database content.
 export const uiText=(german,language)=>language==='en'?(english[german]??german):german;
 export const chooseText=(german,turkish,language)=>language==='tr'?turkish:uiText(german,language);
