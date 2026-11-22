@@ -20,6 +20,7 @@ import {contactError} from './contact-requests.mjs?v=perf1';
 import {mayUseTaskAction} from './task-permissions.mjs?v=20261105-owner-transfer';
 import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.10.0';
 import {bindRecoveryRequests} from './recovery-requests-ui.mjs?v=20261120-compact-bell';
+import {applyUnitClaimFilters} from './unit-claim-filters.mjs?v=20261122-apartment-filters';
 import {bindAccessRequests} from './access-request-ui.mjs?v=perf1';
 import {popupProgress,closeMenuOnScroll} from './seven-ux.mjs?v=20261105-owner-transfer';
 import {installSmartHeader} from './smart-header.mjs?v=5.9.49';
@@ -462,6 +463,10 @@ function selectUnitFinanceView(key,{focus=false}={}){
  }
  return true;
 }
+document.addEventListener('change',event=>{
+ const input=event.target.closest?.('#detailDialog .ay-finance-workspace [data-unit-claim-filter]');
+ if(input)applyUnitClaimFilters(input.closest('.ay-finance-workspace'));
+});
 document.addEventListener('keydown',event=>{
  const current=event.target.closest('#detailDialog .ay-finance-workspace [data-unit-finance-view]');
  if(!current||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
@@ -865,9 +870,35 @@ $('actionForm').addEventListener('submit',async event=>{
    }
   }
   const payload=payloadFor(action,new FormData($('actionForm')),context);
+  // Preserve a single allocation's original entry and apartment for a guided correction.
+  // Only an explicitly confirmed unallocation can start a new, separate allocation.
+  const matchToCorrect=action==='unallocate'&&formAction.args.unit&&can(state,'admin')
+   ?state.data.allocations?.find(a=>a.id===formAction.args.id&&!a.void_reason):null;
+  const originalCharge=matchToCorrect?state.data.charges?.find(c=>c.id===matchToCorrect.charge_id):null;
+  const correction=matchToCorrect&&originalCharge?.unit_id===formAction.args.unit&&matchToCorrect.entry_id
+   ?{unit:originalCharge.unit_id,entry:matchToCorrect.entry_id,cents:Number(matchToCorrect.cents)}:null;
   writeBusy=true;$('saveAction').disabled=true;$('cancelAction').disabled=true;$('actionMessage').textContent='';stopLoading=beginLoading($('actionMessage'),tr('Kaydediliyor…'));
   await mutate(action==='ignore_staged'?'confirm_staged':action,payload);
-  if(attempt!==epoch)return;const back=formAction.back;writeBusy=false;$('actionDialog').close();if(back)restoreParentForm(back);if(!state.stale&&formAction.origin){const origin=formAction.origin;if(origin.action==='unit')showDetail(linkedUnitDetail(origin.id));else if(origin.action==='person_manage')showDetail(personManager(state,origin.id));}toast(state.stale?tr("Kaydedildi; görünüm yenilenemedi. Sayfayı yeniden açın."):state.mode==='demo'?tr("Örnek çalışma alanında kaydedildi."):tr("Kayıt tamamlandı."));
+  if(attempt!==epoch)return;
+  const finishedForm=formAction,back=finishedForm.back;
+  writeBusy=false;$('actionDialog').close();
+  if(correction&&!state.stale){
+   detailView={action:'unit',id:correction.unit};
+   showDetail(linkedUnitDetail(correction.unit));selectUnitTab('finances');selectUnitFinanceView('payments');
+   try{
+    // This is intentionally a second, separately confirmed booking; cancelling
+    // leaves the original bank receipt unapplied instead of silently moving money.
+    showForm('allocate',{entry:correction.entry,unit:correction.unit,correction_unit:correction.unit,amount:(correction.cents/100).toFixed(2).replace('.',',')});
+    return;
+   }catch(error){
+    toast((getLanguage()==='tr'?'Önceki eşleştirme kaldırıldı. Yeni eşleştirme için Mali İşler bölümünü kullanın.':getLanguage()==='de'?'Die Zuordnung wurde aufgehoben. Neue Zuordnung über Finanzen erstellen.':'Allocation removed. Reassign from Finance.')+' '+(error?.message||''));
+    return;
+   }
+  }
+  if(back)restoreParentForm(back);
+  if(!state.stale&&finishedForm.origin){const origin=finishedForm.origin;if(origin.action==='unit')showDetail(linkedUnitDetail(origin.id));else if(origin.action==='person_manage')showDetail(personManager(state,origin.id));}
+  if(!state.stale&&finishedForm.context?.correction_unit&&finishedForm.origin?.action==='unit'){selectUnitTab('finances');selectUnitFinanceView('payments');}
+  toast(state.stale?tr("Kaydedildi; görünüm yenilenemedi. Sayfayı yeniden açın."):state.mode==='demo'?tr("Örnek çalışma alanında kaydedildi."):tr("Kayıt tamamlandı."));
  }catch(error){if(attempt===epoch){if(formAction?.action==='provider'&&!$('actionFields').querySelector('input[name="categories"]:checked')){const disclosure=$('actionFields').querySelector('.provider-category-disclosure');if(disclosure)disclosure.open=true;const counter=$('actionFields').querySelector('#providerCategorySelectionCount');if(counter)counter.dataset.invalid='true';}error.message=tr(error.message);showFormError($('actionForm'),$('actionMessage'),error);}}
  finally{stopLoading();writeBusy=false;$('saveAction').disabled=false;$('cancelAction').disabled=false;}
 });
