@@ -32,7 +32,7 @@ import {notifications,unreadNotifications,hasRead,nextPopup,notificationList,not
 import {bindDesign} from './design.mjs?v=5.10.0';
 import {enhanceTables} from './ui-accessibility.mjs?v=5.10.1';
 import {showFormError,clearFieldError,fieldError} from './ui-feedback.mjs?v=5.10.1';
-import {apartmentInfo} from './apartment-info.mjs?v=20261113-finance-colors';
+import {apartmentInfo} from './apartment-info.mjs?v=20261122-filters-correct';
 import {initializePreferences,syncPreferences,endPreferenceSession,changePreference,resetPreferences,preferences,beginLoading} from './preferences.mjs?v=perf1';
 import {updateAssignmentForm} from './assignments.mjs?v=20261105-owner-transfer';
 import {suggestedOwnerEnd} from './owner-history.mjs?v=20261104';
