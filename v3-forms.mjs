@@ -70,6 +70,23 @@ export function buildV3Form(s,action,args={}){
  else if(action==='bind_charge'){
   const c=d.charges.find(c=>c.id===args.id);title=tr('Sorumlu kişiyi seçin');body=sel('link_id','Kişi',[['',tr('Kişi seçin.')],...d.links.filter(l=>l.unit_id===c?.unit_id).map(l=>[l.id,personName(d,l.person_id)+' · '+roleLabel(l.role)+' · '+l.starts_on+(l.ends_on?' – '+l.ends_on:'')])])+`<p class="fine">${tr('Borç bu kişiye bağlanır. Sonraki sakin değişiklikleri bunu değiştirmez.')}</p>`;
  }
+ else if(action==='reassign_charge'){
+  const c=d.charges.find(x=>x.id===args.id&&!x.void_reason);
+  if(!c||!c.person_id)throw Error(loc('Zugeordnete Forderung nicht gefunden.','Sorumlusu atanmış borç bulunamadı.','Assigned charge not found.'));
+  if((d.allocations||[]).some(a=>a.charge_id===c.id&&!a.void_reason))throw Error(loc('Zuerst die verknüpften Zahlungen korrigieren.','Önce bu borcun ödeme mahsuplarını düzeltin.','Correct the allocated payments first.'));
+  const choices=(d.links||[]).filter(l=>l.unit_id===c.unit_id&&['owner','tenant'].includes(l.role));
+  if(!choices.some(l=>l.person_id!==c.person_id))throw Error(loc('Keine andere Person für diese Wohnung vorhanden.','Bu dairede seçilebilecek başka kişi bulunmuyor.','No alternative person assigned to this apartment.'));
+  const unit=d.units.find(u=>u.id===c.unit_id);
+  const old=personName(d,c.person_id);
+  context.charge_id=c.id;context.expected_person_id=c.person_id;context.expected_link_id=c.link_id||null;
+  context.allowed_links=choices.map(l=>({id:l.id,person_id:l.person_id}));
+  title=loc('Verantwortliche Person korrigieren','Borç sorumlusunu değiştir','Correct responsible person');
+  body='<div class="ay-reassign-preview"><strong>'+e(unit?.code||'')+' · '+e(c.label||c.category)+'</strong><span>'+loc('Betrag','Tutar','Amount')+': '+money(c.cents)+'</span><span>'+loc('Bisher verantwortlich','Mevcut sorumlu','Currently responsible')+': <strong>'+e(old)+'</strong></span></div>'+
+   sel('link_id',loc('Neue verantwortliche Person','Yeni sorumlu kişi','New responsible person'),[['',loc('Person auswählen','Kişi seçin','Choose a person')],...choices.filter(l=>l.person_id!==c.person_id).map(l=>[l.id,personName(d,l.person_id)+' · '+roleLabel(l.role)+' · '+(l.starts_on||'—')+(l.ends_on?' – '+l.ends_on:'')])])+
+   text('reason',loc('Grund der Korrektur','Değişiklik gerekçesi','Reason for correction'))+
+   '<p class="fine">'+loc('Nur die verantwortliche Person wird geändert. Der Gesamtbetrag der Wohnung bleibt gleich. Bitte Zeitraum und Belege prüfen.','Yalnız sorumlu kişi değişir; dairenin toplam borcu aynı kalır. Borç dönemi ve dayanağı mutlaka kontrol edin.','Only the responsible person changes; the apartment total remains the same. Verify period and supporting records.')+'</p>'+
+   check('confirmation',loc('Ich habe die Zuordnung und Nachweise geprüft.','Sorumluyu ve dayanağı kontrol ettim; değişikliği onaylıyorum.','I verified the debtor and supporting records and confirm the change.'));
+ }
  else if(action==='classify_entry'){const t=d.transactions.find(t=>t.id===args.id);title=tr('Kategori seçin.');body=sel('category','Kategori',['Aidat','Havuz','Asansör','Demirbaş','Temizlik','Peyzaj','Elektrik','Banka masrafı','Transfer','İade','Diğer'].map(c=>[c,tr(c)]),t?.category||'Diğer');}
  else if(action==='credit'||action==='match_rule'){
   const t=d.transactions.find(t=>t.id===args.entry);if(!t)throw Error(tr('Kayıt bulunamadı.'));context.entry_id=t.id;
@@ -132,7 +149,7 @@ export function buildV3Form(s,action,args={}){
 }
 export function payloadV3(action,form,ctx){
  if(action.startsWith('assignment_'))return assignmentPayload(action,form,ctx);
- const special=['person_lifecycle','person_restore','person_link','occupancy','edit_link','user_access','staff_remove','person','link','end_link','unlink','switch_tenant','bind_charge','credit','void_credit','match_rule','announcement','provider','provider_category','provider_note','classify_entry'];
+ const special=['person_lifecycle','person_restore','person_link','occupancy','edit_link','user_access','staff_remove','person','link','end_link','unlink','switch_tenant','bind_charge','reassign_charge','credit','void_credit','match_rule','announcement','provider','provider_category','provider_note','classify_entry'];
  if(!special.includes(action)){const p=payloadLegacy(action,form,ctx);if(action==='charge'&&(p.period_from||p.period_to)&&(!dateValid(p.period_from)||!dateValid(p.period_to)||p.period_to<p.period_from))throw Error(tr('Borç döneminin başlangıç ve bitiş tarihlerini kontrol edin.'));if(action==='entry'&&p.category==='Diğer'&&!p.desc)throw Error(tr('Açıklama gerekli.'));return p;}
  if(['person_lifecycle','person_restore'].includes(action)){
   if(!form.has('confirmation')||!ctx.person_id)throw Error(loc('Bestätigung erforderlich.','Onay gerekli.'));
@@ -158,6 +175,15 @@ export function payloadV3(action,form,ctx){
  if(action==='staff_remove'){p.user_id=ctx.user_id;p.confirmation=true;}
  p.primary_contact=form.has('primary_contact');if(action==='user_access'){p.confirmation=true;p.new_person=get('person_mode')==='new';if(p.new_person&&(!get('first_name')||!get('last_name')||!get('email')))throw Error(tr('Ad, soyad ve geçerli e-posta gerekli.'));if(!p.new_person&&get('access_email')&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(get('access_email')))throw Error(loc('Bitte eine gültige E-Mail-Adresse eingeben.','Lütfen geçerli bir e-posta adresi yazın.'));}
  if(action==='bind_charge'&&!get('link_id'))throw Error(tr('Kişi seçin.'));
+ if(action==='reassign_charge'){
+  const link=ctx.allowed_links?.find(l=>l.id===get('link_id'));
+  const reason=get('reason');
+  if(!link||link.person_id===ctx.expected_person_id)throw Error(loc('Andere Person auswählen.','Farklı bir sorumlu kişi seçin.','Select a different responsible person.'));
+  if(reason.length<5||reason.length>500)throw Error(loc('Grund mit 5–500 Zeichen angeben.','En az 5, en fazla 500 karakterlik gerekçe yazın.','Enter a reason between 5 and 500 characters.'));
+  if(!form.has('confirmation'))throw Error(loc('Bestätigung erforderlich.','Değişikliği onaylayın.','Confirmation required.'));
+  return {charge_id:ctx.charge_id,expected_person_id:ctx.expected_person_id,expected_link_id:ctx.expected_link_id,link_id:link.id,reason,confirmation:true};
+ }
+
  if(action==='void_credit'&&get('reason').length<3)throw Error(tr('Gerekçe gerekli.'));
  if(['credit','match_rule'].includes(action)){const l=ctx.targets.find(l=>l.id===get('target'));if(!l)throw Error(tr('Kişi seçin.'));p.unit_id=l.unit_id;p.person_id=l.person_id;delete p.targets;
   if(action==='credit')p.cents=payloadLegacy('allocate',form,ctx).cents;
