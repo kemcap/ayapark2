@@ -339,7 +339,10 @@ function unitFinancePanel(s,u,list,historicFinance='',reviewMarkup=''){
  const entryDate=p=>p.entry?.date||p.entry?.booked_on||'';
  const paymentRows=[...byEntry.values()].sort((a,b)=>entryDate(b).localeCompare(entryDate(a))||String(a.entry?.id||'').localeCompare(String(b.entry?.id||''))).map(p=>{
    const booked=entryDate(p),person=p.entry?.sender_name||p.entry?.sender||t('Zahler nicht verfügbar','Ödeyen bilgisi yok');
-   const lineItems=p.items.map(({c,a})=>'<li><span>'+esc(c.category||c.label||'—')+' · '+esc(subject(c).name)+(c.period_from?' · '+date(c.period_from):'')+'</span><strong>'+money(a.cents)+'</strong></li>').join('');
+   const lineItems=p.items.map(({c,a})=>{
+    const correction=can(s,'admin')?'<button type="button" class="button small ay-allocation-correct" data-action="unallocate" data-id="'+esc(a.id)+'">'+(locale().slice(0,2)==='tr'?'Eşleştirmeyi düzelt':locale().slice(0,2)==='en'?'Correct allocation':'Zuordnung korrigieren')+'</button>':'';
+    return '<li class="ay-payment-match"><span>'+esc(c.category||c.label||'—')+' · '+esc(subject(c).name)+(c.period_from?' · '+date(c.period_from):'')+'</span><span class="ay-payment-match-actions"><strong>'+money(a.cents)+'</strong>'+correction+'</span></li>';
+   }).join('');
    const shared=p.entry&&Number(p.entry.cents)!==p.sum?'<small>'+t('Für diese Wohnung verrechnet','Bu daireye mahsup edilen')+': '+money(p.sum)+(can(s,'finance')?' · '+t('Gesamtüberweisung','Toplam havale')+': '+money(p.entry.cents):'')+'</small>':'';
    const memo=can(s,'finance')&&p.entry?.desc?'<details class="uf-bank-reference"><summary>'+t('Originaler Bank-Verwendungszweck','Orijinal banka açıklaması')+'</summary><p>'+esc(p.entry.desc)+'</p></details>':'';
    const missingDate=!booked&&p.created?'<small>'+t('Zuordnung erstellt','Mahsup kayıt tarihi')+': '+date(p.created)+'</small>':'';
@@ -351,6 +354,18 @@ function unitFinancePanel(s,u,list,historicFinance='',reviewMarkup=''){
  const visibleTotal=claims.reduce((sum,c)=>sum+Math.max(0,remaining(d,c)),0);
  const openClaims=claims.filter(c=>remaining(d,c)>0).sort((a,b)=>String(a.due_on||'').localeCompare(String(b.due_on||'')));
  const paidClaims=claims.filter(c=>remaining(d,c)<=0);
+ const personCandidates=[...new Map(claims.filter(c=>c.person_id).map(c=>[c.person_id,subject(c).name])).entries()].sort((a,b)=>a[1].localeCompare(b[1],locale()));
+ const roleFor=c=>{
+  if(!c.person_id)return 'unassigned';
+  const link=(d.links||[]).find(l=>l.id===c.link_id&&l.unit_id===u.id);
+  const role=link?.role||(['owner','tenant'].includes(c.payer)?c.payer:'other');
+  return role==='owner'||role==='tenant'?role:'other';
+ };
+ const filterOptions='<div class="ay-finance-filter-controls" aria-label="'+loc3('Forderungen filtern','Borçları filtrele','Filter charges')+'">'+
+  '<label><span>'+loc3('Verantwortung','Sorumlu rolü','Responsible role')+'</span><select data-unit-claim-filter="role"><option value="all">'+loc3('Alle Rollen','Tüm roller','All roles')+'</option><option value="owner">'+loc3('Eigentümer','Malik','Owner')+'</option><option value="tenant">'+loc3('Mieter / Bewohner','Kiracı / sakin','Tenant / resident')+'</option><option value="unassigned">'+loc3('Nicht zugeordnet','Belirsiz','Unassigned')+'</option><option value="other">'+loc3('Sonstige Zuordnung','Diğer roller','Other roles')+'</option></select></label>'+
+  '<label><span>'+loc3('Person','Kişi','Person')+'</span><select data-unit-claim-filter="person"><option value="all">'+loc3('Alle Personen','Tüm kişiler','All people')+'</option><option value="unassigned">'+loc3('Ohne zugeordnete Person','Kişi belirlenmemiş','No assigned person')+'</option>'+personCandidates.map(([id,name])=>'<option value="'+esc(id)+'">'+esc(name)+'</option>').join('')+'</select></label></div>'+
+  '<p class="ay-finance-filter-summary" role="status" aria-live="polite"><span>'+loc3('Gefiltert','Filtre sonucu','Filtered')+': </span><strong data-unit-claim-subtotal>'+money(openClaims.reduce((n,c)=>n+Math.max(0,remaining(d,c)),0))+'</strong><small data-unit-claim-count> · '+openClaims.length+' '+loc3('offene Einträge','açık kayıt','open records')+'</small></p>';
+
  const claimRow=c=>{
   const left=Math.max(0,remaining(d,c)),received=paid(d,c.id),isOld=originalLegacyIds.has(c.id);
   const person=c.debtor_redacted?loc3('Name ausgeblendet','İsim gizli','Name hidden'):c.person_id?subject(c).name:loc3('Schuldner nicht zugeordnet','Sorumlu kişi belirlenmemiş','Debtor not assigned');
@@ -362,7 +377,7 @@ function unitFinancePanel(s,u,list,historicFinance='',reviewMarkup=''){
   const bind=can(s,'admin')&&!c.person_id?button(loc3('Schuldner festlegen','Sorumlu belirle','Assign debtor'),'bind_charge','data-id="'+esc(c.id)+'"'):'';
   const allocate=can(s,'finance')&&left>0&&c.person_id?button(loc3('Zahlung zuordnen','Ödeme eşleştir','Match payment'),'auto_allocate','data-charge="'+esc(c.id)+'"'):'';
   const more=can(s,'finance')&&c.reference?'<div class="ay-finance-claim-ref">'+loc3('Buchungsreferenz','Kayıt referansı','Entry reference')+': <code>'+esc(c.reference)+'</code></div>':'';
-  return '<details class="ay-finance-claim"><summary><span class="ay-finance-claim-title"><strong>'+label+'</strong><small>'+esc(category)+' · '+esc(person)+'</small></span><span class="ay-finance-claim-amount'+(left>0?' unit-debt-amount':'')+'">'+money(left)+'</span><span aria-hidden="true" class="ay-finance-claim-chevron">⌄</span></summary>'+
+  return '<details class="ay-finance-claim" data-unit-claim-person="'+esc(c.person_id||'unassigned')+'" data-unit-claim-role="'+roleFor(c)+'" data-unit-claim-open="'+(left>0?'1':'0')+'" data-unit-claim-cents="'+left+'"><summary><span class="ay-finance-claim-title"><strong>'+label+'</strong><small>'+esc(category)+' · '+esc(person)+'</small></span><span class="ay-finance-claim-amount'+(left>0?' unit-debt-amount':'')+'">'+money(left)+'</span><span aria-hidden="true" class="ay-finance-claim-chevron">⌄</span></summary>'+
    '<div class="ay-finance-claim-body"><dl class="ay-finance-claim-grid"><div><dt>'+loc3('Ursprünglich','İlk tutar','Original amount')+'</dt><dd>'+money(c.cents)+'</dd></div><div><dt>'+loc3('Verrechnet','Mahsup edilen','Applied')+'</dt><dd>'+money(received)+'</dd></div><div><dt>'+loc3('Offen','Kalan','Outstanding')+'</dt><dd>'+money(left)+'</dd></div><div><dt>'+dateTitle+'</dt><dd>'+date(c.due_on)+'</dd></div><div><dt>'+loc3('Zeitraum','Dönem','Period')+'</dt><dd>'+period+'</dd></div><div><dt>'+loc3('Verantwortlich','Sorumlu','Responsible')+'</dt><dd>'+esc(person)+'</dd></div></dl>'+
    (isOld?'<p class="fine">'+loc3('Das Importdatum ist nicht automatisch die ursprüngliche Fälligkeit. Den Zeitraum anhand der Unterlagen prüfen.','Devir kayıt tarihi, borcun gerçek vadesi değildir. Dönem kaynak belgelerden doğrulanmalıdır.','The import date is not necessarily the original due date. Check the source period.')+'</p>':'')+
    more+'<div class="row-actions">'+actions+bind+allocate+'</div></div></details>';
@@ -380,7 +395,7 @@ function unitFinancePanel(s,u,list,historicFinance='',reviewMarkup=''){
   '<div class="ay-finance-total"><span>'+loc3('Erfasste offene Forderungen','Kayıtlı toplam açık alacak','Recorded outstanding charges')+'</span><strong'+(visibleTotal>0?' class="unit-debt-amount"':'')+'>'+money(visibleTotal)+'</strong><small>'+loc3('Summe der hier sichtbaren offenen Forderungen; keinem Bewohner automatisch zugeordnet.','Bu görünümdeki açık kayıtların toplamıdır; herhangi bir sakine otomatik yüklenmez.','Sum of visible outstanding claims; not automatically assigned to a resident.')+'</small></div>'+financeTabs+
   '<section class="ay-finance-view" data-unit-finance-panel="debts" id="ayFinancePanel-debts" role="tabpanel">'+
    '<div class="ay-finance-section-heading"><h4>'+loc3('Offene Forderungen','Açık borç kalemleri','Outstanding charges')+'</h4><span>'+openClaims.length+' '+loc3('Einträge','kayıt','records')+'</span></div>'+
-   outstandingMarkup+paidMarkup+
+   filterOptions+'<p class="ay-finance-no-matches" data-unit-claim-empty hidden>'+loc3('Keine passenden Forderungen','Bu filtrelerle eşleşen borç yok','No matching charges')+'</p>'+outstandingMarkup+paidMarkup+
    (reviewMarkup?'<div class="ay-finance-issues">'+reviewMarkup+'</div>':'')+
   '</section>'+
   '<section class="ay-finance-view" data-unit-finance-panel="payments" id="ayFinancePanel-payments" role="tabpanel" hidden>'+
