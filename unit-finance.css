@@ -54,3 +54,60 @@
 .uf-credit>strong{font-size:17px;font-variant-numeric:tabular-nums}
 .uf-credit>small{grid-column:1/-1;font-size:11px;color:var(--muted)}
 @media(max-width:480px){.uf-credit{grid-template-columns:1fr}.uf-credit>strong{justify-self:start}}
+
+
+/* AYA PARK 2 apartment-finance workspace: progressive disclosure, no ledger changes. */
+.ay-unit-detail .ay-finance-workspace{display:grid;gap:14px;min-width:0}
+.ay-unit-detail .ay-finance-total{display:grid;gap:6px;padding:18px;background:var(--soft);border:1px solid var(--line);border-radius:15px}
+.ay-unit-detail .ay-finance-total>span{font-size:12px;color:var(--muted);font-weight:650}
+.ay-unit-detail .ay-finance-total>strong{font-size:clamp(23px,3vw,30px);font-weight:800;line-height:1.25;font-variant-numeric:tabular-nums}
+.ay-unit-detail .ay-finance-total>small{font-size:11px;color:var(--muted);line-height:1.6}
+.ay-unit-detail .ay-finance-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:var(--soft);padding:5px;border-radius:12px;min-width:0}
+.ay-unit-detail .ay-finance-tabs [data-unit-finance-view]{border:1px solid transparent!important;border-radius:9px!important;background:transparent!important;color:var(--muted)!important;min-width:0;min-height:44px;padding:9px 8px!important;line-height:1.35;white-space:normal;font-weight:650;font-size:12px;box-shadow:none!important}
+.ay-unit-detail .ay-finance-tabs [data-unit-finance-view][aria-selected=true]{background:var(--paper)!important;border-color:var(--line)!important;color:var(--ink)!important;box-shadow:0 2px 7px #0001!important}
+.ay-unit-detail .ay-finance-tabs [data-unit-finance-view]:focus-visible{outline:2px solid var(--focus,var(--primary));outline-offset:1px}
+.ay-unit-detail .ay-finance-view{min-width:0;display:grid;gap:11px}
+.ay-unit-detail .ay-finance-view[hidden]{display:none!important}
+.ay-unit-detail .ay-finance-view>h4,.ay-unit-detail .ay-finance-section-heading h4{font-size:15px;line-height:1.4;margin:5px 0}
+.ay-unit-detail .ay-finance-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ay-unit-detail .ay-finance-section-heading span{font-size:11px;color:var(--muted)}
+.ay-unit-detail .ay-finance-claim{border:1px solid var(--line);border-radius:12px;background:var(--paper);overflow:hidden;min-width:0}
+.ay-unit-detail .ay-finance-claim>summary{cursor:pointer;display:flex;align-items:center;gap:9px;list-style:none;min-height:68px;padding:12px 14px}
+.ay-unit-detail .ay-finance-claim>summary::-webkit-details-marker{display:none}
+.ay-unit-detail .ay-finance-claim>summary:focus-visible{outline:2px solid var(--focus,var(--primary));outline-offset:-3px}
+.ay-unit-detail .ay-finance-claim-title{display:grid;gap:5px;min-width:0;flex:1}
+.ay-unit-detail .ay-finance-claim-title strong{font-size:13px;color:var(--ink);line-height:1.4;overflow-wrap:anywhere}
+.ay-unit-detail .ay-finance-claim-title small{font-size:11px;color:var(--muted);line-height:1.45}
+.ay-unit-detail .ay-finance-claim-amount{font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap;font-size:14px}
+.ay-unit-detail .ay-finance-claim-chevron{color:var(--muted);font-size:17px;transition:transform .15s}
+.ay-unit-detail .ay-finance-claim[open] .ay-finance-claim-chevron{transform:rotate(180deg)}
+.ay-unit-detail .ay-finance-claim-body{padding:14px;background:var(--soft);border-top:1px solid var(--line);display:grid;gap:12px;min-width:0}
+.ay-unit-detail .ay-finance-claim-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0}
+.ay-unit-detail .ay-finance-claim-grid>div{display:grid;gap:4px;min-width:0}
+.ay-unit-detail .ay-finance-claim-grid dt{color:var(--muted);font-size:10px}
+.ay-unit-detail .ay-finance-claim-grid dd{margin:0;color:var(--ink);font-weight:650;font-size:12px;overflow-wrap:anywhere}
+.ay-unit-detail .ay-finance-claim-ref{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.ay-unit-detail .ay-finance-claim-ref code{overflow-wrap:anywhere;word-break:break-all}
+.ay-unit-detail .ay-finance-claim-body .row-actions{display:flex;flex-wrap:wrap;gap:8px}
+.ay-unit-detail .ay-finance-claim-body .row-actions>.button{min-height:42px}
+.ay-unit-detail .ay-finance-settled{padding:8px 0;border-top:1px solid var(--line);margin-top:5px}
+.ay-unit-detail .ay-finance-settled>summary{cursor:pointer;font-size:12px;color:var(--muted);padding:10px 0;min-height:40px}
+.ay-unit-detail .ay-finance-settled>.ay-finance-claim{margin:7px 0}
+.ay-unit-detail .ay-finance-unapplied{display:grid;gap:8px;border:1px solid var(--line);padding:14px;border-radius:12px}
+.ay-unit-detail .ay-finance-unapplied h4{margin:0;font-size:13px}
+.ay-unit-detail .ay-finance-credit-row{display:flex;justify-content:space-between;gap:10px;font-size:12px;border-top:1px solid var(--line);padding-top:8px}
+.ay-unit-detail .ay-finance-credit-row strong{font-variant-numeric:tabular-nums}
+.ay-unit-detail .ay-finance-issues{margin-top:8px}
+.ay-unit-detail .ay-finance-issues>.review-panel{border-top:1px solid var(--line)}
+.ay-unit-detail .ay-finance-review-shortcut{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;margin-top:10px;border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:9px;font-size:12px}
+.ay-unit-detail .ay-finance-review-shortcut .button{min-height:38px}
+.ay-unit-detail .ay-unit-overview-rows .unit-debt-amount{font-weight:750}
+@media(max-width:560px){
+ .ay-unit-detail .ay-finance-tabs{gap:3px;padding:4px}
+ .ay-unit-detail .ay-finance-tabs [data-unit-finance-view]{padding:9px 4px!important;font-size:11px}
+ .ay-unit-detail .ay-finance-claim-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ay-unit-detail .ay-finance-claim>summary{padding:12px 10px;gap:6px}
+ .ay-unit-detail .ay-finance-claim-amount{font-size:12px}
+ .ay-unit-detail .ay-finance-review-shortcut{flex-wrap:wrap}
+}
+@media(prefers-reduced-motion:reduce){.ay-unit-detail .ay-finance-claim-chevron{transition:none}}
