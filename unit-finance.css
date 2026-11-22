@@ -111,3 +111,21 @@
  .ay-unit-detail .ay-finance-review-shortcut{flex-wrap:wrap}
 }
 @media(prefers-reduced-motion:reduce){.ay-unit-detail .ay-finance-claim-chevron{transition:none}}
+
+
+/* Apartment claim filtering and auditable, per-allocation corrections. */
+.ay-unit-detail .ay-finance-filter-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:2px 0 0}
+.ay-unit-detail .ay-finance-filter-controls label{min-width:0;display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:600}
+.ay-unit-detail .ay-finance-filter-controls select{width:100%;min-width:0;height:44px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--paper);color:var(--ink);font-size:13px}
+.ay-unit-detail .ay-finance-filter-summary{margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;font-size:12px;color:var(--muted);line-height:1.6}
+.ay-unit-detail .ay-finance-filter-summary strong{font-weight:750;color:var(--ink);font-variant-numeric:tabular-nums}
+.ay-unit-detail .ay-finance-filter-summary small{font-size:11px;color:var(--muted)}
+.ay-unit-detail .ay-finance-claim[hidden],.ay-unit-detail .ay-finance-settled[hidden],.ay-unit-detail .ay-finance-no-matches[hidden]{display:none!important}
+.ay-unit-detail .ay-finance-no-matches{color:var(--muted);font-size:13px;padding:14px;border:1px dashed var(--line);border-radius:10px}
+.ay-unit-detail .ay-payment-match-actions{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.ay-unit-detail .uf-matches .ay-payment-match{align-items:flex-start}
+.ay-unit-detail .ay-allocation-correct{min-height:38px;padding:6px 10px;font-size:11px;white-space:normal;text-align:center;max-width:165px}
+@media(max-width:550px){
+ .ay-unit-detail .ay-finance-filter-controls{grid-template-columns:minmax(0,1fr)}
+ .ay-unit-detail .ay-payment-match-actions{max-width:51%}
+}
