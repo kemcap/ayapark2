@@ -447,6 +447,29 @@ function selectUnitTab(key,{focus=false}={}){
  }
  return true;
 }
+function selectUnitFinanceView(key,{focus=false}={}){
+ const dialog=$('detailDialog'),workspace=dialog.querySelector('.ay-finance-workspace');
+ if(!workspace||!['debts','payments','history'].includes(key))return false;
+ const panels=[...workspace.querySelectorAll('[data-unit-finance-panel]')];
+ const target=panels.find(panel=>panel.dataset.unitFinancePanel===key);
+ if(!target)return false;
+ for(const panel of panels)panel.hidden=panel!==target;
+ for(const tab of workspace.querySelectorAll('[data-unit-finance-view]')){
+  const active=tab.dataset.unitFinanceView===key;
+  tab.setAttribute('aria-selected',String(active));
+  tab.tabIndex=active?0:-1;
+  if(active&&focus)tab.focus({preventScroll:true});
+ }
+ return true;
+}
+document.addEventListener('keydown',event=>{
+ const current=event.target.closest('#detailDialog .ay-finance-workspace [data-unit-finance-view]');
+ if(!current||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+ const tabs=[...$('detailDialog').querySelectorAll('.ay-finance-workspace [data-unit-finance-view]')];
+ const i=tabs.indexOf(current);
+ const next=event.key==='Home'?0:event.key==='End'?tabs.length-1:(i+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+ event.preventDefault();selectUnitFinanceView(tabs[next].dataset.unitFinanceView,{focus:true});
+});
 document.addEventListener('keydown',event=>{
  const current=event.target.closest('#detailDialog .ay-unit-tabs [data-tab]');if(!current||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
  const tabs=[...$('detailDialog').querySelectorAll('.ay-unit-tabs [data-tab]')],i=tabs.indexOf(current),next=event.key==='Home'?0:event.key==='End'?tabs.length-1:(i+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
@@ -514,6 +537,10 @@ document.addEventListener('click',async event=>{
   applyApartmentQuickFilters();
   return;
  }
+ const jumpFinance=event.target.closest('#detailDialog [data-go-finance-view]');
+ if(jumpFinance){selectUnitTab('finances');selectUnitFinanceView(jumpFinance.dataset.goFinanceView);return;}
+ const innerFinanceTab=event.target.closest('#detailDialog [data-unit-finance-view]');
+ if(innerFinanceTab){selectUnitFinanceView(innerFinanceTab.dataset.unitFinanceView);return;}
  const jumpTab=event.target.closest('#detailDialog [data-go-unit-tab]');if(jumpTab){selectUnitTab(jumpTab.dataset.goUnitTab);return;}
   const tab=event.target.closest('#detailDialog .ay-unit-tabs [data-tab]');if(tab){selectUnitTab(tab.dataset.tab);return;}
  const changeChart=event.target.closest('[data-finance-chart-view]');
