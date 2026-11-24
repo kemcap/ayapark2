@@ -15,7 +15,7 @@ export function loginIdentifier(input){
  else if(digits.length===11&&digits.startsWith('05'))digits='90'+digits.slice(1);
  return /^[1-9]\d{9,14}$/.test(digits)?'resident-'+digits+'@ayapark2.invalid':raw;
 }
-const TABLES=new Set(['site_sites','site_units','site_blocks','site_staff_memberships','site_resident_units','ay2_settings','ay2_permissions','ay2_entries','ay2_charges','ay2_allocations','ay2_people','ay2_announcements','ay2_reports','ay2_audit','ay2_staged_charges','ay2_devir_snapshot']);
+const TABLES=new Set(['site_sites','site_units','site_blocks','site_staff_memberships','site_resident_units','ay2_settings','ay2_permissions','ay2_batches','ay2_entries','ay2_charges','ay2_allocations','ay2_people','ay2_announcements','ay2_reports','ay2_audit','ay2_staged_charges','ay2_devir_snapshot']);
 export class AyaparkApi {
  constructor(fetcher=(...args)=>globalThis.fetch(...args),{persist=true,storage,previewOnly=false,verifiedPhoneLogin=ENABLE_VERIFIED_PHONE_LOGIN}={}) {
   this.verifiedPhoneLogin=verifiedPhoneLogin;this.previewOnly=previewOnly;this.fetcher=fetcher;this.generation=0;this.session=null;this.expiry=0;this.refreshing=null;
