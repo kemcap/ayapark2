@@ -16,6 +16,7 @@ import {receiptButtons,downloadWorkbook,openExport} from './report-export-ui.mjs
 import {readBankFile} from './bank-file-reader.mjs?v=5.10.0';
 import {bankFileMessage} from './bank-file-adapters.mjs?v=5.10.0';
 import {reviewImport} from './import-review.mjs?v=5.9.33';
+import {checkBankImport,sourceBounds} from './bank-import-preflight.mjs?v=20261124';
 import {contactError} from './contact-requests.mjs?v=perf1';
 import {mayUseTaskAction} from './task-permissions.mjs?v=20261105-owner-transfer';
 import {bindAdminRecovery} from './admin-recovery-ui.mjs?v=5.10.0';
@@ -49,7 +50,7 @@ import {template} from './v3-import.mjs?v=perf1';
 import {t as tr,getLanguage,setLanguage,bindStaticText} from './i18n.mjs?v=5.10.0';
 import {escapeHtml as e,money,roleName,parseCsv,randomId} from './core.mjs?v=perf1';
 import {fullDemo,demoCommand,refreshDebts,monthlySummary} from './ledger.mjs?v=20261105-owner-transfer';
-import {AyaparkApi} from './api.mjs?v=20261122-reassign-charge';
+import {AyaparkApi} from './api.mjs?v=20261124-import-preflight';
 import {localizedCallingCountries,countryCallingCode,findCountryFromInternational} from './phone-country-codes.mjs?v=20261120-worldwide';
 import {icon,labels,pages,can,visible,renderPage,unitTable,filteredUnits,transactionTable,unitDetail,transactionDetail,button,date} from './ui.mjs?v=20261122-reassign-charge';
 import {buildForm,payloadFor} from './forms.mjs?v=20261122-reassign-charge';
@@ -95,7 +96,7 @@ const phoneRecoveryUi=bindRecoveryRequests({api,getState:()=>state,openRecovery:
 const accessRequestUi=bindAccessRequests({api,getState:()=>state,invite:id=>invitationUi.open(id)});
 async function loadPushStatuses(){if(state.mode!=='connected'||!can(state,'admin'))return;try{const r=await api.rpc('ay10_person_push_status',{p_site:state.data.site.id});state.pushStatus=Object.fromEntries((Array.isArray(r)?r:[]).map(x=>[x.person_id,x]));render();}catch(error){console.warn('Push statuses unavailable',error);}}
 async function loadPersonLogins(){if(state.mode!=='connected'||!can(state,'admin'))return;try{state.personLogins=await api.rpc('ay8_person_last_logins');render();}catch(error){console.warn('Login-Übersicht nicht verfügbar',error);}}
-let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null,importController=null;
+let epoch=0,loginBusy=false,writeBusy=false,formAction=null,toastTimer,fileGeneration=0,importPayload=null,mobileNavGroup=null,importController=null,importCheck=null;
 let lastFinancialLoad=0,financialRefreshBusy=false;
 function renderNavigation(){const compact=window.matchMedia('(max-width:1000px)').matches;if(!compact)mobileNavGroup=null;$('nav').innerHTML=navigation(state,labels,compact,mobileNavGroup);}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,8000);}
@@ -729,7 +730,7 @@ document.addEventListener('click',async event=>{
   if(action==='export_bank'){if(!can(state,'finance'))return;downloadCsv('ayapark2-banka-'+(state.mode==='demo'?'ornek':'kayitlar')+'.csv',[[tr("Tarih"),tr("Açıklama"),tr("Kategori"),tr("Tutar TL"),tr("Referans")],...filteredTransactions(state).map(t=>[t.date,t.desc,t.category,t.cents/100,t.bank_reference||t.reference||''])]);return;}
   if(action==='import'){
    if(isAccessPreview())throw Error(tr(nativePreviewRole(state.fullData)==='super'?'Önizlemede değişiklik yapılamaz. Süper Admin görünümüne dönün.':'Önizlemede değişiklik yapılamaz. Yönetim görünümüne dönün.'));
-   if(!can(state,'import'))return;importPayload=null;$('csvFile').value='';$('importPreview').textContent=tr("Henüz dosya seçilmedi.");setBankImportButton();$('importDialog').showModal();return;
+   if(!can(state,'import'))return;importPayload=null;importCheck=null;$('csvFile').value='';$('importPreview').textContent=tr("Henüz dosya seçilmedi.");setBankImportButton();$('importDialog').showModal();return;
   }
   const back=b.closest('#actionFields')&&formAction?{...formAction,values:[...new FormData($('actionForm'))]}:null;
   showForm(action,{id:b.dataset.id,unit:b.dataset.unit,entry:b.dataset.entry,charge:b.dataset.charge,person:b.dataset.person,kind:b.dataset.kind});if(back)formAction.back=back;
@@ -1065,8 +1066,31 @@ function setBankImportButton(count=0,busy=false){
  b.disabled=busy||!count;
  b.setAttribute('aria-busy',String(busy));
 }
+function importCandidateCount(){
+ if(!importPayload)return 0;
+ if(importCheck?.complete&&importCheck.ambiguous===0)return importCheck.newCount;
+ return importPayload.entries.length;
+}
+function importSourceMarkup(file,bounds){
+ return '<p><strong>'+e(bankImportText('Dosya','Datei','File'))+':</strong> <span class="bank-import-filename">'+e(file)+'</span></p><p><strong>'+e(bankImportText('İşlem tarihleri','Buchungszeitraum','Transaction dates'))+':</strong> '+e(bounds.from)+' – '+e(bounds.to)+(bounds.closingCents==null?'':' · '+e(bankImportText('Son bakiye','Letzter Saldo','Closing balance'))+': <strong>'+money(bounds.closingCents)+'</strong>')+'</p>';
+}
+async function preflightBankImport(payload,bounds){
+ if(state.mode!=='connected')return checkBankImport(payload.entries,[],{complete:false});
+ const site=encodeURIComponent(state.data.site.id),digest=encodeURIComponent(payload.digest);
+ const batches=await api.read('ay2_batches','select=source_name,row_count&site_id=eq.'+site+'&digest=eq.'+digest+'&limit=1');
+ if(batches.length)return checkBankImport(payload.entries,[],{batch:batches[0]});
+ if(!can(state,'finance'))return checkBankImport(payload.entries,[],{complete:false});
+ const existing=await api.readAll('ay2_entries','select=id,booked_on,description,cents,bank_reference,dedup_key,batch_id&site_id=eq.'+site+'&booked_on=gte.'+bounds.from+'&booked_on=lte.'+bounds.to+'&order=id.asc');
+ return checkBankImport(payload.entries,existing);
+}
+function bankImportCheckMarkup(check){
+ if(!check.complete)return '<p class="fine">'+e(bankImportText('Ön kontrol yapılamadı. Kaydederken sunucu tekrarları kontrol edecek.','Vorabgleich nicht verfügbar. Der Server prüft Duplikate beim Speichern.','Precheck unavailable. The server checks duplicates when saving.'))+'</p>';
+ const counts=bankImportText('Yeni: '+check.newCount+' · Tekrar: '+check.duplicates+' · Belirsiz: '+check.ambiguous,'Neu: '+check.newCount+' · Duplikate: '+check.duplicates+' · Unklar: '+check.ambiguous,'New: '+check.newCount+' · Duplicates: '+check.duplicates+' · Uncertain: '+check.ambiguous);
+ const detail=check.alreadyImported?bankImportText('Bu dosya daha önce aktarıldı. Yeni bir ekstre seçin.','Diese Datei wurde bereits importiert. Bitte einen neuen Kontoauszug auswählen.','This file was already imported. Choose a new statement.'):check.newCount===0&&check.ambiguous===0?bankImportText('Yeni hareket yok.','Keine neuen Buchungen.','No new transactions.'):check.ambiguous?bankImportText('Belirsiz hareketler sunucu kontrolü gerektiriyor.','Unklare Bewegungen müssen serverseitig geprüft werden.','Uncertain transactions require a server check.'):bankImportText('Yalnızca eksik hareketler kaydedilecek.','Nur fehlende Buchungen werden gespeichert.','Only missing transactions will be saved.');
+ return '<p><strong>'+e(counts)+'</strong></p><p role="status">'+e(detail)+'</p>'+(check.previousSource?'<p class="fine">'+e(bankImportText('Önceki dosya: ','Vorherige Datei: ','Previous file: ')+check.previousSource)+'</p>':'');
+}
 function applyBankImportLabels(){
- if(!writeBusy)setBankImportButton(importPayload?.entries?.length||0);
+ if(!writeBusy)setBankImportButton(importCandidateCount());
  $('bankFileIntro').textContent=bankImportText('1. Dosyayı seçin. 2. Önizlemeyi kontrol edin. 3. Onayla ve kaydet düğmesine basın.','1. Datei auswählen. 2. Vorschau prüfen. 3. Bestätigen und speichern.','1. Select a file. 2. Check the preview. 3. Confirm and save.');
  $('bankFormatHint').textContent=(getLanguage()==='tr'?('Desteklenen PDF veya XLSX dosyasını doğrudan seçebilirsiniz. Diğer biçimler için CSV şablonunu kullanın. Ödeme eşleştirmelerini ayrıca kontrol edin.'):(uiText("Unterstützte PDF- oder XLSX-Dateien direkt auswählen. Für andere Formate die CSV-Vorlage verwenden. Zahlungszuordnungen anschließend getrennt prüfen.",getLanguage())));
  $('bankFileLabel').textContent=(getLanguage()==='tr'?('CSV, PDF veya XLSX dosyası seçin'):(uiText("CSV-, PDF- oder XLSX-Datei auswählen",getLanguage())));
@@ -1075,7 +1099,7 @@ function applyBankImportLabels(){
 }
 document.addEventListener('ay2:languagechange',applyBankImportLabels);
 async function previewImportFile(options={}){
- const generation=++fileGeneration,file=$('csvFile').files[0];importController?.abort();importController=new AbortController();importPayload=null;setBankImportButton();if(!file){$('importPreview').textContent=tr("Henüz dosya seçilmedi.");return;}
+ const generation=++fileGeneration,file=$('csvFile').files[0];importController?.abort();importController=new AbortController();importPayload=null;importCheck=null;setBankImportButton();if(!file){$('importPreview').textContent=tr("Henüz dosya seçilmedi.");return;}
  try{
   $('importPreview').textContent=(getLanguage()==='tr'?('Dosya yerel olarak okunuyor …'):(uiText("Datei wird lokal gelesen …",getLanguage())));
   const loaded=await readBankFile(file,{...options,signal:importController.signal,onProgress:(page,total)=>{if(generation===fileGeneration)$('importPreview').textContent=((getLanguage()==='tr'?('PDF sayfası '):(uiText("PDF-Seite ",getLanguage()))))+page+' / '+total;}});if(generation!==fileGeneration)return;
@@ -1085,36 +1109,41 @@ async function previewImportFile(options={}){
   const identities=new Set(parsed.entries.map(t=>JSON.stringify([t.date,t.cents,t.reference||'',t.reference?null:t.desc,t.reference?null:t.balance_cents??null])));
   const possibleDuplicates=parsed.entries.length-identities.size;
   if(!sourceReview.mayImport)throw Error((getLanguage()==='tr'?('Ara bakiyeler hareketlerle uyuşmuyor. Kaynak dosyadaki tutarları, ücretleri ve sıralamayı kontrol edin. Hiçbir kayıt aktarılmadı.'):(uiText("Die laufenden Salden passen nicht zu den Bewegungen. Bitte prüfe Beträge, Gebühren und Reihenfolge der Quelldatei. Es wurde nichts importiert.",getLanguage()))));const digest=loaded.digest||await sha256(raw);if(generation!==fileGeneration)return;
-  importPayload={source:file.name,digest,entries:parsed.entries.map(t=>({date:t.date,desc:t.desc,cents:t.cents,category:'Diğer',reference:t.reference||'',balance_cents:t.balance_cents,counterparty:t.counterparty||'',iban:t.iban||'',unit_hint:t.unit_hint||''}))};
+  const candidate={source:file.name,digest,entries:parsed.entries.map(t=>({date:t.date,desc:t.desc,cents:t.cents,category:'Diğer',reference:t.reference||'',balance_cents:t.balance_cents,counterparty:t.counterparty||'',iban:t.iban||'',unit_hint:t.unit_hint||''}))};
+  const bounds=sourceBounds(candidate.entries,sourceReview.direction);
+  $('importPreview').innerHTML=importSourceMarkup(file.name,bounds)+'<p>'+e(bankImportText('Mevcut kayıtlar kontrol ediliyor…','Vorhandene Buchungen werden geprüft…','Checking existing transactions…'))+'</p>';
+  let checked;try{checked=await preflightBankImport(candidate,bounds);}catch{checked=checkBankImport(candidate.entries,[],{complete:false});}
+  if(generation!==fileGeneration||!$('importDialog').open)return;
+  importPayload=candidate;importCheck=checked;
   $('importPreview').innerHTML=`${loaded.metadata?.format==='pdf'?`<p>PDF · ${loaded.metadata.pages} ${(getLanguage()==='tr'?('sayfa okundu'):(uiText("Seiten gelesen",getLanguage())))}${loaded.metadata.identifiersRemoved?' · '+((getLanguage()==='tr'?('işaretli kimlik/vergi numaraları çıkarıldı'):(uiText("markierte Identitäts-/Steuernummern entfernt",getLanguage())))):''}</p>`:loaded.metadata?.sheet?`<p>${(getLanguage()==='tr'?('Çalışma sayfası'):(uiText("Tabellenblatt",getLanguage())))}: ${e(loaded.metadata.sheet)}</p>`:''}<strong>${parsed.entries.length}${tr(" satır · ")}${possibleDuplicates}${tr(" dosya içi olası tekrar")}</strong><p role="status">${(getLanguage()==='tr'?(sourceReview.status==='consistent'?'Ara bakiyeler hareketlerle uyumlu.':sourceReview.status==='partial'?'Mevcut ara bakiyeler uyumlu; bazı bakiye bilgileri eksik.':'Bakiye kontrolü yapılamıyor: en az iki ara bakiye gerekli.'):(sourceReview.status==='consistent'?uiText("Laufende Salden stimmen überein.",getLanguage()):sourceReview.status==='partial'?uiText("Vorhandene Salden stimmen überein; Saldoangaben fehlen teilweise.",getLanguage()):uiText("Kein Saldoabgleich möglich: mindestens zwei laufende Salden werden benötigt.",getLanguage())))}</p><p>${(getLanguage()==='tr'?('Gelir'):(uiText("Einnahmen",getLanguage())))}: ${money(sourceReview.incomeCents)} · ${(getLanguage()==='tr'?('Gider'):(uiText("Ausgaben",getLanguage())))}: ${money(sourceReview.expenseCents)} · ${(getLanguage()==='tr'?('Net'):(uiText("Netto",getLanguage())))}: ${money(sourceReview.netCents)}</p><p class="fine">${(getLanguage()==='tr'?('Açılış bakiyesi ve kaynağın eksiksizliği ayrıca kontrol edilmelidir.'):(uiText("Der Anfangssaldo und die Vollständigkeit der Quelle müssen separat geprüft werden.",getLanguage())))}</p><p class="fine">${({tr:'Henüz kayıt oluşturulmadı. Banka referansı yoksa, ara bakiye aynı görünen farklı hareketleri ayırır.',de:'Die Vorschau speichert keine Buchungen. Fehlt die Bankreferenz, unterscheidet der laufende Saldo gleichlautende Buchungen.',en:'The preview saves no transactions. When a bank reference is missing, the running balance distinguishes otherwise identical transactions.'})[getLanguage()]}</p><div class="table-wrap"><table><caption>${tr("İlk 5 satır")}</caption><thead><tr><th>${tr("Tarih")}</th><th>${tr("Açıklama")}</th><th>${tr("Tutar")}</th></tr></thead><tbody>${parsed.entries.slice(0,5).map(t=>`<tr><td>${e(t.date)}</td><td>${e(t.desc)}</td><td>${money(t.cents)}</td></tr>`).join('')}</tbody></table></div>`;
-  $('importPreview').insertAdjacentHTML('afterbegin','<p><strong>'+e(bankImportText('Dosya okundu – henüz kaydedilmedi.','Datei gelesen – noch nicht gespeichert.','File read – not yet saved.'))+'</strong></p>');
-  setBankImportButton(importPayload.entries.length);
+  $('importPreview').insertAdjacentHTML('afterbegin',importSourceMarkup(file.name,bounds)+bankImportCheckMarkup(checked));
+  setBankImportButton(importCandidateCount());
  }catch(error){if(generation===fileGeneration&&error.name!=='AbortError'){importPayload=null;setBankImportButton();$('importPreview').textContent=bankImportText('Dosya aktarılamadı: ','Datei konnte nicht importiert werden: ','File could not be imported: ')+(error.code?bankFileMessage(error,getLanguage()):(error.message||bankFileMessage({},getLanguage())));}}
 }
 $('csvFile').addEventListener('change',()=>void previewImportFile());
 $('commitImport').addEventListener('click',async()=>{
- if(!importPayload||writeBusy)return;
- const attempt=epoch,payload=importPayload;writeBusy=true;setBankImportButton(payload.entries.length,true);
+ if(!importPayload||!importCandidateCount()||writeBusy)return;
+ const attempt=epoch,payload=importPayload;writeBusy=true;setBankImportButton(importCandidateCount(),true);
  $('csvFile').disabled=true;
  const close=$('importDialog').querySelector('form[method="dialog"] button:not(#commitImport)');if(close)close.disabled=true;
  $('importPreview').insertAdjacentHTML('afterbegin','<p id="bankImportSaving" role="status">'+e(bankImportText('Hareketler kaydediliyor…','Buchungen werden gespeichert…','Saving transactions…'))+'</p>');
  try{
   const r=await mutate('import',payload);if(attempt!==epoch)return;
   if(!r||!Number.isInteger(r.inserted)||!Number.isInteger(r.duplicates)||r.inserted<0||r.duplicates<0||r.inserted+r.duplicates!==payload.entries.length)throw Error(bankImportText('Sunucu kaydı doğrulanamadı. Tekrar denemeden önce banka hareketlerini kontrol edin.','Der Server hat die Speicherung nicht eindeutig bestätigt. Bitte prüfe die Kontobewegungen vor einem erneuten Versuch.','The server did not confirm the import. Check bank transactions before retrying.'));
-  importPayload=null;setBankImportButton();
+  importPayload=null;importCheck=null;setBankImportButton();
   const summary=bankImportText(r.inserted+' yeni hareket kaydedildi, '+r.duplicates+' tekrar atlandı.',r.inserted+' neue Buchungen gespeichert, '+r.duplicates+' Duplikate übersprungen.',r.inserted+' new transactions saved, '+r.duplicates+' duplicates skipped.');
   const result=r.inserted===0?bankImportText('Yeni kayıt yok. Tüm hareketler daha önce aktarılmış.','Keine neuen Buchungen. Alle Bewegungen wurden bereits importiert.','No new records. All transactions were already imported.'):summary;
-  $('importPreview').textContent=result+(state.stale?bankImportText(' Görünüm yenilenemedi.',' Die Anzeige konnte nicht aktualisiert werden.',' The view could not be refreshed.'):'');
+  $('importPreview').textContent=payload.source+' — '+result+(state.stale?bankImportText(' Görünüm yenilenemedi.',' Die Anzeige konnte nicht aktualisiert werden.',' The view could not be refreshed.'):'');
   $('importPreview').append(document.createElement('p'));$('importPreview').insertAdjacentHTML('beforeend',button(tr('Ödemeleri kontrol et'),'review_import'));toast(result);
  }catch(error){if(attempt===epoch){
   const ambiguous='Eski banka kaydı eşleştirilemedi. Referans veya önceki bakiye bilgisi gerekiyor.';
   $('importPreview').textContent=bankImportText('Aktarım doğrulanamadı: ','Import nicht bestätigt: ','Import not confirmed: ')+(error.message===ambiguous?bankImportText(ambiguous,'Ein älterer Umsatz lässt sich nicht eindeutig zuordnen. Bitte prüfe die Bankreferenz oder den laufenden Saldo im früheren Auszug.','An older transaction could not be matched reliably. Check the bank reference or running balance in the earlier statement.'):error.message||'');
-  setBankImportButton(payload.entries.length);
+  setBankImportButton(importCandidateCount());
  }}
  finally{writeBusy=false;$('csvFile').disabled=false;if(close)close.disabled=false;}
 });
 $('importDialog').addEventListener('cancel',event=>{if(writeBusy)event.preventDefault();});
-$('importDialog').addEventListener('close',()=>{importController?.abort();fileGeneration++;importPayload=null;$('csvFile').value='';setBankImportButton();$('importPreview').textContent=tr("Henüz dosya seçilmedi.");});
+$('importDialog').addEventListener('close',()=>{importController?.abort();fileGeneration++;importPayload=null;importCheck=null;$('csvFile').value='';setBankImportButton();$('importPreview').textContent=tr("Henüz dosya seçilmedi.");});
 document.addEventListener('ay2:languagechange',updateLoginLanguage);
 applyStaticLanguage();
 document.documentElement.lang=getLanguage();
