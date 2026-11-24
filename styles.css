@@ -1633,3 +1633,6 @@ dialog #detailTitle:focus{outline:none}
 .ay-recovery-hint .text-button{font-size:12px;min-height:34px;padding:4px 6px}
 .ay-recovery-notice{min-height:56px}
 @media(max-width:560px){.ay-recovery-management{margin:14px 12px 20px}.ay-recovery-management-body{padding:0 12px 12px}.ay-recovery-hint{margin:0 8px 10px}}
+
+/* Long bank statement names must remain readable on small screens. */
+#importPreview p,.bank-import-filename{overflow-wrap:anywhere;min-width:0;max-width:100%}
